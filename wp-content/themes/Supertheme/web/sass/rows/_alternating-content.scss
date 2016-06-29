@@ -1,0 +1,17 @@
+.alternating-content {
+  @extend .clearfix;
+  background-color: $dark-gray;
+  color: #FFF;
+  padding-top: $global-margin * 2;
+  .row {
+    margin-bottom: $global-margin * 2;
+    transform-style: preserve-3d;
+  }
+  @include breakpoint(large) {
+    .content {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
