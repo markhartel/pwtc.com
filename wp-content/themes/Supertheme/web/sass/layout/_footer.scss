@@ -1,0 +1,47 @@
+.footer {
+  padding-top: $global-margin * 2;
+  padding-bottom: $global-margin;
+  color: $white;
+  background-color: $accent-color;
+  a {
+    color: $white;
+    &:hover {
+      color: #f8cb34;
+    }
+  }
+  textarea {
+    height: 200px;
+  }
+  .menu {
+    li:first-of-type a {
+      padding-left: 0;
+    }
+    li:last-of-type a {
+      padding-right: 0;
+    }
+  }
+  .vertical a {
+    @include breakpoint(small only) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  .fa-facebook, .fa-twitter {
+    font-size: 2rem;
+  }
+}
+
+.copyright {
+  line-height: 0.8;
+  padding-top: $global-margin;
+  color: $white;
+  background-color: $dark-gray;
+  small {
+    display: block;
+  }
+  @include breakpoint(large) {
+    small {
+      display: inline;
+    }
+  }
+}

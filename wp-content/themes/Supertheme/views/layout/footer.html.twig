@@ -1,0 +1,41 @@
+<footer class="footer">
+    <div class="row">
+        <div class="medium-6 lrge-8 columns">
+            {{ footerMenu }}
+            <hr />
+            <ul class="no-bullet">
+                <li>
+                    <i class="fa fa-building"></i>
+                    {{ SP.ACF.get_field('address', 'option') }}
+                </li>
+                <li>
+                    <i class="fa fa-envelope"></i>
+                    <a href="mailto:{{ SP.ACF.get_field('email', 'option') }}">
+                        {{ SP.ACF.get_field('email', 'option') }}
+                    </a>
+                </li>
+                <li>
+                    <i class="fa fa-phone"></i>
+                    <a href="tel:{{ SP.ACF.get_field('phone', 'option') }}">
+                        {{ SP.ACF.get_field('phone', 'option') }}
+                    </a>
+                </li>
+                <li>
+                    <ul class="menu">
+                        <li><a href="{{ SP.ACF.get_field('facebook', 'option') }}" target="_blank"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="{{ SP.ACF.get_field('twitter', 'option') }}" target="_blank"><i class="fa fa-twitter"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="medium-6 large-4 columns">
+            <form action="#" method="post">
+                <input type="email" placeholder="Email">
+                <textarea placeholder="Message"></textarea>
+                <div class="text-right">
+                    <input type="submit" class="large button" value="Contact Us" />
+                </div>
+            </form>
+        </div>
+    </div>
+</footer>
