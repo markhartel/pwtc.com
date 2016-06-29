@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
-
+{% block content %}
+    {% if rows is defined and rows|length %}
+        {% for row in rows %}{{ row }}{% endfor %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
 {% block footer %}
     {% include 'layout/footer.html.twig' %}
     {% include 'layout/copyright.html.twig' %}

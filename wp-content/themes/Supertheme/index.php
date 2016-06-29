@@ -1,9 +1,14 @@
 <?php
 use Supertheme\WordPress\AccordionMenuWalker;
 use Supertheme\WordPress\DropDownMenuWalker;
-
 require_once __DIR__.'/App/bootstrap.php';
 
+// get services
+/** @var \Symfony\Component\DependencyInjection\Container $container */
+/** @var Twig_Environment $twig */
+$twig = $container->get("twig.environment");
+
+// preg global twig data
 $data = [];
 $data['isLoggedIn'] = is_user_logged_in();
 $data['avatar'] = get_avatar(get_current_user_id(), 32);
@@ -31,5 +36,13 @@ $data['footerMenu'] = wp_nav_menu([
     'theme_location' => 'footer_menu',
 ]);
 
-$twig = $container->get("twig.environment");
+// get content rows
+$rows = [];
+while(have_rows('content_rows')) {
+    the_row();
+    $rows[] = $twig->render('rows/'.get_row_layout().'.html.twig');
+}
+$data['rows'] = $rows;
+
+// render
 echo $twig->render('basic.html.twig', $data);

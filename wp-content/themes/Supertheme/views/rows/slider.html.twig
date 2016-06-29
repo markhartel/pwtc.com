@@ -1,0 +1,22 @@
+<section class="slick text-center">
+    {% for slide in SP.ACF.get_sub_field('slide') %}
+        <div>
+            <div class="cta">
+                <h1>{{ slide.tagline }}</h1>
+                {% if slide.buttons %}
+                    <div class="button-group">
+                        {% for button in slide.buttons %}
+                            {% if button.external_url %}
+                                <a href="{{ button.url }}" target="_blank" class="{{ button.style }} button">{{ button.text }}</a>
+                            {% else %}
+                                <a href="{{ button.page_url }}" target="_blank" class="{{ button.style }} button">{{ button.text }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <img src="{{ slide.mobile_background_image.url }}" class="hide-for-medium" alt="">
+            <img src="{{ slide.desktop_background_image.url }}" class="hide-for-small-only" alt="">
+        </div>
+    {% endfor %}
+</section>

@@ -32,8 +32,6 @@ var options = {
     styles: {
         src: [
             'web/libs/fancybox/source/jquery.fancybox.css',
-            'web/libs/slick-carousel/slick/slick.css',
-            'web/libs/slick-carousel/slick/slick-theme.css',
             'web/sass/**/*.scss'
         ],
         dist: 'web/stylesheets',

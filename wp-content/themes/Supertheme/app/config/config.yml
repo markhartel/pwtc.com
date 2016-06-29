@@ -27,7 +27,9 @@ parameters:
     - { id: "left_sidebar", name: "Left Sidebar", description: "Left Sidebar" }
     - { id: "right_sidebar", name: "Right Sidebar", description: "Right Sidebar" }
   wordpress.styles:
-    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ~ }
+    - { id: "slick", source: "%template_uri%/web/libs/slick-carousel/slick/slick.css", deps: ~ }
+    - { id: "slick_theme", source: "%template_uri%/web/libs/slick-carousel/slick/slick-theme.css", deps: ["slick"] }
+    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ["slick_theme"] }
   wordpress.scripts:
     - { id: "app", source: "%template_uri%/web/scripts-min/app.min.js", deps: ["jquery"], header: false }
 
