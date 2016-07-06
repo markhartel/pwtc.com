@@ -1,7 +1,7 @@
 <?php
 use Supertheme\WordPress\AccordionMenuWalker;
 use Supertheme\WordPress\DropDownMenuWalker;
-require_once __DIR__.'/App/bootstrap.php';
+require_once __DIR__.'/app/bootstrap.php';
 
 // get services
 /** @var \Symfony\Component\DependencyInjection\Container $container */
