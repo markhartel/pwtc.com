@@ -20,6 +20,7 @@ parameters:
   wordpress.translations: "%template_dir%/languages"
   wordpress.image_sizes:
     fullscreen: [1920, 1080, true]
+    teaser: [600, 600, true]
   wordpress.menus:
     primary_menu: "Primary Menu"
     footer_menu: "Footer Menu"

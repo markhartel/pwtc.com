@@ -30,7 +30,7 @@ $data['footerMenu'] = wp_nav_menu([
     'theme_location' => 'footer_menu',
 ]);
 $data['layout'] = get_field('layout') ?: "one";
-
+$data['blog_url'] = get_option('show_on_front') == 'page' ? get_permalink(get_option('page_for_posts')) : get_bloginfo('url');
 ob_start();
 dynamic_sidebar( 'right_sidebar' );
 $data['right_sidebar'] = ob_get_clean();

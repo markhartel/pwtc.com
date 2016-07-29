@@ -1,74 +1,15 @@
 <section class="news">
     <div class="row column">
-        <h2>News</h2>
+        <h2>{% if title is defined %}{{ title }}{% else %}News{% endif %}</h2>
     </div>
     <div class="row small-up-1 medium-up-2 large-up-4">
-        <div class="column">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">STP Bus from Portland to Seattle</a></h5>
-            <p>
-                Do you need to get your bike and yourself to Seattle to ride the 2016 STP? PWTC has a way!
-                On Friday, July 15th, you can ride a luxury tour bus while your bike, wrapped in a furniture blanket,
-                rides in a truck to Seattle.
-            </p>
-        </div>
-        <div class="column">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">Columbia Gorge Explorer '16 </a></h5>
-            <p>
-                This moderately-paced, 4-day, self-supported tour of the Columbia River Gorge,
-            </p>
-        </div>
-        <div class="column">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">March 2016 Top Talk</a></h5>
-            <p>
-                Safety has become a top concern of mine lately.
-                Over the past month or so, club members have endured serious crashes while riding.
-            </p>
-        </div>
-        <div class="column">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">February Top Talk</a></h5>
-            <p>
-                The first official duty of the club president is to lead the New Year’s Ride.
-                I woke that morning to a thermometer reading 25 degrees and with the wind howling outside the window.
-            </p>
-        </div>
-        <div class="column hide-for-small-only">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">January Top Talk</a></h5>
-            <p>
-                As I sit here and write this in mid-December, we have been washed out of our club rides with a deluge of rain.
-            </p>
-        </div>
-        <div class="column hide-for-small-only">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">December Top Talk</a></h5>
-            <p>
-                Greetings fellow Cyclist!
-            </p>
-        </div>
-        <div class="column hide-for-small-only">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">2015 Santa Barbara Century..."Verde no más"</a></h5>
-            <p>
-                An Alaska Airlines 737-900 touches down at LAX at the advertised 7:30 pm arrival time.
-            </p>
-        </div>
-        <div class="column hide-for-small-only">
-            <a href="#"><img src="http://placehold.it/600x600"/></a>
-            <h5><a href="#">November 2015 Top Talk</a></h5>
-            <p>
-                Happy November and greetings fellow cyclist!
-                It’s fair to say 2015 has been nothing short of excellent!
-                As we start to wrap up 2015,
-                let’s think about the great fun we’ve all had this cycling season
-                and be thankful for our friends and family.
-            </p>
-        </div>
+        {% for teaser in teasers %}
+            <div class="column{% if loop.index > 4 %} hide-for-small-only{% endif %}">
+                {{ teaser }}
+            </div>
+        {% endfor %}
     </div>
     <div class="row column text-center">
-        <a href="" class="large primary button">Read More</a>
+        <a href="{{ blog_url }}" class="large primary button">Read More</a>
     </div>
 </section>

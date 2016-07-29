@@ -142,4 +142,10 @@ class WordPress
     {
         return gravity_form($id_or_title, $display_title, $display_description, $display_inactive, $field_values, $ajax, $tabindex, false);
     }
+
+
+    public function get_pagenum_link($page = 1, $escape = true)
+    {
+        return get_pagenum_link($page, $escape);
+    }
 }
