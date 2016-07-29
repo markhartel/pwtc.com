@@ -11,3 +11,7 @@ if( function_exists('acf_add_options_page') ) {
         'redirect' 	=> false
     ));
 }
+
+add_action( 'widgets_init', function(){
+    register_widget( 'App\Sharethis' );
+});
