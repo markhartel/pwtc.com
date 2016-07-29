@@ -7,6 +7,21 @@
   padding: 0 $global-padding $global-padding 0;
 }
 
+.vertical-centered {
+  &-wrapper {
+    position: relative;
+  }
+  &-content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.margin-bottom-free {
+  margin-bottom: 0 !important;
+}
+
 @each $name, $value in $foundation-palette {
   #{$name}-color: $value;
   .text-#{$name} {

@@ -9,7 +9,8 @@ var gulp         = require('gulp'),
     rename       = require('gulp-rename'),
     notify       = require('gulp-notify'),
     watch        = require('gulp-watch'),
-    livereload   = require('gulp-livereload');
+    livereload   = require('gulp-livereload'),
+    del          = require('del');
 
 var options = {
     images: {
@@ -32,7 +33,9 @@ var options = {
     styles: {
         src: [
             'web/libs/fancybox/source/jquery.fancybox.css',
-            'web/sass/**/*.scss'
+            'web/libs/slick-carousel/slick/slick.css',
+            'web/libs/slick-carousel/slick/slick-theme.css',
+            'web/scss/**/*.scss'
         ],
         dist: 'web/stylesheets',
         style: 'nested',
@@ -53,9 +56,13 @@ var plumberErrorHandler = { errorHandler: notify.onError({
 gulp.task('default', [
     'images',
     'scripts',
-    'sass',
+    'styles',
     'watch'
 ]);
+
+gulp.task('cache:clear', function() {
+    del(['./var/**/*']);
+});
 
 gulp.task('images', function(){
     gulp.src(options.images.src).pipe(plumber(plumberErrorHandler))
@@ -80,7 +87,7 @@ gulp.task('scripts', function(){
         .pipe(livereload());
 });
 
-gulp.task('sass', function(){
+gulp.task('styles', function(){
     gulp.src(options.styles.src).pipe(plumber(plumberErrorHandler))
         .pipe(sass({
             style:          options.scripts.style,
@@ -98,5 +105,5 @@ gulp.task('watch', function(){
     livereload.listen();
     gulp.watch(options.images.src, ['images']);
     gulp.watch(options.scripts.src, ['scripts']);
-    gulp.watch(options.styles.src, ['sass']);
+    gulp.watch(options.styles.src, ['styles']);
 });
