@@ -24,14 +24,29 @@ parameters:
     primary_menu: "Primary Menu"
     footer_menu: "Footer Menu"
   wordpress.sidebars:
-    - { id: "left_sidebar", name: "Left Sidebar", description: "Left Sidebar" }
-    - { id: "right_sidebar", name: "Right Sidebar", description: "Right Sidebar" }
+    -
+      id: "left_sidebar"
+      name: "Left Sidebar"
+      description: "Left Sidebar"
+      before_widget: '<section id="%1$s" class="widget %2$s">'
+      after_widget: '</section>'
+      before_title: '<h4 class="widgettitle">'
+      after_title: '</h4>'
+    -
+      id: "right_sidebar"
+      name: "Right Sidebar"
+      description: "Right Sidebar"
+      before_widget: '<section id="%1$s" class="widget %2$s">'
+      after_widget: '</section>'
+      before_title: '<h4 class="widgettitle">'
+      after_title: '</h4>'
   wordpress.styles:
     - { id: "slick", source: "%template_uri%/web/libs/slick-carousel/slick/slick.css", deps: ~ }
     - { id: "slick_theme", source: "%template_uri%/web/libs/slick-carousel/slick/slick-theme.css", deps: ["slick"] }
     - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ["slick_theme"] }
   wordpress.scripts:
-    - { id: "app", source: "%template_uri%/web/scripts-min/app.min.js", deps: ["jquery"], header: false }
+    - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false }
+    - { id: "app", source: "%template_uri%/web/scripts-min/app.min.js", deps: ["jquery", "sharethis"], header: false }
 
 services:
   # just the basics
