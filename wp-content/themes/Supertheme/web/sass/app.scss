@@ -11,6 +11,11 @@
 @import "rows/alternating-content";
 @import "rows/slick-slider";
 @import "rows/tagline";
+@import "rows/news";
+
+section.content {
+  padding: 4rem 0;
+}
 .no-js .top-bar {
   display: none;
 }
