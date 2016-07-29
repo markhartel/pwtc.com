@@ -35,12 +35,13 @@
   section {
     margin-bottom: $global-margin * 2;
   }
-  .side-nav {
+  .widget_nav_menu {
     ul {
       border-top: 1px solid $dark-gray;
     }
     li {
       border-bottom: 1px solid $dark-gray;
+      display: block;
     }
     a {
       padding: $global-padding 0;

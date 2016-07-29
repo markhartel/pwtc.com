@@ -35,4 +35,8 @@ ob_start();
 dynamic_sidebar( 'right_sidebar' );
 $data['right_sidebar'] = ob_get_clean();
 
+ob_start();
+dynamic_sidebar( 'left_sidebar' );
+$data['left_sidebar'] = ob_get_clean();
+
 return $data;
