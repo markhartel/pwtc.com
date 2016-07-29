@@ -53,6 +53,9 @@
   .is-dropdown-submenu-parent > a::after {
     border-color: $white transparent transparent !important;
   }
+  .avatar {
+    border-radius:100%;
+  }
 }
 .sticky {
   background-color: $dark-gray;
