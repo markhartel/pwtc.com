@@ -34,9 +34,9 @@ $data['blog_url'] = get_option('show_on_front') == 'page' ? get_permalink(get_op
 ob_start();
 dynamic_sidebar( 'right_sidebar' );
 $data['right_sidebar'] = ob_get_clean();
-
 ob_start();
 dynamic_sidebar( 'left_sidebar' );
 $data['left_sidebar'] = ob_get_clean();
+$data['footer_form'] = gravity_form(1, false, false, false, null, true, 1, false);
 
 return $data;

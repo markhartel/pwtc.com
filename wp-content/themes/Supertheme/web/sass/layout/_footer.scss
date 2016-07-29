@@ -9,8 +9,30 @@
       color: #f8cb34;
     }
   }
-  textarea {
-    height: 200px;
+  .gform_wrapper .gform_footer {
+    text-align: right;
+  }
+  .gform_wrapper .top_label .gfield_label {
+    display: none;
+  }
+  .gform_wrapper div.validation_error,
+  .gform_wrapper .validation_message {
+    border: none;
+    padding: 0;
+    color: $white;
+  }
+  .gform_wrapper li.gfield.gfield_error {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  .gform_wrapper li.gfield_error input, .gform_wrapper li.gfield_error textarea {
+    margin: 0;
+  }
+  .gform_wrapper li.gfield.gfield_error.gfield_contains_required div.gfield_description {
+    padding: 0;
+    margin-bottom: 1rem;
   }
   .menu {
     li:first-of-type a {
