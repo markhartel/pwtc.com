@@ -35,7 +35,7 @@ var options = {
             'web/libs/fancybox/source/jquery.fancybox.css',
             'web/libs/slick-carousel/slick/slick.css',
             'web/libs/slick-carousel/slick/slick-theme.css',
-            'web/scss/**/*.scss'
+            'web/sass/**/*.scss'
         ],
         dist: 'web/stylesheets',
         style: 'nested',
@@ -93,7 +93,7 @@ gulp.task('styles', function(){
             style:          options.scripts.style,
             includePaths:   options.styles.includePaths,
             comments:       options.styles.comments,
-            source_map:     options.styles.source_map,
+            sourceComments: options.styles.sourceComments,
             time:           options.styles.time
         }))
         .pipe(autoprefix('last 4 version'))
