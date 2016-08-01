@@ -9,6 +9,7 @@ $data['avatar'] = get_avatar(get_current_user_id(), 32);
 $data['editProfileLink'] = get_edit_user_link(get_current_user_id());
 $data['loginLink'] = wp_login_url();
 $data['logoutLink'] = wp_logout_url();
+$data['url'] = get_site_url();
 $data['desktopMenu'] = wp_nav_menu([
     'echo' => false,
     'container' => false,
