@@ -26,7 +26,7 @@
             <div class="bottom clearfix">
 
                 <ul class="vertical menu">
-                    <li><a href="#" class="title float-left">PWTC</a></li>
+                    <li><a href="{{ url }}" class="title float-left">PWTC</a></li>
                 </ul>
                 {{ desktopMenu }}
             </div>
@@ -34,7 +34,7 @@
         <!-- mobile menu title bar -->
         <div class="title-bar hide-for-medium" data-hide-for="medium">
             <div class="title-bar-left">
-                <div class="title-bar-title"><a href="#">PWTC</a></div>
+                <div class="title-bar-title"><a href="{{ url }}">PWTC</a></div>
             </div>
             <div class="title-bar-right">
                 {% if isLoggedIn is defined and isLoggedIn %}
