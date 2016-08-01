@@ -15,3 +15,38 @@ if( function_exists('acf_add_options_page') ) {
 add_action( 'widgets_init', function(){
     register_widget( 'App\Sharethis' );
 });
+
+add_action('init', function() {
+    register_post_type('rides', [
+        'public' => true,
+        'labels'  => [
+            'name' => 'Rides',
+            'singular_name' => 'Ride',
+        ],
+        'description' => "Bike Ride",
+        'menu_position' => 26,
+        'supports' => [
+            'title',
+            'editor',
+            'thumbnail',
+        ],
+        'has_archive' => true,
+        'menu_icon' => 'dashicons-location-alt',
+    ]);
+    register_post_type('ride_schedules', [
+        'public' => true,
+        'labels'  => [
+            'name' => 'Ride Schedules',
+            'singular_name' => 'Ride Schedule',
+        ],
+        'description' => "Bike Ride Schedule",
+        'menu_position' => 27,
+        'supports' => [
+            'title',
+            'editor',
+            'thumbnail',
+        ],
+        'has_archive' => true,
+        'menu_icon' => 'dashicons-calendar-alt',
+    ]);
+});
