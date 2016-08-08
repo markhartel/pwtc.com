@@ -54,3 +54,27 @@ section.content {
     }
   }
 }
+.fancybox-prev span {
+  background-image: none;
+  &::before {
+    content: "\f060";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+}
+.fancybox-next span {
+  background-image: none;
+  &::before {
+    content: "\f061";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+}
