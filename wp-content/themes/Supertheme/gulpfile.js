@@ -25,6 +25,7 @@ var options = {
         src: [
             'web/libs/foundation-sites/dist/foundation.js',
             'web/libs/fancybox/source/jquery.fancybox.js',
+            'web/libs/fancybox/source/helpers/jquery.fancybox-media.js',
             'web/libs/slick-carousel/slick/slick.js',
             'web/scripts/app.js'
         ],
@@ -89,6 +90,7 @@ gulp.task('scripts', function(){
 
 gulp.task('styles', function(){
     gulp.src(options.styles.src).pipe(plumber(plumberErrorHandler))
+        .pipe(concat('app.scss'))
         .pipe(sass({
             style:          options.scripts.style,
             includePaths:   options.styles.includePaths,

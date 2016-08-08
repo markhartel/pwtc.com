@@ -13,6 +13,7 @@
 @import "rows/slick-slider";
 @import "rows/tagline";
 @import "rows/news";
+@import "rows/video-header";
 
 section.content {
   padding: 4rem 0;
@@ -33,5 +34,23 @@ section.content {
 
   .no-js .title-bar {
     display: none;
+  }
+}
+
+.fancybox-overlay {
+  background-color: rgba(0,0,0,0.9);
+}
+.fancybox-close {
+  background-image: none;
+  top: rem-calc(-48px);
+  right: rem-calc(-12px);
+  &::before {
+    content: "\f00d";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
   }
 }
