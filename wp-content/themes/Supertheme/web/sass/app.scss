@@ -4,6 +4,8 @@
 @include foundation-everything();
 @import "supertheme";
 
+@import "woocommerce";
+
 @import "layout/header";
 @import "layout/footer";
 @import "layout/two-col";
@@ -44,6 +46,7 @@ section.content {
   background-image: none;
   top: rem-calc(-48px);
   right: rem-calc(-12px);
+  display: none;
   &::before {
     content: "\f00d";
     font-family: "FontAwesome";
