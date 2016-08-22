@@ -17,7 +17,7 @@ final class CAS_App {
 	/**
 	 * Plugin version
 	 */
-	const PLUGIN_VERSION       = '3.2.4';
+	const PLUGIN_VERSION       = '3.3';
 
 	/**
 	 * Prefix for sidebar id
@@ -208,6 +208,14 @@ final class CAS_App {
 					);
 				}
 
+				if(cas_fs()->is_not_paying()) {
+					$visibility[] = array(
+						'id' => 'pro',
+						'text' => __('User Roles available in Pro','content-aware-sidebars'),
+						'disabled' => true
+					);
+				}
+
 				wp_enqueue_script('cas/admin/edit');
 				wp_localize_script( 'cas/admin/edit', 'CASAdmin', array(
 					'allVisibility'  => __("All Users","content-aware-sidebars"),
@@ -227,9 +235,9 @@ final class CAS_App {
 			wp_register_script('cas/admin/widgets', plugins_url('/js/widgets.min.js', __FILE__), array('jquery'), CAS_App::PLUGIN_VERSION, true);
 			wp_enqueue_script('cas/admin/widgets');
 			wp_localize_script( 'cas/admin/widgets', 'CASAdmin', array(
-				'edit'           => $sidebar->labels->edit_item,
-				'revisions'      => __("Revisions"),
 				'addNew'         => $sidebar->labels->add_new_item,
+				'collapse'       => __('Collapse','content-aware-sidebars'),
+				'expand'         => __('Expand','content-aware-sidebars'),
 				'filterSidebars' => __("Filter Sidebars","content-aware-sidebars"),
 				'filterWidgets'  => __("Filter Widgets", "content-aware-sidebars")
 			));
