@@ -7,7 +7,7 @@
                 <h1>{{ SP.WordPress.title() }}</h1>
                 {% if SP.ACF.get_field('format') == "meeting" %}
                     <a href="{{ SP.ACF.get_field('file').url }}" class="large primary button"><i class="fa fa-download"></i> Download Meeting Minutes</a>
-                {% elseif SP.ACF.get_field('format') == "new" %}
+                {% elseif SP.ACF.get_field('format') == "news" %}
                     <a href="{{ SP.ACF.get_field('file').url }}" class="large primary button"><i class="fa fa-download"></i> Download Newsletter</a>
                 {% endif %}
                 {{ SP.WordPress.content() }}

@@ -32,6 +32,7 @@ while(have_rows('content_rows')) {
             $teaser_data['excerpt'] = get_the_excerpt($post['ID']);
             $teaser_data['image'] = get_the_post_thumbnail($post['ID'], 'teaser');
             $teaser_data['link'] = get_the_permalink($post['ID']);
+            $teaser_data['format'] = get_field('format', $post['ID']);
             $teasers[] = $twig->render("teasers/post.html.twig", $teaser_data);
         }
         $data['teasers'] = $teasers;

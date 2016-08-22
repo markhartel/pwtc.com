@@ -49,4 +49,8 @@ add_action('init', function() {
         'has_archive' => true,
         'menu_icon' => 'dashicons-calendar-alt',
     ]);
+
+    add_filter('get_the_excerpt', function ($text) {
+        return rtrim($text, '[&hellip;]') . '&hellip;';
+    });
 });
