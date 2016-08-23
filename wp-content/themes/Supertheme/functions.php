@@ -22,7 +22,7 @@ add_action( 'widgets_init', function(){
 });
 
 add_action('init', function() {
-    register_post_type('Ride Maps', [
+    register_post_type('ride_maps', [
         'public' => true,
         'labels'  => [
             'name' => 'Ride Maps',
@@ -54,7 +54,7 @@ add_action('init', function() {
         'has_archive' => true,
         'menu_icon' => 'dashicons-schedule',
     ]);
-    register_post_type('Scheduled Rides', [
+    register_post_type('scheduled_rides', [
         'public' => true,
         'labels'  => [
             'name' => 'Scheduled Rides',

@@ -8,7 +8,6 @@ $twig = $container->get("twig.environment");
 
 // preg global twig data
 $data = require_once __DIR__ . '/app/bootstrap-theme.php';
-
 // get content rows
 $rows = [];
 while(have_rows('content_rows')) {

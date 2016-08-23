@@ -83,6 +83,49 @@ section.content {
 }
 
 
+// general
+a.scroll-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  background-color: $primary-color;
+  color: $white;
+  text-align: center;
+  font-size: 2rem;
+  padding: 0 1rem;
+  z-index: 2;
+  border: 1px solid $white;
+  display: none;
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+.has-tip {
+  font-weight: normal;
+}
+
+.tabs {
+  border: none;
+  background-color: #F6F6F6;
+}
+.tabs-title > a:focus, .tabs-title > a[aria-selected="true"] {
+  background-color: $dark-color;
+  color: $white;
+}
+.tabs-content {
+  border-color: #F6F6F6;
+}
+
+.main-section {
+  padding-top: $global-margin * 4;
+  padding-bottom: $global-margin;
+}
+
+.term {
+  font-weight: bold;
+}
+
 // maps
 .acf-map {
   width: 100%;
@@ -94,4 +137,32 @@ section.content {
 /* fixes potential theme css conflict */
 .acf-map img {
   max-width: inherit !important;
+}
+
+// rides
+.ride {
+  .description {
+    margin-bottom: 1rem;
+  }
+  .description p:last-child {
+    margin: 0;
+  }
+  .details, .location {
+    margin-bottom: $global-margin/2;
+    h4 {
+      margin-bottom: 0;
+    }
+  }
+  .download.button {
+    margin: 0.5rem 0 1rem;
+    @include breakpoint(medium) {
+      float: right;
+      position: relative;
+      top: -2rem;
+      margin: 0 0 -1rem 0;
+    }
+  }
+  .download.button+br {
+    clear: both;
+  }
 }
