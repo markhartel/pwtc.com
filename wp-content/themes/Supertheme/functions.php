@@ -22,27 +22,11 @@ add_action( 'widgets_init', function(){
 });
 
 add_action('init', function() {
-    register_post_type('rides', [
-        'public' => true,
-        'labels'  => [
-            'name' => 'Rides',
-            'singular_name' => 'Ride',
-        ],
-        'description' => "Bike Ride",
-        'menu_position' => 26,
-        'supports' => [
-            'title',
-            'editor',
-            'thumbnail',
-        ],
-        'has_archive' => true,
-        'menu_icon' => 'dashicons-location-alt',
-    ]);
     register_post_type('Ride Maps', [
         'public' => true,
         'labels'  => [
             'name' => 'Ride Maps',
-            'singular_name' => 'Ride Maps',
+            'singular_name' => 'Ride Map',
         ],
         'description' => "Bike Ride Maps",
         'menu_position' => 27,
@@ -53,6 +37,38 @@ add_action('init', function() {
         ],
         'has_archive' => true,
         'menu_icon' => 'dashicons-location-alt',
+    ]);
+    register_post_type('ride_template', [
+        'public' => true,
+        'labels'  => [
+            'name' => 'Ride Templates',
+            'singular_name' => 'Ride Template',
+        ],
+        'description' => "Ride Template",
+        'menu_position' => 26,
+        'supports' => [
+            'title',
+            'editor',
+            'thumbnail',
+        ],
+        'has_archive' => true,
+        'menu_icon' => 'dashicons-schedule',
+    ]);
+    register_post_type('Scheduled Rides', [
+        'public' => true,
+        'labels'  => [
+            'name' => 'Scheduled Rides',
+            'singular_name' => 'Scheduled Ride',
+        ],
+        'description' => "Scheduled Bike Rides",
+        'menu_position' => 27,
+        'supports' => [
+            'title',
+            'editor',
+            'thumbnail',
+        ],
+        'has_archive' => true,
+        'menu_icon' => 'dashicons-calendar-alt',
     ]);
 
     add_filter('get_the_excerpt', function ($text) {
