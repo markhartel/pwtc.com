@@ -10,6 +10,11 @@ if( function_exists('acf_add_options_page') ) {
         'capability' 	=> 'edit_posts',
         'redirect' 	=> false
     ));
+
+
+        add_action('acf/init', function () {
+            acf_update_setting('google_api_key', 'AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k');
+        });
 }
 
 add_action( 'widgets_init', function(){
@@ -33,13 +38,13 @@ add_action('init', function() {
         'has_archive' => true,
         'menu_icon' => 'dashicons-location-alt',
     ]);
-    register_post_type('ride_schedules', [
+    register_post_type('Ride Maps', [
         'public' => true,
         'labels'  => [
-            'name' => 'Ride Schedules',
-            'singular_name' => 'Ride Schedule',
+            'name' => 'Ride Maps',
+            'singular_name' => 'Ride Maps',
         ],
-        'description' => "Bike Ride Schedule",
+        'description' => "Bike Ride Maps",
         'menu_position' => 27,
         'supports' => [
             'title',
@@ -47,10 +52,11 @@ add_action('init', function() {
             'thumbnail',
         ],
         'has_archive' => true,
-        'menu_icon' => 'dashicons-calendar-alt',
+        'menu_icon' => 'dashicons-location-alt',
     ]);
 
     add_filter('get_the_excerpt', function ($text) {
         return rtrim($text, '[&hellip;]') . '&hellip;';
     });
 });
+
