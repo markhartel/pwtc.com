@@ -2913,7 +2913,6 @@ function acf_get_valid_post_id( $post_id = 0 ) {
 			
 		// user
 		} elseif( isset($post_id->roles, $post_id->ID) ) {
-		
 			$post_id = 'user_' . $post_id->ID;
 		
 		// term

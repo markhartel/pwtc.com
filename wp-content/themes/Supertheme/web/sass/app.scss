@@ -166,3 +166,20 @@ a.scroll-to-top {
     clear: both;
   }
 }
+
+// leader profiles
+.leader {
+  text-align: center;
+  margin-bottom: 2rem;
+  img {
+    border-radius: 100%;
+    max-width: 50%;
+    margin-bottom: $global-margin;
+  }
+  .contact li {
+    margin-bottom: 0.4rem;
+    a {
+      display: inline;
+    }
+  }
+}
