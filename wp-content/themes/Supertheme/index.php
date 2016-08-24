@@ -36,6 +36,41 @@ while(have_rows('content_rows')) {
         }
         $data['teasers'] = $teasers;
     }
+    elseif(get_row_layout() == "rides")
+    {
+        $rides_query = new WP_Query([
+            'posts_per_page'	=> 10,
+            'post_type' => 'scheduled_rides',
+            'meta_query' => [
+                [
+                    'key' => 'date',
+                    'value' => date('Ymd'),
+                    'compare' => '>='
+                ],
+                [
+
+                ]
+            ],
+            'orderby' => 'date time',
+            'order'	=> 'ASC DESC    '
+        ]);
+        $rides_data = [];
+        while($rides_query->have_posts()){
+            $rides_query->the_post();
+            $date = get_field('date');
+            if(!isset($rides_data[$date])){
+                $rides_data[$date] = [];
+            }
+            $rides_data[$date][] = [
+                'title' => get_the_title(),
+                'link' => get_the_permalink(),
+                'date' => get_field('date'),
+                'time' => get_field('time'),
+            ];
+        }
+        $data['rides'] = $rides_data;
+        wp_reset_query();
+    }
     $rows[] = $twig->render('rows/'.get_row_layout().'.html.twig', $data);
 }
 $data['rows'] = $rows;

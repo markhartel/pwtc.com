@@ -167,6 +167,157 @@ a.scroll-to-top {
   }
 }
 
+// ride cal
+.rides-filter-container {
+  margin-bottom: $global-margin;
+  .accordion-title {
+    background-color: $dark-gray;
+    color: $white;
+    font-size: 1rem;
+    &::before {
+      content: "\f054";
+      font-family: FontAwesome;
+    }
+  }
+  .is-active .accordion-title::before {
+    content: "\f078";
+    font-family: FontAwesome;
+  }
+  .accordion-content {
+    padding: 0;
+  }
+}
+.rides-filter {
+  padding: $global-margin;
+  margin: 0;
+  background-color: $dark-gray;
+  color: $white;
+  position: relative;
+  label {
+    color: $white;
+  }
+  .simple.menu {
+    margin-bottom: $global-margin;
+  }
+  @include breakpoint(medium) {
+    display: block;
+  }
+}
+
+.rides-calendar {
+  width: 100%;
+  .date {
+    font-size: 2rem;
+    .day-of-week {
+      font-size: 1rem;
+    }
+  }
+  .date {
+    padding-left: 12px;
+  }
+  .day {
+    border-left: 4px solid $secondary-color;
+    margin-bottom: $global-margin;
+  }
+  .day.previous {
+    display: none;
+    color: $medium-gray;
+    border-left-color: $light-gray;
+    a {
+      color: $light-gray;
+      &:hover {
+        color: darken($light-gray, 10%);
+      }
+    }
+  }
+  .day.weekend {
+    border-left-color: $primary-color;
+  }
+  .day.current {
+    border-left-color: $accent-color;
+    a {
+      color: $accent-color;
+      &:hover {
+        color: darken($accent-color, 10%);
+      }
+    }
+  }
+  .day.future {
+    border-left-color: $medium-gray;
+    color: $medium-gray;
+    a {
+      color: $light-gray;
+      &:hover {
+        color: darken($light-gray, 10%);
+      }
+    }
+  }
+  .menu {
+    padding: $global-margin;
+    a {
+      padding: 0 0 $global-margin/2 0;
+    }
+  }
+  @include breakpoint(medium) {
+    display: table;
+    .week {
+      display: table-row;
+    }
+    .day {
+      margin-bottom: 0;
+      border: none;
+      display: table-cell;
+      width: 14.28%;
+    }
+    .day.previous {
+      display: table-cell !important;
+      .date {
+        border-top: 8px solid $light-gray;
+      }
+    }
+    .day.future {
+      .date {
+        border-top: 8px solid $medium-gray;
+      }
+    }
+    .day.current {
+      .date {
+        border-top: 8px solid $accent-color;
+      }
+    }
+    .day.weekend {
+      .date {
+        border-top: 8px solid $primary-color;
+      }
+    }
+    .date {
+      padding-left: 0;
+      border-top: 8px solid $secondary-color;
+      border-bottom: 1px solid $secondary-color;
+      margin: $global-margin / 2;
+      padding-top: $global-margin;
+    }
+  }
+}
+
+// rides section
+.rides {
+  padding: $global-margin * 2 0;
+  color: $white;
+  background-color: $primary-color;
+  .date, .button {
+    margin-top: $global-margin;
+  }
+  .callout {
+    margin: 0;
+    color: $body-font-color;
+    background-color: $body-background;
+  }
+  .button {
+    margin-bottom: 0;
+  }
+}
+
 // leader profiles
 .leader {
   text-align: center;

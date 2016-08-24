@@ -184,8 +184,12 @@
                         <h5 class="name">{{ leader.user_firstname }} {{ leader.user_lastname }}</h5>
                         <ul class="contact vertical menu">
                             <li><a href="tel:5037813938"><i class="fa fa-envelope"></i>{{ leader.user_email }}</a></li>
-                            <li><a href="sms:5036583403"><i class="fa fa-mobile"></i> {{ SP.ACF.get_field('home_phone', 'user_'~leader.ID) }}</a></li>
-                            <li><a href="tel:5037813938"><i class="fa fa-phone"></i> {{ SP.ACF.get_field('cell_phone', 'user_'~leader.ID) }}</a></li>
+                            {% if SP.ACF.get_field('home_phone', 'user_'~leader.ID) %}
+                                <li><a href="sms:{{ SP.ACF.get_field('home_phone', 'user_'~leader.ID) }}"><i class="fa fa-mobile"></i> {{ SP.ACF.get_field('home_phone', 'user_'~leader.ID) }}</a></li>
+                            {% endif %}
+                            {% if SP.ACF.get_field('cell_phone', 'user_'~leader.ID) %}
+                                <li><a href="tel:{{ SP.ACF.get_field('cell_phone', 'user_'~leader.ID) }}"><i class="fa fa-phone"></i> {{ SP.ACF.get_field('cell_phone', 'user_'~leader.ID) }}</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 {% endfor %}
