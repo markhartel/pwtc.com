@@ -44,28 +44,26 @@ while(have_rows('content_rows')) {
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' => date('Ymd'),
-                    'compare' => '>='
+                    'value' =>  date('Y-m-d'),
+                    'compare' => '>=',
+                    'type'			=> 'DATETIME'
                 ],
-                [
-
-                ]
             ],
-            'orderby' => 'date time',
-            'order'	=> 'ASC DESC    '
+            'orderby' => ['date' => 'ASC'],
         ]);
         $rides_data = [];
         while($rides_query->have_posts()){
             $rides_query->the_post();
-            $date = get_field('date');
+            $datetime = new DateTime(get_field('date'));
+            $date = $datetime->format('Y-m-d');
             if(!isset($rides_data[$date])){
                 $rides_data[$date] = [];
             }
             $rides_data[$date][] = [
                 'title' => get_the_title(),
                 'link' => get_the_permalink(),
-                'date' => get_field('date'),
-                'time' => get_field('time'),
+                'date' => $datetime->getTimestamp(),
+                'time' => $datetime->getTimestamp(),
             ];
         }
         $data['rides'] = $rides_data;

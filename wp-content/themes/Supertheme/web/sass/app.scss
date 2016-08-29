@@ -206,6 +206,7 @@ a.scroll-to-top {
 
 .rides-calendar {
   width: 100%;
+  margin: $global-margin 0;
   .date {
     font-size: 2rem;
     .day-of-week {
@@ -262,6 +263,7 @@ a.scroll-to-top {
     display: table;
     .week {
       display: table-row;
+      height: rem-calc(200px);
     }
     .day {
       margin-bottom: 0;
