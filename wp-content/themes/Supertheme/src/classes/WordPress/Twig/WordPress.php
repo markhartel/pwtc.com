@@ -45,6 +45,11 @@ class WordPress
         return get_the_post_thumbnail($post, $size, $attr);
     }
 
+    public function getAttachedImageSrc($attachment_id, $size = 'thumbnail', $icon = false)
+    {
+        return wp_get_attachment_image_src($attachment_id, $size, $icon);
+    }
+
     public function classes($class = '')
     {
         return 'class="'.join(' ', get_body_class($class )).'"';
