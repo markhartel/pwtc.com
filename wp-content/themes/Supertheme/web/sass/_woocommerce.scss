@@ -131,3 +131,21 @@ a.pp_previous::before {
     background-color: scale_color(map-get($foundation-palette, dark), $lightness: -15%);
   }
 }
+
+// variation data
+.variations {
+  border: none;
+  tbody {
+    border: none;
+  }
+  .label {
+    background: none;
+    label {
+      padding: 8px 0;
+      font-size: 1rem;
+    }
+  }
+}
+.product.has-default-attributes.has-children > .images {
+  opacity: 1;
+}
