@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="two-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <article class="medium-8 large-9 columns content ride" data-equalizer-watch>
+                <h1>{{ SP.WordPress.title() }}</h1>
+                <div class="row column details">
+                    <h4>Details</h4>
+                    <div class="row small-up-1 medium-up-2 large-up-3 details">
+                        <div class="column">
+                            <span class="term">Pace:</span>
+                            {% if SP.ACF.get_field('pace') == "slow" %}
+                                <span
+                                        class="value has-tip"
+                                        data-tooltip aria-haspopup="true"
+                                        data-disable-hover="false"
+                                        tabindex="1"
+                                        title="Speeds approximately 10-13 mph (or in a group ride, the pace of the slowest rider)"
+                                >Slow</span>
+                            {% elseif SP.ACF.get_field('pace') == "leisurely" %}
+                                <span
+                                        class="value has-tip"
+                                        data-tooltip aria-haspopup="true"
+                                        data-disable-hover="false"
+                                        tabindex="1"
+                                        title="Speeds approximately 13-15 mph"
+                                >Leisurely</span>
+                            {% elseif SP.ACF.get_field('pace') == "moderate " %}
+                                <span
+                                        class="value has-tip"
+                                        data-tooltip aria-haspopup="true"
+                                        data-disable-hover="false"
+                                        tabindex="1"
+                                        title="Speeds approximately 15-17 mph"
+                                >Moderate</span>
+                            {% elseif SP.ACF.get_field('pace') == "fast" %}
+                                <span
+                                        class="value has-tip"
+                                        data-tooltip aria-haspopup="true"
+                                        data-disable-hover="false"
+                                        tabindex="1"
+                                        title="Normally a paceline ride; speeds in excess of 18 mph"
+                                >Fast</span>
+                            {% else %}
+                                <span
+                                        class="value has-tip"
+                                        data-tooltip aria-haspopup="true"
+                                        data-disable-hover="false"
+                                        tabindex="1"
+                                        title="Ride leader has not submitted a pace"
+                                >N/A</span>
+                            {% endif %}
+                        </div>
+                        <div class="column">
+                            <span class="term">Length:</span>
+                            <span class="value">{{ SP.ACF.get_field('length') }}
+                                {% if SP.ACF.get_field('max_length') %}- {{ SP.ACF.get_field('max_length') }}{% endif %}
+                                miles
+                            </span>
+                        </div>
+                        <div class="column">
+                            <span class="term">Terrain:</span>
+                            <span class="value">
+                                {% for terrain in SP.ACF.get_field('terrain') %}
+                                    {% if terrain == "a" %}
+                                        <span
+                                                class="has-tip"
+                                                data-tooltip
+                                                aria-haspopup="true"
+                                                data-disable-hover="false"
+                                                tabindex="1"
+                                                title="Basically flat, no steep hills"
+                                        >A{% if not loop.last %}, {% endif %}</span>
+                                    {% elseif terrain == "b" %}
+                                        <span
+                                                class="has-tip"
+                                                data-tooltip
+                                                aria-haspopup="true"
+                                                data-disable-hover="false"
+                                                tabindex="1"
+                                                title="Gently rolling terrain with one or two short hills"
+                                        >B{% if not loop.last %}, {% endif %}</span>
+                                    {% elseif terrain == "c" %}
+                                        <span
+                                                class="has-tip"
+                                                data-tooltip
+                                                aria-haspopup="true"
+                                                data-disable-hover="false"
+                                                tabindex="1"
+                                                title="Moderate terrain with rolling short steep hills or moderate, sustained climbs"
+                                        >C{% if not loop.last %}, {% endif %}</span>
+                                    {% elseif terrain == "d" %}
+                                        <span
+                                                class="has-tip"
+                                                data-tooltip
+                                                aria-haspopup="true"
+                                                data-disable-hover="false"
+                                                tabindex="1"
+                                                title="Difficult terrain with longer, steeper hills"
+                                        >D{% if not loop.last %}, {% endif %}</span>
+                                    {% elseif terrain == "e" %}
+                                        <span
+                                                class="has-tip"
+                                                data-tooltip
+                                                aria-haspopup="true"
+                                                data-disable-hover="false"
+                                                tabindex="1"
+                                                title="Extreme terrain with frequent steep hills and long sustained climbs"
+                                        >E{% if not loop.last %}, {% endif %}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row column location">
+                    <h4>Start Location</h4>
+                    <div>{{ SP.ACF.get_field('start_address_street') }}</div>
+                    {% if SP.ACF.get_field('start_address_unit') %}<div>{{ SP.ACF.get_field('start_address_unit') }}</div>{% endif %}
+                    <div>{{ SP.ACF.get_field('start_address_city') }}, {{ SP.ACF.get_field('start_address_state') }} {{ SP.ACF.get_field('start_address_zip') }}</div>
+                    <div class="maps">
+                        <span class="term">Maps:</span>
+                        <span class="value">
+
+                            {% for map in SP.ACF.get_field('maps') %}
+                                {% if map.type == "link" %}
+                                    <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> needs title</a>
+                                {% elseif map.type == "file"%}
+                                    <a href="{{ map.file }}" target="_blank"><i class="fa fa-download"></i> needs title</a>
+                                {% endif %}
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+
+                    </div>
+                    <br>
+                    <div class="google-maps">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d178728.41334213418!2d-122.60778976744692!3d45.57784935435742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a3e5d8862c53%3A0xf71cf0b4205edb52!2s11100+NE+Skidmore+St%2C+Portland%2C+OR+97220!5e0!3m2!1sen!2sus!4v1459154786803" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}

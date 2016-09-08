@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rpark
- * Date: 6/8/2016
- * Time: 11:20 PM
- */
-
 namespace Supertheme\WordPress\Twig;
 
 
@@ -127,6 +120,16 @@ class WordPress
     public function getAvatar($size = 64, $id = null)
     {
         return get_avatar($id ?: get_the_author_meta('ID'), $size);
+    }
+
+    public function getUserMeta($user_id, $key = '', $single = false)
+    {
+        return get_user_meta($user_id, $key, $single);
+    }
+
+    public function getUserData($user_id)
+    {
+        return get_userdata($user_id);
     }
 
     public function menu($args = [])

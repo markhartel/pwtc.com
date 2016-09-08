@@ -20,7 +20,7 @@
                         </div>
                         <div class="column">
                             <span class="term">Time:</span>
-                            <span class="value">{{ SP.ACF.get_field('time') }}</span>
+                            <span class="value">{{ SP.ACF.get_field('date')|date('g:i a') }}</span>
                         </div>
                         <div class="column">
                             <span class="term">Type:</span>
@@ -96,7 +96,10 @@
                         </div>
                         <div class="column">
                             <span class="term">Length:</span>
-                            <span class="value">{{ SP.ACF.get_field('length') }} {% if SP.ACF.get_field('max_length') %}- {{ SP.ACF.get_field('max_length') }}{% endif %} miles</span>
+                            <span class="value">{{ SP.ACF.get_field('length') }}
+                                {% if SP.ACF.get_field('max_length') %}- {{ SP.ACF.get_field('max_length') }}{% endif %}
+                                miles
+                            </span>
                         </div>
                         <div class="column">
                             <span class="term">Terrain:</span>
@@ -161,6 +164,7 @@
                     <div class="maps">
                         <span class="term">Maps:</span>
                         <span class="value">
+
                             {% for map in SP.ACF.get_field('maps') %}
                                 {% if map.type == "link" %}
                                     <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> needs title</a>
@@ -169,6 +173,7 @@
                                 {% endif %}
                                 {% if not loop.last %}, {% endif %}
                             {% endfor %}
+
                     </div>
                     <br>
                     <div class="google-maps">
@@ -178,21 +183,23 @@
             </article>
             <div class="medium-4 large-3 columns sidebar" data-equalizer-watch="">
                 <h3 class="text-center">Ride Leaders</h3>
+
                 {% for leader in SP.ACF.Get_field('ride_leaders') %}
                     <div class="leader">
-                        {{ leader.user_avatar }}
-                        <h5 class="name">{{ leader.user_firstname }} {{ leader.user_lastname }}</h5>
+                        {{ SP.WordPress.getAvatar(128, leader) }}
+                        <h5 class="name">{{ SP.WordPress.getUserMeta(leader, 'first_name', true) }} {{ SP.WordPress.getUserMeta(leader, 'last_name', true) }}</h5>
                         <ul class="contact vertical menu">
-                            <li><a href="tel:5037813938"><i class="fa fa-envelope"></i>{{ leader.user_email }}</a></li>
-                            {% if SP.ACF.get_field('home_phone', 'user_'~leader.ID) %}
-                                <li><a href="sms:{{ SP.ACF.get_field('home_phone', 'user_'~leader.ID) }}"><i class="fa fa-mobile"></i> {{ SP.ACF.get_field('home_phone', 'user_'~leader.ID) }}</a></li>
+                            <li><a href="mailto:{{ SP.WordPress.getUserData(leader).user_email }}"><i class="fa fa-envelope"></i>{{ SP.WordPress.getUserData(leader).user_email }}</a></li>
+                            {% if SP.ACF.get_field('home_phone', 'user_'~leader) %}
+                                <li><a href="sms:{{ SP.ACF.get_field('home_phone', 'user_'~leader) }}"><i class="fa fa-mobile"></i> {{ SP.ACF.get_field('home_phone', 'user_'~leader) }}</a></li>
                             {% endif %}
-                            {% if SP.ACF.get_field('cell_phone', 'user_'~leader.ID) %}
-                                <li><a href="tel:{{ SP.ACF.get_field('cell_phone', 'user_'~leader.ID) }}"><i class="fa fa-phone"></i> {{ SP.ACF.get_field('cell_phone', 'user_'~leader.ID) }}</a></li>
+                            {% if SP.ACF.get_field('cell_phone', 'user_'~leader) %}
+                                <li><a href="tel:{{ SP.ACF.get_field('cell_phone', 'user_'~leader) }}"><i class="fa fa-phone"></i> {{ SP.ACF.get_field('cell_phone', 'user_'~leader) }}</a></li>
                             {% endif %}
                         </ul>
                     </div>
                 {% endfor %}
+
             </div>
         </div>
     </section>

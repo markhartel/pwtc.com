@@ -38,9 +38,9 @@ jQuery(function() {
         is_prev_days_shown = !is_prev_days_shown;
 
         if(is_prev_days_shown) {
-            jQuery(this).html("Hide previous days in this month");
+            jQuery(this).html("Hide previous days");
         } else {
-            jQuery(this).html("Show previous days in this month");
+            jQuery(this).html("Show hidden days");
         }
     });
     jQuery(window).on("scroll", function(){

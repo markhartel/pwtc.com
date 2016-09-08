@@ -231,6 +231,9 @@ a.scroll-to-top {
       }
     }
   }
+  &.previous .day.previous {
+    display: block;
+  }
   .day.weekend {
     border-left-color: $primary-color;
   }

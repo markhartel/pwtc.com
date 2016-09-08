@@ -76,9 +76,10 @@
                 </li>
             </ul>
 
-
-            <a href="#" class="dark button hide-for-medium toggle-previous-days">Show previous days in current month</a>
-            <div class="rides-calendar">
+            {% if month_current_numeric == 'now'|date('n') %}
+                <a href="#" class="dark button hide-for-medium toggle-previous-days">Show Hidden Days</a>
+            {% endif %}
+            <div class="rides-calendar {% if month_current_numeric < 'now'|date('n') %}previous{% endif %}">
                 {% for week in calendar|batch(7, false) %}
                     <div class="week header">
                         {% for day in week %}
