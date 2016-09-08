@@ -1,0 +1,1012 @@
+/*===========================================================================
+ * Upload-mode
+ ===========================================================================*/
+li.attachment.uploading {
+    display: none;
+}
+.rml-fix {
+    clear: both;
+}
+.rml-uploading {
+    margin: -20px 5px 10px 5px;
+    background: #FFFFFF;
+    box-shadow: 0px 0px 1px 1px #E5E5E5;
+}
+
+.rml-uploading-list {
+    padding: 18px 10px 5px 10px;
+}
+
+.rml-uploading-details {
+    font-size: 11px;
+    background: #0073AA;
+    color: white;
+    padding: 10px 10px 5px 10px;
+}
+
+.rml-uploading-item {
+    margin-bottom: 10px;
+    border-top: 1px solid #E5E5E5;
+    padding-top: 10px;
+}
+.rml-uploading-item:first-of-type {
+    border-top: 0px;
+    padding-top: 0px;
+}
+
+.rml-uploading-item .left {
+    float: left;
+    width: 48px;
+    min-height: 48px;
+}
+.rml-uploading-item img {
+    max-width: 48px;
+    height: auto;
+}
+.rml-uploading-item .right {
+    width: calc(100% - 58px);
+    margin-left: 10px;
+    float: right;
+}
+.rml-uploading-item .filename {
+    text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	font-weight: bold;
+}
+.rml-uploading-item .bar {
+    width: 100%;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,e5e5e5+100;White+3D */
+    background: rgb(255,255,255); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+    height: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 2px rgb(178, 178, 178);
+    overflow: hidden;
+}
+.rml-uploading-item .bar .percent {
+    width: 0%;
+    -webkit-transition: .25s width ease-in-out;
+    transition: .25s width ease-in-out;
+    height: 10px;
+    border-radius: 0px 5px 5px 0px;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#7abcff+0,60abf8+44,4096ee+100;Blue+3D+%2314 */
+    background: rgb(122,188,255); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(122,188,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(64,150,238,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); /* IE6-9 */
+}
+.rml-uploading-item .folder {
+    color: rgb(50, 55, 60);
+    font-size: 9px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    line-height: 12px;
+}
+
+.rml-uploading .bar .percent.finish {
+    background: linear-gradient(180deg, #19A250, #169047);
+    background-size: 400% 400%;
+    -webkit-animation: rml-bar-finish 1s ease infinite;
+    -moz-animation: rml-bar-finish 1s ease infinite;
+    -o-animation: rml-bar-finish 1s ease infinite;
+    animation: rml-bar-finish 1s ease infinite;
+}
+
+@-webkit-keyframes rml-bar-finish {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@-moz-keyframes rml-bar-finish {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@-o-keyframes rml-bar-finish {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@keyframes rml-bar-finish { 
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+
+.rml-uploading .warnings {
+    margin-left: -52px;
+    font-size: 10px;
+    line-height: 1.2;
+    margin-top: 10px;
+    color: red;
+    border: 1px solid red;
+    padding: 3px 10px;
+}
+
+/*===========================================================================
+ * General
+ ===========================================================================*/
+body.wp-admin.upload-php #wpbody-content {
+    width: calc(100% - 250px);
+    float: right;
+}
+
+body.wp-admin.upload-php #wpbody > .wrapper-sticky {
+    left: -20px !important;
+}
+body.wp-admin.upload-php #wpbody > .wrapper-sticky > .rml-container {
+    margin-left: -1px !important;
+}
+
+#rml-add-new-folder, #rml-add-new-collection {
+    cursor: pointer;
+}
+
+.rml-container {
+    float: left;
+    width: 250px;
+    margin-left: -20px;
+    border-right: 1px solid rgb(229, 229, 229);
+    padding-bottom: 30px;
+    display: block !important;
+}
+.rml-dummy {
+    display: none !important;
+}
+.rml-container > .wrap {
+    margin-left: 20px;
+    position: relative;
+    z-index: 999;
+}
+
+.rml-container .wp-filter {
+    margin-bottom: 6px;
+}
+
+.rml-container .rml-root-list {
+    position: relative;
+}
+.rml-root-list:not(.rml-all-list):after,
+.rml-calendar-list:after{
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 14px;
+    bottom: 0px;
+    border-right: 1px solid #DDDDDD;
+    border-left: 1px solid #FAFAFA;
+    width: 0px;
+    z-index: -2;
+}
+.rml-root-list li {
+    margin-bottom: 0px;
+    display: block;
+    position: relative;
+}
+
+.rml-expander {
+    position: absolute;
+    top: 4px;
+    left: -9px;
+    font-size: 11px;
+    color: black;
+    opacity: 0.8;
+}
+.rml-expander i {
+    background: #F1F1F1;
+}
+.rml-expander .fa-minus-square-o {
+    display: none;
+}
+.rml-expander.rml-open .fa-minus-square-o {
+    display: inline-block;
+}
+.rml-expander.rml-open .fa-plus-square-o {
+    display: none;
+}
+
+
+
+.rml-root-list ul {
+    padding-left: 20px;
+    display: none;
+}
+.rml-root-list.rml-custom-list ul {
+    display: block !important;
+}
+.rml-custom-list {
+    position: relative;
+}
+.rml-root-list > ul {
+    display: block;
+}
+.rml-root-list li.rml-open > ul {
+    display: block;
+}
+.edit-mode .rml-root-list li ul {
+    display: block !important;
+}
+.edit-mode .rml-root-list .rml-expander{
+    display: none !important;
+}
+.rml-root-list > ul {
+    padding-left: 0px;
+    margin-top: 0px;
+}
+.wrap > .rml-root-list {
+    padding-left: 0px;
+}
+.rml-root-list a {
+    text-decoration: none;
+    display: block;
+    padding: 4px 10px;
+    box-shadow: none !important;
+    -webkit-transition: .15s margin ease-in-out;
+    transition: .15s margin ease-in-out;
+    position: relative;
+}
+.rml-root-list a[data-type="1"],
+.rml-root-list a[data-type="2"] {
+    margin-left: -4px;
+}
+.rml-root-list a > i {
+    margin-right: 5px;
+    background-color: #F1F1F1;
+    padding: 3px 0px;
+}
+
+.rml-root-list a > i.fa.fa-folder-open {
+    display: none;
+}
+.rml-root-list a.active > i.fa.fa-folder-open {
+    display: inline-block;
+}
+.rml-root-list a.active > i.fa.fa-folder {
+    display: none;
+}
+.rml-root-list a.active {
+    cursor: default;
+}
+.rml-root-list a .rml-name {
+    display: inline-block;
+}
+
+/* Custom fields button */
+.rml-root-list a .rml-cfbutton {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 4px;
+    background: #56798A;
+    color: white;
+    text-align: center;
+    font-size: 8px;
+    padding: 0px 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    z-index: 20;
+}
+.rml-root-list a .rml-cfbutton span {
+    display: none;
+    margin-right: 5px;
+}
+
+.rml-root-list a:hover .rml-cfbutton span {
+    display: inline-block;
+}
+.rml-root-list a:hover .rml-cfbutton {
+    padding: 0px 5px 0px 7px;
+}
+.rml-root-list a.active .rml-cfbutton {
+    right: -7px;
+    box-shadow: none;
+}
+
+.rml-root-list a.active .rml-cfbutton,
+.rml-root-list a:hover .rml-cfbutton {
+    display: block;
+}
+.rml-root-list a .rml-cfbutton:hover {
+    background: #39566B;
+}
+
+/* Counter */
+.rml-root-list a span.rml-cnt {
+    color: white;
+    float: right;
+    display: block;
+    background: rgb(156, 161, 166);
+    font-size: 8px;
+    padding: 0px 5px;
+    position: absolute;
+    top: 4px;
+    right: 10px;
+}
+.rml-custom-list a span.rml-cnt {
+    padding: 5px;
+}
+.rml-root-list a span.rml-cnt-0 {
+    display: none;
+}
+
+/* Shadows on buttons */
+.rml-root-list a span.rml-cnt,
+.rml-root-list a:hover .rml-cfbutton{
+    box-shadow: -10px 0px 10px 0px #f1f1f1;
+}
+.rml-root-list a:hover span.rml-cnt{
+    box-shadow:none;
+}
+
+.rml-root-list a.active span.rml-cnt,
+.rml-root-list a.active:hover .rml-cfbutton {
+    box-shadow: -10px 0px 10px 0px #E0E0E0;
+}
+
+.rml-root-list a.active span.rml-cnt {
+    right: 25px;
+    border-right: 2px solid #e0e0e0; 
+}
+.rml-root-list a.active .rml-cfbutton {
+    right: 10px;
+}
+.rml-all-list a.rml-type-3 .rml-cnt {
+    right: 10px !important;
+}
+
+.rml-root-list a.active:hover .rml-cfbutton{
+    box-shadow: -12px 0px 7px 2px #e0e0e0;
+}
+
+/* Others */
+.rml-root-list a i.fa.fa-pencil-square {
+    display: none;
+    color: rgb(156, 161, 166);
+    margin-left: 5px;
+}
+.rml-root-list a:hover i.fa.fa-pencil-square {
+    display: inline-block;
+}
+.rml-root-list input {
+    display: inline-block;
+    width: 78px;
+    font-size: 10px;
+    margin: 0px;
+    padding: 1px 5px;
+}
+.rml-root-list button {
+    font-size: 12px !important;
+    padding: 5px 7px !important;
+    line-height: 8px !important;
+    height: 20px !important;
+}
+.rml-root-list a.active {
+    background: rgb(224, 224, 224);
+    background: -moz-linear-gradient(left,  rgba(224,224,224,0) 0%, rgba(224,224,224,1) 21%, rgba(224,224,224,1) 100%);
+    background: -webkit-linear-gradient(left,  rgba(224,224,224,0) 0%,rgba(224,224,224,1) 21%,rgba(224,224,224,1) 100%);
+    background: linear-gradient(to right,  rgba(224,224,224,0) 0%,rgba(224,224,224,1) 21%,rgba(224,224,224,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00e0e0e0', endColorstr='#e0e0e0',GradientType=1 );
+}
+.rml-root-list a.active > i {
+    background-color: transparent;
+}
+
+.rml-container .filter-items {
+    float: right;
+}
+
+.rml-container .view-switch {
+    font-size: 15px;
+    margin: 2px 0px;
+}
+.rml-container .view-switch a {
+    height: auto;
+    position: relative;
+    color: rgb(180, 185, 190);
+    width: 20px;
+}
+.rml-container .view-switch a:hover {
+    color: rgb(0, 115, 170);
+}
+
+.rml-container .rml-info {
+    float: left;
+    font-size: 11px;
+    line-height: 1.4;
+    padding-top: 10px;
+}
+
+.rml-container strong.headline {
+    padding: 10px 20px;
+    background-color: white;
+    display: block;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+}
+
+.rml-container h1,
+.rml-container h2 {
+    padding-right: 0px;
+}
+
+#media-attachment-folder-filters,
+#filter-by-rml-folder{
+    display: none;
+}
+
+.media-modal-content #media-attachment-folder-filters,
+.media-modal-content #filter-by-rml-folder{
+    display: block;
+    max-width: 98px;
+    position: absolute;
+    top: 0px;
+    padding: 2px 0px 2px 20px;
+    right: 5px;
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    background-image: url(../image/btn-dropdown-white.png);
+    color: white;
+    height: 27px;
+    box-shadow: inset 1px 1px 11px rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    border-radius: 2px;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+    border: 1px solid #3d5586;
+    background-color: #47639c !important;
+}
+
+
+
+/*===========================================================================
+ * Page title action for the create folder buttons
+ ===========================================================================*/
+.rml-container .page-title-action {
+    position: relative;
+}
+.rml-container .page-title-action:after,
+.rml-container .view-switch a:after {
+    display: none;
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    margin-left: -7.5px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 7.5px 7.5px 7.5px;
+    border-color: transparent transparent #0073AA transparent;
+}
+.rml-container .page-title-action:hover:after,
+.rml-container .view-switch a:hover:after {
+    display: block;
+}
+.rml-container .page-title-action-helper {
+    display: none;
+    position: absolute;
+    left: 25px;
+    top: 52px;
+    background: white;
+    width: 225px;
+    z-index: 9999;
+    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.46);
+}
+.rml-container .wrap.edit-mode .page-title-action-helper {
+    display: none !important;
+}
+.rml-container .page-title-action-helper.bar {
+    top: 112px;
+}
+.rml-container .page-title-action-helper div {
+    background: #0073AA;
+    color: white;
+    padding: 10px 15px;
+}
+.rml-container .page-title-action-helper p {
+    margin: 10px 15px;
+}
+
+body.rml-is-touch .rml-container .page-title-action:after,
+body.rml-is-touch .rml-container .view-switch a:after {
+    display: none !important;
+}
+
+
+/*===========================================================================
+ * Library Edit-Mode
+ ===========================================================================*/
+.rml-container .edit-mode .rml-root-list > ul a {
+    cursor: move;
+    position: relative;
+    
+}
+.rml-container .edit-mode .rml-root-list > ul a:after {
+    content: '\f0c9';
+    font-family: FontAwesome;
+    position: absolute;
+    top: 6px;
+    right: 14px;
+    color: rgb(173, 173, 173);
+    box-shadow: -2px 0px 4px 4px #f1f1f1;
+    background-color: #f1f1f1;
+}
+.rml-container .wrap.edit-mode button.save-sort,
+.rml-container .wrap.edit-mode button.abort-sort{
+    display: inline-block !important;
+}
+
+.rml-container .edit-mode .list a.active,
+.rml-container .edit-mode .list a.active > i {
+    background: #F1F1F1 !important;
+}
+
+.rml-container .wrap.edit-mode .page-title-action,
+.rml-container .edit-mode .list.rml-root-list > ul a span,
+.rml-container .edit-mode .list.rml-root-list .rml-cfbutton {
+    opacity: 0;
+}
+
+#rml-folder-sort span {
+    display: none;
+}
+.rml-container .wrap.edit-mode .view-switch a,
+.rml-container .wrap.edit-mode .page-title-action-helper {
+    display: none !important;
+}
+.rml-container .wrap.edit-mode #rml-folder-sort,
+.rml-container .wrap.edit-mode #rml-folder-sort span {
+    display: inline-block !important;
+    color: rgb(0, 115, 170);
+    width: auto;
+}
+
+.rml-container .sort-notice {
+    display: none;
+    margin-bottom: 11px;
+    padding: 7.5px 10px;
+    color: rgb(255, 255, 255);
+    background: #D63030;
+}
+.rml-container .wrap.edit-mode .sort-notice {
+    display: block;
+}
+
+.rml-container .ui-sortable-placeholder {
+    border-radius: 5px;
+    box-shadow: 0px 1px 3px 1px rgb(50, 107, 165) !important;
+    margin-left: 5px;
+    visibility: visible !important;
+    z-index: 9999;
+}
+
+/*===========================================================================
+ * View in attachment details
+ ===========================================================================*/
+.rml-folder-edit {
+    border: 1px solid #ddd;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    background-color: #fff;
+    color: #32373c;
+    outline: 0;
+    -webkit-transition: .05s border-color ease-in-out;
+    transition: .05s border-color ease-in-out;
+    position: relative;
+    padding: 0px 10px;
+}
+.rml-folder-edit i.fa-folder-open {
+    padding: 10px 10px 10px 0px;
+}
+.rml-folder-edit span.folder {
+    margin-right: 10px;
+}
+.rml-folder-edit i.fa-chevron-right {
+    color: #CACACA;
+    margin-right: 10px;
+    font-size: 12px;
+}
+.rml-folder-edit:hover {
+    color: white;
+    background: #0073AA;
+    cursor: pointer;
+}
+.rml-folder-edit select {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    opacity: 0;
+    z-index: 999;
+}
+#post-body .rml-folder-edit select {
+    opacity: 1;
+}
+
+.media-modal-content .attachments-browser .media-toolbar-primary.search-form {
+    width: calc(33% - 100px) !important;
+    margin-right: 100px;
+    box-sizing: border-box;
+}
+
+
+
+/*===========================================================================
+ * Gallery and Collections
+ ===========================================================================*/
+#rml-add-new-gallery {
+    display: none;
+}
+
+
+
+/*===========================================================================
+ * DragnDrop
+ ===========================================================================*/
+body.upload-php .media-frame .attachments-browser {
+    overflow: auto !important;
+}
+body.upload-php > .attachment-move {
+    /*padding: 10px 25px;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    border-radius: 0px 99px 99px 99px;
+    border: 1px solid #070B33;
+    margin-left: 40px;
+    margin-top: -6px;
+    z-index: 9999;
+    box-shadow: 0px 2px 3px rgba(0,0,0,0.5);
+    background: #3f4c6b;
+    background: -moz-linear-gradient(top,  #3f4c6b 0%, #1e2033 100%);
+    background: -webkit-linear-gradient(top,  #3f4c6b 0%,#1e2033 100%);
+    background: linear-gradient(to bottom,  #3f4c6b 0%,#1e2033 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f4c6b', endColorstr='#1e2033',GradientType=0 );
+    */
+    padding: 10px 15px 10px 10px;
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    margin-left: 40px;
+    margin-top: -6px;
+    z-index: 9999;
+    background: #0073AA;
+    box-shadow: 0px 1px 3px 3px rgba(0,0,0,0.2);
+}
+
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover > * {
+    opacity: 0 !important;
+}
+
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover {
+    /*background: #62a527;
+    background: -moz-linear-gradient(top,  #62a527 0%, #75890c 100%);
+    background: -webkit-linear-gradient(top,  #62a527 0%,#75890c 100%);
+    background: linear-gradient(to bottom,  #62a527 0%,#75890c 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#62a527', endColorstr='#75890c',GradientType=0 );
+    color: white;*/
+}
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: -700px;
+    right: 0px;
+    bottom: 0px;
+    box-shadow: 0px 0px 2px 1px #0073AA !important;
+    background: rgba(0, 115, 170, 0.1);
+    z-index: 999;
+}
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover > i,
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover > .rml-name {
+    background: transparent;
+    opacity: 1 !important;
+}
+body.upload-php .wrap.ready-mode .rml-root-list a.ui-state-hover span.rml-cnt {
+    background: #58770A;
+}
+
+
+.rml-split-resize {
+    position: absolute;
+    right: -29px;
+    top: 8px;
+    width: 16px;
+    height: 30px;
+    background: #D6D6D6;
+    border-radius: 15px;
+    cursor: col-resize;
+}
+.rml-split-resize:after {
+    content: '\f142';
+    font-family: FontAwesome;
+    color: #F1F1F1;
+    position: absolute;
+    top: 7px;
+    left: 6px;
+    font-size: 19px;
+}
+
+
+
+
+/*===========================================================================
+ * Info about plugin
+ ===========================================================================*/
+#rml-info-links {
+    margin-top: 0px;
+    font-size: 10px;
+    padding: 0px 18px;
+}
+#rml-info-links a {
+    color: #999;
+    text-decoration: none;
+}
+#rml-info-link-info > span {
+    display: none;
+}
+#rml-info-link-info.active-show > span.active-show {
+    display: inline-block;
+}
+#rml-info-link-info.active-hide > span.active-hide {
+    display: inline-block;
+}
+#rml-info {
+    display: none;
+    background: #FFFFFF;
+    padding: 10px;
+    border: 2px solid #E5E5E5;
+    margin: 10px -6px 0px 6px;
+}
+#rml-info.active-show {
+    display: block;
+}
+.rml-info-image {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 100%;
+    height: 110px;
+}
+.rml-info-image.rii1 {
+    background-image: url(../image/chaos-1.jpg);
+}
+.rml-info-image.rii2 {
+    background-image: url(../image/chaos-2.jpg);
+}
+#rml-info .arrow-down {
+    text-align: center;
+    margin: 10px auto;
+}
+
+.rml-intro-view {
+    margin: 10px 0px;
+}
+.rml-intro-view > div {
+    margin-top: 10px;
+}
+.rml-intro-view p {
+    color: #999;
+    margin-top: 4px;
+    font-size: 12px;
+}
+.rml-intro-view-button {
+    padding: 4px 8px;
+    text-decoration: none;
+    border: none;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background: #e0e0e0;
+    text-shadow: none;
+    font-weight: 600;
+    font-size: 13px;
+    color: #0073aa;
+}
+
+
+
+/*===========================================================================
+ * Order gallery
+ ===========================================================================*/
+body.order-mode .rml-container .rml-all-list {
+    opacity: 0.5;
+}
+
+body.order-mode ul.attachments {
+    padding-bottom: 200px;
+}
+
+#rml-folder-order,
+#rml-folder-order span {
+    display: none;
+}
+
+.rml-container.rml-active-type-2 #rml-folder-order {
+    display: inline-block;
+}
+
+body.order-mode .rml-container .view-switch a,
+body.order-mode .page-title-action-helper {
+    display: none !important;
+}
+body.order-mode #rml-folder-order,
+body.order-mode #rml-folder-order span {
+    display: inline-block !important;
+    color: rgb(0, 115, 170);
+    width: auto;
+}
+
+body.order-mode .attachment-preview .thumbnail:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    -webkit-transition: all 500ms ease-in-out; /* Firefox */
+    -moz-transition: all 500ms ease-in-out; /* WebKit */
+    -o-transition: all 500ms ease-in-out; /* Opera */
+    transition: all 500ms ease-in-out; /* Standard */
+}
+body.order-mode .attachment-preview:hover .thumbnail:after {
+    background: rgba(50, 107, 165, 0.5);
+}
+
+body.order-mode .ui-sortable-helper {
+    background: #f9f9f9 !important;
+    box-shadow: 0px 0px 5px 3px rgb(50, 107, 165) !important;
+    padding: 0px !important;
+}
+body.order-mode .ui-sortable-helper td {
+    display: none;
+}
+body.order-mode .ui-sortable-helper td.title {
+    display: table-cell;
+}
+body.order-mode .ui-sortable-helper td.title .row-actions,
+body.order-mode .ui-sortable-helper th {
+    opacity: 0;
+}
+
+body.order-mode li.ui-sortable-placeholder {
+    height: 10px !important;
+}
+
+
+
+
+/*===========================================================================
+ * Compatibility for other plugins: MLA
+ ===========================================================================*/
+.media-modal-content .attachments-browser .media-toolbar-primary.search-form .mla-search-box {
+    width: 236px;
+}
+.media-modal-content .attachments-browser .media-toolbar-primary.search-form .mla-search-box input.search {
+    max-width: 55px !important;
+}
+
+
+/*===========================================================================
+ * Custom fields (Meta popup)
+ ===========================================================================*/
+.rml-meta {
+    text-align: left;
+    padding: 0px;
+    margin: 0px;
+    display: block;
+}
+
+.rml-meta-helper {
+    font-size: 11px;
+    color: #2E7A9C;
+    cursor: help;
+}
+
+.rml-meta-margin {
+    height: 10px;
+}
+
+.rml-meta-errors {
+    display: none;
+    background: #CA5353;
+    color: white;
+    font-size: 14px;
+    padding: 10px 10px 5px 20px;
+    margin: 0px 0px 10px 0px;
+}
+
+.rml-meta .wp-mediapicker-content img {
+    max-width: 150px !important;
+}
+.rml-meta .wp-mediapicker-content-wrap {
+    width: auto !important;
+}
+.rml-meta .wp-mediapicker-content {
+    background: none !important;
+    border: 0 !important;
+}
+.rml-meta .rml-meta-media-picker {
+    opacity: 0;
+}
+
+.sweet-alert table.form-table {
+    margin: 0px;
+    padding: 0px;
+}
+.sweet-alert table.form-table th {
+    width: 90px;
+    padding-top: 6px;
+    padding-bottom: 0px;
+}
+.sweet-alert table.form-table td {
+    padding-top: 2.5px;
+    padding-bottom: 2.5px;
+    margin: 0px;
+}
+.sweet-alert table.form-table tr.single-row th {
+    padding-top: 3px;
+}
+.sweet-alert p {
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/*===========================================================================
+ * Responsivness
+ ===========================================================================*/
+@media all and (max-width : 667px) {
+    .rml-container {
+        float: inherit;
+        display: block;
+        width: auto !important;
+        padding-bottom: 20px;
+    }
+    
+    .rml-split-resize {
+        display: none;
+    }
+    
+    body.wp-admin.upload-php #wpbody-content {
+        width: auto !important;
+        float: inherit;
+    }
+    
+    #media-attachment-folder-filters,
+    #filter-by-rml-folder{
+        display: block;
+    }
+    
+    #rml-info-links {
+        margin-top: 10px;
+    }
+    
+    .sweet-alert p {
+        max-height: 300px !important;
+    }
+}
