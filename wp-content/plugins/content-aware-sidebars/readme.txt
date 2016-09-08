@@ -4,7 +4,7 @@ Donate link:
 Tags: sidebar, sidebars, custom sidebars, page sidebars, replace sidebar, create sidebars, replace widget area, bbpress, buddypress, polylang, pods, conditional
 Requires at least: 3.9
 Tested up to: 4.6
-Stable tag: 3.3
+Stable tag: 3.3.1
 License: GPLv3
 
 Display custom sidebars on any post, page, category etc. Supports bbPress, BuddyPress, WooCommerce, Easy Digital Downloads and more.
@@ -32,7 +32,7 @@ No coding required!
 * Comes in 38 languages ([help translate!](https://www.transifex.com/projects/p/content-aware-sidebars/))
 * **[NEW]** Sidebar Visibility for All or Logged-in Users
 
-####Display sidebars conditionally
+####Display sidebars on any content
 
 * Singulars, eg. posts or pages
 * Custom Post Types
@@ -55,34 +55,38 @@ Combine conditions in any way you like, e.g. display a sidebar on posts in Categ
 
 Negate conditions, e.g. display a sidebar on all pages except Page X.
 
-####Integrated Support for Popular Plugins
+####Sidebar Integrations and Support
 
-* bbPress (v2.5+)
-* BuddyPress (v2.6+)
-* qTranslate X (v3.4.6.4+)
-* Pods (v2.6+)
-* Polylang (v1.7+)
-* Transposh Translation Filter (v0.9.5+)
-* [WPML Multilingual Blog/CMS (v2.4.3+) Tested and certified](http://wpml.org/plugin/content-aware-sidebars/)
+* bbPress
+* BuddyPress
+* Easy Digital Downloads
+* qTranslate X
+* Pods
+* Polylang
+* Transposh Translation Filter
+* [WooCommerce](https://dev.institute/wordpress/sidebars-pro/woocommerce/)
+* [WPML](https://wpml.org/plugin/content-aware-sidebars/)
 
-> ####Professional Plan
+> ####[Content Aware Sidebars Pro](https://dev.institute/wordpress/sidebars-pro/)
+>
+> Complete control for your custom sidebars:
 >
 > * Priority Email Support
-> * Sidebar and Widget Revisions
+> * Widget Revisions
 > * Display sidebars on URLs + wildcards
 > * Display sidebars on content from any day, month, year
 > * Sidebar Visibility for Roles and Guests
-> * Sync Widgets across Themes
-> * and more...
+> * 1-click Sidebar Draft and Publish
+> * Sync Widgets on Theme Switch
+> * [and more...](https://dev.institute/wordpress/sidebars-pro/pricing/)
 >
-> Install the free version and upgrade at any time right from the dashboard!
+> Install the free version and upgrade at any time directly from the admin panel via [Freemius](http://freemius.com/)!
 
-####For more information
+####More Information
 
-* [Plugin on DEV Institute](http://dev.institute/wordpress/sidebars-pro)
 * [Github](https://github.com/intoxstudio/content-aware-sidebars)
-* [Intox Studio on Facebook](https://www.facebook.com/intoxstudio)
-* [Intox Studio on Twitter](https://twitter.com/intoxstudio)
+* [Facebook](https://www.facebook.com/intoxstudio)
+* [Twitter](https://twitter.com/intoxstudio)
 
 == Installation ==
 
@@ -96,7 +100,7 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 
 == Frequently Asked Questions ==
 
-[Click here to go to the official FAQ page for Content Aware Sidebars](http://www.intox.dk/en/plugin/content-aware-sidebars-en/faq/).
+[Click here to go to the official FAQ page for Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/faq/).
 
 == Translations ==
 
@@ -114,11 +118,7 @@ Do you want to contribute and see your name here?
 
 == Screenshots ==
 
-1. Add a new Content Aware Sidebar to be displayed with all Posts that contains the category Very Categorized. It replaces `Primary Sidebar`
-2. Simple overview of all created Content Aware Sidebars
-3. Add widgets to the newly added sidebar
-4. Viewing front page of site. `Primary Sidebar` is displayed
-5. Viewing a Post that contains Very Categorized. `Very Categorized Posts` sidebar has replaced `Primary Sidebar`
+[Click here to view the latest screenshots and examples of Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/).
 
 == Upgrade Notice ==
 
@@ -130,6 +130,27 @@ Do you want to contribute and see your name here?
 == Changelog ==
 
 [View development on GitHub](https://github.com/intoxstudio/content-aware-sidebars)
+
+= 3.3.1 =
+
+* Added: ux design improvements
+* Added: ability to add more sidebars in quick select
+* Added: toggle to display more than 3 sidebar input fields in quick select
+* Added: select2 dropdowns updated to 4.0.3 on sidebar edit screen
+* Added: re-enabled info box on sidebar edit screen
+* Added: freemius sdk updated
+* Fixed: decoding of taxonomy term names in conditions
+* Fixed: order of content in conditions dropdowns
+* Fixed: yoast seo compatibility on post edit screens
+* Fixed: negated post conditions were included in sidebar quick select
+* Removed: upgrade box on sidebar edit screen
+
+**Pro Plan:**
+
+* Fixed: improved widget revision ux
+* Fixed: select dates would in some cases not be displayed correct in conditions
+* Fixed: widget revisions could in some cases contain wrong or malformed data
+* Fixed: backwards compat in widget revision ui for versions before wp4.5
 
 = 3.3 =
 
@@ -147,7 +168,7 @@ Do you want to contribute and see your name here?
 * Fixed: select2 dropdowns styling more robust to external changes
 * Fixed: minor performance improvements
 
-**Professional Plan:**
+**Pro Plan:**
 
 * Added: set sidebars to published or draft on widgets screen
 
@@ -161,7 +182,7 @@ Do you want to contribute and see your name here?
 * Fixed: simplified introduction tour
 * Fixed: uninstall cleanup for users not on freemius
 
-**Professional Plan:**
+**Pro Plan:**
 
 * Fixed: load buddypress group module correctly
 * Fixed: search for buddypress groups
@@ -195,7 +216,7 @@ Do you want to contribute and see your name here?
 * Removed: ability to set private post status (in favor of visibility option)
 * Removed: donation link from readme
 
-**Professional Plan:**
+**Pro Plan:**
 
 * Added: sidebar and widget revisions
 * Added: extended visibility for roles and guests
