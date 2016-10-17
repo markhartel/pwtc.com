@@ -1,4 +1,8 @@
 jQuery(function() {
+    if(!jQuery('#schedule-rides-preview').length) {
+        return;
+    }
+    
     // disable preview/submit buttons until validation
     jQuery('#schedule-rides-preview').attr('disabled','disabled');
     jQuery('#schedule-rides-create').attr('disabled','disabled');
