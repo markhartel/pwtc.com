@@ -4,7 +4,7 @@ Donate link:
 Tags: sidebar, sidebars, custom sidebars, page sidebars, replace sidebar, create sidebars, replace widget area, bbpress, buddypress, polylang, pods, conditional
 Requires at least: 3.9
 Tested up to: 4.6
-Stable tag: 3.3.1
+Stable tag: 3.3.3
 License: GPLv3
 
 Display custom sidebars on any post, page, category etc. Supports bbPress, BuddyPress, WooCommerce, Easy Digital Downloads and more.
@@ -59,17 +59,17 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 
 * bbPress
 * BuddyPress
-* Easy Digital Downloads
+* [Easy Digital Downloads](https://dev.institute/wordpress/sidebars-pro/easy-digital-downloads/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
 * qTranslate X
 * Pods
 * Polylang
 * Transposh Translation Filter
-* [WooCommerce](https://dev.institute/wordpress/sidebars-pro/woocommerce/)
+* [WooCommerce](https://dev.institute/wordpress/sidebars-pro/woocommerce/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
 * [WPML](https://wpml.org/plugin/content-aware-sidebars/)
 
-> ####[Content Aware Sidebars Pro](https://dev.institute/wordpress/sidebars-pro/)
+> ####Content Aware Sidebars Pro
 >
-> Complete control for your custom sidebars:
+> [Complete control for your custom sidebars](https://dev.institute/wordpress/sidebars-pro/?utm_source=readme&utm_medium=referral&utm_content=title&utm_campaign=cas):
 >
 > * Priority Email Support
 > * Widget Revisions
@@ -78,7 +78,7 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 > * Sidebar Visibility for Roles and Guests
 > * 1-click Sidebar Draft and Publish
 > * Sync Widgets on Theme Switch
-> * [and more...](https://dev.institute/wordpress/sidebars-pro/pricing/)
+> * [and more...](https://dev.institute/wordpress/sidebars-pro/pricing/?utm_source=readme&utm_medium=referral&utm_content=more&utm_campaign=cas)
 >
 > Install the free version and upgrade at any time directly from the admin panel via [Freemius](http://freemius.com/)!
 
@@ -100,7 +100,7 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 
 == Frequently Asked Questions ==
 
-[Click here to go to the official FAQ page for Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/faq/).
+[Click here to view the FAQs for Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/faq/?utm_source=readme&utm_medium=referral&utm_content=faq&utm_campaign=cas).
 
 == Translations ==
 
@@ -118,7 +118,7 @@ Do you want to contribute and see your name here?
 
 == Screenshots ==
 
-[Click here to view the latest screenshots and examples of Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/).
+[Click here to view the latest screenshots and examples of Content Aware Sidebars](https://dev.institute/wordpress/sidebars-pro/?utm_source=readme&utm_medium=referral&utm_content=screenshots&utm_campaign=cas).
 
 == Upgrade Notice ==
 
@@ -130,6 +130,20 @@ Do you want to contribute and see your name here?
 == Changelog ==
 
 [View development on GitHub](https://github.com/intoxstudio/content-aware-sidebars)
+
+= 3.3.3 =
+
+* Added: counter-measure against plugins that add buggy scripts
+* Fixed: saving sidebars in quick select would in some cases trigger warning
+
+**Pro Plan:**
+
+* Fixed: include draft sidebars when syncing widgets across themes
+
+= 3.3.2 =
+
+* Fixed: markup in quick select could in some cases be malformed
+* Fixed: warning when saving sidebar
 
 = 3.3.1 =
 

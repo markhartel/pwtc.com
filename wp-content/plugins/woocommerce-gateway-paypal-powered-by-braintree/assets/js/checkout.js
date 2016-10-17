@@ -145,7 +145,14 @@ jQuery( document ).ready( function( $ ) {
 
 		// In the middle of loading or unloading something? Just return.
 		if ( state === states.LOADING || state === states.UNLOADING ) {
-			return;
+			
+			// If we're waiting for onReady to fire, return.  Otherwise, reset state in 
+			// order to attempt Braintree.setup again.  
+			if ( 0 != jQuery( '#wc-paypal-braintree-cvv' ).children().length ) {
+				return;
+			} else {
+				state = states.NOTLOADED;
+			}
 		}
 
 		// Are key things missing? Just return.
@@ -154,7 +161,7 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 		// No checkout form?  Just return.
-		checkoutForm = jQuery( 'form.checkout' );
+		checkoutForm = jQuery( 'form.checkout, form#order_review, form#add_payment_method' );
 		if ( ! checkoutForm.length ) {
 			return;
 		}
@@ -213,6 +220,15 @@ jQuery( document ).ready( function( $ ) {
 
 			// Does it look like the form got re-rendered on us?  Start unloading (so we can reload).
 			if ( ! paymentDiv.hasClass( 'wc_paypalbraintree_loaded' ) ) {
+				
+				// Check if last field is loaded from previous Braintree setup.  
+				// onReady can take some time to fire causing Braintree to attempt setup 
+				// again after a previous successful setup.  No need to unload.
+				if ( 0 != jQuery( '#wc-paypal-braintree-cvv' ).children().length ) {
+					state = states.LOADED;
+					return;
+				}
+
 				unloadMethod();
 				return;
 			}

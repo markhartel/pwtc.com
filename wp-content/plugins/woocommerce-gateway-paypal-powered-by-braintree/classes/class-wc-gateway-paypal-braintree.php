@@ -335,6 +335,18 @@ abstract class WC_Gateway_Paypal_Braintree extends WC_Payment_Gateway {
 					<tr>
 						<th>
 							<?php _e( 'Connect/Disconnect', 'woocommerce-gateway-paypal-braintree' ); ?>
+							<?php
+							$connect_help_tip = __( 'Click button to create an account with Braintree and start transacting.', 'woocommerce-gateway-paypal-braintree' );
+							if ( ! empty( $this->merchant_access_token ) ) {
+								$connect_help_tip = sprintf(
+									'%s<br><br>%s<br><br>%s',
+									__( 'You just connected your Braintree account to WooCommerce. You can start taking payments now.', 'woocommerce-gateway-paypal-braintree' ),
+									__( 'Once you have processed a payment, PayPal will review your application for final approval. Before you ship any goods make sure you have received a final approval for your Braintree account.', 'woocommerce-gateway-paypal-braintree' ),
+									__( 'Questions? We are a phone call away: 1-855-489-0345.', 'woocommerce-gateway-paypal-braintree' )
+								);
+							}
+							echo wc_help_tip( $connect_help_tip );
+							?>
 						</th>
 						<td>
 							<?php if ( ! empty( $this->merchant_access_token ) ) { ?>
@@ -812,7 +824,7 @@ abstract class WC_Gateway_Paypal_Braintree extends WC_Payment_Gateway {
 			'countryCodeAlpha2' => $order->shipping_country
 		);
 
-		$sale_args = array(
+		$sale_args = apply_filters( 'wc_gateway_paypal_braintree_sale_args', array(
 			'amount'              => $order->order_total,
 			'billing'             => $billing,
 			'shipping'            => $shipping,
@@ -820,9 +832,9 @@ abstract class WC_Gateway_Paypal_Braintree extends WC_Payment_Gateway {
 			'channel'             => 'WooThemes_BT', // aka BN tracking code
 			'orderId'             => $order_id,
 			'options'             => array(
-			'submitForSettlement' => $this->capture ? 'true' : 'false'
-			)
-		);
+				'submitForSettlement' => $this->capture ? 'true' : 'false',
+			),
+		) );
 
 		require_once( dirname( __FILE__ ) . '/../braintree_sdk/lib/Braintree.php' );
 		$gateway = new Braintree_Gateway( array(
@@ -988,6 +1000,11 @@ abstract class WC_Gateway_Paypal_Braintree extends WC_Payment_Gateway {
 		if ( empty( $action_to_take ) ) {
 			$this->log( __FUNCTION__, "Error: The transaction cannot be voided nor refunded in its current state: state = {$transaction->status}" );
 			return false;
+		}
+
+		// Only void transaction when refund amount equals to order's total.
+		if ( 'void' === $action_to_take && $refund_amount != $order->get_total() ) {
+			return new WP_Error( 'unable_to_void', __( 'Unable to void unsettled transaction when refunding partially.', 'woocommerce-gateway-paypal-braintree' ) );
 		}
 
 		try {
