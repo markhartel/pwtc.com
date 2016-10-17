@@ -67,9 +67,9 @@ $query_args = [
     'meta_query' => [
         [
             'key' => 'date',
-            'value' =>  [$loop_datetime->format('Y-m-d'), $loop_until_datetime->format('Y-m-d')],
+            'value' =>  [$loop_datetime->getTimestamp(), $loop_until_datetime->getTimestamp()],
             'compare' => 'BETWEEN',
-            'type' => 'DATETIME'
+            'type' => 'TIMESTAMP'
         ],
     ],
     'orderby' => ['date' => 'ASC'],
@@ -163,7 +163,8 @@ $query = new WP_Query($query_args);
 $scheduled_rides = [];
 while($query->have_posts()) {
     $query->the_post();
-    $datetime = new DateTime(get_field('date'));
+    $datetime = new DateTime();
+    $datetime->setTimestamp(get_field('date'));
     $date = $datetime->format('Y-m-d');
     if(!isset($scheduled_rides[$date])){
         $scheduled_rides[$date] = [];

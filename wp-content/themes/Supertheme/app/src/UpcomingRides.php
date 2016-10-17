@@ -28,25 +28,30 @@ class UpcomingRides extends \WP_Widget {
             echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
         }
 
+        $today = new \DateTime();
         $rides_query = new \WP_Query([
             'posts_per_page'	=> 10,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' =>  date('Y-m-d'),
+                    'value' =>  $today->getTimestamp(),
                     'compare' => '>=',
-                    'type'			=> 'DATETIME'
+                    'type'	=> 'TIMESTAMP'
                 ],
             ],
             'orderby' => ['date' => 'ASC'],
         ]);
-        echo "<ul class='vertical menu'>";
-        while($rides_query->have_posts()){
-            $rides_query->the_post();
-            echo "<li><a href='".get_the_permalink()."'>".get_the_title()."</a></li>";
+        if($rides_query->have_posts()) {
+            echo "<ul class='vertical menu'>";
+            while ($rides_query->have_posts()) {
+                $rides_query->the_post();
+                echo "<li><a href='" . get_the_permalink() . "'>" . get_the_title() . "</a></li>";
+            }
+            echo "</ul>";
+        } else {
+            echo "No upcoming rides";
         }
-        echo "</ul>";
         wp_reset_query();
         echo $args['after_widget'];
     }

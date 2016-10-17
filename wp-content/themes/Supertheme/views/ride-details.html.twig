@@ -183,7 +183,6 @@
             </article>
             <div class="medium-4 large-3 columns sidebar" data-equalizer-watch="">
                 <h3 class="text-center">Ride Leaders</h3>
-
                 {% for leader in SP.ACF.Get_field('ride_leaders') %}
                     <div class="leader">
                         {{ SP.WordPress.getAvatar(128, leader) }}
@@ -199,7 +198,6 @@
                         </ul>
                     </div>
                 {% endfor %}
-
             </div>
         </div>
     </section>

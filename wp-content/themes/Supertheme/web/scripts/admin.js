@@ -69,8 +69,8 @@ jQuery(function() {
         }
         jQuery("#preview").html(
             '<table class="wp-list-table widefat fixed striped posts">'
-                + "<tr><td>Schedule this date?</td></tr>"
-                + rows
+                + "<thead><tr><th>Schedule this date?</th></tr></thead>"
+                + "<tbody>" + rows + "</tbody>"
             + '</table>'
         );
         jQuery('#schedule-rides-create').attr('disabled', false);

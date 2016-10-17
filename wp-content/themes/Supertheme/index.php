@@ -38,15 +38,16 @@ while(have_rows('content_rows')) {
     }
     elseif(get_row_layout() == "rides")
     {
+        $today = new DateTime();
         $rides_query = new WP_Query([
             'posts_per_page'	=> 10,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' =>  date('Y-m-d'),
+                    'value' =>  $today->getTimestamp(),
                     'compare' => '>=',
-                    'type'			=> 'DATETIME'
+                    'type'	=> 'TIMESTAMP'
                 ],
             ],
             'orderby' => ['date' => 'ASC'],
@@ -54,7 +55,8 @@ while(have_rows('content_rows')) {
         $rides_data = [];
         while($rides_query->have_posts()){
             $rides_query->the_post();
-            $datetime = new DateTime(get_field('date'));
+            $datetime = new DateTime();
+            $datetime->setTimestamp(get_field('date'));
             $date = $datetime->format('Y-m-d');
             if(!isset($rides_data[$date])){
                 $rides_data[$date] = [];

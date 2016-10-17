@@ -1,4 +1,5 @@
 <?php
+//require_once __DIR__.'/app/acf.php';
 require_once __DIR__.'/app/bootstrap.php';
 require_once __DIR__.'/src/functions.php';
 
@@ -13,10 +14,9 @@ if( function_exists('acf_add_options_page') ) {
         'redirect' 	=> false
     ));
 
-
-        add_action('acf/init', function () {
-            acf_update_setting('google_api_key', 'AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k');
-        });
+    add_action('acf/init', function () {
+        acf_update_setting('google_api_key', 'AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k');
+    });
 }
 
 add_action( 'widgets_init', function(){
@@ -124,43 +124,60 @@ add_action('acf/save_post', function ($post_id) {
         $terrain = [];
         $maps = [];
 
-        foreach(get_field('maps') as $map) {
-            $map_id = $map->ID;
-            echo $map_id . "<br />";
+        if(get_field('attach_map')) {
+            foreach (get_field('maps') as $map) {
+                $map_id = $map->ID;
 
-            // set length to the lowest length
-            if(!$length) {$length = get_field('length', $map_id); }
-            else if($length && get_field('length', $map_id) < $length) { $length = get_field('length', $map_id); }
+                // set length to the lowest length
+                if (!$length) {
+                    $length = get_field('length', $map_id);
+                } else if ($length && get_field('length', $map_id) < $length) {
+                    $length = get_field('length', $map_id);
+                }
 
-            // set max length to the highest max length
-            if(!$maxLength) {$maxLength = get_field('max_length', $map_id); }
-            else if($maxLength && get_field('max_length', $map_id) < $maxLength) { $maxLength = get_field('max_length', $map_id); }
+                // set max length to the highest max length
+                if (!$maxLength) {
+                    $maxLength = get_field('max_length', $map_id);
+                } else if ($maxLength && get_field('max_length', $map_id) < $maxLength) {
+                    $maxLength = get_field('max_length', $map_id);
+                }
 
-            // set address to the first found address
-            if(!$address && get_field('start_address_street', $map_id)) {
-                update_field('start_address_street', get_field('start_address_street', $map_id), $id);
-                update_field('start_address_unit', get_field('start_address_unit', $map_id), $id);
-                update_field('start_address_state', get_field('start_address_state', $map_id), $id);
-                update_field('start_address_city', get_field('start_address_city', $map_id), $id);
-                update_field('start_address_zip', get_field('start_address_zip', $map_id), $id);
-                update_field('start_location', get_field('start_location', $map_id), $id);
-                $address = true;
+                // set address to the first found address
+                if (!$address && get_field('start_address_street', $map_id)) {
+                    update_field('start_address_street', get_field('start_address_street', $map_id), $id);
+                    update_field('start_address_unit', get_field('start_address_unit', $map_id), $id);
+                    update_field('start_address_state', get_field('start_address_state', $map_id), $id);
+                    update_field('start_address_city', get_field('start_address_city', $map_id), $id);
+                    update_field('start_address_zip', get_field('start_address_zip', $map_id), $id);
+                    update_field('start_location', get_field('start_location', $map_id), $id);
+                    $address = true;
+                }
+
+                $terrain = array_merge($terrain, get_field('terrain', $map_id));
+                $maps = array_merge($maps, get_field('maps', $map_id));
             }
 
-            $terrain = array_merge($terrain, get_field('terrain', $map_id));
-            $maps = array_merge($maps, get_field('maps', $map_id));
+            update_field('terrain', $terrain, $id);
+            update_field('length', $length, $id);
+            update_field('max_length', $maxLength, $id);
+            update_field('field_57bb66366797b', $maps, $id);// map links and files
+        } else {
+            update_field('start_address_street', get_field('start_address_street'), $id);
+            update_field('start_address_unit', get_field('start_address_unit'), $id);
+            update_field('start_address_state', get_field('start_address_state'), $id);
+            update_field('start_address_city', get_field('start_address_city'), $id);
+            update_field('start_address_zip', get_field('start_address_zip'), $id);
+            update_field('start_location', get_field('start_location'), $id);
+            update_field('terrain', get_field('terrain'), $id);
+            update_field('length', get_field('length'), $id);
+            update_field('max_length', get_field('max_length'), $id);
+            update_field('field_57bb66366797b', get_field('maps'), $id);// map links and files
         }
-
-
-        update_field('terrain', $terrain, $id);
-        update_field('length', $length, $id);
-        update_field('max_length', $maxLength, $id);
-        update_field('field_57bb66366797b', $maps, $id);// map links and files
 
         $ride_ids[] = $id;
     }
 
     update_field('schedule_rides', false);
-    update_field('from', get_field('to'));
+    update_field('from', get_field('to', false, false));
     update_field('to', false);
 }, 20);

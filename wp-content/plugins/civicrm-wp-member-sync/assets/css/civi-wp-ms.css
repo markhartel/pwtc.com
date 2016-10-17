@@ -1,0 +1,17 @@
+/**
+ * CiviCRM WordPress Member Sync Styles.
+ *
+ * Implements styling common to all CiviCRM WordPress Member Sync admin pages.
+ *
+ * @package Civi_WP_Member_Sync
+ */
+
+.req
+{
+	color: #f00;
+}
+
+h1.nav-tab-wrapper
+{
+	padding-bottom: 0;
+}
