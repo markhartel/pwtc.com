@@ -3,6 +3,8 @@
     <section class="main-section">
         <div class="row column">
 
+            {{ SP.ACF.get_field('ride_calandar_content', 'option') }}
+
             <h1 class="text-center">Rides - {{ month_current }}</h1>
 
             {% block months %}

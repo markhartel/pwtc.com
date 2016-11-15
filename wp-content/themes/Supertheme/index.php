@@ -26,14 +26,16 @@ while(have_rows('content_rows')) {
         $recent_posts = wp_get_recent_posts($args, ARRAY_A);
         $teasers = [];
         foreach($recent_posts as $post) {
+            setup_postdata($post['ID']);
             $teaser_data = [];
             $teaser_data['title'] = get_the_title($post['ID']);
-            $teaser_data['excerpt'] = get_the_excerpt($post['ID']);
+            $teaser_data['excerpt'] = excerpt();
             $teaser_data['image'] = get_the_post_thumbnail($post['ID'], 'teaser');
             $teaser_data['link'] = get_the_permalink($post['ID']);
             $teaser_data['format'] = get_field('format', $post['ID']);
             $teasers[] = $twig->render("teasers/post.html.twig", $teaser_data);
         }
+        wp_reset_postdata();
         $data['teasers'] = $teasers;
     }
     elseif(get_row_layout() == "rides")
@@ -45,9 +47,9 @@ while(have_rows('content_rows')) {
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' =>  $today->getTimestamp(),
+                    'value' =>  $today->format('Y-m-d 00:00:00'),
                     'compare' => '>=',
-                    'type'	=> 'TIMESTAMP'
+                    'type'	=> 'DATETIME'
                 ],
             ],
             'orderby' => ['date' => 'ASC'],
@@ -55,8 +57,7 @@ while(have_rows('content_rows')) {
         $rides_data = [];
         while($rides_query->have_posts()){
             $rides_query->the_post();
-            $datetime = new DateTime();
-            $datetime->setTimestamp(get_field('date'));
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'));
             $date = $datetime->format('Y-m-d');
             if(!isset($rides_data[$date])){
                 $rides_data[$date] = [];
@@ -74,6 +75,8 @@ while(have_rows('content_rows')) {
     $rows[] = $twig->render('rows/'.get_row_layout().'.html.twig', $data);
 }
 $data['rows'] = $rows;
+
+$data['title'] = get_the_title();
 
 // render
 echo $twig->render('basic.html.twig', $data);

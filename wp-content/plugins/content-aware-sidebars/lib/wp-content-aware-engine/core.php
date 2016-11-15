@@ -1,7 +1,6 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @version 2.0
  * @copyright Joachim Jensen <jv@intox.dk>
  * @license GPLv3
  */
@@ -26,6 +25,7 @@ if(!class_exists("WPCACore")) {
 		
 		/**
 		 * Engine version
+		 * TODO: remove in favor of WPCA_VERSION
 		 */
 		const VERSION              = '2.0';
 
@@ -45,6 +45,12 @@ if(!class_exists("WPCACore")) {
 		const STATUS_NEGATED       = 'negated';
 		const STATUS_PUBLISHED     = 'publish';
 
+		/**
+		 * Exposures for condition groups
+		 */
+		const EXP_SINGULAR         = 0;
+		const EXP_SINGULAR_ARCHIVE = 1;
+		const EXP_ARCHIVE          = 2;
 
 		/**
 		 * Language domain
@@ -95,7 +101,7 @@ if(!class_exists("WPCACore")) {
 			if(is_admin()) {
 
 				add_action('admin_enqueue_scripts',
-					array(__CLASS__,'enqueue_scripts_styles'),9);
+					array(__CLASS__,'add_group_script_styles'),9);
 				add_action('delete_post',
 					array(__CLASS__,'sync_group_deletion'));
 				add_action('trashed_post',
@@ -339,6 +345,9 @@ if(!class_exists("WPCACore")) {
 			);
 
 			$context_data['WHERE'][] = "p.post_status IN ('".implode("','", $post_status)."')";
+
+			//exposure
+			$context_data['WHERE'][] = "p.menu_order ".(is_archive() || is_home() ? '>=' : '<=')." 1";
 				
 			//Syntax changed in MySQL 5.5 and MariaDB 10.0 (reports as version 5.5)
 			$wpdb->query('SET'.(version_compare($wpdb->db_version(), '5.5', '>=') ? ' SESSION' : ' OPTION').' SQL_BIG_SELECTS = 1');
@@ -415,13 +424,14 @@ if(!class_exists("WPCACore")) {
 			if($valid) {
 
 				//todo: move exposure to group, later deprecate?
-				$metas = array(
-					'exposure' => array(
-						'key' => self::PREFIX.'exposure',
-						'value'   => 1,
-						'compare' => (is_archive() || is_home() ? '>=' : '<='),
-					)
-				);
+				$metas = array();
+				//$metas = array(
+				// 	'exposure' => array(
+				// 		'key' => self::PREFIX.'exposure',
+				// 		'value'   => 1,
+				// 		'compare' => (is_archive() || is_home() ? '>=' : '<='),
+				// 	)
+				// );
 
 				$joins = array();
 				$wheres = array();
@@ -439,14 +449,16 @@ if(!class_exists("WPCACore")) {
 						h.meta_value handle
 					FROM $wpdb->posts p
 					INNER JOIN $wpdb->postmeta h ON h.post_id = p.ID AND h.meta_key = '".self::PREFIX."handle' 
-					".implode(' ',$joins)."
+					
 					WHERE
 					p.post_type = '".$post_type."' AND 
 					p.post_status = 'publish' AND 
-					p.ID IN(".implode(',',$valid).") AND 
-					".implode(' AND ',$wheres)."
+					p.ID IN(".implode(',',$valid).") 
+					
 					ORDER BY p.menu_order ASC, h.meta_value DESC, p.post_date DESC
 				");
+				//".implode(' ',$joins)."
+				//AND ".implode(' AND ',$wheres)."
 
 				//diff orderby only works in WP4.0+
 				// $new_results = new WP_Query(array(
@@ -476,6 +488,9 @@ if(!class_exists("WPCACore")) {
 				foreach($results as $result) {
 					self::$post_cache[$post_type][$result->ID] = $result;
 				}
+				foreach(self::$post_cache as $post_type => $cache) {
+					self::$post_cache[$post_type] = apply_filters("wpca/posts/{$post_type}",$cache);
+				}
 			}
 			return self::$post_cache[$post_type];
 		}
@@ -488,14 +503,18 @@ if(!class_exists("WPCACore")) {
 		 * @param   WP_Post   $post
 		 */
 		public static function add_group_meta_box($post_type,$post) {
-			if(self::post_types()->has($post_type)) {
+			self::render_group_meta_box($post,$post_type,'normal','default');
+		}
 
-				$post_type_obj = self::post_types()->get($post_type);
+		public static function render_group_meta_box($post,$screen,$context = 'normal',$priority = 'default') {
+			if(self::post_types()->has($post->post_type)) {
+
+				$post_type_obj = self::post_types()->get($post->post_type);
 				$options = apply_filters("wpca/modules/list",array());
 
 				$view = WPCAView::make("meta_box",array(
-					'post_type'=> $post_type,
-					'nonce'    => wp_nonce_field(self::PREFIX.get_the_ID(), self::NONCE, true, false),
+					'post_type'=> $post->post_type,
+					'nonce'    => wp_nonce_field(self::PREFIX.$post->ID, self::NONCE, true, false),
 					'options'  => $options
 				));
 
@@ -505,13 +524,13 @@ if(!class_exists("WPCACore")) {
 					'cas-rules',
 					$title,
 					array($view,'render'),
-					$post_type,
-					'normal',
-					'default'
+					$screen,
+					$context,
+					$priority
 				);
 
 				$template = WPCAView::make("group_template",array(
-					'post_type'=> $post_type,
+					'post_type'=> $post->post_type,
 					'options'  => $options
 				));
 
@@ -540,6 +559,7 @@ if(!class_exists("WPCACore")) {
 
 			return wp_insert_post(array(
 				'post_status' => self::STATUS_PUBLISHED, 
+				'menu_order'  => self::EXP_SINGULAR_ARCHIVE,
 				'post_type'   => self::TYPE_CONDITION_GROUP,
 				'post_author' => $post->post_author,
 				'post_parent' => $post->ID,
@@ -612,7 +632,8 @@ if(!class_exists("WPCACore")) {
 
 					wp_update_post(array(
 						'ID' => $post_id,
-						'post_status' => isset($_POST[self::PREFIX.'status']) ? self::STATUS_NEGATED : self::STATUS_PUBLISHED
+						'post_status' => $_POST[self::PREFIX.'status'] == self::STATUS_NEGATED ? self::STATUS_NEGATED : self::STATUS_PUBLISHED,
+						'menu_order' => (int)$_POST[self::PREFIX.'exposure']
 					));
 
 					do_action('wpca/modules/save-data',$post_id);
@@ -630,6 +651,14 @@ if(!class_exists("WPCACore")) {
 			
 		}
 
+		public static function add_group_script_styles($hook) {
+			$current_screen = get_current_screen();
+
+			if(self::post_types()->has($current_screen->post_type) && $current_screen->base == 'post') {
+				self::enqueue_scripts_styles($hook);
+			}
+		}
+
 		/**
 		 * Register and enqueue scripts and styles
 		 * for post edit screen
@@ -640,75 +669,85 @@ if(!class_exists("WPCACore")) {
 		 */
 		public static function enqueue_scripts_styles($hook) {
 
-			$current_screen = get_current_screen();
-
-			if(self::post_types()->has($current_screen->post_type) && $current_screen->base == 'post') {
-				
-				$groups = self::_get_condition_groups(null,false);
-				$data = array();
-				foreach ($groups as $group) {
-					$data[] = array(
-						"id" => $group->ID,
-						"status" => $group->post_status,
-						"options" => get_post_custom($group->ID),
-						"conditions" => apply_filters("wpca/modules/group-data",array(),$group->ID)
-					);
-				}
-
-				//Make sure to use packaged version
-				if(wp_script_is("select2","registered")) {
-					wp_deregister_script("select2");
-				}
-
-				//Add to head to take priority
-				//if being added under other name
-				wp_register_script(
-					'select2',
-					plugins_url('/assets/js/select2.min.js', __FILE__),
-					array('jquery'),
-					'4.0.3',
-					false
+			$groups = self::_get_condition_groups(null,false);
+			$data = array();
+			foreach ($groups as $group) {
+				$data[] = array(
+					"id" => $group->ID,
+					"status" => $group->post_status,
+					"exposure" => $group->menu_order,
+					"options" => get_post_custom($group->ID),
+					"conditions" => apply_filters("wpca/modules/group-data",array(),$group->ID)
 				);
+			}
 
-				wp_register_script(
-					'backbone.trackit',
-					plugins_url('/assets/js/backbone.trackit.min.js', __FILE__),
-					array('backbone'),
-					'0.1.0',
-					true
-				);
+			//Make sure to use packaged version
+			if(wp_script_is("select2","registered")) {
+				wp_deregister_script("select2");
+			}
 
-				wp_register_script(
-					self::PREFIX.'condition-groups',
-					plugins_url('/assets/js/condition_groups.min.js', __FILE__),
-					array('jquery','select2','backbone','backbone.trackit'),
-					self::VERSION,
-					true
-				);
-				
-				wp_register_style(
-					self::PREFIX.'condition-groups',
-					plugins_url('/assets/css/condition_groups.css', __FILE__),
-					array(),
-					self::VERSION
-				);
+			//Add to head to take priority
+			//if being added under other name
+			wp_register_script(
+				'select2',
+				plugins_url('/assets/js/select2.min.js', __FILE__),
+				array('jquery'),
+				'4.0.3',
+				false
+			);
 
-				wp_enqueue_script(self::PREFIX.'condition-groups');
-				wp_localize_script(self::PREFIX.'condition-groups', 'WPCA', array(
-					'save'          => __('Save',self::DOMAIN),
-					'cancel'        => __('Cancel',self::DOMAIN),
-					'or'            => __('Or',self::DOMAIN),
-					'and'           => __('And',self::DOMAIN),
-					'remove'        => __('Remove',self::DOMAIN),
-					'searching'     => __('Searching',self::DOMAIN),
-					'noResults'     => __('No results found.',self::DOMAIN),
-					'prefix'        => self::PREFIX,
-					'targetNegate'  => __('Target all but this context',self::DOMAIN),
-					'targetThis'    => __('Target this context',self::DOMAIN),
-					'unsaved'       => __('Conditions have unsaved changes. Do you want to continue and discard these changes?',self::DOMAIN),
-					'groups'        => $data
-				));
-				wp_enqueue_style(self::PREFIX.'condition-groups');
+			wp_register_script(
+				'backbone.trackit',
+				plugins_url('/assets/js/backbone.trackit.min.js', __FILE__),
+				array('backbone'),
+				'0.1.0',
+				true
+			);
+
+			wp_register_script(
+				'backbone.epoxy',
+				plugins_url('/assets/js/backbone.epoxy.min.js', __FILE__),
+				array('backbone'),
+				'1.3.3',
+				true
+			);
+
+			wp_register_script(
+				self::PREFIX.'condition-groups',
+				plugins_url('/assets/js/condition_groups.min.js', __FILE__),
+				array('jquery','select2','backbone','backbone.trackit','backbone.epoxy'),
+				WPCA_VERSION,
+				true
+			);
+			
+			wp_register_style(
+				self::PREFIX.'condition-groups',
+				plugins_url('/assets/css/condition_groups.css', __FILE__),
+				array(),
+				WPCA_VERSION
+			);
+
+			wp_enqueue_script(self::PREFIX.'condition-groups');
+			wp_localize_script(self::PREFIX.'condition-groups', 'WPCA', array(
+				'save'          => __('Save',self::DOMAIN),
+				'cancel'        => __('Cancel',self::DOMAIN),
+				'or'            => __('Or',self::DOMAIN),
+				'and'           => __('And',self::DOMAIN),
+				'remove'        => __('Remove',self::DOMAIN),
+				'searching'     => __('Searching',self::DOMAIN),
+				'noResults'     => __('No results found.',self::DOMAIN),
+				'prefix'        => self::PREFIX,
+				'targetNegate'  => __('Target all but this context',self::DOMAIN),
+				'targetThis'    => __('Target this context',self::DOMAIN),
+				'unsaved'       => __('Conditions have unsaved changes. Do you want to continue and discard these changes?',self::DOMAIN),
+				'groups'        => $data
+			));
+			wp_enqueue_style(self::PREFIX.'condition-groups');
+
+			//todo: manage modules per post type, only load necessary ones
+			foreach(self::$module_manager->get_all() as $module) {
+				add_action('admin_footer',
+					array($module,'template_condition'),1);
 			}
 
 		}

@@ -74,25 +74,11 @@ function duplicate_post_options() {
 
 	<div
 		style="margin: 9px 15px 4px 0; padding: 5px; text-align: center; font-weight: bold; float: left;">
-		<a href="http://lopo.it/duplicate-post-plugin"><?php _e('Visit plugin site'); ?>
-		</a> - <a
-			href="https://translate.wordpress.org/projects/wp-plugins/duplicate-post"><?php _e('Translate', 'duplicate-post'); ?>
-		</a> - <a href="https://wordpress.org/plugins/duplicate-post/faq/"><?php _e('FAQ', 'duplicate-post'); ?>
-		</a> - <a href="http://lopo.it/duplicate-post-plugin"><?php _e('Donate', 'duplicate-post'); ?>
-			(10¢) </a>
-		<form style="display: inline-block; vertical-align: middle;"
-			action="https://www.paypal.com/cgi-bin/webscr" method="post"
-			target="_top">
-			<input type="hidden" name="cmd" value="_s-xclick"> <input
-				type="hidden" name="encrypted"
-				value="-----BEGIN PKCS7-----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-----END PKCS7-----
-"><input type="image"
-				src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_SM.gif"
-				border="0" name="submit"
-				alt="PayPal – The safer, easier way to pay online."> <img alt=""
-				border="0" src="https://www.paypalobjects.com/it_IT/i/scr/pixel.gif"
-				width="1" height="1">
-		</form>
+		<a href="http://lopo.it/duplicate-post-plugin"><?php _e('Visit plugin site'); ?></a>
+		 - <a href="https://translate.wordpress.org/projects/wp-plugins/duplicate-post"><?php _e('Translate', 'duplicate-post'); ?></a>
+		 - <a href="https://wordpress.org/plugins/duplicate-post/faq/"><?php _e('FAQ', 'duplicate-post'); ?></a>
+		 - <a href="http://lopo.it/duplicate-post-plugin"><?php _e('Donate', 'duplicate-post'); ?> (10¢)</a>
+		   <a href="http://lopo.it/duplicate-post-plugin"><img id="donate-button" src="<?php echo plugins_url( 'donate.png', __FILE__ ); ?>" alt="Donate"/></a>
 
 
 	</div>
@@ -104,7 +90,7 @@ function duplicate_post_options() {
 		jQuery('section').hide();
 		jQuery('section').eq(jQuery(this).index()).show();	
 		return false;
-	})
+	});
 	
 	function toggle_private_taxonomies(){
 		jQuery('.taxonomy_private').toggle();
@@ -171,6 +157,9 @@ label.taxonomy_private {
 
 a.toggle_link {
 	font-size: small;
+}
+img#donate-button{
+	vertical-align: middle;
 }
 </style>
 
@@ -313,7 +302,7 @@ a.toggle_link {
 				<tr valign="top">
 					<th scope="row"><?php _e("Enable for these post types", 'duplicate-post'); ?>
 					</th>
-					<td><?php $post_types = get_post_types(array('public' => true),'objects');
+					<td><?php $post_types = get_post_types(array('show_ui' => true),'objects');
 					foreach ($post_types as $post_type_object ) :
 					if ($post_type_object->name == 'attachment') continue; ?> <label> <input
 							type="checkbox" name="duplicate_post_types_enabled[]"

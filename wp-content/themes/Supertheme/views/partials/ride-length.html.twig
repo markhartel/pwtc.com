@@ -1,0 +1,10 @@
+<span class="term">Length:</span>
+<span class="value">
+    {% if attached is not defined or not attached %}
+        {{ length }}
+        {% if max_length %}- {{ max_length }}{% endif %}
+        miles
+    {% else %}
+        <i class="missing">Will use the lowest and highest values found in the attached maps</i>
+    {% endif %}
+</span>

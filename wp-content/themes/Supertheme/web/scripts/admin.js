@@ -1,8 +1,8 @@
 jQuery(function() {
-    if(!jQuery('#schedule-rides-preview').length) {
+    if(!jQuery('#acf-field_57c498d11ff63').length) {
         return;
     }
-    
+
     // disable preview/submit buttons until validation
     jQuery('#schedule-rides-preview').attr('disabled','disabled');
     jQuery('#schedule-rides-create').attr('disabled','disabled');
@@ -62,10 +62,12 @@ jQuery(function() {
                             + "/"
                             + events[i].getDate()
                         + "'>"
-                        + (events[i].getMonth()+1)
-                        + "/"
-                        + events[i].getDate()
-                        + "/"
+                        + dayOfWeek(events[i].getDay())
+                        + ", "
+                        + monthOfYear(events[i].getMonth())
+                        + " "
+                        + ordinalSuffix(events[i].getDate())
+                        + ", "
                         + events[i].getFullYear()
                         + "</label>"
                     + "</td>" +
@@ -82,7 +84,7 @@ jQuery(function() {
 
     // on preview
     function preview(){
-        var every_milliseconds;
+        var every_milliseconds, every_days;
         var time_between = until.getTime() - from.getTime();
 
         // get milliseconds for every value to use when calculating event dates
@@ -90,12 +92,11 @@ jQuery(function() {
         switch(every) {
             case 'day':
                 every_milliseconds = 1 * 24 * 60 * 60 * 1000;
+                every_days = 1;
                 break;
             case 'week':
                 every_milliseconds = 7 * 24 * 60 * 60 * 1000;
-                break;
-            case 'month':
-                every_milliseconds = 30 * 24 * 60 * 60 * 1000;
+                every_days = 7;
                 break;
         }
         var number_of_events = Math.floor(time_between / every_milliseconds) + 1;
@@ -104,8 +105,57 @@ jQuery(function() {
         events = [];
         events.push(from);
         for (var i = 1; i < number_of_events; i++) {
-            events.push(new Date(from.getTime() + every_milliseconds * i));
+            var new_event = new Date(from.getTime());
+            new_event.setDate(from.getDate()+i*every_days);
+            events.push(new_event);
         }
+        console.log(events);
         buildPreviewTable();
+    }
+
+    function dayOfWeek(day) {
+        var week = [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ];
+        return week[day];
+    }
+
+    function monthOfYear(month) {
+        var year = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ];
+        return year[month];
+    }
+
+    function ordinalSuffix(i) {
+        var j = i % 10,
+            k = i % 100;
+        if (j == 1 && k != 11) {
+            return i + "st";
+        }
+        if (j == 2 && k != 12) {
+            return i + "nd";
+        }
+        if (j == 3 && k != 13) {
+            return i + "rd";
+        }
+        return i + "th";
     }
 });

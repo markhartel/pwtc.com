@@ -4,7 +4,7 @@ Donate link: 		http://lopo.it/duplicate-post-plugin/
 Tags: 				duplicate post, copy, clone
 Requires at least: 	3.4
 Tested up to: 		4.6
-Stable tag: 		3.0.1
+Stable tag: 		3.0.3
 License: 			GPLv2 or later
 License URI: 		http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,7 +69,7 @@ If not, maybe there is some kind of conflict with other plugins: feel free [to w
 
 = The plugin is not translated in my language! =
 
-From version 3.0 the plugin's translations are managed by the WordPress.org platform and the plugin si shipped without language files, so first of all update translations under Dashboard->Updates.
+From version 3.0 the plugin's translations are managed by the WordPress.org platform and the plugin is shipped without language files, so first of all update translations under Dashboard->Updates.
 
 If Duplicate Post is still in English, or if there are some untraslated strings, you can help traslating to your language [here](https://translate.wordpress.org/projects/wp-plugins/duplicate-post): you only need a WordPress.org account.
 [Contact me](http://lopo.it/contatti/) if you wish to become an editor for your language.
@@ -89,6 +89,12 @@ There is an open ticket in WordPress Trac, as other plugin developers too are in
 5. The admin bar link. 
 
 == Upgrade Notice ==
+
+= 3.0.3 =
+Notices + small fixes and improvements
+
+= 3.0.2 =
+Small bugfixes: check the changelog for more info
 
 = 3.0.1 =
 Recommended if you have 3.0: fixes the upgrade bug
@@ -133,6 +139,18 @@ Some users have experienced a fatal error when upgrading to v1.1: this may fix i
 New features and customization, WP 3.0 compatibility: you should upgrade if you want to copy Custom Posts with Custom Taxonomies.
 
 == Changelog ==
+
+= 3.0.3 =
+* Notices in admin after copying
+* Fixes warning in custom post type archives
+* Uses site options for version and notice
+* Minor fixes 
+
+= 3.0.2 =
+* Can now be enabled for every custom post type with visible UI (not just public ones)
+* Admin bar CSS only enqueued when needed
+* New "Donate" button
+* Fixes for minor bugs and typos
 
 = 3.0.1 =
 * Fixes the issues for people upgrading from an older version
@@ -262,7 +280,7 @@ The parameters are:
 * *id*
     (integer) (optional) Post ID. Default: Current post ID
     
-Another available template tag is `duplicate_post_get_original($id, $output)` which returns the original post, either as a post object, an associative array or a numeric array (depending on the $output parameter), jus as [get_post()](http://codex.wordpress.org/Function_Reference/get_post) does.
+Another available template tag is `duplicate_post_get_original($id, $output)` which returns the original post, either as a post object, an associative array or a numeric array (depending on the $output parameter), just as [get_post()](http://codex.wordpress.org/Function_Reference/get_post) does.
 `duplicate_post_get_original()` relies on the `_dp_original` custom field.
 
 
@@ -285,7 +303,7 @@ Please refer to the [Plugin API](http://codex.wordpress.org/Plugin_API) for ever
 
 == Contribute ==
 
-If you find this useful and you if you want to contribute, there are three ways:
+If you find this useful and if you want to contribute, there are three ways:
 
    1. You can [write me](http://lopo.it/contatti/) and submit your bug reports, suggestions and requests for features;
    2. If you want to translate it to your language (there are just a few lines of text), you can use the [translation project](https://translate.wordpress.org/projects/wp-plugins/duplicate-post);

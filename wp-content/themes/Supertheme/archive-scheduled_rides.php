@@ -67,9 +67,9 @@ $query_args = [
     'meta_query' => [
         [
             'key' => 'date',
-            'value' =>  [$loop_datetime->getTimestamp(), $loop_until_datetime->getTimestamp()],
+            'value' =>  [$loop_datetime->format('Y-m-d 00:00:00'), $loop_until_datetime->format('Y-m-d 00:00:00')],
             'compare' => 'BETWEEN',
-            'type' => 'TIMESTAMP'
+            'type' => 'DATETIME'
         ],
     ],
     'orderby' => ['date' => 'ASC'],
@@ -163,8 +163,7 @@ $query = new WP_Query($query_args);
 $scheduled_rides = [];
 while($query->have_posts()) {
     $query->the_post();
-    $datetime = new DateTime();
-    $datetime->setTimestamp(get_field('date'));
+    $datetime = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'));
     $date = $datetime->format('Y-m-d');
     if(!isset($scheduled_rides[$date])){
         $scheduled_rides[$date] = [];
@@ -177,7 +176,6 @@ while($query->have_posts()) {
     ];
 }
 wp_reset_postdata();
-
 // build the array
 $calendar = [];
 while($loop_datetime->format('ymd') <= $loop_until_datetime->format('ymd')){
@@ -198,9 +196,6 @@ while($loop_datetime->format('ymd') <= $loop_until_datetime->format('ymd')){
 
 // set data for twig
 $data['calendar'] = $calendar;
-
-
-
 
 // render
 echo $twig->render('ride-calendar.html.twig', $data);

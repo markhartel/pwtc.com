@@ -1,5 +1,5 @@
 <?php
-//require_once __DIR__.'/app/acf.php';
+require_once __DIR__.'/app/acf.php';
 require_once __DIR__.'/app/bootstrap.php';
 require_once __DIR__.'/src/functions.php';
 
@@ -39,6 +39,7 @@ add_action('init', function() {
             'thumbnail',
         ],
         'has_archive' => true,
+        'show_in_rest' => true,
         'menu_icon' => 'dashicons-location-alt',
     ]);
     register_post_type('ride_template', [
@@ -55,6 +56,7 @@ add_action('init', function() {
             'thumbnail',
         ],
         'has_archive' => true,
+        'show_in_rest' => true,
         'menu_icon' => 'dashicons-schedule',
     ]);
     register_post_type('scheduled_rides', [
@@ -71,12 +73,20 @@ add_action('init', function() {
             'thumbnail',
         ],
         'has_archive' => true,
+        'show_in_rest' => true,
         'menu_icon' => 'dashicons-calendar-alt',
     ]);
 
     add_filter('get_the_excerpt', function ($text) {
         return rtrim($text, '[&hellip;]') . '&hellip;';
     });
+});
+
+add_action('template_redirect', function(){
+    $current_post_type = get_post_type();
+    if(in_array($current_post_type, ['ride_maps', 'ride_templates']) && !is_user_logged_in()) {
+        wp_safe_redirect(get_site_url());
+    }
 });
 
 add_action('admin_enqueue_scripts', function () {
@@ -103,81 +113,36 @@ add_action('acf/save_post', function ($post_id) {
         $date = DateTime::createFromFormat('Y/n/j g:i a', $event.' '.get_field('time'));
         $id = wp_insert_post([
             'post_type' => 'scheduled_rides',
-            'post_title' => get_the_title() . ' - ' . $date->format('F jS'),
+            'post_title' => get_the_title(),
             'post_status' => 'publish',
         ]);
 
-        update_field('date', $date->getTimestamp(), $id);
+        update_field('date', $date->format('Y-m-d H:i:s'), $id);
         update_field('type', get_field('type'), $id);
         update_field('pace', get_field('pace'), $id);
         update_field('description', get_field('description', false, false), $id);
+        update_field('start_location', get_field('start_location', false, false), $id);
+        update_field('ride_leaders', $leaders, $id);
+        update_field('attach_map', get_field('attach_map'), $id);
+        update_field('maps', get_field('maps'), $id);
+        update_field('terrain', get_field('terrain'), $id);
+        update_field('length', get_field('length'), $id);
+        update_field('max_length', get_field('max_length'), $id);
 
         $leaders = [];
         foreach(get_field('ride_leaders') as $leader) {
             $leaders[] = $leader['ID'];
         }
-        update_field('ride_leaders', $leaders, $id);
-
-        $length = null;
-        $maxLength = null;
-        $address = false;
-        $terrain = [];
-        $maps = [];
-
-        if(get_field('attach_map')) {
-            foreach (get_field('maps') as $map) {
-                $map_id = $map->ID;
-
-                // set length to the lowest length
-                if (!$length) {
-                    $length = get_field('length', $map_id);
-                } else if ($length && get_field('length', $map_id) < $length) {
-                    $length = get_field('length', $map_id);
-                }
-
-                // set max length to the highest max length
-                if (!$maxLength) {
-                    $maxLength = get_field('max_length', $map_id);
-                } else if ($maxLength && get_field('max_length', $map_id) < $maxLength) {
-                    $maxLength = get_field('max_length', $map_id);
-                }
-
-                // set address to the first found address
-                if (!$address && get_field('start_address_street', $map_id)) {
-                    update_field('start_address_street', get_field('start_address_street', $map_id), $id);
-                    update_field('start_address_unit', get_field('start_address_unit', $map_id), $id);
-                    update_field('start_address_state', get_field('start_address_state', $map_id), $id);
-                    update_field('start_address_city', get_field('start_address_city', $map_id), $id);
-                    update_field('start_address_zip', get_field('start_address_zip', $map_id), $id);
-                    update_field('start_location', get_field('start_location', $map_id), $id);
-                    $address = true;
-                }
-
-                $terrain = array_merge($terrain, get_field('terrain', $map_id));
-                $maps = array_merge($maps, get_field('maps', $map_id));
-            }
-
-            update_field('terrain', $terrain, $id);
-            update_field('length', $length, $id);
-            update_field('max_length', $maxLength, $id);
-            update_field('field_57bb66366797b', $maps, $id);// map links and files
-        } else {
-            update_field('start_address_street', get_field('start_address_street'), $id);
-            update_field('start_address_unit', get_field('start_address_unit'), $id);
-            update_field('start_address_state', get_field('start_address_state'), $id);
-            update_field('start_address_city', get_field('start_address_city'), $id);
-            update_field('start_address_zip', get_field('start_address_zip'), $id);
-            update_field('start_location', get_field('start_location'), $id);
-            update_field('terrain', get_field('terrain'), $id);
-            update_field('length', get_field('length'), $id);
-            update_field('max_length', get_field('max_length'), $id);
-            update_field('field_57bb66366797b', get_field('maps'), $id);// map links and files
-        }
-
-        $ride_ids[] = $id;
     }
 
     update_field('schedule_rides', false);
-    update_field('from', get_field('to', false, false));
+    update_field('from', false);
     update_field('to', false);
 }, 20);
+
+
+
+function mytheme_excerpt_length() {
+    return 50;
+}
+add_filter('excerpt_length','mytheme_excerpt_length');

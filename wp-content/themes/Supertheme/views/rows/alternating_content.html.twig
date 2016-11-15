@@ -5,20 +5,20 @@
         </div>
     {% endif %}
 
-    {% for row in SP.ACF.get_sub_field('rows', false, false) %}
+    {% for row in SP.ACF.get_sub_field('rows') %}
         <div class="row" data-equalizer data-equalize-on="large">
             <div class="medium-6 large-4 {% if loop.index is even %}medium-push-6 large-push-8{% endif %} columns" data-equalizer-watch>
                 <div class="content">
-                    <img src="{{ SP.WordPress.getAttachedImageSrc(row.field_5773f9f17b4ad, 'teaser')[0] }}"/>
-                    {% if row.field_57d1de0a385c9 %}
-                        <a href="{{ row.field_57d1de0a385c9 }}" class="fancybox-media"><i class="fa fa-play"></i></a>
+                    <img src="{{ row.image.sizes.teaser }}"/>
+                    {% if row.video %}
+                        <a href="{{ row.video | slice(38, row.video|length - 48) }}" class="fancybox-media"><i class="fa fa-play"></i></a>
                     {% endif %}
                 </div>
             </div>
             <div class="medium-6 large-8 {% if loop.index is even %}medium-pull-6 large-pull-4{% endif %} columns" data-equalizer-watch>
                 <div class="content">
-                    <h3>{{ row.field_5773f9cd7b4ac }}</h3>
-                    {{ row.field_5773f9fd7b4ae }}
+                    <h3>{{ row.heading }}</h3>
+                    {{ row.content }}
                 </div>
             </div>
         </div>

@@ -12,12 +12,42 @@ if (!defined('CAS_App::PLUGIN_VERSION')) {
 	exit;
 }
 
-$cas_db_updater = new WP_DB_Updater('cas_db_version',CAS_App::PLUGIN_VERSION);
-$cas_db_updater->register_version_update('0.8','cas_update_to_08');
+$cas_db_updater = new WP_DB_Updater('cas_db_version',CAS_App::PLUGIN_VERSION, true);
 $cas_db_updater->register_version_update('1.1','cas_update_to_11');
 $cas_db_updater->register_version_update('2.0','cas_update_to_20');
 $cas_db_updater->register_version_update('3.0','cas_update_to_30');
 $cas_db_updater->register_version_update('3.1','cas_update_to_31');
+$cas_db_updater->register_version_update('3.4','cas_update_to_34');
+
+/**
+ * Version 3.3.3 -> 3.4
+ * Inherit condition exposure from sidebar
+ * Remove sidebar exposure
+ *
+ * @since  3.4
+ * @return boolean
+ */
+function cas_update_to_34() {
+	global $wpdb;
+
+	$wpdb->query("
+		UPDATE $wpdb->posts AS c
+		INNER JOIN $wpdb->posts AS s ON s.ID = c.post_parent
+		INNER JOIN $wpdb->postmeta AS e ON e.post_id = s.ID
+		SET c.menu_order = e.meta_value
+		WHERE c.post_type = 'condition_group'
+		AND e.meta_key = '_ca_exposure'
+	");
+
+	$wpdb->query("
+		DELETE FROM $wpdb->postmeta 
+		WHERE meta_key = '_ca_exposure'
+	");
+
+	wp_cache_flush();
+
+	return true;
+}
 
 /**
  * Version 3.0 -> 3.1
@@ -217,53 +247,6 @@ function cas_update_to_11() {
 		}
 	}
 	
-	return true;
-}
-
-/**
- * Version 0 -> 0.8
- * Introduces database version management, adds preficed keys to metadata
- * 
- * @global object $wpdb
- * @return boolean 
- */
-function cas_update_to_08() {
-	global $wpdb;
-	
-	$metadata = array(
-		'post_types',
-		'taxonomies',
-		'authors',
-		'page_templates',
-		'static',
-		'exposure',
-		'handle',
-		'host',
-		'merge-pos'
-	);
-
-	// Get all sidebars
-	$posts = $wpdb->get_col($wpdb->prepare("
-		SELECT ID 
-		FROM $wpdb->posts 
-		WHERE post_type = %s
-	",'sidebar'));
-
-	//Check if there is any
-	if(!empty($posts)) {
-		//Update the meta keys
-		foreach($metadata as $meta) {
-			$wpdb->query("
-				UPDATE $wpdb->postmeta 
-				SET meta_key = '_cas_".$meta."' 
-				WHERE meta_key = '".$meta."' 
-				AND post_id IN(".implode(',',$posts).")
-			");
-		}
-		// Clear cache for new meta keys
-		wp_cache_flush();
-	}
-
 	return true;
 }
 

@@ -9,7 +9,7 @@
 Plugin Name: Content Aware Sidebars
 Plugin URI: https://dev.institute/wordpress/sidebars-pro/
 Description: Unlimited custom sidebars for any post, page, category etc.
-Version: 3.3.3
+Version: 3.4
 Author: Joachim Jensen
 Author URI: https://dev.institute
 Text Domain: content-aware-sidebars
@@ -46,16 +46,19 @@ if(!class_exists('CAS_App')) {
 	// Load dependencies
 	$cas_dir_path = plugin_dir_path( __FILE__ );
 
-	require($cas_dir_path.'lib/wp-content-aware-engine/core.php');
+	require($cas_dir_path.'lib/wp-content-aware-engine/bootstrap.php');
 	require($cas_dir_path.'app.php');
 
 	if(is_admin()) {
 		require($cas_dir_path.'lib/wp-db-updater/wp-db-updater.php');
 		require($cas_dir_path.'lib/wp-pointer-tour/wp-pointer-tour.php');
 		require($cas_dir_path.'admin/db-updates.php');
+		require($cas_dir_path.'admin/admin.php');
 		require($cas_dir_path.'admin/post_type_sidebar.php');
+		require($cas_dir_path.'admin/sidebar-list-table.php');
 		require($cas_dir_path.'admin/sidebar-overview.php');
 		require($cas_dir_path.'admin/sidebar-edit.php');
+		require($cas_dir_path.'admin/screen_widgets.php');
 	}
 
 	require($cas_dir_path.'sidebar.php');
@@ -75,17 +78,6 @@ if(!class_exists('CAS_App')) {
 		CAS_App::instance()->manager()->manual_sidebar($args);
 	}
 
-	/**
-	 * Template wrapper to display content aware sidebars
-	 *
-	 * @deprecated 3.0           ca_display_sidebar()
-	 * @param      array|string  $args 
-	 * @return     void 
-	 */
-	function display_ca_sidebar($args = array()) {
-		_deprecated_function( __FUNCTION__, '3.0', 'ca_display_sidebar()' );
-		ca_display_sidebar($args);
-	}
 }
 
 

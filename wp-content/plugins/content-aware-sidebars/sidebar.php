@@ -39,13 +39,10 @@ final class CAS_Sidebar_Manager {
 			new CAS_Sidebar_Overview();
 			new CAS_Sidebar_Edit();
 			new CAS_Post_Type_Sidebar();
-
-			add_action('load-widgets.php',
-				array($this,'load_widgets_screen'));
 		}
 
-		add_action('sidebars_widgets',
-			array($this,'replace_sidebar'));
+		add_action('wpca/loaded',
+			array($this,'late_init'));
 		add_action('wp_head',
 			array($this,'sidebar_notify_theme_customizer'));
 		add_action('init',
@@ -58,54 +55,20 @@ final class CAS_Sidebar_Manager {
 		add_shortcode( 'ca-sidebar',
 			array($this,'sidebar_shortcode'));
 
+
 	}
 
 	/**
-	 * Widgets Screen functionality
+	 * Initialize after WPCA has been loaded
+	 * Makes sure the SDK can be used in actions/filters
+	 * forcefully called earlier
 	 *
-	 * @since  3.3
+	 * @since  3.4
 	 * @return void
 	 */
-	public function load_widgets_screen() {
-		add_action( 'dynamic_sidebar_before',
-			array($this,'render_sidebar_controls'));
-	}
-
-	/**
-	 * Render controls for custom sidebars
-	 *
-	 * @since  3.3
-	 * @param  string  $index
-	 * @return void
-	 */
-	public function render_sidebar_controls($index) {
-		//trashed custom sidebars not included
-		if(isset($this->sidebars[$index])) {
-			$sidebar = $this->sidebars[$index];
-			$link = admin_url('post.php?post='.$sidebar->ID);
-
-			switch($sidebar->post_status) {
-				case 'publish':
-					$status = __('Published');
-					break;
-				case 'future':
-					$status = __('Scheduled');
-					break;
-				default:
-					$status = __('Draft');
-			}
-			?>
-				<div class="cas-settings">
-				<div class="sidebar-status">
-					<input type="checkbox" class="sidebar-status-input sidebar-status-<?php echo $sidebar->post_status; ?>" id="cas-status-<?php echo $sidebar->ID; ?>" value="<?php echo $sidebar->ID; ?>" <?php checked($sidebar->post_status, 'publish') ?> disabled="disabled">
-					<label title="<?php echo $status; ?>" class="sidebar-status-label" for="cas-status-<?php echo $sidebar->ID; ?>">
-					</label>
-				</div>
-
-				<a title="<?php esc_attr_e('Edit Sidebar','content-aware-sidebars') ?>" class="dashicons dashicons-admin-generic cas-sidebar-link" href="<?php echo add_query_arg('action','edit',$link); ?>"></a><a title="<?php esc_attr_e('Revisions') ?>" class="cas-sidebar-link" href="<?php echo add_query_arg('action','cas-revisions',$link); ?>"><i class="dashicons dashicons-backup"></i> <?php _e('Revisions') ?></a>
-				</div>
-			<?php
-		}
+	public function late_init() {
+		add_action('sidebars_widgets',
+			array($this,'replace_sidebar'));
 	}
 
 	/**
@@ -147,32 +110,21 @@ final class CAS_Sidebar_Manager {
 			)
 		),'visibility')
 		->add(new WPCAMeta(
-			'exposure',
-			__('Exposure', 'content-aware-sidebars'),
-			1,
-			'select',
-			array(
-				__('Singular', 'content-aware-sidebars'),
-				__('Singular & Archive', 'content-aware-sidebars'),
-				__('Archive', 'content-aware-sidebars')
-			)
-		),'exposure')
-		->add(new WPCAMeta(
 			'handle',
-			_x('Handle','option', 'content-aware-sidebars'),
+			_x('Action','option', 'content-aware-sidebars'),
 			0,
 			'select',
 			array(
 				0 => __('Replace', 'content-aware-sidebars'),
 				1 => __('Merge', 'content-aware-sidebars'),
-				2 => __('Manual', 'content-aware-sidebars'),
+				2 => __('Shortcode / Template Tag', 'content-aware-sidebars'),
 				3 => __('Forced replace','content-aware-sidebars')
 			),
 			__('Replace host sidebar, merge with it or add sidebar manually.', 'content-aware-sidebars')
 		),'handle')
 		->add(new WPCAMeta(
 			'host',
-			__('Host Sidebar', 'content-aware-sidebars'),
+			__('Target Sidebar', 'content-aware-sidebars'),
 			'sidebar-1',
 			'select',
 			$sidebar_list
@@ -202,9 +154,10 @@ final class CAS_Sidebar_Manager {
 		if($this->metadata) {
 			// Remove ability to set self to host
 			if(get_the_ID()) {
-				$sidebar_list = $this->metadata()->get('host')->get_input_list();
+				$host_meta = $this->metadata()->get('host');
+				$sidebar_list = $host_meta->get_input_list();
 				unset($sidebar_list[CAS_App::SIDEBAR_PREFIX.get_the_ID()]);
-				$this->metadata()->get('host')->set_input_list($sidebar_list);
+				$host_meta->set_input_list($sidebar_list);
 			}
 			apply_filters('cas/metadata/populate',$this->metadata);
 		}
@@ -247,13 +200,21 @@ final class CAS_Sidebar_Manager {
 				'publish_posts'      => CAS_App::CAPABILITY,
 				'read_private_posts' => CAS_App::CAPABILITY
 			),
-			'show_ui'       => true,
-			'show_in_menu'  => true,
-			'query_var'     => false,
-			'rewrite'       => false,
-			'menu_position' => 25.099, //less probable to be overwritten
-			'supports'      => array('title','page-attributes'),
-			'menu_icon'     => 'dashicons-welcome-widgets-menus'
+			'public'              => false,
+			'hierarchical'        => false,
+			'exclude_from_search' => true,
+			'publicly_queryable'  => false,
+			'show_ui'             => false,
+			'show_in_menu'        => false,
+			'show_in_nav_menus'   => false,
+			'show_in_admin_bar'   => false,
+			'has_archive'         => false,
+			'rewrite'             => false,
+			'query_var'           => false,
+			'supports'            => array('title','page-attributes'),
+			'menu_icon'           => 'dashicons-welcome-widgets-menus',
+			'can_export'          => false,
+			'delete_with_user'    => false
 		));
 
 		WPCACore::post_types()->add(CAS_App::TYPE_SIDEBAR);
@@ -268,7 +229,11 @@ final class CAS_Sidebar_Manager {
 		$sidebars = get_posts(array(
 			'numberposts' => -1,
 			'post_type'   => CAS_App::TYPE_SIDEBAR,
-			'post_status' => array('publish','future','draft'),
+			'post_status' => array(
+				CAS_App::STATUS_ACTIVE,
+				CAS_App::STATUS_INACTIVE,
+				CAS_App::STATUS_SCHEDULED
+			),
 			'orderby'     => 'title',
 			'order'       => 'ASC'
 		));
@@ -291,12 +256,16 @@ final class CAS_Sidebar_Manager {
 	 */
 	public function update_sidebars() {
 
+		//TODO: check if this is necessary anymore or merge to 1 method
+
 		//Now reregister sidebars with proper content
 		foreach($this->sidebars as $post) {
 
+			$handle_meta = $this->metadata()->get('handle');
+
 			$sidebar_args = array(
 				'name'        => $post->post_title ? $post->post_title : __('(no title)'),
-				'description' => $this->metadata()->get('handle')->get_list_data($post->ID,true),
+				'description' => $handle_meta->get_list_data($post->ID,true),
 				'id'          => CAS_App::SIDEBAR_PREFIX.$post->ID
 			);
 
@@ -309,14 +278,15 @@ final class CAS_Sidebar_Manager {
 			$sidebar_args['before_title'] = '<h4 class="widget-title">';
 			$sidebar_args['after_title'] = '</h4>';
 
-			if ($this->metadata()->get('handle')->get_data($post->ID) != 2) {
-				$host = $this->metadata()->get('host')->get_list_data($post->ID,false);
+			if ($handle_meta->get_data($post->ID) != 2) {
+				$host_meta = $this->metadata()->get('host');
+				$host = $host_meta->get_list_data($post->ID,false);
 				$sidebar_args['description'] .= ': ' . ($host ? $host :  __('Please update Host Sidebar', 'content-aware-sidebars') );
 
 				//Set style from host to fix when content aware sidebar
 				//is called directly by other sidebar managers
 				global $wp_registered_sidebars;
-				$host_id = $this->metadata()->get('host')->get_data($post->ID);
+				$host_id = $host_meta->get_data($post->ID);
 				if(isset($wp_registered_sidebars[$host_id])) {
 					$sidebar_args['before_widget'] = $wp_registered_sidebars[$host_id]['before_widget'];
 					$sidebar_args['after_widget'] = $wp_registered_sidebars[$host_id]['after_widget'];
