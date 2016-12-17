@@ -82,9 +82,11 @@ services:
     class: "Supertheme\\WordPress\\Twig\\ACF"
   twig.wordpress:
     class: "Supertheme\\WordPress\\Twig\\WordPress"
+  twig.civicrm:
+    class: "Supertheme\\WordPress\\Twig\\CiviCRM"
   twig.supertheme:
     class: "Supertheme\\WordPress\\Twig\\SuperTheme"
-    arguments: ["@twig.acf", "@twig.wordpress"]
+    arguments: ["@twig.acf", "@twig.wordpress", "@twig.civicrm"]
   twig.environment:
     class: "Twig_Environment"
     arguments: ["@twig.loader", "%twig.options%"]

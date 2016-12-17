@@ -36,6 +36,38 @@ add_action('init', function () use($container) {
             register_post_type($post_type, $args);
         }
     }
+
+
+    remove_role('ride_leader');
+    remove_role('current_member');
+    remove_role('expired_member');
+    add_role(
+        'ride_leader',
+        __( 'Ride Leader' ),
+        array(
+            'read'         => true,  // true allows this capability
+            'edit_posts'   => true,
+            'delete_posts' => false, // Use false to explicitly deny
+        )
+    );
+    add_role(
+        'current_member',
+        __( 'Current Member' ),
+        array(
+            'read'         => true,  // true allows this capability
+            'edit_posts'   => true,
+            'delete_posts' => false, // Use false to explicitly deny
+        )
+    );
+    add_role(
+        'expired_member',
+        __( 'Expired Member' ),
+        array(
+            'read'         => true,  // true allows this capability
+            'edit_posts'   => true,
+            'delete_posts' => false, // Use false to explicitly deny
+        )
+    );
 });
 
 add_action('after_setup_theme', function() use($container) {

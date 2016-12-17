@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2016-06-13 01:46:55
+<?php /* Smarty version 2.6.27, created on 2016-11-30 21:04:28
          compiled from CRM%5CContact%5CPage%5CView%5CSummary.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM\\Contact\\Page\\View\\Summary.tpl', 1, false),array('block', 'crmButton', 'CRM\\Contact\\Page\\View\\Summary.tpl', 58, false),array('block', 'ts', 'CRM\\Contact\\Page\\View\\Summary.tpl', 59, false),array('block', 'crmRegion', 'CRM\\Contact\\Page\\View\\Summary.tpl', 145, false),array('modifier', 'cat', 'CRM\\Contact\\Page\\View\\Summary.tpl', 42, false),array('function', 'help', 'CRM\\Contact\\Page\\View\\Summary.tpl', 92, false),array('function', 'crmURL', 'CRM\\Contact\\Page\\View\\Summary.tpl', 164, false),)), $this); ?>

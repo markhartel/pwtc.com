@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2016-06-13 01:46:09
+<?php /* Smarty version 2.6.27, created on 2016-11-30 20:47:30
          compiled from CRM%5CDashlet%5CPage%5CBlog.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM\\Dashlet\\Page\\Blog.tpl', 1, false),array('block', 'ts', 'CRM\\Dashlet\\Page\\Blog.tpl', 32, false),)), $this); ?>

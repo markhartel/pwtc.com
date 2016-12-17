@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2016-06-13 01:46:55
+<?php /* Smarty version 2.6.27, created on 2016-11-30 21:04:29
          compiled from CRM/Contact/Page/View/CustomDataFieldView.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/Contact/Page/View/CustomDataFieldView.tpl', 1, false),array('block', 'ts', 'CRM/Contact/Page/View/CustomDataFieldView.tpl', 27, false),array('function', 'crmURL', 'CRM/Contact/Page/View/CustomDataFieldView.tpl', 49, false),array('modifier', 'nl2br', 'CRM/Contact/Page/View/CustomDataFieldView.tpl', 52, false),)), $this); ?>

@@ -1,0 +1,106 @@
+{% extends 'basic.html.twig' %}
+{% set loggedin = true %}
+{% block content %}
+    <section class="two-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <div class="medium-4 medium-push-8 large-3 large-push-9 columns sidebar" data-equalizer-watch>
+                <h2>Membership</h2>
+                <ul class="no-bullet">
+                    <li><span class="term">Plan:</span> <span class="value">{{ membership.membership_name }}</span></li>
+                    <li><span class="term">Joined:</span> <span class="value">{{ membership.join_date | date("F jS Y")}}</span></li>
+                    <li><span class="term">Expires:</span> <span class="value">{{ membership.end_date | date("F jS Y")}}</span></li>
+                    <li><a href="#">Renew</a></li>
+                </ul>
+            </div>
+            <article class="medium-8 medium-pull-4 large-9 large-pull-3 columns content account" data-equalizer-watch>
+                <h2>Basic Info <small><a href="#">Edit</a></small></h2>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <div class="account-overview">
+                            {{ SP.WordPress.getAvatar(210) }}
+                        </div>
+                    </div>
+                    <div class="large-6 columns">
+                        <div class="account-overview">
+                            <ul class="contact vertical menu">
+                                <h3 class="name">{{ user.display_name }} {{ contact_id }}</h3>
+                                {% for phone in user.phone %}
+                                    <li>
+                                        {% if phone.phone_type_id == 1 %}
+                                            <i class="fa fa-phone"></i>
+                                        {% elseif phone.phone_type_id == 3 %}
+                                            <i class="fa fa-fax"></i>
+                                        {% else %}
+                                            <i class="fa fa-mobile"></i>
+                                        {% endif %}
+                                        {{ phone.phone }}
+                                    </li>
+                                {% endfor %}
+                                {% for email in user.email %}
+                                    <li><i class="fa fa-envelope"></i> {{ email.email }}</li>
+                                {% endfor %}
+                                {% for address in user.address %}
+                                    <li>
+                                        <i class="fa fw fa-building"></i>
+                                        {{ address.street_address }} <br />
+                                        {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
+                                        {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
+                                        <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(1046) }} {{ address.postal_code }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <h3>Family Members
+                    <small><a href="#">Add New</a></small>
+                </h3>
+                {% if not household_members %}
+                    <div class="row column">
+                        <p>Currently no family members on your membership</p>
+                    </div>
+                {% endif %}
+                <div class="row small-up-1 medium-up-2 large-up-4">
+                    {% for member in household_members %}
+                        <div class="account-overview column">
+                            <img src="web/images/minified/avatar.min.gif" alt="" />
+                            <h5 class="name">{{ member.display_name }}</h5>
+                            <ul class="contact vertical menu">
+                                {% for phone in member.phone %}
+                                    <li>
+                                        {% if phone.phone_type_id == 1 %}
+                                            <i class="fa fa-phone"></i>
+                                        {% elseif phone.phone_type_id == 3 %}
+                                            <i class="fa fa-fax"></i>
+                                        {% else %}
+                                            <i class="fa fa-mobile"></i>
+                                        {% endif %}
+                                        {{ phone.phone }}
+                                    </li>
+                                {% endfor %}
+                                {% for email in member.email %}
+                                    <li><i class="fa fa-envelope"></i> {{ email.email }}</li>
+                                {% endfor %}
+                                {% for address in member.address %}
+                                    <li>
+                                        <i class="fa fw fa-building"></i>
+                                        {{ address.street_address }} <br />
+                                        {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
+                                        {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
+                                        <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(1046) }} {{ address.postal_code }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <ul class="horizontal menu">
+                                <li><a href="">Edit</a></li>
+                                <li><a href="">Delete</a></li>
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}

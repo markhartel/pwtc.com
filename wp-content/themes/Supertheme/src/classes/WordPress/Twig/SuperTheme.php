@@ -18,14 +18,21 @@ class SuperTheme
     protected $wordPress;
 
     /**
+     * @var WordPress
+     */
+    protected $civicrm;
+
+
+    /**
      * SuperTheme constructor.
      * @param ACF $acf
      * @param WordPress $wordpress
      */
-    public function __construct(ACF $acf, WordPress $wordpress)
+    public function __construct(ACF $acf, WordPress $wordpress, CiviCRM $civicrm)
     {
         $this->ACF = $acf;
         $this->wordPress = $wordpress;
+        $this->civicrm = $civicrm;
     }
 
     /**
@@ -43,4 +50,9 @@ class SuperTheme
     {
         return $this->wordPress;
     }
+    
+    public function getCiviCRM() {
+        return $this->civicrm;
+    }
+
 }
