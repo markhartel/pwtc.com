@@ -57,7 +57,16 @@
                 </div>
                 <br>
                 <h3>Family Members
-                    <small><a href="#">Add New</a></small>
+                    <small><a href="#add-form" class="fancybox">Add New</a></small>
+                    <div id="add-form">
+                        <div class="row column">
+                            <form action="" id="addHousehold">
+                                <label for="">Email: <input type="text" name="email"></label>
+                                <input type="hidden" name="action" value="add_household"/>
+                                <a href="#" class="primary button">Add</a>
+                            </form>
+                        </div>
+                    </div>
                 </h3>
                 {% if not household_members %}
                     <div class="row column">

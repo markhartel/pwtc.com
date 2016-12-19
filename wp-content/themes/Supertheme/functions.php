@@ -262,3 +262,55 @@ function delete_household(){
 }
 add_action('wp_ajax_delete_household', 'delete_household');
 add_action('wp_ajax_nopriv_delete_household', 'delete_household');
+
+function add_household(){
+    civicrm_initialize();
+    $wordpress_user = get_userdata(get_current_user_id());
+
+    // current user household
+    $result = civicrm_api3('contact', 'get', array(
+        'sequential' => 1,
+        'email' => $wordpress_user->user_email,
+    ));
+    $contact_id = $result['values'][0]['contact_id'];
+    $result = civicrm_api3('Relationship', 'get', array(
+        'sequential' => 1,
+        'relationship_type_id' => 6,
+        'contact_id_a' => $contact_id,
+    ));
+
+    if($result['values']) {
+        $household_id = $result['values'][0]['contact_id_b'];
+    }
+
+    if(!isset($household_id) || !$household_id) {
+        //@todo create household
+    }
+
+    // new user contact
+    $email = $_POST['email'];
+    $result = civicrm_api3('contact', 'get', array(
+        'sequential' => 1,
+        'email' => $email,
+    ));
+
+    if(!$result['values']) {
+        //@TODO cerate wordpress user and contact
+    } else {
+        $household_member_id = $result['values'][0]['contact_id'];
+    }
+    
+    // new user household
+    $result = civicrm_api3('Relationship', 'create', array(
+        'sequential' => 1,
+        'contact_id_a' => $household_member_id,
+        'contact_id_b' => $household_id,
+        'relationship_type_id' => 7,
+    ));
+
+    echo "$email has been added to the household";
+
+    die();
+}
+add_action('wp_ajax_add_household', 'add_household');
+add_action('wp_ajax_nopriv_add_household', 'add_household');
