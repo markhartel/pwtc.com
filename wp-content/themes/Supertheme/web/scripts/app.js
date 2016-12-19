@@ -70,7 +70,23 @@ jQuery(function() {
             type: 'post',
             data: jQuery("#basicInfo").serialize(),
             success : function( response ) {
-                alert(response)
+                jQuery.fancybox(response);
+                setTimeout(function(){ window.location.reload(); }, 3000);
+            }
+        });
+        e.preventDefault();
+        return false;
+    });
+
+
+    jQuery('.household-delete .alert.button').on('click', function(e){
+        jQuery.ajax({
+            url : civi.ajax_url,
+            type: 'post',
+            data: jQuery(this).parent('div').next('form').serialize(),
+            success : function( response ) {
+                jQuery.fancybox(response);
+                setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();

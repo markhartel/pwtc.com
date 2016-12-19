@@ -78,7 +78,7 @@ if($civi_contact->relationship["data"]) {
             if($member_result['values']) {
                 $params = array('contact_id' => $member_result['values'][0]['contact_id']);
                 $defaults = array();
-                $data['household_members'][] = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+                $data['household_members'][] = ['relationship_id' => $member['id'], 'data' => CRM_Contact_BAO_Contact::retrieve($params, $defaults)];
             }
         }
     }

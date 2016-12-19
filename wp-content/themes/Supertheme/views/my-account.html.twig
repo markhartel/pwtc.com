@@ -68,9 +68,9 @@
                     {% for member in household_members %}
                         <div class="account-overview column">
                             <img src="web/images/minified/avatar.min.gif" alt="" />
-                            <h5 class="name">{{ member.display_name }}</h5>
+                            <h5 class="name">{{ member.data.display_name }}</h5>
                             <ul class="contact vertical menu">
-                                {% for phone in member.phone %}
+                                {% for phone in member.data.phone %}
                                     <li>
                                         {% if phone.phone_type_id == 1 %}
                                             <i class="fa fa-phone"></i>
@@ -82,10 +82,10 @@
                                         {{ phone.phone }}
                                     </li>
                                 {% endfor %}
-                                {% for email in member.email %}
+                                {% for email in member.data.email %}
                                     <li><i class="fa fa-envelope"></i> {{ email.email }}</li>
                                 {% endfor %}
-                                {% for address in member.address %}
+                                {% for address in member.data.address %}
                                     <li>
                                         <i class="fa fw fa-building"></i>
                                         {% if address.street_address is defined %}{{ address.street_address }} <br />{% endif %}
@@ -99,11 +99,24 @@
                                 {% endfor %}
                             </ul>
                             <ul class="horizontal menu">
-                                <li><a href="">Delete</a></li>
+                                <li><a href="#household_delete_{{ loop.index }}" class="alert button fancybox">Delete</a></li>
                             </ul>
+                            <div class="household-delete" id="household_delete_{{ loop.index }}">
+                                <p>Are you sure you want to remove {{ member.data.display_name }} from your household?</p>
+                                <div class="button-group">
+                                    <a class="alert button">Yes</a>
+                                    <a href="javascript:jQuery.fancybox.close();" class="dark button">No</a>
+                                </div>
+                                <form action="">
+                                    <input type="hidden" name="name" value="{{ member.data.display_name }}">
+                                    <input type="hidden" name="id" value="{{ member.relationship_id }}">
+                                    <input type="hidden" name="action" value="delete_household"/>
+                                </form>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
+                <div class="fancybox-message"></div>
             </article>
         </div>
     </section>

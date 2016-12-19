@@ -187,8 +187,6 @@ function basic_info(){
         'first_name' => $first,
         'last_name' => $last,
     ));
-    echo "Civi Contact Update <hr />";
-    var_dump($result);
 
     $result = civicrm_api3('Email', 'create', array(
         'sequential' => 1,
@@ -197,8 +195,6 @@ function basic_info(){
         'email' => $email,
         'location_type_id' => $email_location,
     ));
-    echo "Civi email update <hr />";
-    var_dump($result);
 
     // update phones
     for($i = 0; $i < count($_POST['phone']); $i++) {
@@ -217,8 +213,6 @@ function basic_info(){
             'is_primary' => $primary,
             'phone_type_id' => $phone_type,
         ));
-        echo "Civi phone update <hr />";
-        var_dump($result);
     }
 
     // update addressses
@@ -244,11 +238,27 @@ function basic_info(){
             'postal_code' => $zip,
             'is_primary' => $primary,
         ));
-        echo "Civi address update <hr />";
-        var_dump($result);
     }
+
+    echo "Account has been updated";
 
     die();
 }
 add_action('wp_ajax_basic_info', 'basic_info');
 add_action('wp_ajax_nopriv_basic_info', 'basic_info');
+
+function delete_household(){
+    $relationship = $_POST['id'];
+    $name = $_POST['name'];
+    civicrm_initialize();
+    $result = civicrm_api3('Relationship', 'delete', array(
+        'sequential' => 1,
+        'id' => 9,
+    ));
+
+    echo "$name has been removed from the household";
+
+    die();
+}
+add_action('wp_ajax_delete_household', 'delete_household');
+add_action('wp_ajax_nopriv_delete_household', 'delete_household');
