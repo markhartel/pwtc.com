@@ -253,7 +253,7 @@ function delete_household(){
     civicrm_initialize();
     $result = civicrm_api3('Relationship', 'delete', array(
         'sequential' => 1,
-        'id' => 9,
+        'id' => $relationship,
     ));
 
     echo "$name has been removed from the household";
