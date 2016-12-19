@@ -1,3 +1,4 @@
+// sharethis
 if(typeof(stLight) != "undefined") {
     stLight.options({
         publisher: "31abfba6-0978-4139-8479-d6e96f61d25f",
@@ -7,9 +8,13 @@ if(typeof(stLight) != "undefined") {
     });
 }
 
+// general
 jQuery(function() {
     jQuery(document).foundation();
-    jQuery('.fancybox').fancybox();
+    jQuery('.fancybox').fancybox({
+        scrolling: "no",
+        fitToView: false
+    });
     jQuery('.fancybox-media').fancybox({
         openEffect  : 'none',
         closeEffect : 'none',
@@ -54,6 +59,23 @@ jQuery(function() {
         jQuery("html, body").animate({ scrollTop: 0 }, "slow");
         return false;
     });
+});
+
+
+// forms
+jQuery(function() {
+    jQuery('#basicInfo .primary.button').on('click', function(e){
+        jQuery.ajax({
+            url : civi.ajax_url,
+            type: 'post',
+            data: jQuery("#basicInfo").serialize(),
+            success : function( response ) {
+                alert(response)
+            }
+        });
+        e.preventDefault();
+        return false;
+    })
 });
 
 // acf google maps

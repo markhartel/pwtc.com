@@ -3,7 +3,7 @@ Contributors: automattic, akeda, allendav, royho, slash1andy, woosteve, spraveen
 Tags: ecommerce, e-commerce, commerce, woothemes, wordpress ecommerce, store, sales, sell, shop, shopping, cart, checkout, configurable, paypal, braintree
 Requires at least: 4.4
 Tested up to: 4.6.1
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -109,6 +109,9 @@ New feature requests and bugs reports can be made in the plugin forum.
 4. Checkout with PayPal or Credit and Debit Cards.
 
 == Changelog ==
+
+= 1.2.6 =
+* Fix - Issue where buyer unable to change subscription payment method with free-trial (order total is 0).
 
 = 1.2.5 =
 * Fix - Prevent void on unsettled transaction when refunding partially.

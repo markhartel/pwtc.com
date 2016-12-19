@@ -134,7 +134,7 @@ class CAC_Sortable_Model_Post extends CAC_Sortable_Model {
 			// WC Order
 			'order_total',
 			'order_date',
-			'order_title',
+			//'order_title',
 
 			// WC Product
 			'name',

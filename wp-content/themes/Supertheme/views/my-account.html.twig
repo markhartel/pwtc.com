@@ -1,6 +1,7 @@
 {% extends 'basic.html.twig' %}
 {% set loggedin = true %}
 {% block content %}
+    {% include "account/basic-info.html.twig" %}
     <section class="two-col-section">
         <div class="background"></div>
         <div class="row" data-equalizer data-equalize-on="medium">
@@ -14,17 +15,18 @@
                 </ul>
             </div>
             <article class="medium-8 medium-pull-4 large-9 large-pull-3 columns content account" data-equalizer-watch>
-                <h2>Basic Info <small><a href="#">Edit</a></small></h2>
+                <h2>Basic Info <small><a href="#basic-form" class="fancybox">Edit</a></small></h2>
                 <div class="row">
                     <div class="large-6 columns">
                         <div class="account-overview">
-                            {{ SP.WordPress.getAvatar(210) }}
+                            {{ SP.WordPress.getAvatar(200) }}
                         </div>
                     </div>
                     <div class="large-6 columns">
                         <div class="account-overview">
                             <ul class="contact vertical menu">
-                                <h3 class="name">{{ user.display_name }} {{ contact_id }}</h3>
+                                <li><h3 class="name">{{ user.first_name }} {{ user.last_name }}</h3></li>
+                                <li><i class="fa fa-user"></i> {{ contact_id }}</li>
                                 {% for phone in user.phone %}
                                     <li>
                                         {% if phone.phone_type_id == 1 %}
@@ -46,7 +48,7 @@
                                         {{ address.street_address }} <br />
                                         {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
                                         {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
-                                        <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(1046) }} {{ address.postal_code }}
+                                        <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(address.state_province_id) }} {{ address.postal_code }}
                                     </li>
                                 {% endfor %}
                             </ul>
@@ -86,15 +88,17 @@
                                 {% for address in member.address %}
                                     <li>
                                         <i class="fa fw fa-building"></i>
-                                        {{ address.street_address }} <br />
+                                        {% if address.street_address is defined %}{{ address.street_address }} <br />{% endif %}
                                         {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
                                         {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
-                                        <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(1046) }} {{ address.postal_code }}
+                                        <i class="fa fa-fw"></i>
+                                        {% if address.city is defined %}{{ address.city }},{% endif %}
+                                        {% if address.state_province_id is defined %}{{ SP.Civicrm.convert_county_id(address.state_province_id) }}{% endif %}
+                                        {% if address.postal_code is defined %}{{ address.postal_code }}{% endif %}
                                     </li>
                                 {% endfor %}
                             </ul>
                             <ul class="horizontal menu">
-                                <li><a href="">Edit</a></li>
                                 <li><a href="">Delete</a></li>
                             </ul>
                         </div>

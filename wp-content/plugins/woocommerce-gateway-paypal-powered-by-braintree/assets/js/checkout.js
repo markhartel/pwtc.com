@@ -237,4 +237,7 @@ jQuery( document ).ready( function( $ ) {
 
 	setInterval( checkSetup, 250 );
 
+	$( document.body ).on( 'checkout_error', function() {
+		$( '#paypalbraintree_nonce' ).remove();
+	});
 } );

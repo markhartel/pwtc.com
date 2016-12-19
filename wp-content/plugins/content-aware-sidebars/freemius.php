@@ -61,25 +61,6 @@ function cas_fs_connect_message_update(
     );
 }
 
-function cas_fs_connect_message(
-    $message,
-    $user_first_name,
-    $plugin_title,
-    $user_login,
-    $site_link,
-    $freemius_link
-)
-{
-    return sprintf(
-        __fs( 'hey-x' ) . '<br>' . __( 'To get the most out of this plugin, %2$s needs to connect your user, %3$s at %4$s, to %5$s.', 'content-aware-sidebars' ),
-        $user_first_name,
-        '<b>' . $plugin_title . '</b>',
-        '<b>' . $user_login . '</b>',
-        $site_link,
-        $freemius_link
-    );
-}
-
 $cas_fs->add_filter(
     'connect_message_on_update',
     'cas_fs_connect_message_update',
@@ -88,7 +69,7 @@ $cas_fs->add_filter(
 );
 $cas_fs->add_filter(
     'connect_message',
-    'cas_fs_connect_message',
+    'cas_fs_connect_message_update',
     10,
     6
 );

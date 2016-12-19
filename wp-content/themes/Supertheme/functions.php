@@ -146,3 +146,109 @@ function mytheme_excerpt_length() {
     return 50;
 }
 add_filter('excerpt_length','mytheme_excerpt_length');
+
+// forms processing
+add_action( 'wp_enqueue_scripts', function() {
+    wp_localize_script('app', 'civi', array(
+        'ajax_url' => admin_url('admin-ajax.php')
+    ));
+});
+function basic_info(){
+    // update wordpress info
+    $wordpress_user = get_userdata(get_current_user_id());
+    if(!$wordpress_user) {
+        echo "Must be logged in";
+        die();
+    }
+    $first = $_POST['first'];
+    $last = $_POST['last'];
+    $email = $_POST['email'];
+    $email_id = $_POST['email_id'];
+    $email_location = $_POST['email_location'];
+    $wordpress_update = [
+        'ID' => $wordpress_user->ID,
+        'first_name' => $first,
+        'last_name' => $last,
+    ];
+    if($wordpress_user->user_email != $email) {
+        $wordpress_update['user_email'] = $email;
+    }
+    $result = wp_update_user($wordpress_update);
+    if(!$result) {
+        echo "WordPress Error <hr />";
+        var_dump($result);
+    }
+
+    // update civicrm infor
+    $contact_id = $_POST['contact_id'];
+    $result = civicrm_api3('Contact', 'create', array(
+        'sequential' => 1,
+        'id' => $contact_id,
+        'first_name' => $first,
+        'last_name' => $last,
+    ));
+    echo "Civi Contact Update <hr />";
+    var_dump($result);
+
+    $result = civicrm_api3('Email', 'create', array(
+        'sequential' => 1,
+        'contact_id' => $contact_id,
+        'id' => $email_id,
+        'email' => $email,
+        'location_type_id' => $email_location,
+    ));
+    echo "Civi email update <hr />";
+    var_dump($result);
+
+    // update phones
+    for($i = 0; $i < count($_POST['phone']); $i++) {
+        $phone_id = $_POST['phone_id'][$i];
+        $phone_number = $_POST['phone'][$i];
+        $phone_location = $_POST['phone_location'][$i];
+        $phone_type = $_POST['phone_type'][$i];
+        $primary = $_POST['phone_primary'] == $phone_id ? 1 : 0;
+
+        $result = civicrm_api3('Phone', 'create', array(
+            'sequential' => 1,
+            'contact_id' => $contact_id,
+            'id' => $phone_id,
+            'phone' => $phone_number,
+            'location_type_id' => $phone_location,
+            'is_primary' => $primary,
+            'phone_type_id' => $phone_type,
+        ));
+        echo "Civi phone update <hr />";
+        var_dump($result);
+    }
+
+    // update addressses
+    for($i = 0; $i < count($_POST['address_type']); $i++) {
+        $address_id = $_POST['address_id'][$i];
+        $address_type = $_POST['address_type'][$i];
+        $address_1 = $_POST['address_1'][$i];
+        $address_2 = $_POST['address_2'][$i];
+        $city = $_POST['address_city'][$i];
+        $state = $_POST['address_state'][$i];
+        $zip = $_POST['address_zip'][$i];
+        $primary = $_POST['phone'][$i] ? 1 : 0;
+
+        $result = civicrm_api3('Address', 'create', array(
+            'sequential' => 1,
+            'contact_id' => $contact_id,
+            'id' => $address_id,
+            'location_type_id' => $address_type,
+            'street_address' => $address_1,
+            'supplemental_address_1' => $address_2,
+            'city' => $city,
+            'state_province_id' => $state,
+            'postal_code' => $zip,
+            'is_primary' => $primary,
+        ));
+        echo "Civi address update <hr />";
+        var_dump($result);
+    }
+
+    die();
+}
+add_action('wp_ajax_basic_info', 'basic_info');
+add_action('wp_ajax_nopriv_basic_info', 'basic_info');

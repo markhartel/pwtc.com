@@ -72,7 +72,7 @@ abstract class CAC_Sortable_Model {
 	private function update_sorting_preference( $orderby, $order = '' ) {
 		$preference = array(
 			'orderby' => $orderby,
-			'order'   => $order ? $order : 'ASC'
+			'order'   => $order ? $order : 'ASC',
 		);
 		update_user_meta( get_current_user_id(), $this->get_preference_key(), $preference );
 	}
@@ -163,6 +163,7 @@ abstract class CAC_Sortable_Model {
 			if ( $this->default_orderby != $preference['orderby'] ) {
 				$vars['orderby'] = $preference['orderby'];
 				$vars['order'] = $preference['order'];
+				unset( $vars['fields'] );
 			}
 		}
 
@@ -348,7 +349,7 @@ abstract class CAC_Sortable_Model {
 				'key'     => $field['name'],
 				'compare' => 'NOT EXISTS',
 			);
-			
+
 			$vars['meta_query'][] = array(
 				'key'     => $field['name'],
 				'compare' => '=',
@@ -510,7 +511,7 @@ abstract class CAC_Sortable_Model {
 
 		return array(
 			'items'     => $items,
-			'sort_flag' => $sort_flag
+			'sort_flag' => $sort_flag,
 		);
 	}
 }

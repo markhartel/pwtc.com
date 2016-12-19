@@ -105,6 +105,7 @@ class CAC_Sortable_Model_Comment extends CAC_Sortable_Model {
 				break;
 
 			case 'column-author' :
+			case 'author' :
 				$pieces['orderby'] = 'comment_author';
 				break;
 
@@ -125,6 +126,7 @@ class CAC_Sortable_Model_Comment extends CAC_Sortable_Model {
 				break;
 
 			case 'column-reply_to' :
+			case 'response' :
 				$pieces['orderby'] = 'comment_parent';
 				break;
 
@@ -153,6 +155,7 @@ class CAC_Sortable_Model_Comment extends CAC_Sortable_Model {
 				break;
 
 			case 'column-date_gmt' :
+			case 'date' :
 				$pieces['orderby'] = 'comment_date_gmt'; // this the default for Comment Query
 				break;
 

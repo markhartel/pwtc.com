@@ -34,13 +34,21 @@ abstract class WC_Gateway_Paypal_Braintree_Subscription extends WC_Gateway_Paypa
 	}
 
 	/**
-	 * Check if order contains subscriptions.
+	 * Check if order contains subscriptions, is renewal order, or subscription.
 	 *
 	 * @param  int $order_id
 	 * @return bool
 	 */
 	protected function order_contains_subscription( $order_id ) {
-		return function_exists( 'wcs_order_contains_subscription' ) && ( wcs_order_contains_subscription( $order_id ) || wcs_order_contains_renewal( $order_id ) );
+		if ( ! function_exists( 'wcs_order_contains_subscription' ) ) {
+			return false;
+		}
+
+		return (
+			wcs_order_contains_subscription( $order_id )
+			|| wcs_order_contains_renewal( $order_id )
+			|| wcs_is_subscription( $order_id )
+		);
 	}
 
 	/**
@@ -170,7 +178,7 @@ abstract class WC_Gateway_Paypal_Braintree_Subscription extends WC_Gateway_Paypa
 			// We have a customer id now, so let's do the sale and store the payment method in the vault.
 			$result = $gateway->transaction()->sale( $sale_args );
 			if ( ! $result->success ) {
-				$notice = sprintf( __( 'Error: PayPal Powered by Braintree was unable to complete the transaction. Please try again later or use another means of payment. Reason: %s', 'woocommerce-gateway-paypal-braintree' ), $error_message );
+				$notice = sprintf( __( 'Error: PayPal Powered by Braintree was unable to complete the transaction. Please try again later or use another means of payment. Reason: %s', 'woocommerce-gateway-paypal-braintree' ), $result->message );
 				wc_add_notice( $notice, 'error' );
 				$this->log( __FUNCTION__, "Error: Unable to complete transaction. Reason: {$result->message}" );
 				return false;

@@ -79,7 +79,9 @@ jQuery( document ).ready( function( $ ) {
 			_ajax_nonce : CAC_Filtering.nonce
 		},
 		function( response ) {
-
+			if( ! response ){
+				return;
+			}
 			if ( response.success ) {
 
 				var $select_boxes = $( 'select.cpac_filter' );

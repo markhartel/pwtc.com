@@ -2,9 +2,9 @@
 Contributors: 		lopo
 Donate link: 		http://lopo.it/duplicate-post-plugin/
 Tags: 				duplicate post, copy, clone
-Requires at least: 	3.4
-Tested up to: 		4.6
-Stable tag: 		3.0.3
+Requires at least: 	3.6
+Tested up to: 		4.7
+Stable tag: 		3.1.2
 License: 			GPLv2 or later
 License URI: 		http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,13 +20,15 @@ How it works:
 
 1. In 'Edit Posts'/'Edit Pages', you can click on 'Clone' link below the post/page title: this will immediately create a copy and return to the list.
 
-2. In 'Edit Posts'/'Edit Pages', you can click on 'New Draft' link below the post/page title.
+2. NEW! In 'Edit Posts'/'Edit Pages', you can select one or more items, then choose 'Clone' in the 'Bulk Actions' dropdown to copy them all at once.
 
-3. On the post edit screen, you can click on 'Copy to a new draft' above "Cancel"/"Move to trash". 
+3. In 'Edit Posts'/'Edit Pages', you can click on 'New Draft' link below the post/page title.
 
-4. While viewing a post as a logged in user, you can click on 'Copy to a new draft' as a dropdown link under "Edit Post" in the admin bar.
+4. On the post edit screen, you can click on 'Copy to a new draft' above "Cancel"/"Move to trash". 
 
-2, 3 and 4 will lead to the edit page for the new draft: change what you want, click on 'Publish' and you're done.
+5. While viewing a post as a logged in user, you can click on 'Copy to a new draft' as a dropdown link under "Edit Post" in the admin bar.
+
+3, 4 and 5 will lead to the edit page for the new draft: change what you want, click on 'Publish' and you're done.
 
 There is also a **template tag**, so you can put it in your templates and clone your posts/pages from the front-end. Clicking on the link will lead you to the edit page for the new draft, just like the admin bar link.
 
@@ -74,12 +76,6 @@ From version 3.0 the plugin's translations are managed by the WordPress.org plat
 If Duplicate Post is still in English, or if there are some untraslated strings, you can help traslating to your language [here](https://translate.wordpress.org/projects/wp-plugins/duplicate-post): you only need a WordPress.org account.
 [Contact me](http://lopo.it/contatti/) if you wish to become an editor for your language.
 
-= Can you add it to the bulk actions in the post/page list? =
-
-I can't. There is no way to do it without hacking the core code of WordPress.
-There is an open ticket in WordPress Trac, as other plugin developers too are interested to this feature: we can only hope that eventually our wish will be fulfilled.
-
-
 == Screenshots ==
 
 1. Here you can copy the post you're editing to a new draft.
@@ -87,8 +83,18 @@ There is an open ticket in WordPress Trac, as other plugin developers too are in
 3. The options page.
 4. The template tag manually added to Twenty Ten theme. Click on the "Copy to a new draft" link and you're redirected to the edit screen for a new draft copy of your post.
 5. The admin bar link. 
+6. Bulk clone action.
 
 == Upgrade Notice ==
+
+= 3.1.2 =
+Fixes the problem with custom fields
+
+= 3.1.1 =
+Bulk clone + custom field wildcards + other features + bugfixes + fix for nasty nag
+
+= 3.1 =
+Bulk clone + custom field wildcards + other features + bugfixes
 
 = 3.0.3 =
 Notices + small fixes and improvements
@@ -139,6 +145,22 @@ Some users have experienced a fatal error when upgrading to v1.1: this may fix i
 New features and customization, WP 3.0 compatibility: you should upgrade if you want to copy Custom Posts with Custom Taxonomies.
 
 == Changelog ==
+
+= 3.1.2 =
+* Fix for custom fields not copied
+
+= 3.1.1 =
+* Fix for nasty update nag (plus a failsafe checkbox)
+
+= 3.1 =
+* Bulk clone action added (WP 4.7+)
+* Wildcards enabled for custom fields to skip
+* Options to copy post author, post format (moved from taxonomies), menu order, post template
+* Check publish_posts/publish_pages capability to prevent Contributors from publishing by cloning
+* Using wp_slash (WP 3.6+) or a better workaround (WP 4.4+) on the post and its meta, should also fix some compatibility issues
+* Check if admin bar is showing before enqueueing CSS
+* Probable fix for repeated clone bug
+* Other minor bugs fixed 
 
 = 3.0.3 =
 * Notices in admin after copying

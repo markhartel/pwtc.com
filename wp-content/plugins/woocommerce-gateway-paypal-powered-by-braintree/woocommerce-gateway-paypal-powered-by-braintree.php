@@ -5,7 +5,7 @@
  * Description: Receive payments using Paypal Powered by Braintree.  A server with cURL, SSL support, and a valid SSL certificate is required (for security reasons) for this gateway to function. Requires PHP 5.4+
  * Author: WooThemes
  * Author URI: http://woothemes.com/
- * Version: 1.2.5
+ * Version: 1.2.6
  *
  * Copyright (c) 2016 WooThemes
  *
