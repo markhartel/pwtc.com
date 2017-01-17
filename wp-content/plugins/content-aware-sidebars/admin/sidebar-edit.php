@@ -3,7 +3,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
 if (!defined('CAS_App::PLUGIN_VERSION')) {
@@ -39,13 +39,18 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		add_filter( 'get_delete_post_link',
 			array($this,'get_delete_post_link'), 10, 3 );
 
-		if ( cas_fs()->is_not_paying() )  {
+		if (cas_fs()->is_not_paying() )  {
 			add_action('wp_ajax_cas_dismiss_review_notice',
 				array($this,'ajax_review_clicked'));
 			add_action('wpca/meta_box/after',
 				array($this,'show_review_link'));
 			add_filter('wpca/modules/list',
 				array($this,'add_to_module_list'),99);
+			add_action( 'all_admin_notices',
+				array($this,'admin_notice_review'));
+			add_action( 'admin_enqueue_scripts',
+				array($this,'add_general_scripts_styles')
+			);
 		}
 	}
 
@@ -147,8 +152,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			wp_enqueue_script( 'jquery-touch-punch' );
 		}
 
-		add_thickbox();
-
 		// Add the local autosave notice HTML
 		//add_action( 'admin_footer', '_local_storage_notice' );
 
@@ -228,10 +231,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			'<p><a href="https://dev.institute/docs/content-aware-sidebars/faq/?utm_source=plugin&utm_medium=referral&utm_content=help-tab&utm_campaign=cas" target="_blank">'.__('FAQ','content-aware-sidebars').'</a></p>'.
 			'<p><a href="http://wordpress.org/support/plugin/content-aware-sidebars" target="_blank">'.__('Forum Support','content-aware-sidebars').'</a></p>'
 		);
-
-		if ( cas_fs()->is_not_paying() )  {
-			add_action( 'admin_notices', array($this,'admin_notice_review'));
-		}
 
 	}
 
@@ -456,10 +455,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		echo '</div>';
 		echo '<br class="clear" />';
 		echo '</div></form></div>';
-
-		if ( cas_fs()->is_not_paying() ) {
-			$this->render_upgrade_modal();
-		}
 	}
 
 	/**
@@ -780,14 +775,23 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		$has_reviewed = get_user_option(CAS_App::META_PREFIX.'cas_review');
 		if($has_reviewed === false) {
 			$tour_taken = $this->_tour_manager->get_user_option();
-			if($tour_taken && (time() - $tour_taken) >= WEEK_IN_SECONDS*2) {
-				echo '<div class="update-nag notice js-cas-notice-review">';
-				echo '<p>'.__('You have used this plugin for some time now. I hope you like it!','content-aware-sidebars').'</p>';
-				echo '<p>'.sprintf('Please spend 2 minutes to support it with a %sreview on WordPress.org%s. Thank you.',
-				'<strong><a target="_blank" href="https://wordpress.org/support/view/plugin-reviews/content-aware-sidebars?filter=5#postform">',
-				'</a></strong>').'</p>';
-				echo '<br><p>- '.__('Joachim Jensen, developer of Content Aware Sidebars','content-aware-sidebars').'</p>';
-				echo '<p><a target="_blank" class="button-primary" href="https://wordpress.org/support/view/plugin-reviews/content-aware-sidebars?filter=5#postform">'.__('Review Plugin','content-aware-sidebars').'</a> <button class="button-secondary">'.__("I don't like it",'content-aware-sidebars').'</button></p>';
+			if($tour_taken && (time() - $tour_taken) >= WEEK_IN_SECONDS) {
+				$current_user = wp_get_current_user();
+
+				//updated class for wp4.0 and below
+				echo '<div class="notice notice-success updated js-cas-notice-review">';
+				echo '<p>';
+				printf(__("Hey %s, it's Joachim from %s. You have used this free plugin for some time now, and I hope you like it!",'content-aware-sidebars'),
+					'<strong>'.$current_user->display_name.'</strong>',
+					'<strong>Content Aware Sidebars</strong>'
+				);
+				echo '<br>';
+				printf(__("I have spent countless hours developing it, and it would mean a lot to me if you %ssupport it with a quick review on WordPress.org.%s",'content-aware-sidebars'),
+					'<strong><a target="_blank" href="https://wordpress.org/support/view/plugin-reviews/content-aware-sidebars?filter=5#postform">',
+					'</a></strong>'
+				);
+				echo '</p>';
+				echo '<p><a target="_blank" class="button-primary" href="https://wordpress.org/support/view/plugin-reviews/content-aware-sidebars?filter=5#postform">'.__('Review Content Aware Sidebars','content-aware-sidebars').'</a> <button class="button-secondary">'.__("No thanks",'content-aware-sidebars').'</button></p>';
 				echo '</div>';
 			}
 		}
@@ -809,8 +813,8 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		echo '<td>';
 		echo '<span class="js-cas-activation">';
 		echo '<input type="text" name="sidebar_activate" value="'.$activate_date.'" data-input placeholder="'.esc_attr__('Select date','content-aware-sidebars').'">';
-		echo '<a class="button button-small" data-toggle><i class="dashicons dashicons-calendar"></i></a>';
-		echo '<a class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></a>';
+		echo '<button type="button" class="button button-small" data-toggle><span class="dashicons dashicons-calendar"></span></button>';
+		echo '<button type="button" class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></button>';
 		echo '</span>';
 		echo '</td></tr>';
 
@@ -818,8 +822,8 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		echo '<td>';
 		echo '<span class="js-cas-expiry">';
 		echo '<input type="text" name="sidebar_deactivate" value="'.$deactivate_date.'" data-input placeholder="'.esc_attr__('Never','content-aware-sidebars').'">';
-		echo '<a class="button button-small" data-toggle><i class="dashicons dashicons-calendar"></i></a>';
-		echo '<a class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></a>';
+		echo '<button type="button" class="button button-small" data-toggle><span class="dashicons dashicons-calendar"></span></button>';
+		echo '<button type="button" class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></button>';
 		echo '</span>';
 		echo '</td></tr>';
 
@@ -830,7 +834,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	public function meta_box_schedule($post) {
 		global $wp_locale;
 
-		echo '<p>'.__('Display sidebar only in given time ranges on select days.').' <span class="cas-pro-label">Pro</span></p>';
+		echo '<p>'.__('Display sidebar only in given time ranges on select days.').' <span class="cas-pro-label">'.__('Pro','content-aware-sidebars').'</span></p>';
 		echo '<div>';
 
 		$i = $start = get_option('start_of_week',0);
@@ -1010,32 +1014,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	</ul>
 
 	<?php
-	}
-
-	/**
-	 * Render plugin upgrade modal
-	 *
-	 * @since  3.4
-	 * @return void
-	 */
-	public function render_upgrade_modal() {
-		$features = array(
-			__('Extra condition types','content-aware-sidebars'),
-			__('Widget Revisions','content-aware-sidebars'),
-			__('Visibility for roles','content-aware-sidebars'),
-			__('Time Schedule','content-aware-sidebars'),
-			__('Sync widgets across themes','content-aware-sidebars')
-		);
-		echo '<a style="display:none;" class="thickbox js-cas-pro-popup" href="#TB_inline?width=400&amp;height=220&amp;inlineId=pro-popup-notice" title="'.__('Buy Content Aware Sidebars Pro','content-aware-sidebars').'"></a>';
-		echo '<div id="pro-popup-notice" style="display:none;">';
-		echo '<img style="margin-top:15px;" class="alignright" src="'.plugins_url('../css/icon.png', __FILE__).'" width="128" height="128" />';
-		echo '
-		<h2>'.__('Get All Features With Content Aware Sidebars Pro','content-aware-sidebars').'</h2>';
-		echo '<p>'.sprintf(__('Power up your sidebars with: %s and more.','content-aware-sidebars'),strtolower(implode(', ', $features))).'</p>';
-		echo '<p>'.__('You can upgrade without leaving the admin panel by clicking below.','content-aware-sidebars');
-		echo '<br />'.__('Free updates and email support included.','content-aware-sidebars').'</p>';
-		echo '<p><a class="button-primary" target="_blank" href="'.esc_url(cas_fs()->get_upgrade_url()).'">Buy Now</a> <a href="" class="button-secondary js-cas-pro-read-more" target="_blank" href="">Read More</a></p>';
-		echo '</div>';
 	}
 
 	/**
@@ -1225,6 +1203,16 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	}
 
 	/**
+	 * Add general scripts to admin screens
+	 *
+	 * @since 3.4.1
+	 */
+	public function add_general_scripts_styles() {
+		wp_register_script('cas/admin/general', plugins_url('../js/general.js', __FILE__), array('jquery'), CAS_App::PLUGIN_VERSION, true);
+		wp_enqueue_script('cas/admin/general');
+	}
+
+	/**
 	 * Register and enqueue scripts styles
 	 * for screen
 	 *
@@ -1232,11 +1220,11 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function add_scripts_styles() {
 
-		wp_register_script('flatpickr', plugins_url('../js/flatpickr.min.js', __FILE__), array(), '2.0', false);
+		wp_register_script('flatpickr', plugins_url('../js/flatpickr.min.js', __FILE__), array(), '2.3.4', false);
 
-		wp_register_script('cas/admin/edit', plugins_url('../js/cas_admin.js', __FILE__), array('jquery','flatpickr'), CAS_App::PLUGIN_VERSION, false);
+		wp_register_script('cas/admin/edit', plugins_url('../js/cas_admin.min.js', __FILE__), array('jquery','flatpickr'), CAS_App::PLUGIN_VERSION, false);
 		
-		wp_register_style('flatpickr', plugins_url('../css/flatpickr.dark.min.css', __FILE__), array(), '2.0');			
+		wp_register_style('flatpickr', plugins_url('../css/flatpickr.dark.min.css', __FILE__), array(), '2.3.4');
 		wp_register_style('cas/admin/style', plugins_url('../css/style.css', __FILE__), array('flatpickr'), CAS_App::PLUGIN_VERSION);
 
 		$visibility = array();
