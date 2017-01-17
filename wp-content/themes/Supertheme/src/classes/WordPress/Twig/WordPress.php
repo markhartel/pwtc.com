@@ -146,7 +146,7 @@ class WordPress
     public function processShortcode($content, $ignore = false)
     {
         ob_start();
-        do_shortcode($content, $ignore);
+        echo do_shortcode($content, $ignore);
         return ob_get_clean();
     }
 

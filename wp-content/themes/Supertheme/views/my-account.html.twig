@@ -11,15 +11,15 @@
                     <li><span class="term">Plan:</span> <span class="value">{{ membership.membership_name }}</span></li>
                     <li><span class="term">Joined:</span> <span class="value">{{ membership.join_date | date("F jS Y")}}</span></li>
                     <li><span class="term">Expires:</span> <span class="value">{{ membership.end_date | date("F jS Y")}}</span></li>
-                    <li><a href="#">Renew</a></li>
+                    <li><a href="http://localhost:8056/pwtc.com/civicrm/?page=CiviCRM&q=civicrm/contribute/transact&reset=1&id=6">Renew</a></li>
                 </ul>
             </div>
             <article class="medium-8 medium-pull-4 large-9 large-pull-3 columns content account" data-equalizer-watch>
                 <h2>Basic Info <small><a href="#basic-form" class="fancybox">Edit</a></small></h2>
                 <div class="row">
                     <div class="large-6 columns">
-                        <div class="account-overview">
-                            {{ SP.WordPress.getAvatar(200) }}
+                        <div class="account-overview profile">
+                            {{ SP.WordPress.processShortcode("[basic-user-avatars]") }}
                         </div>
                     </div>
                     <div class="large-6 columns">

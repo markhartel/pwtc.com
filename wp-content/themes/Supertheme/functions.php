@@ -284,7 +284,13 @@ function add_household(){
     }
 
     if(!isset($household_id) || !$household_id) {
-        //@todo create household
+        $result = civicrm_api3('Contact', 'create', array(
+            'sequential' => 1,
+            'contact_type' => "Household",
+            'household_name' => $wordpress_user->user_firstname . " " . $wordpress_user->user_lastname,
+            'primary_contact_id' => $contact_id,
+        ));
+        $household_id = $result['values'][0]['"id"'];
     }
 
     // new user contact
@@ -295,7 +301,26 @@ function add_household(){
     ));
 
     if(!$result['values']) {
-        //@TODO cerate wordpress user and contact
+        // create blank contact
+        $result = civicrm_api3('Contact', 'create', array(
+            'sequential' => 1,
+            'contact_type' => "Individual",
+            'first_name' => $email,
+        ));
+        $household_member_id = $result['values'][0]['id'];
+        // add email
+        $result = civicrm_api3('Email', 'create', array(
+            'sequential' => 1,
+            'contact_id' => $household_member_id,
+            'email' => $email,
+        ));
+        //@todo add primary address
+        // create user if one doesnt exist
+        $user_id = username_exists($email);
+        if (!$user_id and email_exists($email) == false) {
+            $random_password = wp_generate_password(12, false);
+            $user_id = wp_create_user($email, $random_password, $email);
+        }
     } else {
         $household_member_id = $result['values'][0]['contact_id'];
     }
