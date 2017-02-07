@@ -374,3 +374,11 @@ a.scroll-to-top {
     }
   }
 }
+
+// civi forms
+.crm-section .label, .messages .crm-container h3 {
+  background-color: transparent;
+}
+.crm-container .crm-section .content {
+  margin-left: 17%;
+}

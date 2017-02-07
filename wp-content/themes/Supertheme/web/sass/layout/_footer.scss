@@ -34,6 +34,10 @@
     padding: 0;
     margin-bottom: 1rem;
   }
+  .gform_wrapper .field_sublabel_above .ginput_complex.ginput_container label,
+  .gform_wrapper .field_sublabel_above div.ginput_container[class*="gfield_time_"] label {
+    display: none !important;
+  }
   .menu {
     li:first-of-type a {
       padding-left: 0;
