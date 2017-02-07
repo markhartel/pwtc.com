@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2016-11-30 20:47:23
+<?php /* Smarty version 2.6.27, created on 2017-01-19 19:22:41
          compiled from CRM/common/dashboard.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/common/dashboard.tpl', 1, false),array('function', 'crmURL', 'CRM/common/dashboard.tpl', 51, false),array('function', 'crmKey', 'CRM/common/dashboard.tpl', 53, false),)), $this); ?>
