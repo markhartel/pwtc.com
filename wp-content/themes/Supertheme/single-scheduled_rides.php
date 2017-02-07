@@ -18,7 +18,7 @@ if(get_field('attach_map')) {
     $terrain = [];
     $maps = [];
     foreach (get_field('maps') as $map) {
-        $map_id = $map->ID;
+        $map_id = $map;
 
         // set length to the lowest length
         if (!$length) {
