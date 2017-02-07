@@ -10,10 +10,7 @@
                             <a href="#">
                                 {{ avatar }}
                             </a>
-                            <ul class="menu">
-                                <li><a href="{{ url }}/my-account">My Account</a></li>
-                                <li><a href="{{ logoutLink }}">Log out</a></li>
-                            </ul>
+                            {{ memberMenu }}
                         </li>
                     </ul>
                 {% else %}
@@ -43,10 +40,7 @@
                             <a class="mobile-account-menu">
                                 {{ avatar }}
                             </a>
-                            <ul class="menu">
-                                <li><a href="{{ editProfileLink }}">My Account</a></li>
-                                <li><a href="{{ logoutLink }}">Log out</a></li>
-                            </ul>
+                            {{ memberMenu }}
                         </li>
                     </ul>
                 {% else %}

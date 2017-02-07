@@ -23,6 +23,7 @@ parameters:
     fullscreen: [1920, 1080, true]
     teaser: [600, 600, true]
   wordpress.menus:
+    member_menu: "Member Menu"
     primary_menu: "Primary Menu"
     footer_menu: "Footer Menu"
   wordpress.sidebars:

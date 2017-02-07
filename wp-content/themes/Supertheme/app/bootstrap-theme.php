@@ -17,6 +17,12 @@ $data['desktopMenu'] = wp_nav_menu([
     'theme_location' => 'primary_menu',
     'walker' => new DropDownMenuWalker(),
 ]);
+$data['memberMenu'] = wp_nav_menu([
+    'echo' => false,
+    'container' => false,
+    'items_wrap' => '<ul id="%1$s" class="%2$s menu">%3$s</ul>',
+    'theme_location' => 'member_menu',
+]);
 $data['mobileMenu'] = wp_nav_menu([
     'echo' => false,
     'container' => false,
