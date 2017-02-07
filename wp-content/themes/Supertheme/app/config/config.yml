@@ -45,7 +45,7 @@ parameters:
   wordpress.styles:
     - { id: "slick", source: "%template_uri%/web/libs/slick-carousel/slick/slick.css", deps: ~ }
     - { id: "slick_theme", source: "%template_uri%/web/libs/slick-carousel/slick/slick-theme.css", deps: ["slick"] }
-    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ["slick_theme"] }
+    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ["slick_theme"], version: "1.0" }
   wordpress.scripts:
     - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false }
     - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false }
