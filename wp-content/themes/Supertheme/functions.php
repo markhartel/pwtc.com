@@ -339,3 +339,34 @@ function add_household(){
 }
 add_action('wp_ajax_add_household', 'add_household');
 add_action('wp_ajax_nopriv_add_household', 'add_household');
+
+// custom column for scheduled rides
+add_filter('manage_posts_columns', function($defaults) {
+    if(get_current_screen()->id == "edit-scheduled_rides") {
+        $defaults['schedule_date'] = 'Schedule Date';
+    }
+    return $defaults;
+});
+add_filter('manage_edit-scheduled_rides_sortable_columns', function ($sortable_columns) {
+    $sortable_columns[ 'schedule_date' ] = 'schedule_date';
+    return $sortable_columns;
+});
+add_action('pre_get_posts', function ($query) {
+    if(!is_admin() && !get_current_screen()->id == "edit-scheduled_rides") {
+        return;
+    }
+
+    $orderby = $query->get('orderby');
+    if( 'schedule_date' == $orderby ) {
+        $query->set('meta_key','date');
+        $query->set('orderby','meta_value');
+    }
+});
+add_action('manage_posts_custom_column', function($column_name, $post_ID){
+    if(!$column_name == 'schedule_date') {
+        return;
+    }
+
+    $date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $post_ID, false));
+    echo $date->format('D, F j, g:i a, Y');
+}, 10, 2);
