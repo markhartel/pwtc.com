@@ -352,7 +352,7 @@ add_filter('manage_edit-scheduled_rides_sortable_columns', function ($sortable_c
     return $sortable_columns;
 });
 add_action('pre_get_posts', function ($query) {
-    if(!is_admin() && !get_current_screen()->id == "edit-scheduled_rides") {
+    if(!is_admin()) {
         return;
     }
 
