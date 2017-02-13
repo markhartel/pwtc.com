@@ -5,20 +5,9 @@ $wafConfigURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=configu
 $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeAutoPrepend');
 /** @var array $wafData */
 ?>
-<div class="wrap wordfence" id="paidWrap">
-	<?php
-	$pageTitle = "Wordfence Web Application Firewall";
-	$helpLink = "http://docs.wordfence.com/en/WAF";
-	$helpLabel = "Learn more about the Wordfence Web Application Firewall";
-	include('pageTitle.php');
-	?>
+<div class="wordfenceHelpLink"><a href="<?php echo $helpLink; ?>" target="_blank" class="wfhelp"></a><a href="<?php echo $helpLink; ?>" target="_blank"><?php echo $helpLabel; ?></a></div>
+<div>
 	<div class="wordfenceModeElem" id="wordfenceMode_waf"></div>
-	
-	<?php
-	$rightRail = new wfView('marketing/rightrail', array('additionalClasses' => 'wordfenceRightRailWAF'));
-	echo $rightRail;
-	?>
-
 	<?php
 	if (defined('WFWAF_ENABLED') && !WFWAF_ENABLED) :
 		$message = 'To allow the firewall to re-enable, please remove this line from the appropriate file.';
@@ -46,37 +35,35 @@ $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeA
 	<?php endif ?>
 
 	<?php if (!empty($storageExceptionMessage)): ?>
-		<div style="font-weight: bold; margin: 20px 0px;;">
-			<?php echo wp_kses($storageExceptionMessage, 'post') ?>
+		<div class="wf-add-top wf-add-bottom">
+			<strong><?php echo wp_kses($storageExceptionMessage, 'post') ?></strong>
 		</div>
 	<?php elseif (!empty($wafActionContent)): ?>
-		<div style="max-width: 900px;"> 
+		<div> 
+			<!-- begin wafActionContent -->
 		<?php echo $wafActionContent ?>
+			<!-- end wafActionContent -->
 
 		<?php if (!empty($_REQUEST['wafAction']) && $_REQUEST['wafAction'] == 'removeAutoPrepend') { ?>
-			<p class="wf-notice"><em>If you cannot complete the uninstallation process,
-					<a target="_blank" href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F">click here for
-						help</a>.</em></p>
+			<p class="wf-notice"><em>If you cannot complete the uninstallation process, <a target="_blank" href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F">click here for help</a>.</em></p>
 		<?php }
 		else if (!empty($_REQUEST['wafAction']) && $_REQUEST['wafAction'] == 'updateSuPHPConfig') {
 			//Do nothing
 		}
 		else { ?>
-			<p class="wf-notice"><em>If you cannot complete the setup process,
-				<a target="_blank" href="https://docs.wordfence.com/en/Web_Application_Firewall_Setup">click here for
-					help</a>.</em></p>
+			<p class="wf-notice"><em>If you cannot complete the setup process, <a target="_blank" href="https://docs.wordfence.com/en/Web_Application_Firewall_Setup">click here for help</a>.</em></p>
 		<?php } ?>
 		</div>
 	<?php else: ?>
 
 		<?php if (!empty($configExceptionMessage)): ?>
-			<div style="font-weight: bold; margin: 20px 0px; max-width: 700px;">
-				<?php echo wp_kses($configExceptionMessage, 'post') ?>
+			<div class="wf-add-top wf-add-bottom">
+				<strong><?php echo wp_kses($configExceptionMessage, 'post') ?></strong>
 			</div>
 		<?php endif ?>
 
 		<?php if (!wfConfig::get('isPaid')) { ?>
-			<div class="wf-premium-callout" style="margin: 20px 0 20px 2px;width: 700px;">
+			<div class="wf-premium-callout wf-add-bottom">
 				<h3>The Wordfence Firewall stops you from getting hacked</h3>
 
 				<p>As new threats emerge, the Threat Defense Feed is updated to protect you from new attacks. The
@@ -84,134 +71,98 @@ $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeA
 					free user <strong>you are receiving the community version</strong> of the feed which is updated 30
 					days later.</p>
 
-				<p class="center"><a class="button button-primary"
-				                     href="https://www.wordfence.com/wafOptions1/wordfence-signup/">
-						Get Premium</a></p>
+				<p class="center"><a class="wf-btn wf-btn-primary wf-btn-callout" href="https://www.wordfence.com/wafOptions1/wordfence-signup/">Get Premium</a></p>
 			</div>
 		<?php } ?>
 
 		<?php if (WFWAF_SUBDIRECTORY_INSTALL): ?>
 			<div class="wf-notice">
 				You are currently running the Wordfence Web Application Firewall from another WordPress installation.
-				Please <a
-					href="<?php echo network_admin_url('admin.php?page=WordfenceWAF&wafAction=configureAutoPrepend'); ?>">click
-					here</a> to configure the Firewall to run correctly on this site.
+				Please <a href="<?php echo network_admin_url('admin.php?page=WordfenceWAF&wafAction=configureAutoPrepend'); ?>">click here</a> to configure the Firewall to run correctly on this site.
 			</div>
 		<?php else: ?>
-			<div class="wordfenceWrap" style="margin: 20px 20px 20px 30px;">
 				<?php if (wfConfig::get('isPaid')) { ?>
 					<div class="wf-success" style="max-width: 881px;"> 
 						You are running the Premium version of the Threat Defense Feed which is updated in real-time as new
 						threats emerge. <a href="https://www.wordfence.com/zz14/sign-in/" target="_blank">Protect additional sites.</a>
 					</div>
 				<?php } ?>
-				<form action="javascript:void(0)" id="waf-config-form">
-
-					<table class="wfConfigForm">
-						<tr>
-							<td>
-								<h2>Protection Level:<a href="http://docs.wordfence.com/en/WAF#Protection_Level"
-								                        target="_blank" class="wfhelp"></a></h2>
-							</td>
-							<td colspan="2">
-								<?php if (!WFWAF_AUTO_PREPEND): ?>
-									<span class="wf-notice-text">Basic WordPress Protection</span>
-									&nbsp;&nbsp;&nbsp;
-									<a style="vertical-align: middle" class="button button-primary"
-									   href="<?php echo $wafConfigURL ?>">Optimize the Wordfence Firewall</a>
-								<?php else: ?>
-									<span class="wf-success-text">Extended Protection</span>
-								<?php endif ?>
-							</td>
-						</tr>
-						<tr>
-							<?php
-							$wafStatus = (!WFWAF_ENABLED ? 'disabled' : $config->getConfig('wafStatus'));
-							?>
-							<td><h2>Firewall Status:<a href="http://docs.wordfence.com/en/WAF#Firewall_Status"
-							                           target="_blank" class="wfhelp"></a></h2></td>
-							<td colspan="2">
-								<select style="width: 300px" name="wafStatus" id="input-wafStatus"<?php echo !WFWAF_ENABLED ? ' disabled' : '' ?>>
-									<option<?php echo $wafStatus == 'enabled' ? ' selected' : '' ?>
-										class="wafStatus-enabled" value="enabled">Enabled and Protecting
-									</option>
-									<option<?php echo $wafStatus == 'learning-mode' ? ' selected' : '' ?>
-										class="wafStatus-learning-mode" value="learning-mode">Learning Mode
-									</option>
-									<option<?php echo $wafStatus == 'disabled' ? ' selected' : '' ?>
-										class="wafStatus-disabled" value="disabled">Disabled
-									</option>
-								</select>
-								<script>
-									(function($) {
-										$('#input-wafStatus').val(<?php echo json_encode($wafStatus) ?>)
-											.on('change', function() {
-												var val = $(this).val();
-												$('.wafStatus-description').hide();
-												$('#wafStatus-' + val + '-description').show();
-											});
-									})(jQuery);
-								</script>
-							</td>
-						</tr>
-						<tr id="waf-learning-mode-grace-row">
-							<td></td>
-							<td>
-								<label>
-									<input type="checkbox" name="learningModeGracePeriodEnabled"
-									       value="1"<?php echo $config->getConfig('learningModeGracePeriodEnabled') ? ' checked' : ''; ?>>
-									Automatically switch to Enabled Mode on:
-								</label>
-							</td>
-							<th>
-
-								<input type="text" name="learningModeGracePeriod" id="input-learningModeGracePeriod"
-								       class="wf-datetime"
-								       placeholder="Enabled until..."
-								       data-value="<?php echo esc_attr($config->getConfig('learningModeGracePeriod') ? (int) $config->getConfig('learningModeGracePeriod') : '') ?>"
-								>
-							</th>
-						</tr>
-						<tr>
-							<td style="text-align: center">
-								<button type="submit" class="button button-primary"<?php echo !WFWAF_ENABLED ? ' disabled' : '' ?>>Save</button>
-							</td>
-							<td colspan="2">
-								<div class="wafStatus-description" id="wafStatus-enabled-description">
-									In this mode, the Wordfence Web Application Firewall is actively blocking requests
-									matching known attack patterns, and is actively protecting your site from attackers.
+				<form action="javascript:void(0)" id="waf-config-form" class="wf-form-horizontal">
+					<div class="wf-form-group">
+						<label for="wf-waf-protection-mode" class="wf-col-sm-5 wf-col-md-3 wf-control-label waf-config-label">Protection Level <a href="http://docs.wordfence.com/en/WAF#Protection_Level" target="_blank" class="wfhelp"></a></label>
+						<div class="wf-col-sm-7 wf-col-md-5">
+						<?php if (!WFWAF_AUTO_PREPEND): ?>
+							<p class="wf-form-control-static wf-notice-text">Basic WordPress Protection</p>
+							<p class="wf-form-control-static"><a class="wf-btn wf-btn-primary wf-btn-callout" href="<?php echo $wafConfigURL ?>">Optimize the Wordfence Firewall</a></p>
+						<?php else: ?>
+							<p class="wf-form-control-static wf-success-text">Extended Protection</p>
+						<?php endif ?>
+						</div>
+					</div>
+					<div class="wf-form-group">
+						<label for="input-wafStatus" class="wf-col-sm-5 wf-col-md-3 wf-control-label waf-config-label">Firewall Status <a href="http://docs.wordfence.com/en/WAF#Firewall_Status" target="_blank" class="wfhelp"></a></label>
+						<?php $wafStatus = (!WFWAF_ENABLED ? 'disabled' : $config->getConfig('wafStatus')); ?>
+						<div class="wf-col-sm-7 wf-col-md-5">
+							<select id="input-wafStatus" name="wafStatus" class="wf-form-control"<?php echo !WFWAF_ENABLED ? ' disabled' : '' ?>>
+								<option<?php echo $wafStatus == 'enabled' ? ' selected' : '' ?> class="wafStatus-enabled" value="enabled">Enabled and Protecting</option>
+								<option<?php echo $wafStatus == 'learning-mode' ? ' selected' : '' ?> class="wafStatus-learning-mode" value="learning-mode">Learning Mode</option>
+								<option<?php echo $wafStatus == 'disabled' ? ' selected' : '' ?> class="wafStatus-disabled" value="disabled">Disabled</option>
+							</select>
+							<script type="application/javascript">
+								(function($) {
+									$('#input-wafStatus').val(<?php echo json_encode($wafStatus) ?>)
+										.on('change', function() {
+											var val = $(this).val();
+											$('.wafStatus-description').hide();
+											$('#wafStatus-' + val + '-description').show();
+										});
+								})(jQuery);
+							</script>
+						</div>
+					</div>
+					<div id="waf-learning-mode-grace-row" class="wf-form-group">
+						<div class="wf-col-sm-7 wf-col-sm-offset-5 wf-col-md-9 wf-col-md-offset-3">
+							<div class="wf-form-inline">
+								<div class="wf-checkbox">
+									<label>
+										<input type="checkbox" name="learningModeGracePeriodEnabled" value="1"<?php echo $config->getConfig('learningModeGracePeriodEnabled') ? ' checked' : ''; ?>> Automatically switch to Enabled Mode on
+									</label>
 								</div>
-								<div class="wafStatus-description" id="wafStatus-learning-mode-description">
-									When you first install the Wordfence Web Application Firewall, it will be in
-									learning
-									mode. This allows
-									Wordfence to learn about your site so that we can understand how to protect it and
-									how
-									to allow normal visitors through the firewall. We recommend you let Wordfence learn
-									for
-									a week before you enable the firewall.
-								</div>
-								<div class="wafStatus-description" id="wafStatus-disabled-description">
-									In this mode, the Wordfence Web Application Firewall is functionally turned off and
-									does not run any of its rules or analyze the request in any way.
-								</div>
-							</td>
-						</tr>
-						<?php /* ?>
-				<tr>
-					<td>
-						<input type="checkbox" name="throttleServerSideAttacks" id="input-throttleServerSideAttacks"
-						       value="1"<?php echo $config->getConfig('throttleServerSideAttacks') ? ' checked' : ''; ?>>
-					</td>
-					<th><label for="input-throttleServerSideAttacks">Throttle IPs that trip rules matching a server-side
-							vulnerability (SQLi, RCE, LFI, etc)</label></th>
-				</tr>
-				<?php */ ?>
-					</table>
+								<input type="text" name="learningModeGracePeriod" id="input-learningModeGracePeriod" class="wf-datetime wf-form-control" placeholder="Enabled until..." data-value="<?php echo esc_attr($config->getConfig('learningModeGracePeriod') ? (int) $config->getConfig('learningModeGracePeriod') : '') ?>">
+							</div>
+						</div>
+					</div>
+					<div class="wf-form-group">
+						<div class="wf-col-sm-7 wf-col-sm-offset-5 wf-col-md-offset-3">
+							<div class="wafStatus-description" id="wafStatus-enabled-description">
+								In this mode, the Wordfence Web Application Firewall is actively blocking requests
+								matching known attack patterns, and is actively protecting your site from attackers.
+							</div>
+							<div class="wafStatus-description" id="wafStatus-learning-mode-description">
+								When you first install the Wordfence Web Application Firewall, it will be in
+								learning
+								mode. This allows
+								Wordfence to learn about your site so that we can understand how to protect it and
+								how
+								to allow normal visitors through the firewall. We recommend you let Wordfence learn
+								for
+								a week before you enable the firewall.
+							</div>
+							<div class="wafStatus-description" id="wafStatus-disabled-description">
+								In this mode, the Wordfence Web Application Firewall is functionally turned off and
+								does not run any of its rules or analyze the request in any way.
+							</div>
+						</div>
+					</div>
+					<div class="wf-form-group">
+						<div class="wf-col-sm-7 wf-col-sm-offset-5 wf-col-md-offset-3">
+							<button type="submit" class="wf-btn wf-btn-primary wf-btn-callout"<?php echo !WFWAF_ENABLED ? ' disabled' : '' ?>>Save</button>
+						</div>
+					</div>
 
 					<br>
 
-					<h2>Rules<a href="http://docs.wordfence.com/en/WAF#Rules" target="_blank" class="wfhelp"></a></h2>
+					<h2>Rules <a href="http://docs.wordfence.com/en/WAF#Rules" target="_blank" class="wfhelp"></a></h2>
 
 					<div id="waf-rules-wrapper"></div>
 
@@ -228,73 +179,89 @@ $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeA
 
 				<br>
 
-				<h2>Whitelisted URLs<a href="http://docs.wordfence.com/en/WAF#Whitelisted_URLs" target="_blank"
-				                       class="wfhelp"></a></h2>
+				<h2>Whitelisted URLs <a href="http://docs.wordfence.com/en/WAF#Whitelisted_URLs" target="_blank" class="wfhelp"></a></h2>
 
 				<p><em>The URL/parameters in this table will not be tested by the firewall. They are typically added
 						while the firewall is in Learning Mode or by an admin who identifies a particular action/request
 						is a false positive.</em></p>
 
-				<p id="whitelist-form">
-					<strong>Add Whitelisted URL/Param:</strong><br>
-					<label>
-						URL:
-						<input type="text" name="whitelistURL">
-					</label>
-					&nbsp;
-					<label>
-						Param:
-						<select name="whitelistParam">
-							<option value="request.body">POST Body</option>
-							<option value="request.cookies">Cookie</option>
-							<option value="request.fileNames">File Name</option>
-							<option value="request.headers">Header</option>
-							<option value="request.queryString">Query String</option>
-						</select>
-					</label>
-					&nbsp;
-					<label>
-						Param Name:
-						<input type="text" name="whitelistParamName">
-					</label>
-					<button type="button" class="button button-small" id="waf-whitelisted-urls-add">Add</button>
-				</p>
+				<div id="whitelist-form">
+					<p><strong>Add Whitelisted URL/Param:</strong></p>
+					<div class="wf-form-inline">
+						<div class="wf-form-group">
+							<label for="whitelistURL">URL:</label>
+							<input class="wf-form-control" type="text" name="whitelistURL" id="whitelistURL">
+						</div>
+						<div class="wf-form-group">
+							<label for="whitelistParam">Param:</label>
+							<select class="wf-form-control" name="whitelistParam" id="whitelistParam">
+								<option value="request.body">POST Body</option>
+								<option value="request.cookies">Cookie</option>
+								<option value="request.fileNames">File Name</option>
+								<option value="request.headers">Header</option>
+								<option value="request.queryString">Query String</option>
+							</select>
+						</div>
+						<div class="wf-form-group">
+							<label for="whitelistParamName">Param Name:</label>
+							<input class="wf-form-control" type="text" name="whitelistParamName" id="whitelistParamName">
+						</div>
+						<button type="button" class="wf-btn wf-btn-default" id="waf-whitelisted-urls-add">Add</button>
+					</div>
+				</div>
 
 				<div id="waf-whitelisted-urls-wrapper"></div>
 				
-				<p id="whitelist-monitor">
-					<strong>Monitor Background Requests for False Positives:</strong><br>
-					<label><input type="checkbox" id="monitor-front" name="monitor-front" value="1"<?php echo wfConfig::get('ajaxWatcherDisabled_front') ? '' : ' checked'; ?>>Front</label> &nbsp; <label><input type="checkbox" id="monitor-admin" name="monitor-admin" value="1"<?php echo wfConfig::get('ajaxWatcherDisabled_admin') ? '' : ' checked'; ?>>Admin Panel</label> <a
-						href="https://docs.wordfence.com/en/WAF#Whitelisted_URLs"
-						target="_blank" class="wfhelp"></a>
-				</p> 
+				<div id="whitelist-monitor" class="wf-form-horizontal">
+					<div class="wf-form-group">
+						<div class="wf-col-xs-12">
+							<p class="wf-form-control-static"><strong>Monitor Background Requests for False Positives</strong> <a href="https://docs.wordfence.com/en/WAF#Whitelisted_URLs" target="_blank" class="wfhelp"></a></p>
+						</div>
+						<div class="wf-col-xs-12">
+							<label class="wf-checkbox-inline"><input type="checkbox" id="monitor-front" name="monitor-front" value="1"<?php echo wfConfig::get('ajaxWatcherDisabled_front') ? '' : ' checked'; ?>>Front</label>
+							<label class="wf-checkbox-inline"><input type="checkbox" id="monitor-admin" name="monitor-admin" value="1"<?php echo wfConfig::get('ajaxWatcherDisabled_admin') ? '' : ' checked'; ?>>Admin Panel</label>
+						</div>
+					</div>
+					<br>
+					
+				</div> 
 				<br>
 				
 				<h2>Advanced Configuration</h2>
-					
-					<p id="waf-advanced-options">
-						<strong>Other Options</strong><br>
-						<label><input type="checkbox" id="waf-disable-ip-blocking" name="waf-disable-ip-blocking" value="1"<?php echo $config->getConfig('disableWAFIPBlocking') ? ' checked' : ''; ?>>Delay IP and Country blocking until after WordPress and plugins have loaded (only process firewall rules early)</label> <a
-							href="https://docs.wordfence.com/en/WAF#Advanced_Configuration"
-							target="_blank" class="wfhelp"></a>
-					</p>
+				<div id="waf-advanced-options" class="wf-form-horizontal">
+					<div class="wf-form-group">
+						<div class="wf-col-xs-12">
+							<p class="wf-form-control-static"><strong>Other Options</strong></p>
+						</div>
+						<div class="wf-col-xs-12">
+							<label class="wf-checkbox-inline"><input type="checkbox" id="waf-disable-ip-blocking" name="waf-disable-ip-blocking" value="1"<?php echo $config->getConfig('disableWAFIPBlocking') ? ' checked' : ''; ?>>Delay IP and Country blocking until after WordPress and plugins have loaded (only process firewall rules early) <a href="https://docs.wordfence.com/en/WAF#Advanced_Configuration" target="_blank" class="wfhelp"></a></label>
+						</div>
+					</div>
+				</div>
 				
-				<?php if (WFWAF_AUTO_PREPEND) : ?>	
-					<p><strong>Remove Extended Protection<a href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F" target="_blank"
-										 class="wfhelp"></a></strong><br>
-				 
-				<em>If you're moving to a new host or a new installation location, you may need to temporarily disable extended protection to avoid any file not found errors. Use this action to remove the configuration changes that enable extended protection mode or you can <a href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F" target="_blank">remove them manually</a>.</em></p>
-				
-				<p><a href="<?php echo $wafRemoveURL; ?>" class="button button-small" id="waf-remove-extended">Remove Extended Protection</a></p>
+				<?php if (WFWAF_AUTO_PREPEND) : ?>
+				<div class="wf-form-horizontal">
+					<div class="wf-form-group">
+						<div class="wf-col-xs-12">
+							<p class="wf-form-control-static"><strong>Remove Extended Protection <a href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F" target="_blank" class="wfhelp"></a></strong></p>
+						</div>
+						<div class="wf-col-xs-12">
+							<p class="wf-form-control-static"><em>If you're moving to a new host or a new installation location, you may need to temporarily disable extended protection to avoid any file not found errors. Use this action to remove the configuration changes that enable extended protection mode or you can <a href="https://docs.wordfence.com/en/Web_Application_Firewall_FAQ#How_can_I_remove_the_firewall_setup_manually.3F" target="_blank">remove them manually</a>.</em></p>
+						</div>
+					</div>
+					<div class="wf-form-group">
+						<div class="wf-col-xs-12">
+							<a href="<?php echo $wafRemoveURL; ?>" class="wf-btn wf-btn-default wf-btn-sm" id="waf-remove-extended">Remove Extended Protection</a> 
+						</div>
+					</div>
+				</div>
 				<?php endif ?>
-			</div>
 		<?php endif ?>
 	<?php endif ?>
-
 </div>
 
 <script type="text/x-jquery-template" id="waf-rules-tmpl">
-	<table class="wf-table">
+	<table class="wf-striped-table">
 		<thead>
 		<tr>
 			<th style="width: 5%">Enabled</th>
@@ -326,20 +293,20 @@ $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeA
 </script>
 <script type="text/x-jquery-template" id="waf-whitelisted-urls-tmpl">
 	<?php ob_start() ?>
-	<form action="javascript:void(0)" class="wf-bulk-action wf-whitelist-actions">
-		<select name="wf-bulk-action">
+	<form action="javascript:void(0)" class="wf-bulk-action wf-whitelist-actions wf-form-inline">
+		<select class="wf-form-control" name="wf-bulk-action">
 			<option value="">Bulk Actions</option>
 			<option value="delete">Delete</option>
 			<option value="enable">Enable</option>
 			<option value="disable">Disable</option>
 		</select>
-		<button type="submit" class="button">Apply</button>
+		<button type="submit" class="wf-btn wf-btn-default">Apply</button>
 	</form>
 	<?php
 	$bulkActionForm = ob_get_clean();
 	echo $bulkActionForm;
 	?>
-	<table class="wf-table whitelist-table">
+	<table class="wf-striped-table whitelist-table">
 		<thead>
 		<tr>
 			<th style="width: 2%;text-align: center"><input type="checkbox" class="wf-whitelist-table-bulk-action"></th>
@@ -433,12 +400,12 @@ $wafRemoveURL = network_admin_url('admin.php?page=WordfenceWAF&wafAction=removeA
 			</td>
 			<td>
 				<span class="whitelist-display" style="white-space: nowrap">
-					<button type="button" class="button button-small whitelist-url-edit">Edit</button>
-					<button type="button" class="button button-small whitelist-url-delete">Delete</button>
+					<button type="button" class="wf-btn wf-btn-default wf-btn-sm whitelist-url-edit">Edit</button>
+					<button type="button" class="wf-btn wf-btn-default wf-btn-sm whitelist-url-delete">Delete</button>
 				</span>
 				<span class="whitelist-edit" style="white-space: nowrap">
-					<button type="button" class="button button-small whitelist-url-save">Save</button>
-					<button type="button" class="button button-small whitelist-url-cancel">Cancel</button>
+					<button type="button" class="wf-btn wf-btn-default wf-btn-sm whitelist-url-save">Save</button>
+					<button type="button" class="wf-btn wf-btn-default wf-btn-sm whitelist-url-cancel">Cancel</button>
 				</span>
 			</td>
 		</tr>

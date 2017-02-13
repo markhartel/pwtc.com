@@ -21,8 +21,11 @@ abstract class WC_Gateway_Paypal_Braintree_Subscription extends WC_Gateway_Paypa
 			'subscription_amount_changes',
 			'subscription_date_changes',
 			'multiple_subscriptions',
-			'subscription_payment_method_change_admin',
-			'subscription_payment_method_change_customer',
+			'subscription_payment_method_change_admin'
+			// NOTE: PayPal Braintree does NOT support $0 transactions so we
+			// must NOT enable subscription_payment_method_change_customer
+			// because Subscriptions requires that the gateway allow zero amount
+			// transactions for that to work
 			)
 		);
 

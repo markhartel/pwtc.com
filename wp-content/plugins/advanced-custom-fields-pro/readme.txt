@@ -106,6 +106,37 @@ http://support.advancedcustomfields.com/
 
 == Changelog ==
 
+= 5.5.7 =
+* Core: Fixed bug causing `get_field()` to return incorrect data for sub fields registered via PHP code.
+
+= 5.5.6 =
+* Core: Fixed bug causing license key to be ignored after changing url from http to https
+* Core: Fixed Select2 (v4) bug where 'allow null' setting would not correctly save empty value
+* Core: Added new 'acf/validate_field' filter
+* Core: Added new 'acf/validate_field_group' filter
+* Core: Added new 'acf/validate_post_id' filter
+* Core: Added new 'row_index_offset' setting
+* Core: Fixed bug causing value loading issues for a taxonomy term in WP < 4.4
+* Core: Minor fixes and improvements
+
+= 5.5.5 =
+* File field: Fixed bug creating draft post when saving an empty value
+* Image field: Fixed bug mentioned above
+
+= 5.5.4 =
+* File field: Added logic to 'connect' selected attachment to post (only if attachment is not 'connected')
+* File field: Removed `filesize()` call causing performance issues with externally hosted attachments
+* File field: Added AJAX validation to 'basic' uploader
+* Image field: Added 'connect' logic mentioned above
+* Image field: Added AJAX validation mentioned above
+* True false field: Improved usability by allowing 'tab' key to focus element (use space or arrow keys to toggle)
+* Gallery field: Fixed bug causing unsaved changes in sidebar to be lost when selecting another attachment
+* API: Fixed `add_row()` and `add_sub_row()` return values (from true to new row index)
+* Core: Improved `get_posts()` query speeds by setting 'update_cache' settings to false
+* Core: Allowed 'instruction_placement' setting on 'widget' forms (previously set always to 'below fields')
+* Core: Removed 'ACF PRO invalid license nag' and will include fix for 'protocol change' in next release
+* Language: Updated French translation - thanks to Martial Parfait
+
 = 5.5.3 =
 * Options page: Fixed bug when using WPML in multiple tabs causing incorrect 'lang' to be used during save.
 * Core: Added support with new `get_user_locale()` setting in WP 4.7

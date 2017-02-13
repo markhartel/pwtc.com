@@ -626,7 +626,7 @@ function acf_get_post_types( $args = array() ) {
 	$exclude[] = 'acf-field';
 	$exclude[] = 'acf-field-group';
 	
-	
+		
 	// loop
 	foreach( $post_types as $i => $post_type ) {
 		
@@ -1490,9 +1490,11 @@ function acf_get_posts( $args = array() ) {
 	// defaults
 	// leave suppress_filters as true becuase we don't want any plugins to modify the query as we know exactly what 
 	$args = wp_parse_args( $args, array(
-		'posts_per_page'	=> -1,
-		'post_type'			=> '',
-		'post_status'		=> 'any'
+		'posts_per_page'			=> -1,
+		'post_type'					=> '',
+		'post_status'				=> 'any',
+		'update_post_meta_cache'	=> false,
+		'update_post_term_cache' 	=> false
 	));
 	
 
@@ -2837,6 +2839,10 @@ function acf_in_array( $value = '', $array = false ) {
 
 function acf_get_valid_post_id( $post_id = 0 ) {
 	
+	// vars
+	$_post_id = $post_id;
+	
+	
 	// if not $post_id, load queried object
 	if( !$post_id ) {
 		
@@ -2869,8 +2875,8 @@ function acf_get_valid_post_id( $post_id = 0 ) {
 		
 		// term
 		} elseif( isset($post_id->taxonomy, $post_id->term_id) ) {
-		
-			$post_id = 'term_' . $post_id->term_id;
+			
+			$post_id = acf_get_term_post_id( $post_id->taxonomy, $post_id->term_id );
 		
 		// comment
 		} elseif( isset($post_id->comment_ID) ) {
@@ -2946,7 +2952,7 @@ function acf_get_valid_post_id( $post_id = 0 ) {
 	
 	
 	// filter for 3rd party
-	$post_id = apply_filters('acf/get_valid_post_id', $post_id);
+	$post_id = apply_filters('acf/validate_post_id', $post_id, $_post_id);
 	
 	
 	// return
@@ -3001,7 +3007,7 @@ function acf_get_post_id_info( $post_id = 0 ) {
 		$type = explode($glue, $post_id);
 		$id = array_pop($type);
 		$type = implode($glue, $type);
-		$meta = array('post', 'user', 'comment', 'term'); // add in 'term'
+		$meta = array('post', 'user', 'comment', 'term');
 		
 		
 		// check if is taxonomy (ACF < 5.5)
@@ -3034,6 +3040,7 @@ function acf_get_post_id_info( $post_id = 0 ) {
 	return $info;
 	
 }
+
 
 /*
 
@@ -3085,6 +3092,36 @@ function acf_isset_termmeta( $taxonomy = '' ) {
 	// return
 	return true;
 		
+}
+
+
+/*
+*  acf_get_term_post_id
+*
+*  This function will return a valid post_id string for a given term and taxonomy
+*
+*  @type	function
+*  @date	6/2/17
+*  @since	5.5.6
+*
+*  @param	$taxonomy (string)
+*  @param	$term_id (int)
+*  @return	(string)
+*/
+
+function acf_get_term_post_id( $taxonomy, $term_id ) {
+	
+	// WP < 4.4
+	if( !acf_isset_termmeta() ) {
+		
+		return $taxonomy . '_' . $term_id;
+		
+	}
+	
+	
+	// return
+	return 'term_' . $term_id;
+	
 }
 
 
@@ -3845,7 +3882,8 @@ function acf_validate_attachment( $attachment, $field, $context = 'prepare' ) {
 	// custom
 	} else {
 		
-		$file = wp_parse_args($file, $attachment);
+		$file = array_merge($file, $attachment);
+		$file['type'] = pathinfo($attachment['url'], PATHINFO_EXTENSION);
 		
 	}
 	
@@ -4911,6 +4949,79 @@ function _acf_settings_slug( $v ) {
     $slug = current($slug);
 	
 	return $slug;
+}
+
+
+
+
+/*
+*  acf_strip_protocol
+*
+*  This function will remove the proticol from a url 
+*  Used to allow licences to remain active if a site is switched to https 
+*
+*  @type	function
+*  @date	10/01/2017
+*  @since	5.5.4
+*  @author	Aaron 
+*
+*  @param	$url (string)
+*  @return	(string) 
+*/
+
+function acf_strip_protocol( $url ) {
+		
+	// strip the protical 
+	return str_replace(array('http://','https://'), '', $url);
+
+}
+
+
+/*
+*  acf_connect_attachment_to_post
+*
+*  This function will connect an attacment (image etc) to the post 
+*  Used to connect attachements uploaded directly to media that have not been attaced to a post
+*
+*  @type	function
+*  @date	11/01/2017
+*  @since	5.5.4
+*
+*  @param	$attachment_id (int)
+*  @param	$post_id (int)
+*  @return	(boolean) 
+*/
+
+function acf_connect_attachment_to_post( $attachment_id = 0, $post_id = 0 ) {
+	
+	// bail ealry if $attachment_id is not valid
+	if( !$attachment_id || !is_numeric($attachment_id) ) return false;
+	
+	
+	// bail ealry if $post_id is not valid
+	if( !$post_id || !is_numeric($post_id) ) return false;
+	
+	
+	// vars 
+	$post = get_post( $attachment_id );
+	
+	
+	// check if valid post
+	if( $post && $post->post_type == 'attachment' && $post->post_parent == 0 ) {
+		
+		// update
+		wp_update_post( array('ID' => $post->ID, 'post_parent' => $post_id) );
+		
+		
+		// return
+		return true;
+		
+	}
+	
+	
+	// return
+	return true;
+
 }
 
 ?>

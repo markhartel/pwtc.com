@@ -5,7 +5,7 @@
  * Description: Receive payments using Paypal Powered by Braintree.  A server with cURL, SSL support, and a valid SSL certificate is required (for security reasons) for this gateway to function. Requires PHP 5.4+
  * Author: WooThemes
  * Author URI: http://woothemes.com/
- * Version: 1.2.6
+ * Version: 1.2.7
  *
  * Copyright (c) 2016 WooThemes
  *
@@ -561,7 +561,15 @@ class WC_PayPal_Braintree_Loader {
 	public function are_our_gateways_enabled() {
 
 		// It doesn't matter which gateway we check, since setting changes are cloned between them
-		$gateway_settings = get_option( 'woocommerce_paypalbraintree_paypal_settings', array() );
+		$gateway_settings = get_option( 'woocommerce_paypalbraintree_paypal_settings', array(
+			'enabled'            => 'yes',
+			'title_paypal'       => __( 'PayPal Account', 'woocommerce-gateway-paypal-braintree' ),
+			'description_paypal' => '',
+			'title_cards'        => __( 'Credit or Debit Card (PayPal)', 'woocommerce-gateway-paypal-braintree' ),
+			'description_cards'  => '',
+			'capture'            => 'yes',
+			'debug'              => 'no',
+		) );
 
 		if ( empty( $gateway_settings ) ) {
 			return false;
@@ -733,7 +741,7 @@ class WC_PayPal_Braintree_Loader {
 				'label'       => __( 'Enable debugging messages', 'woocommerce-gateway-paypal-braintree' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Sends debug messages to the WooCommerce System Status log.', 'woocommerce-gateway-paypal-braintree' ),
-				'default'     => 'yes'
+				'default'     => 'no'
 			)
 		);
 
