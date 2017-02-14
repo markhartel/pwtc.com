@@ -30,7 +30,9 @@ if(get_field('attach_map')) {
             $maxLength = get_field('max_length', $map_id);
         }
         $terrain = array_merge($terrain, get_field('terrain', $map_id));
-        $maps = array_merge($maps, get_field('maps', $map_id));
+        $raw_map = get_field('maps', $map_id);
+        $raw_map[0]['title'] = $map->post_title;
+        $maps = array_merge($maps, $raw_map);
     }
 }
 $data['terrain'] = isset($terrain) ? array_unique($terrain) : get_field('terrain');

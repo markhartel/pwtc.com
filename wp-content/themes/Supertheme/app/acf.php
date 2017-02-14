@@ -1225,33 +1225,6 @@ if( function_exists('acf_add_local_field_group') ):
                         'placeholder' => '',
                     ),
                     array (
-                        'key' => 'field_58183373e177e',
-                        'label' => 'Title',
-                        'name' => 'title',
-                        'type' => 'text',
-                        'instructions' => '',
-                        'required' => 1,
-                        'conditional_logic' => array (
-                            array (
-                                array (
-                                    'field' => 'field_57bb665f6797c',
-                                    'operator' => '==',
-                                    'value' => 'link',
-                                ),
-                            ),
-                        ),
-                        'wrapper' => array (
-                            'width' => '50',
-                            'class' => '',
-                            'id' => '',
-                        ),
-                        'default_value' => '',
-                        'placeholder' => '',
-                        'prepend' => '',
-                        'append' => '',
-                        'maxlength' => '',
-                    ),
-                    array (
                         'key' => 'field_57bb667e6797d',
                         'label' => 'Link',
                         'name' => 'link',
@@ -1268,7 +1241,7 @@ if( function_exists('acf_add_local_field_group') ):
                             ),
                         ),
                         'wrapper' => array (
-                            'width' => '',
+                            'width' => '50',
                             'class' => '',
                             'id' => '',
                         ),
