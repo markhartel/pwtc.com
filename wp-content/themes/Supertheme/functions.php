@@ -122,7 +122,7 @@ add_action('acf/save_post', function ($post_id) {
 
         $leaders = [];
         foreach(get_field('ride_leaders') as $leader) {
-            $leaders[] = $leader;
+            $leaders[] = $leader['ID'];
         }
 
         update_field('date', $date->format('Y-m-d H:i:s'), $id);
