@@ -376,6 +376,9 @@ a.scroll-to-top {
 }
 
 // civi forms
+.crm-container div.form-item {
+  height: auto !important;
+}
 .crm-section .label, .messages .crm-container h3 {
   background-color: transparent;
 }
