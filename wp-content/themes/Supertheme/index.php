@@ -42,7 +42,7 @@ while(have_rows('content_rows')) {
     {
         $today = new DateTime();
         $rides_query = new WP_Query([
-            'posts_per_page' => 4,
+            'posts_per_page' => 6,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [

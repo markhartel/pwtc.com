@@ -30,7 +30,7 @@ class UpcomingRides extends \WP_Widget {
 
         $today = new \DateTime();
         $rides_query = new \WP_Query([
-            'posts_per_page'	=> 10,
+            'posts_per_page'	=> 6,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [
@@ -49,6 +49,7 @@ class UpcomingRides extends \WP_Widget {
                 echo "<li><a href='" . get_the_permalink() . "'>" . get_the_title() . "</a></li>";
             }
             echo "</ul>";
+            echo "<a href='" . site_url('scheduled_rides') . "' class='dark button'>More Rides</a>";
         } else {
             echo "No upcoming rides";
         }
