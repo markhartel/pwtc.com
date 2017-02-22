@@ -25,6 +25,26 @@ add_action( 'widgets_init', function(){
 });
 
 add_action('init', function() {
+    add_role('ride_leader', 'Ride Leader', []);
+    add_role('ride_captain', 'Ride Captain', [
+        'access_uploaded_files' => true,
+        'delete_others_rides' => true,
+        'delete_private_rides' => true,
+        'delete_published_rides' => true,
+        'delete_rides' => true,
+        'edit_others_rides' => true,
+        'edit_private_rides' => true,
+        'edit_published_rides' => true,
+        'edit_rides' => true,
+        'publish_rides' => true,
+        'read' => true,
+        'read_private_rides' => true,
+        'register_for_events' => true,
+        'sign_civicrm_petition' => true,
+        'upload_files' => true,
+        'view_event_info' => true,
+    ]);
+
     register_post_type('ride_maps', [
         'public' => true,
         'labels'  => [
@@ -32,13 +52,15 @@ add_action('init', function() {
             'singular_name' => 'Ride Map',
         ],
         'description' => "Bike Ride Maps",
-        'menu_position' => 27,
+        'menu_position' => 28,
         'supports' => [
             'title',
             'editor',
             'thumbnail',
             'author',
         ],
+        'capability_type' => ['ride', 'rides'],
+        'map_meta_cap' => true,
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-location-alt',
@@ -50,13 +72,15 @@ add_action('init', function() {
             'singular_name' => 'Ride Template',
         ],
         'description' => "Ride Template",
-        'menu_position' => 26,
+        'menu_position' => 29,
         'supports' => [
             'title',
             'editor',
             'thumbnail',
             'author',
         ],
+        'capability_type' => ['ride', 'rides'],
+        'map_meta_cap' => true,
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-schedule',
@@ -68,13 +92,15 @@ add_action('init', function() {
             'singular_name' => 'Scheduled Ride',
         ],
         'description' => "Scheduled Bike Rides",
-        'menu_position' => 27,
+        'menu_position' => 30,
         'supports' => [
             'title',
             'editor',
             'thumbnail',
             'author',
         ],
+        'capability_type' => ['ride', 'rides'],
+        'map_meta_cap' => true,
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-calendar-alt',
@@ -82,6 +108,19 @@ add_action('init', function() {
 
     add_filter('get_the_excerpt', function ($text) {
         return rtrim($text, '[&hellip;]') . '&hellip;';
+    });
+
+    add_filter('woocommerce_disable_admin_bar', function(){
+        $user = wp_get_current_user();
+        if (in_array('ride_captain', (array) $user->roles)){
+            return false;
+        }
+    });
+    add_filter('woocommerce_prevent_admin_access', function(){
+        $user = wp_get_current_user();
+        if (in_array('ride_captain', (array) $user->roles)){
+            return false;
+        }
     });
 });
 
