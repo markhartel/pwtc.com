@@ -37,7 +37,8 @@ $previous_month_datetime = $current_first_day->sub(new DateInterval('P1D'));
 $next_month_datetime = $current_last_day->add(new DateInterval('P1D'));
 
 // set some data for twig
-$data['month_current'] = $current_datetime ->format('F');
+$data['month_current'] = $current_datetime->format('F');
+$data['year_current'] = $current_datetime->format('Y');
 $data['month_previous'] = $previous_month_datetime->format('F');
 $data['month_next'] = $next_month_datetime->format('F');
 $data['month_current_numeric'] = $current_datetime ->format('n');
