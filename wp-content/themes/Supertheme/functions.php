@@ -112,15 +112,17 @@ add_action('init', function() {
 
     add_filter('woocommerce_disable_admin_bar', function(){
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles)){
+        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options')){
             return false;
         }
+        return true;
     });
     add_filter('woocommerce_prevent_admin_access', function(){
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles)){
+        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options')){
             return false;
         }
+        return true;
     });
 });
 
