@@ -71,7 +71,3 @@ add_action('after_setup_theme', function() use($container) {
         register_nav_menus($container->getParameter('wordpress.menus'));
     }
 });
-
-add_filter('login_redirect', function ($redirect_to, $request, $user){
-    return home_url();
-}, 10, 3 );

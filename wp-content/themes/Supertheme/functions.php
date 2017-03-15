@@ -416,3 +416,8 @@ add_action('manage_posts_custom_column', function($column_name, $post_ID){
     $date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $post_ID, false));
     echo $date->format('D F j, Y \a\t g:i a');
 }, 10, 2);
+
+// redirect users to home page after login
+add_filter('login_redirect', function ($redirect_to, $request, $user){
+    return home_url();
+}, 10, 3 );
