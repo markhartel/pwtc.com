@@ -286,6 +286,33 @@ function basic_info(){
         ));
     }
 
+    $membership_captain = array();
+    $membership_captain['email'] = get_field('membership_captain_email', 'option');
+    $membership_captain['name'] = get_field('membership_captain_name', 'option');
+    if($membership_captain['email'] && $membership_captain['name']) {
+        $message = Swift_Message::newInstance()
+            ->setSubject("$first $last updated their account on pwtc.com")
+            ->setFrom(array('wordpress@pwtc.com' => 'pwtc.com'))
+            ->setTo(array($membership_captain['email'] => $membership_captain['name']))
+            ->setBody(<<<HTML
+            <p>$first $last has updated their information in WordPress.</p>
+            <ul>
+                <li>WordPress ID: {$wordpress_user->ID}</li>
+                <li>CiviCRM ID: $contact_id</li>
+            </ul>
+HTML
+                , 'text/html'
+            );
+        $transport = Swift_MailTransport::newInstance();
+        $mailer = Swift_Mailer::newInstance($transport);
+        $sent = $mailer->send($message);
+        if(!$sent) {
+            echo "<p style='display: none'>Failed to send email to membership captain</p>";
+        } else {
+            echo "<p style='display: none'>Successfully sent email to membership captain</p>";
+        }
+    }
+
     echo "Account has been updated";
 
     die();

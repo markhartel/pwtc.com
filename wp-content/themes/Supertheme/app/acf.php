@@ -2076,6 +2076,38 @@ if( function_exists('acf_add_local_field_group') ):
         'title' => 'Theme Options',
         'fields' => array (
             array (
+                'key' => 'field_membership_captain_name',
+                'label' => 'Membership Captain Name',
+                'name' => 'membership_captain_name',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 1,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => 50,
+                    'class' => '',
+                    'id' => '',
+                ),
+                'default_value' => '',
+                'placeholder' => '',
+            ),
+            array (
+                'key' => 'field_membership_captain_email',
+                'label' => 'Membership Captain Email',
+                'name' => 'membership_captain_email',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 1,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => 50,
+                    'class' => '',
+                    'id' => '',
+                ),
+                'default_value' => '',
+                'placeholder' => '',
+            ),
+            array (
                 'key' => 'field_580dc27b7fcb8',
                 'label' => 'Ride Calandar Content',
                 'name' => 'ride_calandar_content',
