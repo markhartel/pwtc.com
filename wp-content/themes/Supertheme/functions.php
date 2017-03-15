@@ -27,7 +27,7 @@ add_action( 'widgets_init', function(){
 add_action('init', function() {
     add_role('current_member', 'Current Member', ['read' => false]);
     add_role('expired_member', 'Expired Member', ['read' => false]);
-    add_role('ride_leader', 'Ride Leader', ['read' => false]);
+    add_role('ride_leader', 'Ride Leader', ['read' => true]);
     add_role('ride_captain', 'Ride Captain', [
         'access_uploaded_files' => true,
         'delete_others_rides' => true,
@@ -114,14 +114,14 @@ add_action('init', function() {
 
     add_filter('woocommerce_disable_admin_bar', function(){
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options')){
+        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options') || user_can($user, 'edit_posts')){
             return false;
         }
         return true;
     });
     add_filter('woocommerce_prevent_admin_access', function(){
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options')){
+        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options') || user_can($user, 'edit_posts')){
             return false;
         }
         return true;
