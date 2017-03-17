@@ -25,6 +25,8 @@ add_action( 'widgets_init', function(){
 });
 
 add_action('init', function() {
+    update_option('basic_user_avatars_caps', true);
+
     add_role('current_member', 'Current Member', ['read' => false]);
     add_role('expired_member', 'Expired Member', ['read' => false]);
     add_role('ride_leader', 'Ride Leader', ['read' => true]);
