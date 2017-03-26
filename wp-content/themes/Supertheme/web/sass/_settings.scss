@@ -57,6 +57,17 @@ $titlebar-padding: 0.75rem;
 
 // accordion
 $accordion-item-padding: 0.75rem 1rem;
+$accordion-item-color: $white;
+$accordion-background: map-get($foundation-palette, accent);
+$accordion-item-background-hover: darken(map-get($foundation-palette, accent), 15%);
+$accordion-title-font-size: rem-calc(16px);
+$accordion-content-border: 1px solid map-get($foundation-palette, accent);
+.accordion-title {
+  font-size: rem-calc(16px);
+}
+.accordion-title:hover, .accordion-title:active, .accordion-title:focus {
+  color: $white;
+}
 
 // buttons
 $button-color-alt: $white;
