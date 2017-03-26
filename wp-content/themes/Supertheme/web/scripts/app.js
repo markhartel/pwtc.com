@@ -64,7 +64,7 @@ jQuery(function() {
 
 // forms
 jQuery(function() {
-    jQuery('#basicInfo .primary.button').on('click', function(e){
+    jQuery('#basicInfo').on('submit', function(e){
         jQuery.ajax({
             url : civi.ajax_url,
             type: 'post',
@@ -92,11 +92,11 @@ jQuery(function() {
         return false;
     });
 
-    jQuery('#addHousehold .primary.button').on('click', function(e){
+    jQuery('#addHousehold').on('submit', function(e){
         jQuery.ajax({
             url : civi.ajax_url,
             type: 'post',
-            data: jQuery(this).parent('form').serialize(),
+            data: jQuery(this).serialize(),
             success : function( response ) {
                 jQuery.fancybox(response);
                 setTimeout(function(){ window.location.reload(); }, 3000);
