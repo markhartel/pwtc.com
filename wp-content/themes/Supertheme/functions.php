@@ -122,11 +122,30 @@ add_action('init', function() {
         return true;
     });
     add_filter('woocommerce_prevent_admin_access', function(){
+        $prevent_access = false;
+
+        if ( 'yes' === get_option( 'woocommerce_lock_down_admin', 'yes' ) && ! is_ajax() && basename( $_SERVER["SCRIPT_FILENAME"] ) !== 'admin-post.php' ) {
+            $has_cap     = false;
+            $access_caps = array( 'edit_posts', 'manage_woocommerce', 'view_admin_dashboard' );
+
+            foreach ( $access_caps as $access_cap ) {
+                if ( current_user_can( $access_cap ) ) {
+                    $has_cap = true;
+                    break;
+                }
+            }
+
+            if ( ! $has_cap ) {
+                $prevent_access = true;
+            }
+        }
+
         $user = wp_get_current_user();
         if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options') || user_can($user, 'edit_posts')){
             return false;
         }
-        return true;
+
+        return $prevent_access;
     });
 });
 
@@ -323,7 +342,7 @@ add_action('wp_ajax_basic_info', 'basic_info');
 add_action('wp_ajax_nopriv_basic_info', 'basic_info');
 
 function delete_household(){
-    $relationship = $_POST['id'];
+    $relationship = $_POST['id'];//
     $name = $_POST['name'];
     civicrm_initialize();
     $result = civicrm_api3('Relationship', 'delete', array(
