@@ -35,9 +35,9 @@ class UpcomingRides extends \WP_Widget {
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' =>  $today->getTimestamp(),
+                    'value' =>  $today->format('Y-m-d 00:00:00'),
                     'compare' => '>=',
-                    'type'	=> 'TIMESTAMP'
+                    'type'	=> 'DATETIME'
                 ],
             ],
             'orderby' => ['date' => 'ASC'],
