@@ -17,7 +17,7 @@ final class CAS_App {
 	/**
 	 * Plugin version
 	 */
-	const PLUGIN_VERSION       = '3.4.3';
+	const PLUGIN_VERSION       = '3.5.1';
 
 	/**
 	 * Prefix for sidebar id
@@ -72,9 +72,6 @@ final class CAS_App {
 	}
 
 	public function __construct() {
-
-		//__('Manage and show sidebars according to the content being viewed.','content-aware-sidebars');
-		//__('Content Aware Sidebars','content-aware-sidebars');
 
 		$this->_manager = new CAS_Sidebar_Manager();
 

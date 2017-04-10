@@ -23,7 +23,63 @@
 
 			this.addSidebarToolbar();
 			this.addWidgetSearch();
+			this.toggleSidebarStatus();
 
+			var $widget_list = $('#widget-list');
+
+			$('div.widgets-sortables')
+			.on('sortstart',function(e,ui) {
+				console.log("YO");
+				$widget_list.css('overflow-y','visible');
+			})
+			.on('sortstop',function(e,ui) {
+				$widget_list.css('overflow-y','auto');
+			});
+
+			
+			$('#widget-list').children('.widget')
+			.on('dragstart',function(e,ui) {
+				$widget_list.css('overflow-y','visible');
+			})
+			.on('dragstop',function(e,ui) {
+				$widget_list.css('overflow-y','auto');
+			});
+
+		},
+
+		/**
+		 * Initiate
+		 *
+		 * @since  3.3
+		 * @return {void}
+		 */
+		toggleSidebarStatus: function() {
+			$(".widget-liquid-right").on('change','.sidebar-status-input',function(e) {
+				var $this = $(this),
+					status = $this.is(':checked');
+
+				if(!($this.hasClass('sidebar-status-future') && !confirm(CASAdmin.enableConfirm))) {
+					$.post(
+					    ajaxurl, 
+					    {
+							'action'    : 'cas_sidebar_status',
+							'sidebar_id': $this.val(),
+							'status'    : status
+					    }, 
+					    function(response){
+					    	if(response.success) {
+					    		//change title attr
+					    		$this.next().attr('title',response.data.title);
+					    		$this.removeClass('sidebar-status-future');
+					    	} else {
+					    		$this.attr('checked',!status);
+					    	}
+					    }
+					);
+				} else {
+					$this.attr('checked',!status);
+				}
+			});
 		},
 		/**
 		 * Add search input for widgets
@@ -45,7 +101,7 @@
 			var that = this,
 				filterTimer,
 				cachedFilter = "";
-			this.$widgetContainer.on('keyup', '.js-cas-widget-filter',function(e) {
+			this.$widgetContainer.on('input', '.js-cas-widget-filter',function(e) {
 				var filter = $(this).val();
 				if(filter != cachedFilter) {
 					cachedFilter = filter;
@@ -77,8 +133,8 @@
 			var box = '<div class="wp-filter cas-filter-sidebar">'+
 			'<a href="admin.php?page=wpcas-edit" class="button button-primary">'+CASAdmin.addNew+'</a>'+
 			'<input type="search" class="js-cas-filter" placeholder="'+CASAdmin.filterSidebars+'...">'+
-			'<a href="#" class="js-sidebars-toggle sidebars-toggle" data-toggle="0">'+CASAdmin.collapse+'</a>'+
-			'<a href="#" class="js-sidebars-toggle sidebars-toggle" data-toggle="1">'+CASAdmin.expand+'</a>'+
+			'<a href="#" title="'+CASAdmin.collapse+'" class="js-sidebars-toggle sidebars-toggle" data-toggle="0"><span class="dashicons dashicons-arrow-up-alt2"></span></a>'+
+			'<a href="#" title="'+CASAdmin.expand+'" class="js-sidebars-toggle sidebars-toggle" data-toggle="1"><span class="dashicons dashicons-arrow-down-alt2"></span></a>'+
 			'</div>';
 
 			this.$sidebarContainer.prepend(box);
@@ -121,7 +177,7 @@
 			var that = this,
 				filterTimer,
 				cachedFilter = "";
-			this.$sidebarContainer.on('keyup', '.js-cas-filter',function(e) {
+			this.$sidebarContainer.on('input', '.js-cas-filter',function(e) {
 				var filter = $(this).val();
 				if(filter != cachedFilter) {
 					cachedFilter = filter;

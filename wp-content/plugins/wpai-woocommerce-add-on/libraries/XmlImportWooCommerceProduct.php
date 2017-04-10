@@ -6,6 +6,8 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 
 	public $previousID;
 
+    public $product_taxonomies;
+
 	public $reserved_terms = array(
 				'attachment', 'attachment_id', 'author', 'author_name', 'calendar', 'cat', 'category', 'category__and',
 				'category__in', 'category__not_in', 'category_name', 'comments_per_page', 'comments_popup', 'cpage', 'day',
@@ -29,7 +31,10 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 		$this->logger = $options['logger'];
 		$this->chunk  = $options['chunk'];
 		$this->xpath  = $options['xpath_prefix'];
-		
+
+        $product_taxonomies = array('post_format', 'product_type', 'product_shipping_class');
+        $this->product_taxonomies = array_diff_key(get_taxonomies_by_object_type(array('product'), 'object'), array_flip($product_taxonomies));
+
 	}
 
 	public function parse()
@@ -361,7 +366,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 		$product_type 	= empty( $product_types[$i] ) ? 'simple' : sanitize_title( stripslashes( $product_types[$i] ) );
 
 		if ($this->import->options['update_all_data'] == 'no' and ! $this->import->options['is_update_product_type'] and ! $is_new_product ){			
-			$product 	  = get_product($pid);			
+			$product 	  = WC()->product_factory->get_product($pid);
 			if ( ! empty($product->product_type) ) $product_type = $product->product_type;
 		}		
 		
@@ -395,7 +400,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 		$this->pushmeta($pid, '_regular_price', ($product_regular_price[$i] == "") ? '' : stripslashes( $product_regular_price[$i] ) );
 		$this->pushmeta($pid, '_sale_price', ($product_sale_price[$i] == "") ? '' : stripslashes( $product_sale_price[$i] ) );
 		$this->pushmeta($pid, '_tax_status', stripslashes( $product_tax_status[$i] ) );
-		$this->pushmeta($pid, '_tax_class', stripslashes( $product_tax_class[$i] ) );
+		$this->pushmeta($pid, '_tax_class', strtolower($product_tax_class[$i]) == 'standard' ? '' : stripslashes( $product_tax_class[$i] ) );
 		$this->pushmeta($pid, '_visibility', stripslashes( $product_visibility[$i] ) );
 		$this->pushmeta($pid, '_purchase_note', stripslashes( $product_purchase_note[$i] ) );
 		$this->pushmeta($pid, '_featured', ($is_featured == "yes") ? 'yes' : 'no' );
@@ -1231,7 +1236,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 								if (empty($articleData['ID']) or $this->is_update_cf('_tax_class'))
 								{
 									if ( $product_tax_class[ $i ] !== 'parent' )
-										$this->pushmeta($pid, '_tax_class', sanitize_text_field( $product_tax_class[ $i ] ));										
+										$this->pushmeta($pid, '_tax_class', strtolower($product_tax_class[ $i ]) == 'standard' ? '' : sanitize_text_field( $product_tax_class[ $i ] ));
 									else
 										delete_post_meta( $pid, '_tax_class' );
 								}
@@ -2607,7 +2612,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 					}
 
 					if ( $variation_product_tax_class[ $j ] !== 'parent' )
-						update_post_meta( $variation_to_update_id, '_tax_class', sanitize_text_field( $variation_product_tax_class[ $j ] ) );
+						update_post_meta( $variation_to_update_id, '_tax_class', strtolower($variation_product_tax_class[ $j ]) == 'standard' ? '' : sanitize_text_field( $variation_product_tax_class[ $j ] ) );
 					else
 						delete_post_meta( $variation_to_update_id, '_tax_class' );
 
@@ -3232,18 +3237,15 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 					$this->wpdb->update( $this->wpdb->posts, array('post_status' => 'publish' ), array('ID' => $importData['pid']));				
 				}	
 
-        $this->wpdb->update( $this->wpdb->posts, array( 'post_excerpt' => '', 'post_name' => sanitize_title($p->post_title), 'guid' => '' ), array('ID' => $importData['pid']));
-        $variation_taxonomies = array('post_format', 'product_type', 'product_shipping_class');
-        $variation_taxonomies = apply_filters('wp_all_import_variation_taxonomies', $variation_taxonomies);
-        $post_taxonomies = array_diff_key(get_taxonomies_by_object_type(array('product'), 'object'), array_flip($variation_taxonomies));
-        if ( ! empty($post_taxonomies) ):
-          foreach ($post_taxonomies as $ctx):
-            if ( strpos($ctx->name, "pa_") === 0 ) continue;
-            $this->associate_terms($importData['pid'], false, $ctx->name);
-          endforeach;
-        endif;
+                $this->wpdb->update( $this->wpdb->posts, array( 'post_excerpt' => '', 'post_name' => sanitize_title($p->post_title), 'guid' => '' ), array('ID' => $importData['pid']));
+                if ( ! empty($this->product_taxonomies) ):
+                  foreach ($this->product_taxonomies as $ctx):
+                    if ( strpos($ctx->name, "pa_") === 0 ) continue;
+                    $this->associate_terms($importData['pid'], NULL, $ctx->name);
+                  endforeach;
+                endif;
 
-        delete_post_meta($importData['pid'], '_v_product_manage_stock');
+                delete_post_meta($importData['pid'], '_v_product_manage_stock');
 				delete_post_meta($importData['pid'], '_v_stock');
 				delete_post_meta($importData['pid'], '_v_stock_status');
 				delete_post_meta($importData['pid'], '_v_variation_enabled');
@@ -3254,7 +3256,17 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 			}			
 			else
 			{
-				update_post_meta( $importData['pid'], '_product_version', WC_VERSION );
+				// unset attributes
+                $product_attributes = get_post_meta( $importData['pid'], '_product_attributes', true );
+                if ( ! empty($this->product_taxonomies) ):
+                    foreach ($this->product_taxonomies as $ctx):
+                        if ( strpos($ctx->name, "pa_") === 0 && ! isset($product_attributes[$ctx->name]) ){
+                            $this->associate_terms($importData['pid'], NULL, $ctx->name);
+                        }
+                    endforeach;
+                endif;
+
+			    update_post_meta( $importData['pid'], '_product_version', WC_VERSION );
 				$post_to_update_id = $importData['pid'];
 
 				// [associate linked products]
@@ -3308,7 +3320,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 			{
 				$gallery = $tmp_gallery;
 			}
-      $this->pushmeta( $post_to_update_id, '_product_image_gallery', implode(",", $gallery) );
+            $this->pushmeta( $post_to_update_id, '_product_image_gallery', implode(",", $gallery) );
 			// [\update product gallery]
 
 			wc_delete_product_transients($importData['pid']);		
@@ -3416,7 +3428,7 @@ class XmlImportWooCommerceProduct extends XmlImportWooCommerce{
 
 		$variations = array();
 
-		$_product = get_product( $post_id, array( 'product_type' => 'variable' ) );
+		$_product = WC()->product_factory->get_product($post_id);
 
 		$v = $_product->get_attributes();		
 

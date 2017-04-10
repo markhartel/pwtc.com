@@ -12,6 +12,12 @@ if (!defined('ABSPATH')) {
 }
 
 if(!class_exists("WPCACore")) {
+
+	// $domain = explode('/',plugin_basename( __FILE__ ));
+	//define('WPCA_DOMAIN',$domain[0]);
+	define('WPCA_DOMAIN','wp-content-aware-engine');
+	define('WPCA_PATH',plugin_dir_path(__FILE__));
+
 	/**
 	 * Core for WordPress Content Aware Engine
 	 */
@@ -110,6 +116,10 @@ if(!class_exists("WPCACore")) {
 					array(__CLASS__,'sync_group_untrashed'));
 				add_action('add_meta_boxes',
 					array(__CLASS__,'add_group_meta_box'),10,2);
+				add_action("wpca/group/settings",
+					array(__CLASS__,"render_condition_options"),-1,2);
+				add_action("wpca/modules/save-data",
+					array(__CLASS__,"save_condition_options"));
 			
 				add_action('wp_ajax_wpca/add-rule',
 					array(__CLASS__,'ajax_update_group'));
@@ -173,6 +183,7 @@ if(!class_exists("WPCACore")) {
 				'transposh'     => defined('TRANSPOSH_PLUGIN_VER'),		// Transposh Translation Filter
 				'wpml'          => class_exists('SitePress')			// WPML Multilingual Blog/CMS
 			);
+
 			foreach($modules as $name => $bool) {
 				if($bool) {
 					$class_name = self::CLASS_PREFIX."Module_".$name;
@@ -189,7 +200,7 @@ if(!class_exists("WPCACore")) {
 		 * @return  void
 		 */
 		public static function load_textdomain() {
-			load_plugin_textdomain(self::DOMAIN, false, dirname(plugin_basename(__FILE__)).'/lang/');
+			load_plugin_textdomain(WPCA_DOMAIN, false, dirname(plugin_basename(__FILE__)).'/lang/');
 		}
 		
 		/**
@@ -213,28 +224,28 @@ if(!class_exists("WPCACore")) {
 			
 			register_post_type(self::TYPE_CONDITION_GROUP,array(
 				'labels'       => array(
-					'name'               => __('Condition Groups', self::DOMAIN),
-					'singular_name'      => __('Condition Group', self::DOMAIN),
-					'add_new'            => _x('Add New', 'group', self::DOMAIN),
-					'add_new_item'       => __('Add New Group', self::DOMAIN),
-					'edit_item'          => _x('Edit', 'group', self::DOMAIN),
-					'new_item'           => '',
-					'all_items'          => '',
-					'view_item'          => '',
-					'search_items'       => '',
-					'not_found'          => __('No Groups found',self::DOMAIN),
-					'not_found_in_trash' => ''
+					'name'               => __('Condition Groups', WPCA_DOMAIN),
+					'singular_name'      => __('Condition Group', WPCA_DOMAIN),
 				),
 				'capabilities' => $capabilities,
-				'show_ui'      => false,
-				'show_in_menu' => false,
-				'query_var'    => false,
-				'rewrite'      => false,
-				'supports'     => array('author'), //prevents fallback
+				'public'              => false,
+				'hierarchical'        => false,
+				'exclude_from_search' => true,
+				'publicly_queryable'  => false,
+				'show_ui'             => false,
+				'show_in_menu'        => false,
+				'show_in_nav_menus'   => false,
+				'show_in_admin_bar'   => false,
+				'has_archive'         => false,
+				'rewrite'             => false,
+				'query_var'           => false,
+				'supports'            => array('author'),
+				'can_export'          => false,
+				'delete_with_user'    => false
 			));
 
 			register_post_status( self::STATUS_NEGATED, array(
-				'label'                     => _x( 'Negated', 'condition group', self::DOMAIN ),
+				'label'                     => _x( 'Negated', 'condition status', WPCA_DOMAIN ),
 				'public'                    => false,
 				'exclude_from_search'       => true,
 				'show_in_admin_all_list'    => false,
@@ -449,7 +460,6 @@ if(!class_exists("WPCACore")) {
 						h.meta_value handle
 					FROM $wpdb->posts p
 					INNER JOIN $wpdb->postmeta h ON h.post_id = p.ID AND h.meta_key = '".self::PREFIX."handle' 
-					
 					WHERE
 					p.post_type = '".$post_type."' AND 
 					p.post_status = 'publish' AND 
@@ -518,7 +528,7 @@ if(!class_exists("WPCACore")) {
 					'options'  => $options
 				));
 
-				$title = isset($post_type_obj->labels->ca_title) ? $post_type_obj->labels->ca_title : __('Conditional Logic', self::DOMAIN);
+				$title = isset($post_type_obj->labels->ca_title) ? $post_type_obj->labels->ca_title : __('Conditional Logic', WPCA_DOMAIN);
 
 				add_meta_box(
 					'cas-rules',
@@ -569,28 +579,24 @@ if(!class_exists("WPCACore")) {
 		/**
 		 * Get condition groups for a post type
 		 * Uses current post per default
-		 * Creates the first group if necessary
 		 * 
 		 * @since  1.0
 		 * @param  WP_Post|int    $post_id
-		 * @param  boolean        $create_first
 		 * @return array
 		 */
-		private static function _get_condition_groups($post_id = null, $create_first = false) {
+		private static function _get_condition_groups($post_id = null) {
 			$post = get_post($post_id);
+			$groups = array();
 
-			$groups = get_posts(array(
-				'posts_per_page'   => -1,
-				'post_type'        => self::TYPE_CONDITION_GROUP,
-				'post_parent'      => $post->ID,
-				'post_status'      => array(self::STATUS_PUBLISHED,self::STATUS_NEGATED),
-				'order'            => 'ASC'
-			));
-			if($groups == null && $create_first) {
-				$group = self::add_condition_group($post);
-				$groups[] = get_post($group);
+			if($post) {
+				$groups = get_posts(array(
+					'posts_per_page'   => -1,
+					'post_type'        => self::TYPE_CONDITION_GROUP,
+					'post_parent'      => $post->ID,
+					'post_status'      => array(self::STATUS_PUBLISHED,self::STATUS_NEGATED),
+					'order'            => 'ASC'
+				));
 			}
-
 			return $groups;
 
 		}
@@ -608,39 +614,39 @@ if(!class_exists("WPCACore")) {
 			try {
 				if(!isset($_POST['current_id']) || 
 					!check_ajax_referer(self::PREFIX.$_POST['current_id'],'token',false)) {
-					$response = __('Unauthorized request',self::DOMAIN);
+					$response = __('Unauthorized request',WPCA_DOMAIN);
 					throw new Exception("Forbidden",403);
 				}
 
 				//Make sure some rules are sent
 				if(!isset($_POST['cas_condition'])) {
 					//Otherwise we delete group
-					if(isset($_POST['cas_group_id']) && wp_delete_post(intval($_POST['cas_group_id']), true) === false) {
-						$response = __('Could not delete conditions',self::DOMAIN);
+					if($_POST['id'] && wp_delete_post(intval($_POST['id']), true) === false) {
+						$response = __('Could not delete conditions',WPCA_DOMAIN);
 						throw new Exception("Internal Server Error",500);
 					}
 					$response['removed'] = true;
 				}
 				if(!isset($response['removed'])) {
 					//If ID was not sent at this point, it is a new group
-					if(!isset($_POST['cas_group_id'])) {
+					if(!$_POST['id']) {
 						$post_id = self::add_condition_group(intval($_POST['current_id']));
 						$response['new_post_id'] = $post_id;
 					} else {
-						$post_id = intval($_POST['cas_group_id']);
+						$post_id = intval($_POST['id']);
 					}
 
 					wp_update_post(array(
 						'ID' => $post_id,
-						'post_status' => $_POST[self::PREFIX.'status'] == self::STATUS_NEGATED ? self::STATUS_NEGATED : self::STATUS_PUBLISHED,
-						'menu_order' => (int)$_POST[self::PREFIX.'exposure']
+						'post_status' => $_POST['status'] == self::STATUS_NEGATED ? self::STATUS_NEGATED : self::STATUS_PUBLISHED,
+						'menu_order' => (int)$_POST['exposure']
 					));
 
 					do_action('wpca/modules/save-data',$post_id);
 				}
 
-				$response['message'] = __('Conditions updated',self::DOMAIN);
-
+				$response['message'] = __('Conditions updated',WPCA_DOMAIN);
+				
 				wp_send_json($response);
 				
 			} catch(Exception $e) {
@@ -651,12 +657,68 @@ if(!class_exists("WPCACore")) {
 			
 		}
 
+		/**
+		 * Save registered meta for condition group
+		 *
+		 * @since  3.2
+		 * @param  int  $group_id
+		 * @return void
+		 */
+		public static function save_condition_options($group_id) {
+			$meta_keys = self::get_condition_meta_keys(get_post_type($group_id));
+			foreach ($meta_keys as $key => $default_value) {
+				$value = isset($_POST[$key]) ? $_POST[$key] : false;
+				if($value) {
+					update_post_meta($group_id,$key,$value);
+				} else if(get_post_meta($group_id,$key,true)) {
+					delete_post_meta($group_id,$key);
+				}
+			}
+		}
+
 		public static function add_group_script_styles($hook) {
 			$current_screen = get_current_screen();
+
+			wp_register_style(
+				self::PREFIX.'condition-groups',
+				plugins_url('/assets/css/condition_groups.css', __FILE__),
+				array(),
+				WPCA_VERSION
+			);
 
 			if(self::post_types()->has($current_screen->post_type) && $current_screen->base == 'post') {
 				self::enqueue_scripts_styles($hook);
 			}
+		}
+
+		/**
+		 * Display extra options for condition group
+		 *
+		 * @since  3.2
+		 * @param  string  $post_type
+		 * @return void
+		 */
+		public static function render_condition_options($post_type) {
+			echo '<li>';
+			echo '<label class="cae-toggle">';
+			echo '<input data-vm="checked:int(_ca_autoselect)" type="checkbox" />';
+			echo '<div class="cae-toggle-bar"></div>'._e("Auto-select new children of selected items",WPCA_DOMAIN);
+			echo '</label>';
+			echo '</li>';
+		}
+
+		/**
+		 * Get condition option defaults
+		 *
+		 * @since  3.2
+		 * @param  string  $post_type
+		 * @return array
+		 */
+		public static function get_condition_meta_keys($post_type) {
+			$group_meta = array(
+				'_ca_autoselect' => 0
+			);
+			return apply_filters("wpca/condition/meta",$group_meta,$post_type);
 		}
 
 		/**
@@ -669,16 +731,34 @@ if(!class_exists("WPCACore")) {
 		 */
 		public static function enqueue_scripts_styles($hook) {
 
-			$groups = self::_get_condition_groups(null,false);
+			$group_meta = self::get_condition_meta_keys(get_post_type());
+
+			$groups = self::_get_condition_groups();
 			$data = array();
+			$i = 0;
 			foreach ($groups as $group) {
-				$data[] = array(
-					"id" => $group->ID,
-					"status" => $group->post_status,
-					"exposure" => $group->menu_order,
-					"options" => get_post_custom($group->ID),
+				$data[$i] = array(
+					"id"         => $group->ID,
+					"status"     => $group->post_status,
+					"exposure"   => $group->menu_order,
 					"conditions" => apply_filters("wpca/modules/group-data",array(),$group->ID)
 				);
+				// $meta = get_post_custom($group->ID);
+				// foreach ($group_meta as $meta_key => $default_value) {
+				// 	$value = $default_value;
+				// 	if(isset($meta[$meta_key])) {
+				// 		$value = $meta[$meta_key];
+				// 	}
+				// 	$data[$i][$meta_key] = $value;
+				// }
+				foreach ($group_meta as $meta_key => $default_value) {
+					$value = get_post_meta($group->ID,$meta_key,true);
+					if($value === false) {
+						$value = $default_value;
+					}
+					$data[$i][$meta_key] = $value;
+				}
+				$i++;
 			}
 
 			//Make sure to use packaged version
@@ -719,28 +799,15 @@ if(!class_exists("WPCACore")) {
 				WPCA_VERSION,
 				true
 			);
-			
-			wp_register_style(
-				self::PREFIX.'condition-groups',
-				plugins_url('/assets/css/condition_groups.css', __FILE__),
-				array(),
-				WPCA_VERSION
-			);
 
 			wp_enqueue_script(self::PREFIX.'condition-groups');
 			wp_localize_script(self::PREFIX.'condition-groups', 'WPCA', array(
-				'save'          => __('Save',self::DOMAIN),
-				'cancel'        => __('Cancel',self::DOMAIN),
-				'or'            => __('Or',self::DOMAIN),
-				'and'           => __('And',self::DOMAIN),
-				'remove'        => __('Remove',self::DOMAIN),
-				'searching'     => __('Searching',self::DOMAIN),
-				'noResults'     => __('No results found.',self::DOMAIN),
-				'prefix'        => self::PREFIX,
-				'targetNegate'  => __('Target all but this context',self::DOMAIN),
-				'targetThis'    => __('Target this context',self::DOMAIN),
-				'unsaved'       => __('Conditions have unsaved changes. Do you want to continue and discard these changes?',self::DOMAIN),
-				'groups'        => $data
+				'searching'     => __('Searching',WPCA_DOMAIN),
+				'noResults'     => __('No results found.',WPCA_DOMAIN),
+				'targetNegate'  => __('Target all but this context',WPCA_DOMAIN),
+				'unsaved'       => __('Conditions have unsaved changes. Do you want to continue and discard these changes?',WPCA_DOMAIN),
+				'groups'        => $data,
+				'meta_default'  => $group_meta
 			));
 			wp_enqueue_style(self::PREFIX.'condition-groups');
 
@@ -760,13 +827,11 @@ if(!class_exists("WPCACore")) {
 		 * @return  void
 		 */
 		private static function _autoload_class_files($class) {
-			$path = plugin_dir_path( __FILE__ );
-
-			if(strpos($class, self::CLASS_PREFIX) !== false) {
-				$class = str_replace(self::CLASS_PREFIX, "", $class);
-				$class = self::str_replace_first("_", "/", $class);
+			if(strpos($class, self::CLASS_PREFIX) === 0) {
+				$class = str_replace(self::CLASS_PREFIX, '', $class);
+				$class = self::str_replace_first('_', '/', $class);
 				$class = strtolower($class);
-				$file = $path . $class . ".php";
+				$file = WPCA_PATH . $class . ".php";
 				if(file_exists($file)) {
 					include($file);
 				}

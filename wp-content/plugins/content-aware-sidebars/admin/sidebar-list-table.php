@@ -513,7 +513,9 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 				echo '<strong>'.__( 'Active' ).'</strong>';
 				$deactivate_date = get_post_meta($post->ID, CAS_App::META_PREFIX.'deactivate_time',true);
 				if($deactivate_date) {
+					// translators: Sidebar status date format, see http://php.net/date
 					$h_time = mysql2date( __( 'Y/m/d' ), $deactivate_date );
+					// translators: Sidebar status date and time format, see http://php.net/date
 					$t_time = mysql2date( __( 'Y/m/d g:i:s a' ), $deactivate_date );
 					echo '<br />'.sprintf(__('Until %s','content-aware-sidebars'),'<abbr title="' . $t_time . '">' . $h_time . '</abbr>');
 				}
@@ -585,14 +587,22 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 		$post_type_object = get_post_type_object( $post->post_type );
 		$actions = array();
 		$title = _draft_or_post_title();
+		$cas_fs = cas_fs();
 
 		if (current_user_can( 'edit_post', $post->ID ) && $post->post_status != 'trash') {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link( $post->ID ),
-				/* translators: %s: post title */
+				/* translators: %s: sidebar title */
 				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
 				__( 'Edit' )
+			);
+			$actions['duplicate'] = sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				esc_url($cas_fs->get_upgrade_url()),
+				/* translators: %s: sidebar title */
+				esc_attr( sprintf( __( 'Duplicate %s', 'content-aware-sidebars' ), $title ) ),
+				__( 'Duplicate', 'content-aware-sidebars' )
 			);
 
 			$link = admin_url('post.php?post='.$post->ID);
@@ -628,7 +638,9 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 			}
 		}
 
-		return $this->row_actions( $actions );
+		return $this->row_actions(
+			apply_filters( 'cas/admin/row_actions', $actions, $post )
+		);
 	}
 
 }

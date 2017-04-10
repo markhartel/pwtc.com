@@ -4,7 +4,7 @@ Plugin Name: CiviCRM Admin Utilities
 Plugin URI: http://haystack.co.uk
 Description: Custom code to modify CiviCRM's behaviour
 Author: Christian Wach
-Version: 0.2.4
+Version: 0.2.7
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-admin-utilities
 Domain Path: /languages
@@ -15,7 +15,7 @@ Depends: CiviCRM
 
 
 // set our version here
-define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.4' );
+define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.7' );
 
 // trigger logging of 'civicrm_pre' and 'civicrm_post'
 if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_DEBUG' ) ) {
@@ -238,6 +238,9 @@ class CiviCRM_Admin_Utilities {
 		// prevent warning if screen not defined
 		if ( empty( $screen ) ) return;
 
+		// bail if there's no post type
+		if ( empty( $screen->post_type ) ) return;
+
 		// get chosen post types
 		$selected_types = $this->admin->setting_get( 'post_types' );
 
@@ -268,6 +271,13 @@ class CiviCRM_Admin_Utilities {
 			remove_action( 'media_buttons', array( $civi->modal, 'add_form_button' ), 100 );
 			remove_action( 'admin_enqueue_scripts', array( $civi->modal, 'add_form_button_js' ) );
 			remove_action( 'admin_footer', array( $civi->modal, 'add_form_button_html' ) );
+
+			// also remove core resources
+		    remove_action( 'admin_head', array( $civi, 'wp_head' ), 50 );
+			remove_action( 'load-post.php', array( $civi->modal, 'add_core_resources' ) );
+			remove_action( 'load-post-new.php', array( $civi->modal, 'add_core_resources' ) );
+			remove_action( 'load-page.php', array( $civi->modal, 'add_core_resources' ) );
+			remove_action( 'load-page-new.php', array( $civi->modal, 'add_core_resources' ) );
 
 		} else {
 

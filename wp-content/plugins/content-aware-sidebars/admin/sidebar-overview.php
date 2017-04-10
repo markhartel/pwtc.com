@@ -20,13 +20,26 @@ final class CAS_Sidebar_Overview extends CAS_Admin {
 	 */
 	public $table;
 
-	public function __construct() {
-		parent::__construct();
+	/**
+	 * Add filters and actions for admin dashboard
+	 * e.g. AJAX calls
+	 *
+	 * @since  3.5
+	 * @return void
+	 */
+	public function admin_hooks() {
+		add_filter('set-screen-option',
+			array($this,'set_screen_option'), 10, 3);
+	}
 
-		if(is_admin()) {
-			add_filter('set-screen-option',
-				array($this,'set_screen_option'), 10, 3);
-		}
+	/**
+	 * Add filters and actions for frontend
+	 *
+	 * @since  3.5
+	 * @return void
+	 */
+	public function frontend_hooks() {
+
 	}
 
 	/**
@@ -60,6 +73,18 @@ final class CAS_Sidebar_Overview extends CAS_Admin {
 		);
 	}
 
+
+	/**
+	 * Authorize user for screen
+	 *
+	 * @since  3.5
+	 * @return boolean
+	 */
+	public function authorize_user() {
+		$post_type_object = get_post_type_object(CAS_App::TYPE_SIDEBAR);
+		return current_user_can( $post_type_object->cap->edit_posts );
+	}
+
 	/**
 	 * Prepare screen load
 	 *
@@ -67,15 +92,6 @@ final class CAS_Sidebar_Overview extends CAS_Admin {
 	 * @return void
 	 */
 	public function prepare_screen() {
-		
-		$post_type_object = get_post_type_object(CAS_App::TYPE_SIDEBAR);
-		if ( ! current_user_can( $post_type_object->cap->edit_posts ) ) {
-			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to edit posts in this post type.' ) . '</p>',
-				403
-			);
-		}
 
 		add_screen_option( 'per_page', array(
 			'default' => 20,
@@ -251,34 +267,30 @@ final class CAS_Sidebar_Overview extends CAS_Admin {
 
 	public function bulk_messages() {
 
-		$bulk_counts = array(
-			'updated'   => isset($_REQUEST['updated'] )? absint( $_REQUEST['updated'] ) : 0,
-			'locked'    => isset($_REQUEST['locked'] ) ? absint( $_REQUEST['locked'] ) : 0,
-			'deleted'   => isset($_REQUEST['deleted'] ) ? absint( $_REQUEST['deleted'] ) : 0,
-			'trashed'   => isset($_REQUEST['trashed'] ) ? absint( $_REQUEST['trashed'] ) : 0,
-			'untrashed' => isset($_REQUEST['untrashed'] ) ? absint( $_REQUEST['untrashed'] ) : 0
-		);
-
 		$manage_widgets = sprintf(' <a href="%1$s">%2$s</a>','widgets.php',__('Manage widgets','content-aware-sidebars'));
 
 		$bulk_messages = array(
-			'updated'   => _n( '%s sidebar updated.', '%s sidebars updated.', $bulk_counts['updated'], 'content-aware-sidebars').$manage_widgets,
-			'locked'    => _n( '%s sidebar not updated, somebody is editing it.', '%s sidebars not updated, somebody is editing them.', $bulk_counts['locked'], 'content-aware-sidebars'),
-			'deleted'   => _n( '%s sidebar permanently deleted.', '%s sidebars permanently deleted.', $bulk_counts['deleted'], 'content-aware-sidebars'),
-			'trashed'   => _n( '%s sidebar moved to the Trash.', '%s sidebars moved to the Trash.', $bulk_counts['trashed'], 'content-aware-sidebars'),
-			'untrashed' => _n( '%s sidebar restored from the Trash.', '%s sidebars restored from the Trash.', $bulk_counts['untrashed'], 'content-aware-sidebars'),
+			'updated'   => _n_noop( '%s sidebar updated.', '%s sidebars updated.', 'content-aware-sidebars'),
+			'locked'    => _n_noop( '%s sidebar not updated, somebody is editing it.', '%s sidebars not updated, somebody is editing them.', 'content-aware-sidebars'),
+			'deleted'   => _n_noop( '%s sidebar permanently deleted.', '%s sidebars permanently deleted.', 'content-aware-sidebars'),
+			'trashed'   => _n_noop( '%s sidebar moved to the Trash.', '%s sidebars moved to the Trash.', 'content-aware-sidebars'),
+			'untrashed' => _n_noop( '%s sidebar restored from the Trash.', '%s sidebars restored from the Trash.', 'content-aware-sidebars'),
 		);
-
-		$bulk_counts = array_filter( $bulk_counts );
+		$bulk_messages = apply_filters('cas/admin/bulk_messages',$bulk_messages);
 
 		$messages = array();
-		foreach ( $bulk_counts as $message => $count ) {
-			if ( isset( $bulk_messages[ $message ] ) )
-				$messages[] = sprintf( $bulk_messages[ $message ], number_format_i18n( $count ) );
+		foreach ( $bulk_messages as $key => $message ) {
+			if(isset($_REQUEST[$key] )) {
+				$count = absint( $_REQUEST[$key] );
+				$messages[] = sprintf(
+					translate_nooped_plural($message, $count ),
+					number_format_i18n( $count )
+				);
 
-			if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-				$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
-				$messages[] = '<a href="' . esc_url( wp_nonce_url( "admin.php?page=wpcas&doaction=undo&action=untrash&ids=$ids", "bulk-sidebars" ) ) . '">' . __('Undo') . '</a>';
+				if ( $key == 'trashed' && isset( $_REQUEST['ids'] ) ) {
+					$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
+					$messages[] = '<a href="' . esc_url( wp_nonce_url( "admin.php?page=wpcas&doaction=undo&action=untrash&ids=$ids", "bulk-sidebars" ) ) . '">' . __('Undo') . '</a>';
+				}
 			}
 		}
 

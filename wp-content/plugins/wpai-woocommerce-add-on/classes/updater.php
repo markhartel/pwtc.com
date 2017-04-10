@@ -126,7 +126,7 @@ if( ! class_exists('PMWI_Updater') ) {
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_timeout_' . $cache_key) );
                                          
-                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", maybe_serialize( $version_info ), $this->slug . '_' . $cache_key) );                        
+                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name, autoload ) VALUES ( %s, %s, 'no' )", maybe_serialize( $version_info ), $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", strtotime("+1 hour"), $this->slug . '_timeout_' . $cache_key) );
                         
                     }
@@ -215,7 +215,7 @@ if( ! class_exists('PMWI_Updater') ) {
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_timeout_' . $cache_key) );
                                          
-                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", maybe_serialize( $version_info ), $this->slug . '_' . $cache_key) );                        
+                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name, autoload ) VALUES ( %s, %s, 'no' )", maybe_serialize( $version_info ), $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", strtotime("+1 hour"), $this->slug . '_timeout_' . $cache_key) );                       
                         
                     }
@@ -340,7 +340,7 @@ if( ! class_exists('PMWI_Updater') ) {
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", $this->slug . '_timeout_' . $cache_key) );
                                          
-                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", maybe_serialize( $_data ), $this->slug . '_' . $cache_key) );                        
+                        $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name, autoload ) VALUES ( %s, %s, 'no' )", maybe_serialize( $_data ), $this->slug . '_' . $cache_key) );
                         $wpdb->query( $wpdb->prepare("INSERT INTO $wpdb->options ( option_value, option_name ) VALUES ( %s, %s )", strtotime("+1 hour"), $this->slug . '_timeout_' . $cache_key) );
                                                                       
                     }   

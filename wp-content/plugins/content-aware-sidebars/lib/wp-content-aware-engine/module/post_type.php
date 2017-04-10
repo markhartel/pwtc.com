@@ -39,7 +39,7 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('post_type',__('Post Types',WPCACore::DOMAIN));
+		parent::__construct('post_type',__('Post Types',WPCA_DOMAIN));
 	}
 
 	/**
@@ -163,9 +163,10 @@ class WPCAModule_post_type extends WPCAModule_Base {
 			foreach($this->_post_types()->get_all() as $post_type) {
 				$data = $this->_get_content(array('include' => $ids, 'posts_per_page' => -1, 'post_type' => $post_type->name, 'orderby' => 'title', 'order' => 'ASC'));
 
-				if($data || isset($lookup[$post_type->name]) || isset($lookup[WPCACore::PREFIX.'sub_' . $post_type->name])) {
+				if($data || isset($lookup[$post_type->name])) {
 					$group_data[$this->id."-".$post_type->name] = array(
-						"label" => $post_type->label
+						"label" => $post_type->label,
+						"default_value" => $post_type->name
 					);
 
 					if($data) {
@@ -174,12 +175,6 @@ class WPCAModule_post_type extends WPCAModule_Base {
 							$posts[$post->ID] = $post->post_title.$this->_post_states($post);
 						}
 						$group_data[$this->id."-".$post_type->name]["data"] = $posts;
-					}
-
-					if(isset($lookup[WPCACore::PREFIX.'sub_' . $post_type->name])) {
-						$group_data[$this->id."-".$post_type->name]["options"] = array(
-							WPCACore::PREFIX.'sub_' . $post_type->name => true
-						);
 					}
 				}
 			}
@@ -266,7 +261,10 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 */
 	public function list_module($list) {
 		foreach($this->_post_types()->get_all() as $post_type) {
-			$list[$this->id."-".$post_type->name] = $post_type->label;
+			$list[$this->id."-".$post_type->name] = array(
+				'name' => $post_type->label,
+				'default_value' => $post_type->name
+			);
 		}
 		return $list;
 	}
@@ -282,15 +280,14 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		if(WPCACore::post_types()->has(get_post_type())) {
 			foreach($this->_post_types()->get_all() as $post_type) {
 
-				$placeholder = $post_type->has_archive ? "/".sprintf(__("%s Archives",WPCACore::DOMAIN),$post_type->labels->singular_name) : "";
-				$placeholder = $post_type->name == "post" ? "/".__("Blog Page",WPCACore::DOMAIN) : $placeholder;
+				$placeholder = $post_type->has_archive ? "/".sprintf(__("%s Archives",WPCA_DOMAIN),$post_type->labels->singular_name) : "";
+				$placeholder = $post_type->name == "post" ? "/".__("Blog Page",WPCA_DOMAIN) : $placeholder;
 				$placeholder = $post_type->labels->all_items.$placeholder;
 
 				echo WPCAView::make("module/condition_".$this->id."_template",array(
 					'id'          => $this->id,
 					'placeholder' => $placeholder,
-					'post_type'   => $post_type->name,
-					'autoselect'  => WPCACore::PREFIX.'sub_'.$post_type->name
+					'post_type'   => $post_type->name
 				))->render();
 			}
 		}
@@ -366,8 +363,8 @@ class WPCAModule_post_type extends WPCAModule_Base {
 						'meta_query' => array(
 						'relation'   => 'AND',
 							array(
-								'key'     => WPCACore::PREFIX . $this->id,
-								'value'   => WPCACore::PREFIX.'sub_' . $post->post_type,
+								'key'     => WPCACore::PREFIX . 'autoselect',
+								'value'   => 1,
 								'compare' => '='
 							),
 							array(

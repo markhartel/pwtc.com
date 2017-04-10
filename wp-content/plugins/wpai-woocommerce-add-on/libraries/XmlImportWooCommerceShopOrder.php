@@ -666,6 +666,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 			return $order_id;
 		}
 
+		/** @var WC_Order $order */
 		$order = wc_get_order($order_id);
 
 		/*
@@ -914,11 +915,34 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 			$this->_import_taxes_items( $order, $order_id, $index );
 		}
 
-		/*
-		*
-		* Import Order Refunds
-		*
-		*/		
+        /*
+        *
+        * Import Order Total
+        *
+        */
+
+        if ( empty($this->articleData['ID']) or $this->import->options['update_all_data'] == 'yes' or $this->import->options['is_update_total'] )
+        {
+            if ( $this->import->options['pmwi_order']['order_total_logic'] !== 'auto' )
+            {
+                if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ) {
+                    $order->set_total($this->data['pmwi_order']['order_total_xpath'][$index], 'total');
+                }
+                else{
+                    update_post_meta( $order_id, '_order_total', wc_format_decimal( $this->data['pmwi_order']['order_total_xpath'][$index], wc_get_price_decimals() ) );
+                }
+            }
+            else
+            {
+                $order->calculate_totals();
+            }
+        }
+
+        /*
+        *
+        * Import Order Refunds
+        *
+        */
 		if ( empty($this->articleData['ID']) or $this->import->options['update_all_data'] == 'yes' or $this->import->options['is_update_refunds'] )
 		{
 			if ( ! empty($this->data['pmwi_order']['order_refund_amount'][$index]) )
@@ -980,25 +1004,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 					}
 				}			
 			}
-		}	
-
-		/*
-		*
-		* Import Order Total
-		*
-		*/	
-
-		if ( empty($this->articleData['ID']) or $this->import->options['update_all_data'] == 'yes' or $this->import->options['is_update_total'] )
-		{
-			if ( $this->import->options['pmwi_order']['order_total_logic'] !== 'auto' )
-			{
-				$order->set_total( $this->data['pmwi_order']['order_total_xpath'][$index], 'total' );
-			}
-			else
-			{
-				$order->calculate_totals();
-			}
-		}		
+		}
 
 		/*
 		*
@@ -1586,8 +1592,37 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 							'tax_data' => array(),
 							'taxable' => 0
 						);
+                        if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ) {
+                            $item_id = $order->add_fee((object) $fee_line);
+                        }
+                        else{
 
-						$item_id = $order->add_fee( (object) $fee_line );
+                            $item = new WC_Order_Item_Fee();
+                            $item->set_order_id( $order_id );
+                            $item->set_name( wc_clean( $fee_line['name'] ) );
+                            $item->set_total( isset( $fee_line['amount'] ) ? floatval( $fee_line['amount'] ) : 0 );
+
+                            // if taxable, tax class and total are required
+                            if ( ! empty( $fee_line['taxable'] ) ) {
+                                if ( ! isset( $fee_line['tax_class'] ) ) {
+                                    $this->logger and call_user_func($this->logger, __('- <b>WARNING</b> Fee tax class is required when fee is taxable.', 'wp_all_import_plugin'));
+                                }
+                                else{
+                                    $item->set_tax_status( 'taxable' );
+                                    $item->set_tax_class( $fee_line['tax_class'] );
+
+                                    if ( isset( $fee_line['total_tax'] ) ) {
+                                        $item->set_total_tax( isset( $fee_line['total_tax'] ) ? wc_format_refund_total( $fee_line['total_tax'] ) : 0 );
+                                    }
+
+                                    if ( isset( $fee_line['tax_data'] ) ) {
+                                        $item->set_total_tax( wc_format_refund_total( array_sum( $fee_line['tax_data'] ) ) );
+                                        $item->set_taxes( array_map( 'wc_format_refund_total', $fee_line['tax_data'] ) );
+                                    }
+                                }
+                            }
+                            $item_id = $item->save();
+                        }
 					}					
 
 					if ( ! $item_id ) {
@@ -1607,12 +1642,33 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 				else
 				{
 					$item_id = str_replace('fee-item-', '', $fee_item->product_key);
-					$is_updated = $order->update_fee($item_id, array(
-						'name' => $fee['name'],
-						'tax_class' => '',
-						'line_total' => $fee['amount'],
-						'line_tax' => 0						
-					));
+
+                    if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ) {
+                        $is_updated = $order->update_fee($item_id, array(
+                            'name' => $fee['name'],
+                            'tax_class' => '',
+                            'line_total' => $fee['amount'],
+                            'line_tax' => 0
+                        ));
+                    }
+                    else{
+                        $item = new WC_Order_Item_Fee( $item_id );
+
+                        if ( isset( $fee['title'] ) ) {
+                            $item->set_name( wc_clean( $fee['name'] ) );
+                        }
+                        if ( isset( $fee['tax_class'] ) ) {
+                            $item->set_tax_class( $fee['tax_class'] );
+                        }
+                        if ( isset( $fee['amount'] ) ) {
+                            $item->set_total( floatval( $fee['amount'] ) );
+                        }
+                        if ( isset( $fee['total_tax'] ) ) {
+                            $item->set_total_tax( floatval( $fee['total_tax'] ) );
+                        }
+                        $is_updated = $item->save();
+                    }
+
 					if ( $is_updated )
 					{
 						$fee_item->set(array(								
@@ -1670,7 +1726,19 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 
 					if ( ! $item_id )
 					{
-						$item_id = $order->add_coupon( $coupon['code'], $absAmount, $coupon['amount_tax'] );
+						if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ){
+                            $item_id = $order->add_coupon( $coupon['code'], $absAmount, $coupon['amount_tax'] );
+                        }
+                        else{
+                            $item = new WC_Order_Item_Coupon();
+                            $item->set_props( array(
+                                'code'         => $coupon['code'],
+                                'discount'     => isset( $coupon['amount'] ) ? floatval( $coupon['amount'] ) : 0,
+                                'discount_tax' => 0,
+                                'order_id'     => $order_id,
+                            ) );
+                            $item_id = $item->save();
+                        }
 					}					
 
 					if ( ! $item_id ) {
@@ -1689,13 +1757,32 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 				}		
 				else
 				{
-					$item_id = str_replace('coupon-item-', '', $order_item->product_key);					
+					$item_id = str_replace('coupon-item-', '', $order_item->product_key);
 
-					$is_updated = $order->update_coupon($item_id, array(
-						'code' => $coupon['code'],
-						'discount_amount' => $absAmount,
-						// 'discount_amount_tax' => empty($coupon['amount_tax']) ? NULL : $coupon['amount_tax']
-					));
+                    if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ) {
+
+                        $is_updated = $order->update_coupon($item_id, array(
+                            'code' => $coupon['code'],
+                            'discount_amount' => $absAmount,
+                            // 'discount_amount_tax' => empty($coupon['amount_tax']) ? NULL : $coupon['amount_tax']
+                        ));
+
+                    }
+                    else{
+
+                        $item = new WC_Order_Item_Coupon( $item_id );
+
+                        if ( isset( $coupon['code'] ) ) {
+                            $item->set_code( $coupon['code'] );
+                        }
+
+                        if ( isset( $coupon['amount'] ) ) {
+                            $item->set_discount( floatval( $coupon['amount'] ) );
+                        }
+
+                        $is_updated = $item->save();
+                    }
+
 					if ( $is_updated )
 					{
 						$order_item->set(array(								
@@ -1866,9 +1953,17 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						$tax['tax_amount'] = 0;
 						$tax['shipping_tax_amount'] = 0;
 					}
-				}												
+				}
+                else{
+                    if ( ! empty($this->tax_rates[$tax['tax_code']])) {
+                        $tax_rate = $this->tax_rates[$tax['tax_code']];
+                    }
+                    else{
+                        $founded_by_name = false;
+                    }
+                }
 
-				if ( $founded )
+                if ( $founded )
 				{
 					$tax_item = new PMXI_Post_Record();
 					$tax_item->getBy(array(
