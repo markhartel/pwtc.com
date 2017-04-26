@@ -25,26 +25,6 @@
 			this.addWidgetSearch();
 			this.toggleSidebarStatus();
 
-			var $widget_list = $('#widget-list');
-
-			$('div.widgets-sortables')
-			.on('sortstart',function(e,ui) {
-				console.log("YO");
-				$widget_list.css('overflow-y','visible');
-			})
-			.on('sortstop',function(e,ui) {
-				$widget_list.css('overflow-y','auto');
-			});
-
-			
-			$('#widget-list').children('.widget')
-			.on('dragstart',function(e,ui) {
-				$widget_list.css('overflow-y','visible');
-			})
-			.on('dragstop',function(e,ui) {
-				$widget_list.css('overflow-y','auto');
-			});
-
 		},
 
 		/**

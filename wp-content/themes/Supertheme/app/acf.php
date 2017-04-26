@@ -2108,6 +2108,22 @@ if( function_exists('acf_add_local_field_group') ):
                 'placeholder' => '',
             ),
             array (
+                'key' => 'field_membership_renewal_link',
+                'label' => 'Membership Renewal Link',
+                'name' => 'membership_renewal_link',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 1,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+                'default_value' => '',
+                'placeholder' => '',
+            ),
+            array (
                 'key' => 'field_580dc27b7fcb8',
                 'label' => 'Ride Calandar Content',
                 'name' => 'ride_calandar_content',

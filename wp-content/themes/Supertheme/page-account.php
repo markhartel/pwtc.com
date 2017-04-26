@@ -34,26 +34,33 @@ $memberships = civicrm_api3('Membership', 'get', array(
 ));
 $data['membership'] = [];
 foreach($memberships['values'] as $membership) {
-	if(isset($data['membership']['join_date']) && $data['membership']['join_date']) {
-		$data['membership']['join_date'] = min($data['membership']['join_date'], $membership['join_date']);
-	} else {
-		$data['membership']['join_date'] = $membership['join_date'];
+	if(isset($membership['join_date'])) {
+		if (isset($data['membership']['join_date']) && $data['membership']['join_date']) {
+			$data['membership']['join_date'] = min($data['membership']['join_date'], $membership['join_date']);
+		} else {
+			$data['membership']['join_date'] = $membership['join_date'];
+		}
 	}
 
-	if(isset($data['membership']['start_date']) && $data['membership']['start_date']) {
-		$data['membership']['start_date'] = min($data['membership']['start_date'], $membership['start_date']);
-	} else {
-		$data['membership']['join_date'] = $membership['join_date'];
+	if(isset($membership['start_date'])) {
+		if (isset($data['membership']['start_date']) && $data['membership']['start_date']) {
+			$data['membership']['start_date'] = min($data['membership']['start_date'], $membership['start_date']);
+		} else {
+			$data['membership']['start_date'] = $membership['start_date'];
+		}
 	}
 
-	if(isset($data['membership']['end_date']) && $data['membership']['end_date']) {
-		$data['membership']['end_date'] = max($data['membership']['end_date'], $membership['end_date']);
-	} else {
-		$data['membership']['end_date'] = $membership['end_date'];
-		$data['membership']['membership_name'] = $membership['membership_name'];
+	if(isset($membership['end_date'])) {
+		if (isset($data['membership']['end_date']) && $data['membership']['end_date']) {
+			$data['membership']['end_date'] = max($data['membership']['end_date'], $membership['end_date']);
+		} else {
+			$data['membership']['end_date'] = $membership['end_date'];
+			$data['membership']['membership_name'] = $membership['membership_name'];
+		}
 	}
 }
-
+// renew
+$data['renew'] = get_field('membership_renewal_link', 'option');
 // use the api to find the households
 $data['household_members'] = [];
 if($civi_contact->relationship["data"]) {

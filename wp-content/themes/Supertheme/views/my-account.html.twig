@@ -12,7 +12,7 @@
                         <li><span class="term">Plan:</span> <span class="value">{{ membership.membership_name }}</span></li>
                         <li><span class="term">Joined:</span> <span class="value">{{ membership.join_date | date("F jS Y")}}</span></li>
                         <li><span class="term">Expires:</span> <span class="value">{{ membership.end_date | date("F jS Y")}}</span></li>
-                        <li><a href="http://localhost:8056/pwtc.com/civicrm/?page=CiviCRM&q=civicrm/contribute/transact&reset=1&id=6">Renew</a></li>
+                        <li><a href="{{ renew }}">Renew</a></li>
                     </ul>
                 {% else %}
                     <h2>No Membership</h2>
@@ -65,16 +65,31 @@
                     <div id="add-form">
                         <div class="row column">
                             <form action="" id="addHousehold">
-                                <label for="">Email: <input type="text" name="email"></label>
-                                <input type="hidden" name="action" value="add_household"/>
-                                <button type="aubmit" class="primary button">Add</button>
+                                <div class="row column">
+                                    <p>Enter in the email and name of the person you want to add to your family membership</p>
+                                </div>
+                                <div class="row column">
+                                    <label for="">Email: <input type="email" name="email"></label>
+                                </div>
+                                <div class="row">
+                                    <div class="small-6 columns">
+                                        <label for="">First Name: <input type="text" name="first_name"></label>
+                                    </div>
+                                    <div class="small-6 columns">
+                                        <label for="">Last Name: <input type="text" name="last_name"></label>
+                                    </div>
+                                </div>
+                                <div class="row column">
+                                    <input type="hidden" name="action" value="add_household"/>
+                                    <button type="submit" class="primary button">Add</button>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </h3>
                 {% if not household_members %}
                     <div class="row column">
-                        <p>Currently no family members on your membership</p>
+                        <p>currently you have no family members on your membership</p>
                     </div>
                 {% endif %}
                 <div class="row small-up-1 medium-up-2 large-up-4">

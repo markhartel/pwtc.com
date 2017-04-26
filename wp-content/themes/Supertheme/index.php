@@ -65,8 +65,8 @@ while(have_rows('content_rows')) {
             $rides_data[$date][] = [
                 'title' => get_the_title(),
                 'link' => get_the_permalink(),
-                'date' => $datetime->getTimestamp(),
-                'time' => $datetime->getTimestamp(),
+                'date' => get_field('date'),
+                'time' => get_field('date'),
             ];
         }
         $data['rides'] = $rides_data;

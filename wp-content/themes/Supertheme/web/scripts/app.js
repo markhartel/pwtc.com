@@ -70,12 +70,12 @@ jQuery(function() {
             type: 'post',
             data: jQuery("#basicInfo").serialize(),
             success : function( response ) {
+                response += "<p>The page will automatically refresh in a few seconds</p>";
                 jQuery.fancybox(response);
                 setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();
-        return false;
     });
 
     jQuery('.household-delete .alert.button').on('click', function(e){
@@ -84,12 +84,12 @@ jQuery(function() {
             type: 'post',
             data: jQuery(this).parent('div').next('form').serialize(),
             success : function( response ) {
+                response += "<p>The page will automatically refresh in a few seconds</p>";
                 jQuery.fancybox(response);
-                setTimeout(function(){ window.location.reload(); }, 3000);
+                //setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();
-        return false;
     });
 
     jQuery('#addHousehold').on('submit', function(e){
@@ -98,12 +98,12 @@ jQuery(function() {
             type: 'post',
             data: jQuery(this).serialize(),
             success : function( response ) {
+                response += "<p>The page will automatically refresh in a few seconds</p>";
                 jQuery.fancybox(response);
-                setTimeout(function(){ window.location.reload(); }, 3000);
+                //setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();
-        return false;
     })
 });
 
