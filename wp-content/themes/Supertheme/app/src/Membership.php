@@ -188,6 +188,7 @@ HTML
             'relationship_type_id' => 6,
             'contact_id_a' => $contact_id,
         ));
+
         if($result['values']) {
             $household_id = $result['values'][0]['contact_id_b'];
         }
@@ -198,9 +199,15 @@ HTML
                 'sequential' => 1,
                 'contact_type' => "Household",
                 'household_name' => $wordpress_user->user_firstname . " " . $wordpress_user->user_lastname,
-                'primary_contact_id' => $contact_id,
+                //'primary_contact_id' => $contact_id,
             ));
             $household_id = $result['values'][0]['id'];
+            $result = civicrm_api3('Relationship', 'create', array(
+                'sequential' => 1,
+                'contact_id_a' => $contact_id,
+                'contact_id_b' => $household_id,
+                'relationship_type_id' => 6,
+            ));
         }
 
         // check if user already has a contact by looking for the email
