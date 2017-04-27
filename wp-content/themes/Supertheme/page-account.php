@@ -1,9 +1,9 @@
 <?php
-/**
- * Template Name: Two Columns
- *
- */
 require_once __DIR__.'/app/bootstrap.php';
+
+if(!is_user_logged_in()) {
+	wp_safe_redirect(get_site_url());
+}
 
 // get services
 /** @var \Symfony\Component\DependencyInjection\Container $container */
