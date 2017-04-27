@@ -28,9 +28,9 @@ if(get_field('attach_map')) {
 
 
         if($maxLength) {
-            $maxLength = max(get_field('max_length', $map_id), $maxLength, $length);
+            $maxLength = max(get_field('max_length', $map_id), $maxLength, get_field('length', $map_id));
         } else {
-            $maxLength = get_field('max_length', $map_id) ?: $length;
+            $maxLength = get_field('max_length', $map_id) ?: get_field('length', $map_id);
         }
 
         $terrain = array_merge($terrain, get_field('terrain', $map_id));
