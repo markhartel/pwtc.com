@@ -10,11 +10,19 @@ if(typeof(stLight) != "undefined") {
 
 // general
 jQuery(function() {
+    // load foundation
     jQuery(document).foundation();
+    jQuery('img.avatar').load(function(){
+        Foundation.reInit('equalizer');
+    });
+    
+    // fancybox
     jQuery('.fancybox').fancybox({
         scrolling: "no",
         fitToView: false
     });
+
+    // fancybox
     jQuery('.fancybox-media').fancybox({
         openEffect  : 'none',
         closeEffect : 'none',
@@ -22,6 +30,8 @@ jQuery(function() {
             media : {}
         }
     });
+
+    //slick
     jQuery('.slick').slick({
         autoplay: true,
         autoplaySpeed: 6000,
@@ -29,6 +39,8 @@ jQuery(function() {
         speed: 250,
         dots: true
     });
+
+    // scroll to contact
     jQuery('.scroll-to-contact').click(function(e){
         e.preventDefault();
         jQuery('html, body').animate({
@@ -37,6 +49,8 @@ jQuery(function() {
             jQuery(".footer form [type='email']").focus();
         });
     });
+
+    // prev days toggle
     var is_prev_days_shown = false;
     jQuery('.toggle-previous-days').click(function(){
         jQuery('.day.previous').toggle();
@@ -48,6 +62,8 @@ jQuery(function() {
             jQuery(this).html("Show hidden days");
         }
     });
+
+    // scroll to top
     jQuery(window).on("scroll", function(){
         if(jQuery(document).scrollTop() > jQuery(window).height()) {
             jQuery('a.scroll-to-top').fadeIn();
@@ -86,7 +102,7 @@ jQuery(function() {
             success : function( response ) {
                 response += "<p>The page will automatically refresh in a few seconds</p>";
                 jQuery.fancybox(response);
-                //setTimeout(function(){ window.location.reload(); }, 3000);
+                setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();
@@ -100,7 +116,7 @@ jQuery(function() {
             success : function( response ) {
                 response += "<p>The page will automatically refresh in a few seconds</p>";
                 jQuery.fancybox(response);
-                //setTimeout(function(){ window.location.reload(); }, 3000);
+                setTimeout(function(){ window.location.reload(); }, 3000);
             }
         });
         e.preventDefault();
