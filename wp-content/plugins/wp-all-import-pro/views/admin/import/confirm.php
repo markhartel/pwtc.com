@@ -154,7 +154,7 @@
 							}
 							if ( in_array($import_type, array('upload', 'file'))){ $path = preg_replace('%.*wp-content/%', 'wp-content/', $path); }
 						?>
-						<p><?php printf(__('WP All Import will import the file <span style="color:#40acad;">%s</span>, which is <span style="color:#000; font-weight:bold;">%s</span>', 'wp_all_import_plugin'), $path, (isset($locfilePath)) ? human_filesize(filesize($locfilePath)) : __('undefined', 'wp_all_import_plugin')); ?></p>
+						<p><?php printf(__('WP All Import will import the file <span style="color:#40acad;">%s</span>, which is <span style="color:#000; font-weight:bold;">%s</span>', 'wp_all_import_plugin'), $path, (isset($locfilePath)) ? pmxi_human_filesize(filesize($locfilePath)) : __('undefined', 'wp_all_import_plugin')); ?></p>
 
 						<?php if ( strpos($xpath, '[') !== false){ ?>
 						<p><?php printf(__('WP All Import will process the records matching the XPath expression: <span style="color:#46ba69; font-weight:bold;">%s</span>', 'wp_all_import_plugin'), $xpath); ?></p>

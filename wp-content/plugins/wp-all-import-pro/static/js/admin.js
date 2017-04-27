@@ -776,7 +776,7 @@
 
 			$.post($URL, $form.serialize(), function (response) {
 							
-				$ths.pointer({'content' : response.html});				
+				$ths.pointer({'content' : response.html});
 
 				$pointer.css({'position':'fixed', 'top' : '15%', 'left' : $leftOffset + 'px'});
 				
@@ -836,7 +836,6 @@
 			if ($(this).is(':checked') && ( $(this).val() == 'gallery' || $(this).val() == 'no') )
 			{
 				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('p:first').show();
-				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('input').attr({'disabled':'disabled'});
 			}
 		});
 		
@@ -844,14 +843,11 @@
 			if ($(this).is(':checked') && ( $(this).val() == 'gallery' || $(this).val() == 'no') )
 			{				
 				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('p:first').show();
-				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('input').attr({'disabled':'disabled'});
 			}
 			else
 			{
 				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('p:first').hide();
-				$(this).parents('.wpallimport-collapsed-content:first').find('.advanced_options_files').find('input').removeAttr('disabled');
 			}
-			
 		});
 
 		// Auto-detect custom fields

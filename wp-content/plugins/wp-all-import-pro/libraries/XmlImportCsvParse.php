@@ -976,9 +976,17 @@ class PMXI_CsvParser
 
         $create_new_headers = apply_filters('wp_all_import_auto_create_csv_headers', false, $import_id);
         $replace_first_number = apply_filters('wp_all_import_replace_first_number_in_headers', true, $import_id);
+        $skip_x_rows = apply_filters('wp_all_import_skip_x_csv_rows', false, $import_id);
         $headers = array();    
         while ($keys = fgetcsv($res, $l, $d, $e)) {
-            
+            if ($skip_x_rows !== false && $skip_x_rows > $c){
+                $c++;
+                continue;
+            }
+            if ($skip_x_rows !== false && $skip_x_rows <= $c){
+                $skip_x_rows = false;
+                $c = 0;
+            }
             $empty_columns = 0;
             foreach ($keys as $key) {
                 if ($key == '') $empty_columns++;

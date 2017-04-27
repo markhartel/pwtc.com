@@ -61,7 +61,7 @@
 				<th scope="row"><label><?php _e('Cron Processing Time Limit', 'wp_all_import_plugin'); ?></label></th>
 				<td>
 					<input type="text" class="regular-text" name="cron_processing_time_limit" value="<?php echo esc_attr($post['cron_processing_time_limit']); ?>"/>
-					<p class="description"><?php _e('Leave blank to use your server\'s limit on script run times.', 'wp_all_import_plugin'); ?></p>
+					<p class="description"><?php _e('Maximum execution time for the cron processing script. If this is blank, the default value of 120 (2 minutes) will be used.', 'wp_all_import_plugin'); ?></p>
 				</td>
 			</tr>
 			<tr>

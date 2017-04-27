@@ -4,7 +4,7 @@ Plugin Name: Duplicate Page
 Plugin URI: https://wordpress.org/plugins/duplicate-page/
 Description: Duplicate Posts, Pages and Custom Posts using single click.
 Author: mndpsingh287
-Version: 2.2
+Version: 2.3
 Author URI: https://profiles.wordpress.org/mndpsingh287/
 License: GPLv2
 Text Domain: duplicate_page
@@ -227,7 +227,7 @@ if(!class_exists('duplicate_page')):
 				$data = json_decode($result, true);
 				curl_close ($curl);
 				if(!empty($data) && $data['status'] == 1 && !empty($data['image'])) {
-					return '<a href="'.$data['link'].'" target="_blank" title="Filemanager PRO"><img src="'.$data['image'].'" width="100%"></a>';
+					return '<a href="'.$data['link'].'" target="_blank" title="Click here"><img src="'.$data['image'].'" width="100%"></a>';
 				}
 		}
 		/*

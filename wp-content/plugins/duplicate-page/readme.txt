@@ -5,7 +5,7 @@ Donate link: http://www.webdesi9.com/donate/?plugin=duplicate-page
 Tags: Page Duplicate, Post duplicate, duplicate custom posts, duplicate page, duplicate post, duplicate ,custom posts, post, page, duplicate this, duplicate, content duplicate, duplicate content, data duplicate, duplicate data, copy page, clone page,wordpress page duplicate, wordpress post duplicate, Copy post, wordpress page duplicator, wordpress post duplicator, Cloner
 Requires at least: 3.4
 Tested up to: 4.7.2
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,7 +64,7 @@ https://www.youtube.com/watch?v=Fj8BHxvebXs&feature=youtu.be
 
 * Strings Translations
 
-= 2.3 (21st Feb, 2017) =
+= 2.3 (27st april, 2017) =
 
 * Minor Fixes
 

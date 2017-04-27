@@ -952,9 +952,9 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 						$dom->loadXML($xml); // FIX: libxml xpath doesn't handle default namespace properly, so remove it upon XML load							
 						libxml_use_internal_errors($old);
 						$xpath = new DOMXPath($dom);						
-						if (($this->data['elements'] = $elements = @$xpath->query(PMXI_Plugin::$session->xpath)) and $elements->length){ 						
-							
-							if ( $loop == $tagno ){
+						if (($this->data['elements'] = $elements = @$xpath->query(PMXI_Plugin::$session->xpath)) and $elements->length){
+                            $loop += $elements->length;
+							if ( $loop >= $tagno ){
 								/* Merge nested XML/CSV files */
 								/*$nested_files = json_decode(PMXI_Plugin::$session->options['nested_files'], true);
 								if ( ! empty($nested_files) ){										
@@ -966,8 +966,7 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 								unset($dom, $xpath, $elements);
 								break(2); 			
 							}
-							unset($dom, $xpath, $elements);																								
-							$loop++;
+							unset($dom, $xpath, $elements);
 						}											  					 
 				    }
 				}
@@ -1277,12 +1276,12 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 								if ($post['is_tax_hierarchical_group_delim'][$ctx] and !empty($post['tax_hierarchical_group_delim'][$ctx])){
 
 									// apply mapping rules before splitting via separator symbol
-									if ( ! empty($post['tax_enable_mapping'][$ctx]) and ! empty($post['tax_logic_mapping'][$ctx]) ){		
-										if ( ! empty($post['tax_mapping'][$ctx])){						
-											$mapping_rules = json_decode($post['tax_mapping'][$ctx], true);																			
-											if ( ! empty( $mapping_rules) ){			
+									if ( ! empty($post['tax_enable_mapping'][$ctx]) and ! empty($post['tax_logic_mapping'][$ctx]) ){
+										if ( ! empty($post['tax_mapping'][$ctx])){
+											$mapping_rules = json_decode($post['tax_mapping'][$ctx], true);
+											if ( ! empty( $mapping_rules) ){
 												foreach ($mapping_rules as $rule) {
-													if ( ! empty($rule[trim($d)])){ 
+													if ( ! empty($rule[trim($d)])){
 														$d = trim($rule[trim($d)]);
 														break;
 													}
@@ -2324,8 +2323,8 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 
 		$default = PMXI_Plugin::get_default_import_options();
 						
-		$this->data['source'] = PMXI_Plugin::$session->source;	
-		$this->data['locfilePath'] = PMXI_Plugin::$session->filePath;	
+		$this->data['source'] = PMXI_Plugin::$session->source;
+        $this->data['locfilePath'] = PMXI_Plugin::$session->filePath;
 		$this->data['count'] = PMXI_Plugin::$session->count;	
 		$this->data['xpath'] = PMXI_Plugin::$session->xpath;
 		$this->data['isWizard'] = true;

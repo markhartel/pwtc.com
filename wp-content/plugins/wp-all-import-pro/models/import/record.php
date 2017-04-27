@@ -355,10 +355,10 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 							    }		
 
 							    if ( $loop > 0 and ( $loop == $this->options['records_per_request'] or $this->count == $this->imported + $this->skipped or $this->count == $loop + $this->imported + $this->skipped ) ) { // skipping scheduled imports if any for the next hit
-							    	$feed .= "</pmxi_records>";		
+							    	$feed .= "</pmxi_records>";
 
-							    	$this->process($feed, $logger, $chunk_number, $cron, '/pmxi_records', $loop);
-							    	
+                                    $this->process($feed, $logger, $chunk_number, $cron, '/pmxi_records', $loop);
+
 							    	// set last update
 							    	$this->set(array(
 										'registered_on' => date('Y-m-d H:i:s'),
@@ -375,7 +375,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 						}								
 						
 						// detect, if cron process if finished
-						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped ){
+						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped || (int) $this->queue_chunk_number > (int) $this->imported + (int) $this->skipped ){
 							
 							$this->delete_source( $logger );
 
@@ -539,7 +539,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 							}
 
 							// Set out of stock status for missing records [Woocommerce add-on option]
-							if (empty($this->options['is_delete_missing']) and $this->options['custom_type'] == "product" and class_exists('PMWI_Plugin') and !empty($this->options['missing_records_stock_status'])) {
+							if (empty($this->options['is_delete_missing']) and $this->options['custom_type'] == "product" and class_exists('PMWI_Plugin') and !empty($this->options['missing_records_stock_status']) and "manual" != $this->options['duplicate_matching']) {
 																
 								$postList = new PMXI_Post_List();												
 								$args = array('import_id' => $this->id, 'iteration !=' => $this->iteration);
@@ -986,7 +986,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 			require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
 
 			$taxonomies = array();						
-			$exclude_taxonomies = apply_filters('pmxi_exclude_taxonomies', (class_exists('PMWI_Plugin')) ? array('post_format', 'product_type', 'product_shipping_class') : array('post_format'));	
+			$exclude_taxonomies = apply_filters('pmxi_exclude_taxonomies', (class_exists('PMWI_Plugin')) ? array('post_format', 'product_type', 'product_shipping_class', 'product_visibility') : array('post_format'));
 			$post_taxonomies = array_diff_key(get_taxonomies_by_object_type(array($this->options['custom_type']), 'object'), array_flip($exclude_taxonomies));
             if ( $this->is_parsing_required('is_update_categories') && ! empty($post_taxonomies) && ! in_array($this->options['custom_type'], array('import_users', 'taxonomies')) ):
 				foreach ($post_taxonomies as $ctx): if ("" == $ctx->labels->name or (class_exists('PMWI_Plugin') and strpos($ctx->name, "pa_") === 0 and $this->options['custom_type'] == "product")) continue;
@@ -1397,29 +1397,28 @@ class PMXI_Import_Record extends PMXI_Model_Record {
                             $image_meta_descriptions_bundle[ empty($section['slug']) ? 'pmxi_gallery_image' : $section['slug']] = $image_meta_descriptions;
                         }
 
-                        if ( "yes" == $this->options[$section['slug'] . 'download_images'] ){
-                            // Composing images suffix
-                            $chunk == 1 and $this->options[$section['slug'] . 'auto_rename_images'] and $logger and call_user_func($logger, __('Composing ' . strtolower($section['title']) . ' suffix...', 'wp_all_import_plugin'));
-                            $auto_rename_images = array();
-                            if ( $this->options[$section['slug'] . 'auto_rename_images'] and ! empty($this->options[$section['slug'] . 'auto_rename_images_suffix'])){
-                                $auto_rename_images = XmlImportParser::factory($xml, $cxpath, $this->options[$section['slug'] . 'auto_rename_images_suffix'], $file)->parse($records); $tmp_files[] = $file;
-                            }
-                            else{
-                                count($titles) and $auto_rename_images = array_fill(0, count($titles), '');
-                            }
-                            $auto_rename_images_bundle[ empty($section['slug']) ? 'pmxi_gallery_image' : $section['slug']] = $auto_rename_images;
 
-                            // Composing images extensions
-                            $chunk == 1 and $this->options[$section['slug'] . 'auto_set_extension'] and $logger and call_user_func($logger, __('Composing ' . strtolower($section['title']) . ' extensions...', 'wp_all_import_plugin'));
-                            $auto_extensions = array();
-                            if ( $this->options[$section['slug'] . 'auto_set_extension'] and ! empty($this->options[$section['slug'] . 'new_extension'])){
-                                $auto_extensions = XmlImportParser::factory($xml, $cxpath, $this->options[$section['slug'] . 'new_extension'], $file)->parse($records); $tmp_files[] = $file;
-                            }
-                            else{
-                                count($titles) and $auto_extensions = array_fill(0, count($titles), '');
-                            }
-                            $auto_extensions_bundle[ empty($section['slug']) ? 'pmxi_gallery_image' : $section['slug']] = $auto_extensions;
+                        // Composing images suffix
+                        $chunk == 1 and $this->options[$section['slug'] . 'auto_rename_images'] and $logger and call_user_func($logger, __('Composing ' . strtolower($section['title']) . ' suffix...', 'wp_all_import_plugin'));
+                        $auto_rename_images = array();
+                        if ( $this->options[$section['slug'] . 'auto_rename_images'] and ! empty($this->options[$section['slug'] . 'auto_rename_images_suffix'])){
+                            $auto_rename_images = XmlImportParser::factory($xml, $cxpath, $this->options[$section['slug'] . 'auto_rename_images_suffix'], $file)->parse($records); $tmp_files[] = $file;
                         }
+                        else{
+                            count($titles) and $auto_rename_images = array_fill(0, count($titles), '');
+                        }
+                        $auto_rename_images_bundle[ empty($section['slug']) ? 'pmxi_gallery_image' : $section['slug']] = $auto_rename_images;
+
+                        // Composing images extensions
+                        $chunk == 1 and $this->options[$section['slug'] . 'auto_set_extension'] and $logger and call_user_func($logger, __('Composing ' . strtolower($section['title']) . ' extensions...', 'wp_all_import_plugin'));
+                        $auto_extensions = array();
+                        if ( $this->options[$section['slug'] . 'auto_set_extension'] and ! empty($this->options[$section['slug'] . 'new_extension'])){
+                            $auto_extensions = XmlImportParser::factory($xml, $cxpath, $this->options[$section['slug'] . 'new_extension'], $file)->parse($records); $tmp_files[] = $file;
+                        }
+                        else{
+                            count($titles) and $auto_extensions = array_fill(0, count($titles), '');
+                        }
+                        $auto_extensions_bundle[ empty($section['slug']) ? 'pmxi_gallery_image' : $section['slug']] = $auto_extensions;
 
                     }
                 }
@@ -2201,7 +2200,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 
 					$existing_meta_keys = array(); 
 
-					if (empty($articleData['ID']) or $this->options['update_all_data'] == 'yes' or ($this->options['update_all_data'] == 'no' and $this->options['is_update_custom_fields']) or ($this->options['update_all_data'] == 'no' and $this->options['is_update_attributes'] and $post_type[$i] == "product" and class_exists('PMWI_Plugin'))) {																			
+					if (empty($articleData['ID']) or $this->options['update_all_data'] == 'yes' or ($this->options['update_all_data'] == 'no' and $this->options['is_update_custom_fields']) or ($this->options['update_all_data'] == 'no' and !empty($this->options['is_update_attributes']) and $post_type[$i] == "product" and class_exists('PMWI_Plugin'))) {
 
 						$show_log = ( ! empty($serialized_meta) );
 
@@ -2327,10 +2326,10 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 							}
 						}
 					}
-					
+
 					// [/addons import]
 
-					if (empty($articleData['ID']) or $this->options['update_all_data'] == 'yes' or ($this->options['update_all_data'] == 'no' and $this->options['is_update_custom_fields']) or ($this->options['update_all_data'] == 'no' and $this->options['is_update_attributes'] and $post_type[$i] == "product" and class_exists('PMWI_Plugin'))) {																			
+					if (empty($articleData['ID']) or $this->options['update_all_data'] == 'yes' or ($this->options['update_all_data'] == 'no' and $this->options['is_update_custom_fields']) or ($this->options['update_all_data'] == 'no' and !empty($this->options['is_update_attributes']) and $post_type[$i] == "product" and class_exists('PMWI_Plugin'))) {
 
 						$encoded_meta = array();						
 						
@@ -2568,7 +2567,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 
 												// generate local file name
 												$image_name = urldecode(($this->options[$option_slug . 'auto_rename_images'] and !empty($auto_rename_images_bundle[$slug][$i])) ? sanitize_file_name(($img_ext) ? str_replace("." . $default_extension, "", $auto_rename_images_bundle[$slug][$i]) : $auto_rename_images_bundle[$slug][$i]) : (($img_ext) ? str_replace("." . $default_extension, "", $bn) : $bn)) . (("" != $img_ext) ? '.' . $img_ext : '');
-												$image_name = apply_filters("wp_all_import_image_filename", $image_name, empty($img_titles[$k]) ? '' : $img_titles[$k], empty($img_captions[$k]) ? '' : $img_captions[$k], empty($img_alts[$k]) ? '' : $img_alts[$k], $articleData, $this->id);
+												$image_name = apply_filters("wp_all_import_image_filename", $image_name, empty($img_titles[$k]) ? '' : $img_titles[$k], empty($img_captions[$k]) ? '' : $img_captions[$k], empty($img_alts[$k]) ? '' : $img_alts[$k], $articleData, $this->id, $img_url);
 												
 												// if wizard store image data to custom field									
 												$create_image   = false;
@@ -2579,7 +2578,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 
 												if ( $bundle_data['type'] == 'images' and base64_encode(base64_decode($url)) == $url and $is_base64_images_allowed ){
                                                     $image_name = empty($this->options[$option_slug . 'auto_rename_images']) ? md5(time()) . '.jpg' : sanitize_file_name($auto_rename_images_bundle[$slug][$i]) . '.jpg';
-                                                    $image_name = apply_filters("wp_all_import_image_filename", $image_name, empty($img_titles[$k]) ? '' : $img_titles[$k], empty($img_captions[$k]) ? '' : $img_captions[$k], empty($img_alts[$k]) ? '' : $img_alts[$k], $articleData, $this->id);
+                                                    $image_name = apply_filters("wp_all_import_image_filename", $image_name, empty($img_titles[$k]) ? '' : $img_titles[$k], empty($img_captions[$k]) ? '' : $img_captions[$k], empty($img_alts[$k]) ? '' : $img_alts[$k], $articleData, $this->id, $img_url);
 
                                                     // search existing attachment
                                                     if ($this->options[$option_slug . 'search_existing_images'] or "gallery" == $this->options[$option_slug . 'download_images']){
@@ -3113,7 +3112,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 						$logger and call_user_func($logger, sprintf(__('Attachments import skipped for post `%s` according to \'pmxi_is_attachments_to_update\' filter...', 'wp_all_import_plugin'), $articleData['post_title']));		
 					}
 					// [/attachments]
-					
+
 					// [custom taxonomies]
 					if ( ! empty($taxonomies) ){
 
@@ -3332,7 +3331,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 				$is_import_complete = ($records_count == $records_to_import);								
 
 				// Set out of stock status for missing records [Woocommerce add-on option]
-				if ( $is_import_complete and empty($this->options['is_delete_missing']) and $post_type[$i] == "product" and class_exists('PMWI_Plugin') and !empty($this->options['missing_records_stock_status'])) {
+				if ( $is_import_complete and empty($this->options['is_delete_missing']) and $post_type[$i] == "product" and class_exists('PMWI_Plugin') and !empty($this->options['missing_records_stock_status']) and "manual" != $this->options['duplicate_matching']) {
 
 					$logger and call_user_func($logger, __('Update stock status previously imported posts which are no longer actual...', 'wp_all_import_plugin'));
 					$args = array('import_id' => $this->id, 'iteration !=' => $this->iteration);
@@ -3608,7 +3607,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 	}		
 	
 	protected function associate_terms($pid, $assign_taxes, $tx_name, $logger, $is_cron = false){
-		
+        wp_cache_flush();
 		$terms = wp_get_object_terms( $pid, $tx_name );
 		$term_ids = array();     
 

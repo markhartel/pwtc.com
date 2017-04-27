@@ -3,7 +3,7 @@
 Plugin Name: WP All Import Pro
 Plugin URI: http://www.wpallimport.com/
 Description: The most powerful solution for importing XML and CSV files to WordPress. Import to Posts, Pages, and Custom Post Types. Support for imports that run on a schedule, ability to update existing imports, and much more.
-Version: 4.4.3
+Version: 4.4.4
 Author: Soflyy
 */
 
@@ -31,7 +31,7 @@ if ( is_plugin_active('wp-all-import/plugin.php') ){
 }
 else {
 
-	define('PMXI_VERSION', '4.4.3');
+	define('PMXI_VERSION', '4.4.4');
 
 	define('PMXI_EDITION', 'paid');
 
@@ -265,8 +265,10 @@ else {
 			// init plugin options
 			$option_name = get_class($this) . '_Options';
 			$options_default = PMXI_Config::createFromFile(self::ROOT_DIR . '/config/options.php')->toArray();
+            $current_options = get_option($option_name, array());
+            if (empty($current_options)) $current_options = array();
 
-			$this->options = array_intersect_key(get_option($option_name, array()), $options_default) + $options_default;
+			$this->options = array_intersect_key($current_options, $options_default) + $options_default;
 			$this->options = array_intersect_key($options_default, array_flip(array('info_api_url'))) + $this->options; // make sure hidden options apply upon plugin reactivation
 			if ('' == $this->options['cron_job_key']) $this->options['cron_job_key'] = wp_all_import_url_title(wp_all_import_rand_char(12));
 			
@@ -341,6 +343,9 @@ else {
 		public function fix_options(){
 
 			global $wpdb;
+			$installed_ver = get_option( "wp_all_import_db_version" );
+
+			if ( $installed_ver == PMXI_VERSION ) return true;
 
 			$imports = new PMXI_Import_List();
 			$post    = new PMXI_Post_Record();
@@ -452,6 +457,7 @@ else {
 				}
 				if ($commit_migration) update_option('pmxi_is_migrated', PMXI_VERSION);
 			}
+			update_option( "wp_all_import_db_version", PMXI_VERSION );
 		}
 
 		public function ver_4_transition_fix( &$options ){
@@ -753,6 +759,10 @@ else {
 		 * Plugin activation logic
 		 */
 		public function activation() {
+
+			$installer = new PMXI_Installer();
+			$installer->checkActivationConditions();
+
 			// uncaught exception doesn't prevent plugin from being activated, therefore replace it with fatal error so it does
 			set_exception_handler(create_function('$e', 'trigger_error($e->getMessage(), E_USER_ERROR);'));
 

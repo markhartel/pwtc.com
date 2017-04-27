@@ -14,8 +14,8 @@
 		}
 	}	
 
-	if (!function_exists('human_filesize')){
-		function human_filesize($bytes, $decimals = 2) {
+	if (!function_exists('pmxi_human_filesize')){
+		function pmxi_human_filesize($bytes, $decimals = 2) {
 		 	$sz = 'BKMGTP';
 		  	$factor = floor((strlen($bytes) - 1) / 3);
 		  	return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
@@ -164,7 +164,7 @@
             $r = array();
             // populate $r
             foreach ($taxonomies as $taxonomy) {
-                if (in_array($taxonomy->name, $ignore) || $taxonomy->show_in_nav_menus === false ) {
+                if (in_array($taxonomy->name, $ignore)) {
                     continue;
                 }
                 if ( ! empty($taxonomy->labels->name) && strpos($taxonomy->labels->name, "_") === false){
