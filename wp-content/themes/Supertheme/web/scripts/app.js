@@ -15,7 +15,7 @@ jQuery(function() {
     jQuery('img.avatar').load(function(){
         Foundation.reInit('equalizer');
     });
-    
+
     // fancybox
     jQuery('.fancybox').fancybox({
         scrolling: "no",
@@ -108,7 +108,10 @@ jQuery(function() {
         e.preventDefault();
     });
 
-    jQuery('#addHousehold').on('submit', function(e){
+    jQuery('#addHousehold').on('submit', function(e) {
+        e.preventDefault();
+    });
+    jQuery('#addHousehold').on('formvalid.zf.abide', function(e){
         jQuery.ajax({
             url : civi.ajax_url,
             type: 'post',

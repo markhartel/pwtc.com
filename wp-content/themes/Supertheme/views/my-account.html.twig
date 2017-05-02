@@ -67,19 +67,31 @@
                         <small><a href="#add-form" class="fancybox">Add New</a></small>
                         <div id="add-form">
                             <div class="row column">
-                                <form action="" id="addHousehold">
+                                <form action="" id="addHousehold" data-abide novalidate>
                                     <div class="row column">
                                         <p>Enter in the email and name of the person you want to add to your family membership</p>
                                     </div>
                                     <div class="row column">
-                                        <label for="">Email: <input type="email" name="email"></label>
+                                        <label for="">
+                                            Email:
+                                            <input type="email" name="email" required pattern="email">
+                                            <span class="form-error">A valid email is required</span>
+                                        </label>
                                     </div>
                                     <div class="row">
                                         <div class="small-6 columns">
-                                            <label for="">First Name: <input type="text" name="first_name"></label>
+                                            <label for="">
+                                                First Name:
+                                                <input type="text" name="first_name" required pattern="alpha">
+                                                <span class="form-error">A valid first name is required. Only a-z characters are allowed</span>
+                                            </label>
                                         </div>
                                         <div class="small-6 columns">
-                                            <label for="">Last Name: <input type="text" name="last_name"></label>
+                                            <label for="">
+                                                Last Name:
+                                                <input type="text" name="last_name" required pattern="alpha">
+                                                <span class="form-error">A valid last name is required. Only a-z characters are allowed</span>
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="row column">
