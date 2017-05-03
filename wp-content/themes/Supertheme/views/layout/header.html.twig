@@ -5,7 +5,7 @@
             <!-- top row -->
             <div class="top clearfix">
                 {% if isLoggedIn is defined and isLoggedIn %}
-                    <ul class="dropdown menu hide-for-small-only float-right" data-dropdown-menu>
+                    <ul class="dropdown menu hide-for-small-only float-right" data-dropdown-menu data-close-on-click-inside="false">
                         <li>
                             <a href="#">
                                 {{ avatar }}
@@ -35,7 +35,7 @@
             </div>
             <div class="title-bar-right">
                 {% if isLoggedIn is defined and isLoggedIn %}
-                    <ul class="dropdown menu float-left" data-dropdown-menu>
+                    <ul class="dropdown menu float-left" data-dropdown-menu data-close-on-click-inside="false">
                         <li>
                             <a class="mobile-account-menu">
                                 {{ avatar }}
