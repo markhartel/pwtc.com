@@ -34,9 +34,9 @@ jQuery(function() {
     //slick
     jQuery('.slick').slick({
         autoplay: true,
-        autoplaySpeed: 6000,
+        autoplaySpeed: 4000,
         fade: true,
-        speed: 250,
+        speed: 500,
         dots: true
     });
 
