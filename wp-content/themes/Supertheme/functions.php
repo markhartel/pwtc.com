@@ -36,3 +36,7 @@ add_action( 'wp_enqueue_scripts', function() {
 add_filter('login_redirect', function ($redirect_to, $request, $user){
     return home_url();
 }, 10, 3 );
+
+add_filter( 'login_redirect', function ($redirect_to, $request, $user) {
+    return home_url().'/account';
+}, 10, 3 );
