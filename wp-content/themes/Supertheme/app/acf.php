@@ -484,7 +484,7 @@ if( function_exists('acf_add_local_field_group') ):
                                         'collapsed' => '',
                                         'min' => '',
                                         'max' => '',
-                                        'layout' => '',
+                                        'layout' => 'block',
                                         'button_label' => 'Add Row',
                                         'sub_fields' => array (
                                             array (
@@ -556,7 +556,7 @@ if( function_exists('acf_add_local_field_group') ):
                                                     'id' => '',
                                                 ),
                                                 'message' => '',
-                                                'default_value' => 0,
+                                                'default_value' => false,
                                             ),
                                             array (
                                                 'key' => 'field_5773f4a34eda5',
