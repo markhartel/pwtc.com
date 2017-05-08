@@ -40,7 +40,7 @@ while(have_rows('content_rows')) {
     }
     elseif(get_row_layout() == "rides")
     {
-        $today = new DateTime();
+        $today = new DateTime(null, new DateTimeZone(supertheme_get_timezone_string()));
         $rides_query = new WP_Query([
             'posts_per_page' => 6,
             'post_type' => 'scheduled_rides',

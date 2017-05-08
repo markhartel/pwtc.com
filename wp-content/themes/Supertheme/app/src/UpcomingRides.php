@@ -28,7 +28,7 @@ class UpcomingRides extends \WP_Widget {
             echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
         }
 
-        $today = new \DateTime();
+        $today = new \DateTime(null, new \DateTimeZone(supertheme_get_timezone_string()));
         $rides_query = new \WP_Query([
             'posts_per_page'	=> 6,
             'post_type' => 'scheduled_rides',
