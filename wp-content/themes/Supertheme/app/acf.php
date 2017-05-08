@@ -1684,7 +1684,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'from',
                 'type' => 'date_picker',
                 'instructions' => '',
-                'required' => 1,
+                'required' => 0,
                 'conditional_logic' => array (
                     array (
                         array (
@@ -1709,7 +1709,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'to',
                 'type' => 'date_picker',
                 'instructions' => '',
-                'required' => 1,
+                'required' => 0,
                 'conditional_logic' => array (
                     array (
                         array (
