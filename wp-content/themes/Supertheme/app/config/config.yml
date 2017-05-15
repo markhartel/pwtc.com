@@ -3,11 +3,11 @@ parameters:
     - "%template_dir%/views"
     - "%template_dir%/src/views"
   twig.options:
-    debug:            "%WP_DEBUG%"
+    debug:            false
     charset:          "utf-8"
-    cache:            false
-    auto_reload:      "%WP_DEBUG%"
-    strict_variables: "%WP_DEBUG%"
+    cache:            "%template_dir%/var/twig"
+    auto_reload:      "%wp_debug%"
+    strict_variables: false
     autoescape:       false
     optimizations:    -1
   logger.name: "SuperTheme"
