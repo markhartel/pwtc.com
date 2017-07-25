@@ -23,7 +23,7 @@ while(have_posts()) {
     $teaser_data = [];
     $teaser_data['title'] = get_the_title($id);
     $teaser_data['excerpt'] = get_the_excerpt($id);
-    $teaser_data['image'] = get_the_post_thumbnail($id, 'teaser');
+    $teaser_data['image'] = get_the_post_thumbnail($id, [280,280]);
     $teaser_data['link'] = get_the_permalink($id);
     $teaser_data['format'] = get_field('format');
     $teasers[] = $twig->render("teasers/post.html.twig", $teaser_data);

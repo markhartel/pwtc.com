@@ -39,9 +39,10 @@ var options = {
             'web/sass/**/*.scss'
         ],
         dist: 'web/stylesheets',
-        style: 'nested',
+        style: 'compressed',
         includePaths: [
             'web/libs/font-awesome/scss',
+            'web/libs/slick-carousel/slick',
             'web/libs/foundation-sites/scss',
             'src/web/scss'
         ],
@@ -92,7 +93,7 @@ gulp.task('styles', function(){
     gulp.src(options.styles.src).pipe(plumber(plumberErrorHandler))
         .pipe(concat('app.scss'))
         .pipe(sass({
-            style:          options.scripts.style,
+            outputStyle:    options.styles.style,
             includePaths:   options.styles.includePaths,
             comments:       options.styles.comments,
             sourceComments: options.styles.sourceComments,

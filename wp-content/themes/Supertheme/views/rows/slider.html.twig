@@ -15,8 +15,8 @@
                     </div>
                 {% endif %}
             </div>
-            <img src="{{ slide.mobile_background_image.url }}" class="hide-for-medium" alt="">
-            <img src="{{ slide.desktop_background_image.url }}" class="hide-for-small-only" alt="">
+            <img src="{{ slide.mobile_background_image.sizes.mobile_slider }}" class="hide-for-medium" alt="">
+            <img src="{{ slide.desktop_background_image.sizes.desktop_slider }}" class="hide-for-small-only" alt="">
         </div>
     {% endfor %}
 </section>

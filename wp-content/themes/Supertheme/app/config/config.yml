@@ -22,6 +22,8 @@ parameters:
   wordpress.image_sizes:
     fullscreen: [1920, 1080, true]
     teaser: [600, 600, true]
+    desktop_slider: [1900, 630, true]
+    mobile_slider: [600, 300, true]
   wordpress.menus:
     member_menu: "Member Menu"
     primary_menu: "Primary Menu"
@@ -44,9 +46,7 @@ parameters:
       before_title: '<h4 class="widgettitle">'
       after_title: '</h4>'
   wordpress.styles:
-    - { id: "slick", source: "%template_uri%/web/libs/slick-carousel/slick/slick.css", deps: ~ }
-    - { id: "slick_theme", source: "%template_uri%/web/libs/slick-carousel/slick/slick-theme.css", deps: ["slick"] }
-    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ["slick_theme"], version: "1.0" }
+    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: [], version: "1.0" }
   wordpress.scripts:
     - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false }
     - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false }

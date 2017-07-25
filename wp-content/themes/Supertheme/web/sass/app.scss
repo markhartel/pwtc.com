@@ -1,23 +1,47 @@
 @import "settings";
 @import "font-awesome";
+@import "slick.scss";
+@import "slick-theme.scss";
 @import "foundation";
 @include foundation-everything();
 @import "supertheme";
-
 @import "woocommerce";
-
 @import "layout/header";
 @import "layout/footer";
 @import "layout/two-col";
 @import "layout/widget";
-
 @import "rows/alternating-content";
 @import "rows/slick-slider";
 @import "rows/tagline";
 @import "rows/news";
 @import "rows/video-header";
-
 @import "print";
+
+// gravity forms
+.gfield {
+  list-style-type: none;
+}
+.gform_validation_container {
+  display: none;
+}
+.ginput_complex {
+  margin-left: -0.9375rem;
+  margin-right: -0.9375rem;
+  max-width: 75rem;
+  span {
+    width: 50%;
+    padding-left: 0.9375rem;
+    padding-right: 0.9375rem;
+    float: left;
+  }
+}
+#gform_1 > div.validation_error {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-bottom: $global-padding;
+}
+
+// add forms
 
 #basic-form, .household-delete, .fancybox-message, #add-form {
   display: none;
