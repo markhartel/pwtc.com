@@ -15,22 +15,54 @@ class wfUtils {
 		if($secs < 1){
 			return "a moment";
 		}
-		$months = floor($secs / (86400 * 30));
-		$days = floor($secs / 86400);
-		$hours = floor($secs / 3600);
-		$minutes = floor($secs / 60);
-		if($months) {
-			$days -= $months * 30;
+		
+		if (function_exists('date_diff')) {
+			$now = new DateTime();
+			$utc = new DateTimeZone('UTC');
+			$dtStr = gmdate("c", $now->getTimestamp() + $secs); //Have to do it this way because of PHP 5.2
+			$then = new DateTime($dtStr, $utc);
+			
+			$diff = $then->diff($now);
+			$years = $diff->y;
+			$months = $diff->m;
+			$days = $diff->d;
+			$hours = $diff->h;
+			$minutes = $diff->i;
+		}
+		else {
+			$years = 0;
+			$months = floor($secs / (86400 * 30));
+			$days = floor($secs / 86400);
+			$hours = floor($secs / 3600);
+			$minutes = floor($secs / 60);
+			
+			if ($months) {
+				$days -= $months * 30;
+			}
+			else if ($days) {
+				$hours -= $days * 24;
+			}
+			else if ($hours) {
+				$minutes -= $hours * 60;
+			}
+		}
+		
+		if ($years) {
+			return self::pluralize($years, 'year', $months, 'month');
+		}
+		else if ($months) {
 			return self::pluralize($months, 'month', $days, 'day');
-		} else if($days) {
-			$hours -= $days * 24;
+		}
+		else if ($days) {
 			return self::pluralize($days, 'day', $hours, 'hour');
-		} else if($hours) {
-			$minutes -= $hours * 60;
+		}
+		else if ($hours) {
 			return self::pluralize($hours, 'hour', $minutes, 'min');
-		} else if($minutes) {
+		}
+		else if ($minutes) {
 			return self::pluralize($minutes, 'min');
-		} else {
+		}
+		else {
 			if($noSeconds){
 				return "less than a minute";
 			} else {
@@ -135,8 +167,8 @@ class wfUtils {
 			}
 		}
 		
-		$bin_network = substr(self::inet_pton($network), 0, ceil($prefix / 8));
-		$bin_ip = substr(self::inet_pton($ip), 0, ceil($prefix / 8));
+		$bin_network = wfUtils::substr(self::inet_pton($network), 0, ceil($prefix / 8));
+		$bin_ip = wfUtils::substr(self::inet_pton($ip), 0, ceil($prefix / 8));
 		if ($prefix % 8 != 0) { //Adjust the last relevant character to fit the mask length since the character's bits are split over it
 			$pos = intval($prefix / 8);
 			$adjustment = chr(((0xff << (8 - ($prefix % 8))) & 0xff));
@@ -809,7 +841,12 @@ class wfUtils {
 		$c2 = array_shift($trace);
 		error_log("Caller for " . $caller['file'] . " line " . $caller['line'] . " is " . $c2['file'] . ' line ' . $c2['line']);
 	}
-	public static function getWPVersion(){
+	public static function getWPVersion($forceRecheck = false){
+		if ($forceRecheck) {
+			require(ABSPATH . 'wp-includes/version.php'); //defines $wp_version
+			return $wp_version;
+		}
+		
 		if(wordfence::$wordfence_wp_version){
 			return wordfence::$wordfence_wp_version;
 		} else {
@@ -957,6 +994,7 @@ class wfUtils {
 		$wfdb->truncate($wpdb->base_prefix . 'wfHoover');
 
 		wfConfig::set('wf_scanRunning', '');
+		wfIssues::updateScanStillRunning(false);
 	}
 	public static function isScanRunning(){
 		$scanRunning = wfConfig::get('wf_scanRunning');
@@ -1476,7 +1514,7 @@ class wfUtils {
 			$span = '<span style="color:#587ECB">';
 		}
 		
-		for ($i = 0; $i < strlen($string); $i++) {
+		for ($i = 0; $i < wfUtils::strlen($string); $i++) {
 			$c = $string[$i];
 			$b = ord($c);
 			if ($b < 0x20) {
@@ -1494,7 +1532,7 @@ class wfUtils {
 					$test = (($test << 1) & 0xff);
 				}
 				
-				$brokenUTF8 = ($i + $bytes > strlen($string) || $bytes == 1);
+				$brokenUTF8 = ($i + $bytes > wfUtils::strlen($string) || $bytes == 1);
 				if (!$brokenUTF8) { //Make sure we have all the bytes
 					for ($n = 1; $n < $bytes; $n++) {
 						$c2 = $string[$i + $n];
@@ -1542,7 +1580,7 @@ class wfUtils {
 			if ($waf->getStorageEngine()->getConfig('attackDataKey', false) === false) {
 				$waf->getStorageEngine()->setConfig('attackDataKey', mt_rand(0, 0xfff));
 			}
-			$response = wp_remote_get(sprintf(WFWAF_API_URL_SEC . "proxy-check/%d.txt", $waf->getStorageEngine()->getConfig('attackDataKey')));
+			$response = wp_remote_get(sprintf(WFWAF_API_URL_SEC . "proxy-check/%d.txt", $waf->getStorageEngine()->getConfig('attackDataKey')), array('headers' => array('Referer' => false)));
 			
 			if (!is_wp_error($response)) {
 				$okToSendBody = wp_remote_retrieve_body($response);
@@ -1597,6 +1635,7 @@ class wfUtils {
 				'body'    => json_encode($payload),
 				'headers' => array(
 					'Content-Type' => 'application/json',
+					'Referer' => false,
 				),
 				'timeout' => $timeout,
 				'blocking' => $blocking,
@@ -1779,7 +1818,16 @@ class wfUtils {
 		if (!is_string($string)) { return false; }
 		if (strlen($string) % 2 == 1) { return false; }
 		return pack('H*', $string);
-  }
+	}
+	
+	/**
+	 * Returns whether or not the site should be treated as if it's full-time SSL.
+	 * 
+	 * @return bool
+	 */
+	public static function isFullSSL() {
+		return is_ssl() && parse_url(self::wpHomeURL(), PHP_URL_SCHEME) === 'https'; //It's possible for only wp-admin to be SSL so we check the home URL too
+	}
 
 	/**
 	 * Identical to the same functions in wfWAFUtils.
@@ -1888,8 +1936,10 @@ class wfUtils {
 	 * @return mixed
 	 */
 	public static function substr($string, $start, $length = null) {
-		$args = func_get_args();
-		return self::callMBSafeStrFunction('substr', $args);
+		if ($length === null) { $length = self::strlen($string); }
+		return self::callMBSafeStrFunction('substr', array(
+			$string, $start, $length
+		));
 	}
 	
 	/**
@@ -1911,9 +1961,9 @@ class wfUtils {
 	 * @return mixed
 	 */
 	public static function substr_count($haystack, $needle, $offset = 0, $length = null) {
-		$haystack = self::substr($haystack, $offset, $length);
+		if ($length === null) { $length = self::strlen($haystack); }
 		return self::callMBSafeStrFunction('substr_count', array(
-			$haystack, $needle,
+			$haystack, $needle, $offset, $length
 		));
 	}
 	
@@ -1937,6 +1987,24 @@ class wfUtils {
 		return self::callMBSafeStrFunction('strrpos', $args);
 	}
 	
+	public static function array_first($array) {
+		if (empty($array)) {
+			return null;
+		}
+		
+		$values = array_values($array);
+		return $values[0];
+	}
+	
+	public static function array_last($array) {
+		if (empty($array)) {
+			return null;
+		}
+		
+		$values = array_values($array);
+		return $values[count($values) - 1];
+	}
+	
 	/**
 	 * Returns the current timestamp, adjusted as needed to get close to what we consider a true timestamp. We use this
 	 * because a significant number of servers are using a drastically incorrect time.
@@ -1950,6 +2018,44 @@ class wfUtils {
 			if ($offset === false) { $offset = 0; }
 		}
 		return time() + $offset;
+	}
+	
+	/**
+	 * Formats and returns the given timestamp using the time zone set for the WordPress installation.
+	 * 
+	 * @param string $format See the PHP docs on DateTime for the format options. 
+	 * @param int|bool $timestamp Assumed to be in UTC. If false, defaults to the current timestamp.
+	 * @return string
+	 */
+	public static function formatLocalTime($format, $timestamp = false) {
+		if ($timestamp === false) {
+			$timestamp = time();
+		}
+		
+		$utc = new DateTimeZone('UTC');
+		$dtStr = gmdate("c", $timestamp); //Have to do it this way because of PHP 5.2
+		$dt = new DateTime($dtStr, $utc);
+		$tz = get_option('timezone_string');
+		if (!empty($tz)) {
+			$dt->setTimezone(new DateTimeZone($tz));
+		}
+		else {
+			$gmt = get_option('gmt_offset');
+			if (!empty($gmt)) {
+				if (PHP_VERSION_ID < 50510) {
+					$dtStr = gmdate("c", $timestamp + $gmt * 3600); //Have to do it this way because of < PHP 5.5.10
+					$dt = new DateTime($dtStr, $utc);
+				}
+				else {
+					$direction = ($gmt > 0 ? '+' : '-');
+					$gmt = abs($gmt);
+					$h = (int) $gmt;
+					$m = ($gmt - $h) * 60;
+					$dt->setTimezone(new DateTimeZone($direction . str_pad($h, 2, '0', STR_PAD_LEFT) . str_pad($m, 2, '0', STR_PAD_LEFT)));
+				}
+			}
+		}
+		return $dt->format($format);
 	}
 }
 
@@ -1982,11 +2088,12 @@ class wfWebServerInfo {
 	 */
 	public static function createFromEnvironment() {
 		$serverInfo = new self;
+		$sapi = php_sapi_name();
 		if (stripos($_SERVER['SERVER_SOFTWARE'], 'apache') !== false) {
 			$serverInfo->setSoftware(self::APACHE);
 			$serverInfo->setSoftwareName('apache');
 		}
-		if (stripos($_SERVER['SERVER_SOFTWARE'], 'litespeed') !== false) {
+		if (stripos($_SERVER['SERVER_SOFTWARE'], 'litespeed') !== false || $sapi == 'litespeed') {
 			$serverInfo->setSoftware(self::LITESPEED);
 			$serverInfo->setSoftwareName('litespeed');
 		}
@@ -1999,7 +2106,7 @@ class wfWebServerInfo {
 			$serverInfo->setSoftwareName('iis');
 		}
 
-		$serverInfo->setHandler(php_sapi_name());
+		$serverInfo->setHandler($sapi);
 
 		return $serverInfo;
 	}

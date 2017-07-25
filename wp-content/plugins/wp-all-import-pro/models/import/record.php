@@ -375,8 +375,8 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 						}								
 						
 						// detect, if cron process if finished
-						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped || (int) $this->queue_chunk_number > (int) $this->imported + (int) $this->skipped ){
-							
+						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped || (int) ($this->queue_chunk_number - 1) > (int) $this->imported + (int) $this->skipped ){
+
 							$this->delete_source( $logger );
 
 							// Delete posts that are no longer present in your file

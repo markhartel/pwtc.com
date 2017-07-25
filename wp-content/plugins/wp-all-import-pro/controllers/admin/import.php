@@ -953,20 +953,21 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 						libxml_use_internal_errors($old);
 						$xpath = new DOMXPath($dom);						
 						if (($this->data['elements'] = $elements = @$xpath->query(PMXI_Plugin::$session->xpath)) and $elements->length){
-                            $loop += $elements->length;
-							if ( $loop >= $tagno ){
-								/* Merge nested XML/CSV files */
-								/*$nested_files = json_decode(PMXI_Plugin::$session->options['nested_files'], true);
-								if ( ! empty($nested_files) ){										
-									$merger = new PMXI_Nested($dom, $nested_files, $xml, PMXI_Plugin::$session->xpath);
-									$merger->merge();
-									$xml = $merger->get_xml();
-									unset($merger);													
-								}*/							
-								unset($dom, $xpath, $elements);
-								break(2); 			
-							}
-							unset($dom, $xpath, $elements);
+
+						    if ( $loop == $tagno ){
+                                /* Merge nested XML/CSV files */
+                                /*$nested_files = json_decode(PMXI_Plugin::$session->options['nested_files'], true);
+                                if ( ! empty($nested_files) ){
+                                    $merger = new PMXI_Nested($dom, $nested_files, $xml, PMXI_Plugin::$session->xpath);
+                                    $merger->merge();
+                                    $xml = $merger->get_xml();
+                                    unset($merger);
+                                }*/
+                                unset($dom, $xpath, $elements);
+                                break(2);
+                            }
+                            unset($dom, $xpath, $elements);
+                            $loop++;
 						}											  					 
 				    }
 				}

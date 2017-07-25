@@ -77,24 +77,39 @@ class wordfenceScanner {
 		
 		if (wfWAF::getInstance() && method_exists(wfWAF::getInstance(), 'setMalwareSignatures')) {
 			try { wfWAF::getInstance()->setMalwareSignatures(array()); } catch (Exception $e) { /* Ignore */ }
+			if (method_exists(wfWAF::getInstance(), 'setMalwareSignatureCommonStrings')) {
+				try {
+					wfWAF::getInstance()->setMalwareSignatureCommonStrings(array(), array());
+				}
+				catch (Exception $e) { /* Ignore */ }
+			}
 		}
 
 		if (is_array($sigData['rules'])) {
 			$wafPatterns = array();
+			$wafCommonStringIndexes = array();
 			foreach ($sigData['rules'] as $key => $signatureRow) {
 				list(, , $pattern) = $signatureRow;
 				$logOnly = (isset($signatureRow[5]) && !empty($signatureRow[5])) ? $signatureRow[5] : false;
-				if (@preg_match('/' . $pattern . '/i', null) === false) {
-					wordfence::status(1, 'error', "A regex Wordfence received from it's servers is invalid. The pattern is: " . esc_html($pattern));
+				$commonStringIndexes = (isset($signatureRow[6]) && is_array($signatureRow[6])) ? $signatureRow[6] : array();
+				if (@preg_match('/' . $pattern . '/iS', null) === false) {
+					wordfence::status(1, 'error', "A regex Wordfence received from its servers is invalid. The pattern is: " . esc_html($pattern));
 					unset($sigData['rules'][$key]);
 				}
 				else if (!$logOnly) {
 					$wafPatterns[] = $pattern;
+					$wafCommonStringIndexes[] = $commonStringIndexes;
 				}
 			}
 			
 			if (wfWAF::getInstance() && method_exists(wfWAF::getInstance(), 'setMalwareSignatures')) {
 				try { wfWAF::getInstance()->setMalwareSignatures($wafPatterns); } catch (Exception $e) { /* Ignore */ }
+				if (method_exists(wfWAF::getInstance(), 'setMalwareSignatureCommonStrings') && isset($sigData['commonStrings']) && is_array($sigData['commonStrings'])) {
+					try {
+						wfWAF::getInstance()->setMalwareSignatureCommonStrings($sigData['commonStrings'], $wafCommonStringIndexes);
+					}
+					catch (Exception $e) { /* Ignore */ }
+				}
 			}
 		}
 
@@ -175,6 +190,9 @@ class wordfenceScanner {
 		if(! $this->lastStatusTime){
 			$this->lastStatusTime = microtime(true);
 		}
+		
+		//The site's own URL is checked in an earlier scan stage so we exclude it here.
+		$hooverExclusions = wordfenceURLHoover::standardExcludedHosts();
 		
 		$lastCount = 'whatever';
 		$excludePattern = self::getExcludeFilePattern(self::EXCLUSION_PATTERNS_USER | self::EXCLUSION_PATTERNS_MALWARE); 
@@ -316,6 +334,9 @@ class wordfenceScanner {
 						break;
 					}
 					else {
+						$allCommonStrings = $this->patterns['commonStrings'];
+						$commonStringsFound = array_fill(0, count($allCommonStrings), null); //Lazily looked up below
+						
 						$regexMatched = false;
 						foreach ($this->patterns['rules'] as $rule) {
 							$stoppedOnSignature = $record->stoppedOnSignature;
@@ -330,11 +351,28 @@ class wordfenceScanner {
 							
 							$type = (isset($rule[4]) && !empty($rule[4])) ? $rule[4] : 'server';
 							$logOnly = (isset($rule[5]) && !empty($rule[5])) ? $rule[5] : false;
+							$commonStringIndexes = (isset($rule[6]) && is_array($rule[6])) ? $rule[6] : array();
 							if ($type == 'server' && !$treatAsBinary) { continue; }
 							else if (($type == 'both' || $type == 'browser') && $fileExt == 'js') { $extraMsg = ''; }
 							else if (($type == 'both' || $type == 'browser') && !$treatAsBinary) { continue; }
 							
-							if (preg_match('/(' . $rule[2] . ')/i', $data, $matches, PREG_OFFSET_CAPTURE)) {
+							foreach ($commonStringIndexes as $i) {
+								if ($commonStringsFound[$i] === null) {
+									$s = $allCommonStrings[$i];
+									$commonStringsFound[$i] = (preg_match('/' . $s . '/i', $data) == 1);
+								}
+								
+								if (!$commonStringsFound[$i]) {
+									//wordfence::status(4, 'info', "Skipping malware signature ({$rule[0]}) due to short circuit.");
+									continue 2;
+								}
+							}
+							
+							/*if (count($commonStringIndexes) > 0) {
+								wordfence::status(4, 'info', "Processing malware signature ({$rule[0]}) because short circuit matched.");
+							}*/
+							
+							if (preg_match('/(' . $rule[2] . ')/iS', $data, $matches, PREG_OFFSET_CAPTURE)) {
 								$matchString = $matches[1][0];
 								$matchOffset = $matches[1][1];
 								$beforeString = wfWAFUtils::substr($data, max(0, $matchOffset - 100), $matchOffset - max(0, $matchOffset - 100));
@@ -362,8 +400,6 @@ class wordfenceScanner {
 								$record->updateStoppedOn($rule[0], $currentPosition);
 								fclose($fh);
 								
-								wfScanEngine::checkForKill();
-								$forkObj->checkForDurationLimit();
 								wordfence::status(4, 'info', "Forking during malware scan ({$rule[0]}) to ensure continuity.");
 								$forkObj->fork(); //exits
 							}
@@ -398,7 +434,7 @@ class wordfenceScanner {
 					}
 					
 					if (!$dontScanForURLs) {
-						$this->urlHoover->hoover($file, $data);
+						$this->urlHoover->hoover($file, $data, $hooverExclusions);
 					}
 					
 					if ($totalRead > 2 * 1024 * 1024) {
@@ -424,8 +460,7 @@ class wordfenceScanner {
 			return false;
 		}
 		$this->urlHoover->cleanup();
-		$siteURL = get_site_url();
-		$siteHost = parse_url($siteURL, PHP_URL_HOST);
+		
 		foreach($hooverResults as $file => $hresults){
 			$record = wordfenceMalwareScanFile::fileForPath($file);
 			$dataForFile = $this->dataForFile($file, $this->path . $file);
@@ -438,20 +473,15 @@ class wordfenceScanner {
 				if (empty($result['URL'])) {
 					continue; 
 				}
-				$url = $result['URL'];
-				$urlHost = parse_url($url, PHP_URL_HOST);
-				if (strcasecmp($siteHost, $urlHost) === 0) {
-					continue;
-				}
 				
-				if($result['badList'] == 'goog-malware-shavar'){
+				if ($result['badList'] == 'goog-malware-shavar') {
 					$this->addResult(array(
 						'type' => 'file',
 						'severity' => 1,
 						'ignoreP' => $this->path . $file,
 						'ignoreC' => md5_file($this->path . $file),
 						'shortMsg' => "File contains suspected malware URL: " . esc_html($this->path . $file),
-						'longMsg' => "This file contains a suspected malware URL listed on Google's list of malware sites. Wordfence decodes " . esc_html($this->patterns['word3']) . " when scanning files so the URL may not be visible if you view this file. The URL is: " . esc_html($result['URL']) . " - More info available at <a href=\"http://safebrowsing.clients.google.com/safebrowsing/diagnostic?site=" . urlencode($result['URL']) . "&client=googlechrome&hl=en-US\" target=\"_blank\">Google Safe Browsing diagnostic page</a>.",
+						'longMsg' => "This file contains a suspected malware URL listed on Google's list of malware sites. Wordfence decodes " . esc_html($this->patterns['word3']) . " when scanning files so the URL may not be visible if you view this file. The URL is: " . esc_html($result['URL']) . " - More info available at <a href=\"http://safebrowsing.clients.google.com/safebrowsing/diagnostic?site=" . urlencode($result['URL']) . "&client=googlechrome&hl=en-US\" target=\"_blank\" rel=\"noopener noreferrer\">Google Safe Browsing diagnostic page</a>.",
 						'data' => array_merge(array(
 							'file' => $file,
 							'shac' => $record->SHAC,
@@ -459,7 +489,8 @@ class wordfenceScanner {
 							'gsb' => 'goog-malware-shavar'
 						), $dataForFile),
 					));
-				} else if($result['badList'] == 'googpub-phish-shavar'){
+				}
+				else if ($result['badList'] == 'googpub-phish-shavar') {
 					$this->addResult(array(
 						'type' => 'file',
 						'severity' => 1,
@@ -472,6 +503,22 @@ class wordfenceScanner {
 							'shac' => $record->SHAC,
 							'badURL' => $result['URL'],
 							'gsb' => 'googpub-phish-shavar'
+						), $dataForFile),
+					));
+				}
+				else if ($result['badList'] == 'wordfence-dbl') {
+					$this->addResult(array(
+						'type' => 'file',
+						'severity' => 1,
+						'ignoreP' => $this->path . $file,
+						'ignoreC' => md5_file($this->path . $file),
+						'shortMsg' => "File contains suspected malware URL: " . esc_html($this->path . $file),
+						'longMsg' => "This file contains a URL that is currently listed on Wordfence's domain blacklist. The URL is: " . esc_html($result['URL']),
+						'data' => array_merge(array(
+							'file' => $file,
+							'shac' => $record->SHAC,
+							'badURL' => $result['URL'],
+							'gsb' => 'wordfence-dbl'
 						), $dataForFile),
 					));
 				}

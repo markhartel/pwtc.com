@@ -50,13 +50,13 @@ function wp_all_import_get_image_from_gallery($image_name, $targetDir = FALSE, $
         }
 
         // search attachment by file name without extension
-        if (empty($attch)) {
+        if (empty($attch) and !empty($wp_filetype['type'])) {
             $attachment_title = explode(".", $image_name);
             if (is_array($attachment_title) and count($attachment_title) > 1) {
                 array_pop($attachment_title);
             }
             $image_name = implode(".", $attachment_title);
-            $attch = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . $wpdb->posts . " WHERE (post_title = %s OR post_title = %s OR post_name = %s) AND post_type = %s AND post_mime_type LIKE %s;", $image_name, preg_replace('/\\.[^.\\s]{3,4}$/', '', $image_name), sanitize_title($image_name), "attachment", "image%"));
+            $attch = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . $wpdb->posts . " WHERE (post_title = %s OR post_title = %s OR post_name = %s) AND post_type = %s AND post_mime_type LIKE %s;", $image_name, preg_replace('/\\.[^.\\s]{3,4}$/', '', $image_name), sanitize_title($image_name), "attachment", $wp_filetype['type']));
         }
     }
 

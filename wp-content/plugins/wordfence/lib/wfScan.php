@@ -4,7 +4,7 @@ class wfScan {
 	public static $errorHandlingOn = true;
 	private static $peakMemAtStart = 0;
 	public static function wfScanMain(){
-		self::$peakMemAtStart = memory_get_peak_usage();
+		self::$peakMemAtStart = memory_get_peak_usage(true);
 		$db = new wfDB();
 		if($db->errorMsg){
 			self::errorExit("Could not connect to database to start scan: " . $db->errorMsg);
@@ -55,7 +55,9 @@ class wfScan {
 				self::errorExit("There is already a scan running.");
 			}
 			
-			wfConfig::set('wfPeakMemory', 0);
+			wfIssues::updateScanStillRunning();
+			wfConfig::set('wfPeakMemory', 0, wfConfig::DONT_AUTOLOAD);
+			wfConfig::set('wfScanStartVersion', wfUtils::getWPVersion());
 			wfConfig::set('lowResourceScanWaitStep', false);
 			if (wfConfig::get('lowResourceScansEnabled')) {
 				self::status(1, 'info', "Using low resource scanning");
@@ -83,7 +85,7 @@ class wfScan {
 				exit();
 			}
 		} else {
-			wordfence::statusPrep(); //Re-initializes all status counters
+			wfIssues::statusPrep(); //Re-initializes all status counters
 			$scan = new wfScanEngine();
 			$scan->deleteNewIssues();
 		}
@@ -92,9 +94,24 @@ class wfScan {
 		}
 		catch (wfScanEngineDurationLimitException $e) {
 			wfUtils::clearScanLock();
-			self::logPeakMemory();
-			self::status(2, 'info', "Wordfence used " . sprintf('%.2f', (wfConfig::get('wfPeakMemory') - self::$peakMemAtStart) / 1024 / 1024) . "MB of memory for scan. Server peak memory usage was: " . sprintf('%.2f', wfConfig::get('wfPeakMemory') / 1024 / 1024) . "MB");
+			$peakMemory = self::logPeakMemory();
+			self::status(2, 'info', "Wordfence used " . wfUtils::formatBytes($peakMemory - self::$peakMemAtStart) . " of memory for scan. Server peak memory usage was: " . wfUtils::formatBytes($peakMemory));
 			self::status(2, 'error', "Scan terminated with error: " . $e->getMessage());
+			exit();
+		}
+		catch (wfScanEngineCoreVersionChangeException $e) {
+			wfUtils::clearScanLock();
+			$peakMemory = self::logPeakMemory();
+			self::status(2, 'info', "Wordfence used " . wfUtils::formatBytes($peakMemory - self::$peakMemAtStart) . " of memory for scan. Server peak memory usage was: " . wfUtils::formatBytes($peakMemory));
+			self::status(2, 'error', "Scan terminated with message: " . $e->getMessage());
+			
+			$nextScheduledScan = wordfence::getNextScanStartTimestamp();
+			if ($nextScheduledScan !== false && $nextScheduledScan - time() > 21600 /* 6 hours */) {
+				$nextScheduledScan = time() + 3600;
+				wordfence::scheduleSingleScan($nextScheduledScan);
+			}
+			self::status(2, 'error', wordfence::getNextScanStartTime($nextScheduledScan));
+			
 			exit();
 		}
 		catch (Exception $e){
@@ -104,15 +121,17 @@ class wfScan {
 			exit();
 		}
 		wfUtils::clearScanLock();
-		self::logPeakMemory();
-		self::status(2, 'info', "Wordfence used " . sprintf('%.2f', (wfConfig::get('wfPeakMemory') - self::$peakMemAtStart) / 1024 / 1024) . "MB of memory for scan. Server peak memory usage was: " . sprintf('%.2f', wfConfig::get('wfPeakMemory') / 1024 / 1024) . "MB");
+		$peakMemory = self::logPeakMemory();
+		self::status(2, 'info', "Wordfence used " . wfUtils::formatBytes($peakMemory - self::$peakMemAtStart) . " of memory for scan. Server peak memory usage was: " . wfUtils::formatBytes($peakMemory));
 	}
 	private static function logPeakMemory(){
-		$oldPeak = wfConfig::get('wfPeakMemory', 0);
-		$peak = memory_get_peak_usage();
-		if($peak > $oldPeak){
-			wfConfig::set('wfPeakMemory', $peak);
+		$oldPeak = wfConfig::get('wfPeakMemory', 0, false);
+		$peak = memory_get_peak_usage(true);
+		if ($peak > $oldPeak) {
+			wfConfig::set('wfPeakMemory', $peak, wfConfig::DONT_AUTOLOAD);
+			return $peak;
 		}
+		return $oldPeak;
 	}
 	public static function obHandler($buf){
 		if(strlen($buf) > 1000){

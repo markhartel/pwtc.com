@@ -48,7 +48,7 @@ class wfAPI {
 		if (isset($dat['_hasKeyConflict'])) {
 			$hasKeyConflict = ($dat['_hasKeyConflict'] == 1);
 			if ($hasKeyConflict) {
-				new wfNotification(null, wfNotification::PRIORITY_DEFAULT, '<a href="' . network_admin_url('admin.php?page=WordfenceSecOpt') . '">The Wordfence API key you\'re using does not match this site\'s address. Premium features are disabled.</a>', 'wfplugin_keyconflict', null, array(array('link' => 'https://www.wordfence.com/manage-wordfence-api-keys/', 'label' => 'Manage Keys')));
+				new wfNotification(null, wfNotification::PRIORITY_HIGH_CRITICAL, '<a href="' . network_admin_url('admin.php?page=WordfenceSecOpt') . '">The Wordfence API key you\'re using does not match this site\'s address. Premium features are disabled.</a>', 'wfplugin_keyconflict', null, array(array('link' => 'https://www.wordfence.com/manage-wordfence-api-keys/', 'label' => 'Manage Keys')));
 			}
 		}
 		
@@ -84,6 +84,7 @@ class wfAPI {
 			'user-agent' => "Wordfence.com UA " . (defined('WORDFENCE_VERSION') ? WORDFENCE_VERSION : '[Unknown version]'),
 			'body'       => $postParams,
 			'sslverify'  => $ssl_verify,
+			'headers'	 => array('Referer' => false),
 		);
 		if (!$ssl_verify) {
 			// Some versions of cURL will complain that SSL verification is disabled but the CA bundle was supplied.
