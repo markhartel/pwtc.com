@@ -20,7 +20,7 @@ $data = require_once __DIR__ . '/app/bootstrap-theme.php';
 $current_datetime = new DateTime(date('F'),  new \DateTimeZone(supertheme_get_timezone_string()));
 $data['invalid_date'] = false;
 if(isset($_GET['month']) && $_GET['month']) {
-    $valid_date = DateTime::createFromFormat('M', $_GET['month']);
+    $valid_date = DateTime::createFromFormat('F-d', $_GET['month'].'-01');
     if (!$valid_date) {
         $data['invalid_date'] = true;
     } else {
@@ -42,6 +42,7 @@ $data['year_current'] = $current_datetime->format('Y');
 $data['month_previous'] = $previous_month_datetime->format('F');
 $data['month_next'] = $next_month_datetime->format('F');
 $data['month_current_numeric'] = $current_datetime ->format('n');
+
 
 // get the first and last days for the calendar
 $calendar_start_datetime = $current_first_day->sub(new DateInterval('P'.$current_first_day->format('w').'D'));
