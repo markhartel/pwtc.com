@@ -2,7 +2,12 @@
 add_action('init', function() {
     add_filter('woocommerce_disable_admin_bar', function(){
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options') || user_can($user, 'edit_posts')){
+        if (
+            in_array('ride_captain', (array) $user->roles) ||
+            in_array('statistician', (array) $user->roles) ||
+            user_can($user, 'manage_options') ||
+            user_can($user, 'edit_posts')
+        ){
             return false;
         }
         return true;
@@ -28,7 +33,12 @@ add_action('init', function() {
         }
 
         $user = wp_get_current_user();
-        if (in_array('ride_captain', (array) $user->roles) || user_can($user, 'manage_options') || user_can($user, 'edit_posts')){
+        if (
+            in_array('ride_captain', (array) $user->roles) ||
+            in_array('statistician', (array) $user->roles) ||
+            user_can($user, 'manage_options') ||
+            user_can($user, 'edit_posts')
+        ){
             return false;
         }
 
