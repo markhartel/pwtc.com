@@ -6,15 +6,14 @@
  * @copyright 2017 by Joachim Jensen
  */
 
-if (!defined('CAS_App::PLUGIN_VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
 class CAS_Post_Type_Sidebar {
 
 	const MODULE_NAME = 'post_type';
+	const NONCE       = '_cas_nonce';
 
 	protected static $_theme_sidebars = array();
 
@@ -70,9 +69,10 @@ class CAS_Post_Type_Sidebar {
 	 */
 	public static function save_post_sidebars($post_id, $post) {
 
-		// Save button pressed
-		if (!isset($_POST['original_publish']) && !isset($_POST['save_post']))
+		if(!(isset($_POST[self::NONCE])
+			&& wp_verify_nonce($_POST[self::NONCE], self::NONCE.$post_id))) {
 			return;
+		}
 		
 		// Check post permissions
 		if (!current_user_can('edit_post', $post_id))
@@ -96,9 +96,7 @@ class CAS_Post_Type_Sidebar {
 
 		$user_can_create_sidebar = current_user_can(CAS_App::CAPABILITY);
 
-		foreach ($new as $host => $sidebar_id_string) {
-			//$sidebar_ids = explode(',', $sidebar_id_string);
-			$sidebar_ids = $sidebar_id_string;
+		foreach ($new as $host => $sidebar_ids) {
 			foreach ($sidebar_ids as $sidebar_id) {
 				//Post has sidebar already
 				if(isset($relations[$sidebar_id])) {
@@ -152,7 +150,16 @@ class CAS_Post_Type_Sidebar {
 
 		//remove old relations
 		//todo: sanity check if post is added to several groups?
+		$sidebars = CAS_App::instance()->manager()->sidebars;
+		$host_meta = CAS_App::instance()->manager()->metadata()->get('host');
 		foreach ($relations as $sidebar_id => $group_id) {
+			if(isset($sidebars['ca-sidebar-'.$sidebar_id])) {
+				$host_id = $host_meta->get_data($sidebar_id);
+				if(!isset(self::$_theme_sidebars[$host_id])) {
+					continue;
+				}
+			}
+
 			//group with no post_type meta will be removed
 			//even if it has other meta (unlikely)
 			$group_meta = get_post_meta($group_id, $meta_key);
@@ -172,59 +179,27 @@ class CAS_Post_Type_Sidebar {
 	 * @return void
 	 */
 	public static function create_meta_boxes($post) {
-		add_meta_box(
-			'cas-content-sidebars',
-			__('Sidebars - Quick Select','content-aware-sidebars'),
-			array(__CLASS__, 'render_sidebars_metabox'),
-			$post->post_type,
-			'side',
-			'default'
-		);
-	}
 
-	/**
-	 * Render sidebar metabox for post types
-	 *
-	 * @since  3.3
-	 * @param  WP_Post  $post
-	 * @return void
-	 */
-	public static function render_sidebars_metabox($post) {
-
-		$module = WPCACore::modules()->get(self::MODULE_NAME);
-		
 		$post_sidebars = array();
 		foreach(self::_get_content_sidebars(array($post->ID)) as $sidebar) {
 			$post_sidebars[$sidebar->ID] = $sidebar->ID;
 		}
 
-		$sidebars = CAS_App::instance()->manager()->sidebars;
-		
-		$host_meta = CAS_App::instance()->manager()->metadata()->get('host');
-		foreach ($sidebars as $sidebar) {
+		$manager = CAS_App::instance()->manager();
+
+		$host_meta = $manager->metadata()->get('host');
+		foreach ($manager->sidebars as $sidebar) {
 			$host_id = $host_meta->get_data($sidebar->ID);
 			if(isset(self::$_theme_sidebars[$host_id])) {
 				self::$_theme_sidebars[$host_id]['options'][$sidebar->ID] = array(
 					'id' => $sidebar->ID,
 					'text' => $sidebar->post_title.self::sidebar_states($sidebar)
 				);
-			}
-			if(isset($post_sidebars[$sidebar->ID])) {
-				self::$_theme_sidebars[$host_id]['options'][$sidebar->ID]['select'] = 1;
+				if(isset($post_sidebars[$sidebar->ID])) {
+					self::$_theme_sidebars[$host_id]['options'][$sidebar->ID]['select'] = 1;
+				}
 			}
 		}
-
-		$labels = array(
-			'canCreate' => current_user_can(CAS_App::CAPABILITY),
-			'createNew' => __('Create New','content-aware-sidebars'),
-			'labelNew' => __('New','content-aware-sidebars')
-		);
-		if($labels['canCreate']) {
-			$labels['notFound'] = __('Type to Add New Sidebar','content-aware-sidebars');
-		} else {
-			$labels['notFound'] = __('No sidebars found','content-aware-sidebars');
-		}
-		wp_localize_script('cas/sidebars/suggest', 'CAS', $labels);
 
 		$post_type = get_post_type_object($post->post_type);
 		$content = array(
@@ -244,36 +219,24 @@ class CAS_Post_Type_Sidebar {
 		}
 		$content[] = __('Archive Page','content-aware-sidebars');
 
-		$i = 0;
-		$limit = 3;
-		foreach (self::$_theme_sidebars as $id => $sidebar) {
+		$path = plugin_dir_path( __FILE__ ).'../view/';
+		$view = WPCAView::make($path.'sidebars_quick_select.php',array(
+			'post'     => $post,
+			'sidebars' => self::$_theme_sidebars,
+			'limit'    => 3,
+			'content'  => $content,
+			'singular' => $post_type->labels->singular_name,
+			'nonce'    => wp_nonce_field(self::NONCE.$post->ID, self::NONCE, false, false)
+		));
 
-			if($i == $limit) {
-				echo '<div class="cas-more" style="display:none;">';
-			}
-
-			echo '<div><label style="display:block;padding:8px 0 4px;font-weight:bold;" for="ca_sidebars_'.$id.'">'.$sidebar['label'].'</label>';
-
-			echo '<select style="width:100%;" id="ca_sidebars_'.$id.'" class="js-cas-sidebars" name="cas_sidebars['.$id.'][]" multiple data-tags="'.$labels['canCreate'].'" data-placeholder="'.__('Default').'">';
-			foreach ($sidebar['options'] as $sidebar) {
-				echo '<option value="'.$sidebar['id'].'" '.selected(isset($sidebar['select']),true,false).'>'.$sidebar['text'].'</option>';
-			}
-			if($labels['canCreate']) {
-				echo '<option value="0" disabled="disabled">'.__('Type to Add New Sidebar','content-aware-sidebars').'</option>';
-			}
-			echo '</select></div>';
-			$i++;
-		}
-		if($i > $limit) {
-			echo '</div>';
-			echo '<div style="text-align:center;"><button class="js-cas-more button button-small" data-toggle=".cas-more"><span class="dashicons dashicons-arrow-down-alt2"></span></button></div>';
-		}
-
-		echo '<p class="howto">'.sprintf(__('Note: Selected Sidebars are displayed on this %s specifically.','content-aware-sidebars'),strtolower($post_type->labels->singular_name)).' ';
-
-		$content = array_slice($content, 0, 3);
-		$link = '<a href="'.admin_url('admin.php?page=wpcas').'">'.__('Sidebar Manager').'</a>';
-		echo sprintf(__('Display sidebars per %s etc. with the %s.','content-aware-sidebars'),strtolower(implode(', ', $content)),$link).'</p>';
+		add_meta_box(
+			'cas-content-sidebars',
+			__('Sidebars - Quick Select','content-aware-sidebars'),
+			array($view, 'render'),
+			$post->post_type,
+			'side',
+			'default'
+		);
 	}
 
 	/**
@@ -292,7 +255,7 @@ class CAS_Post_Type_Sidebar {
 				$status = ' ('.__( 'Scheduled' ).')';
 				break;
 			default:
-				$status = ' ('.__( 'Inactive' ).')';
+				$status = ' ('.__( 'Inactive', 'content-aware-sidebars').')';
 				break;
 		}
 		return $status;
@@ -337,6 +300,17 @@ class CAS_Post_Type_Sidebar {
 		if($screen->base == 'post' && $module->_post_types()->has($screen->post_type)) {
 			wp_enqueue_style(CAS_App::META_PREFIX.'condition-groups');
 			wp_enqueue_script('cas/sidebars/suggest');
+
+			$labels = array(
+				'createNew' => __('Create New','content-aware-sidebars'),
+				'labelNew'  => __('New','content-aware-sidebars')
+			);
+			if(current_user_can(CAS_App::CAPABILITY)) {
+				$labels['notFound'] = __('Type to Add New Sidebar','content-aware-sidebars');
+			} else {
+				$labels['notFound'] = __('No sidebars found','content-aware-sidebars');
+			}
+			wp_localize_script('cas/sidebars/suggest', 'CAS', $labels);
 		}
 	}
 

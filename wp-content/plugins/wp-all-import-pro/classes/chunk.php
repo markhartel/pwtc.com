@@ -339,15 +339,19 @@ class PMXI_Chunk {
         $pattern = '/(<\/\w+):([\w+|\.|-]+>)/i';
         $replacement = '$1_$2';
         $feed = preg_replace($pattern, $replacement, $feed);
-        // pull out colons from attributes
-        $pattern = '/(\s+\w+):(\w+[=]{1})/i';
-        $replacement = '$1_$2';
-        $feed = preg_replace($pattern, $replacement, $feed);
+
+        $is_replace_colons = apply_filters('wp_all_import_replace_colons_in_attribute_names', true);
+        if ( $is_replace_colons ) {
+            // pull out colons from attributes
+            $pattern = '/(\s+\w+):(\w+[=]{1})/i';
+            $replacement = '$1_$2';
+            $feed = preg_replace($pattern, $replacement, $feed);
+        }
         // pull colons from single element 
         // (<\w+):(\w+\/>)
         $pattern = '/(<\w+):([\w+|\.|-]+\/>)/i';
         $replacement = '$1_$2';
-        $feed = preg_replace($pattern, $replacement, $feed);              
+        $feed = preg_replace($pattern, $replacement, $feed);
 
         $is_preprocess_enabled = apply_filters('is_xml_preprocess_enabled', true);
         if ($is_preprocess_enabled)

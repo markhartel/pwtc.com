@@ -973,7 +973,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						'import_id'   => $this->import->id,
 						'post_id'     => $order_id,
 						'unique_key'  => 'refund-item-' . $order_id,
-						'product_key' => 'refund-item-' . $refund->id,
+						'product_key' => 'refund-item-' . $refund->get_id(),
 						'iteration'   => $this->import->iteration
 					))->save();
 
@@ -986,7 +986,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 							if ($customer)
 							{
 								wp_update_post(array(
-									'ID' => $refund->id,
+									'ID' => $refund->get_id(),
 									'post_author' => $customer->ID
 								));
 							}
@@ -996,7 +996,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						default:
 							
 							wp_update_post(array(
-								'ID' => $refund->id,
+								'ID' => $refund->get_id(),
 								'post_author' => 0
 							));
 
@@ -1018,7 +1018,10 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 		}
 
 		update_post_meta( $order_id, '_order_version', WC_VERSION );
-        update_post_meta( $order_id, '_order_tax', 0 );
+        $_order_tax = get_post_meta($order_id, '_order_tax', true);
+        if (empty($_order_tax)){
+            update_post_meta( $order_id, '_order_tax', 0 );
+        }
         update_post_meta( $order_id, '_order_shipping_tax', 0 );
 	}
 
@@ -1306,7 +1309,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						$product_item->getBy(array(
 							'import_id'  => $this->import->id,
 							'post_id'    => $order_id,
-							'unique_key' => 'line-item-' . $product->id . '-' . $variation_str
+							'unique_key' => 'line-item-' . $product->get_id() . '-' . $variation_str
 						));
 						
 						if ( $product_item->isEmpty() )
@@ -1340,7 +1343,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 								$product_item->set(array(
 									'import_id'   => $this->import->id,
 									'post_id'     => $order_id,
-									'unique_key'  => 'line-item-' . $product->id . '-' . $variation_str,
+									'unique_key'  => 'line-item-' . $product->get_id() . '-' . $variation_str,
 									'product_key' => 'line-item-' . $item_id,
 									'iteration'   => $this->import->iteration
 								))->save();
@@ -1850,7 +1853,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 
 				if ( $method )
 				{					
-					$shipping_method = new WC_Shipping_Rate($method->id, $shipping['name'], $shipping['amount']);					
+					$shipping_method = new WC_Shipping_Rate($method->id, $shipping['name'], $shipping['amount']);
 
 					$shipping_item = new PMXI_Post_Record();
 					$shipping_item->getBy(array(
@@ -1957,9 +1960,11 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
                 else{
                     if ( ! empty($this->tax_rates[$tax['tax_code']])) {
                         $tax_rate = $this->tax_rates[$tax['tax_code']];
+                        $tax['tax_amount'] = 0;
+                        $tax['shipping_tax_amount'] = 0;
                     }
                     else{
-                        $founded_by_name = false;
+                        $founded = false;
                     }
                 }
 
@@ -1991,8 +1996,23 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						}
 
 						if ( ! $item_id )
-						{							
-							$item_id = $order->add_tax( $tax_rate->tax_rate_id, $tax['tax_amount'], $tax['shipping_tax_amount'] );
+						{
+
+                            if ( version_compare(WOOCOMMERCE_VERSION, '3.0') < 0 ) {
+                                $item_id = $order->add_tax( $tax_rate->tax_rate_id, $tax['tax_amount'], $tax['shipping_tax_amount'] );
+                            }
+                            else{
+
+                                $item = new WC_Order_Item_Tax();
+                                $item->set_props( array(
+                                    'name'      => $tax_rate->tax_rate_name,
+                                    'tax_class' => empty($tax_rate->tax_rate_class) ? 0 : $tax_rate->tax_rate_class,
+                                    'total'     => $tax['tax_amount'],
+                                    'total_tax' => $tax['tax_amount'],
+                                    'order_id'  => $order_id,
+                                ) );
+                                $item_id = $item->save();
+                            }
 						}
 
 						if ( ! $item_id ) {						
@@ -2009,6 +2029,35 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 							))->save();
 						}
 					}
+					else{
+
+                        $item_id = str_replace('tax-item-', '', $tax_item->product_key);
+
+                        if ( version_compare(WOOCOMMERCE_VERSION, '3.0') >= 0 ) {
+
+                            $item = new WC_Order_Item_Tax( $item_id );
+
+                            if ( isset( $tax_rate->tax_rate_name ) ) {
+                                $item->set_name( wc_clean( $tax_rate->tax_rate_name ) );
+                            }
+                            if ( isset( $tax_rate->tax_rate_id ) ) {
+                                $item->set_rate( $tax_rate->tax_rate_id );
+                            }
+                            if ( isset( $tax['tax_amount'] ) ) {
+                                $item->set_tax_total( floatval( $tax['tax_amount'] ) );
+                            }
+
+                            $is_updated = $item->save();
+
+                            if ( $is_updated )
+                            {
+                                $tax_item->set(array(
+                                    'iteration'   => $this->import->iteration
+                                ))->save();
+                            }
+                        }
+
+                    }
 //					$order->update_taxes();
 				}				
 			}
@@ -2220,7 +2269,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
         $tax_based_on       = get_option( 'woocommerce_tax_based_on' );
 
         // If is_vat_exempt is 'yes', or wc_tax_enabled is false, return and do nothing.
-        if ( 'yes' === $order->is_vat_exempt || ! wc_tax_enabled() ) {
+        if ( ! wc_tax_enabled() ) {
             return false;
         }
 
@@ -2296,7 +2345,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
         $tax_based_on       = get_option( 'woocommerce_tax_based_on' );
 
         // If is_vat_exempt is 'yes', or wc_tax_enabled is false, return and do nothing.
-        if ( 'yes' === $order->is_vat_exempt || ! wc_tax_enabled() ) {
+        if ( ! wc_tax_enabled() ) {
             return false;
         }
 

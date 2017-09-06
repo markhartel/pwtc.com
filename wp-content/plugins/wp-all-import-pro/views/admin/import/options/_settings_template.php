@@ -1,7 +1,7 @@
 <div class="wpallimport-collapsed closed wpallimport-section">
 	<div class="wpallimport-content-section">
 		<div class="wpallimport-collapsed-header">
-			<h3><?php _e('Configure Advanced Settings','wp_all_import_plugin');?></h3>	
+			<h3><?php _e('Advanced Options','wp_all_import_plugin');?></h3>	
 		</div>
 		<div class="wpallimport-collapsed-content" style="padding: 0;">
 			<div class="wpallimport-collapsed-content-inner">				

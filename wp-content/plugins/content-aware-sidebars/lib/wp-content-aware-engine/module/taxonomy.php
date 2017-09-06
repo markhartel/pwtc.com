@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -160,30 +158,39 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 	 */
 	protected function _get_content($args = array()) {
 		$args = wp_parse_args($args, array(
-			'include'  => '',
-			'taxonomy' => 'category',
-			'number'   => 20,
-			'orderby'  => 'name',
-			'order'    => 'ASC',
-			'offset'   => 0,
-			'search'   => ''
+			'include'                => '',
+			'taxonomy'               => 'category',
+			'number'                 => 20,
+			'orderby'                => 'name',
+			'order'                  => 'ASC',
+			'paged'                  => 1,
+			'search'                 => '',
+			'hide_empty'             => false,
+			'update_term_meta_cache' => false
 		));
-		extract($args);
-		$total_items = wp_count_terms($taxonomy,array('hide_empty'=>false));
-		$terms = array();
+
+		$args['offset'] = ($args['paged']-1)*$args['number'];
+		unset($args['paged']);
+
+		$total_items = wp_count_terms($args['taxonomy'],array(
+			'hide_empty' => $args['hide_empty']
+		));
+
+		$retval = array();
 		if($total_items) {
-			$terms = get_terms($taxonomy, array(
-				'number'     => $number,
-				'hide_empty' => false,
-				'include'    => $include,
-				'offset'     => ($offset*$number),
-				'orderby'    => $orderby,
-				'order'      => $order,
-				'search'     => $args['search'],
-				'update_term_meta_cache' => false
-			));
+			$terms = get_terms($args['taxonomy'],$args);
+			$taxonomy = get_taxonomy($args['taxonomy']);
+
+			//Hierarchical taxonomies use ids instead of slugs
+			//see http://codex.wordpress.org/Function_Reference/wp_set_post_objects
+			$value_var = ($taxonomy->hierarchical ? 'term_id' : 'slug');
+
+			foreach ($terms as $term) {
+				//term names are encoded
+				$retval[$term->$value_var] = htmlspecialchars_decode($term->name);
+			}
 		}
-		return $terms;
+		return $retval;
 	}
 
 	/**
@@ -200,7 +207,7 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 			}
 			//Polylang module should later take advantage of taxonomy
 			if(defined('POLYLANG_VERSION')) {
-				unset($this->taxonomy_objects["language"]);
+				unset($this->taxonomy_objects['language']);
 			}
 		}
 		return $this->taxonomy_objects;
@@ -235,10 +242,14 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 			$posts = isset($terms_by_tax[$taxonomy->name]) ? $terms_by_tax[$taxonomy->name] : 0;
 
 			if($posts || isset($ids[$taxonomy->name])) {
+
+				$placeholder = '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$taxonomy->labels->singular_name);
+				$placeholder = $taxonomy->labels->all_items.$placeholder;
 				
-				$group_data[$this->id."-".$taxonomy->name] = array(
-						"label" => $taxonomy->label,
-						"default_value" => $taxonomy->name
+				$group_data[$this->id.'-'.$taxonomy->name] = array(
+					'label'         => $taxonomy->label,
+					'placeholder'   => $placeholder,
+					'default_value' => $taxonomy->name
 				);
 
 				if($posts) {
@@ -251,7 +262,7 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 					foreach ($posts as $post) {
 						$retval[$post->$value_var] = $post->name;
 					}
-					$group_data[$this->id."-".$taxonomy->name]["data"] = $retval;
+					$group_data[$this->id.'-'.$taxonomy->name]['data'] = $retval;
 				}
 			}
 		}
@@ -267,33 +278,15 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 	 */
 	public function list_module($list) {
 		foreach($this->_get_taxonomies() as $taxonomy) {
-			$list[$this->id."-".$taxonomy->name] = array(
-				'name' => $taxonomy->label,
+			$placeholder = '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$taxonomy->labels->singular_name);
+			$placeholder = $taxonomy->labels->all_items.$placeholder;
+			$list[$this->id.'-'.$taxonomy->name] = array(
+				'name'          => $taxonomy->label,
+				'placeholder'   => $placeholder,
 				'default_value' => $taxonomy->name
 			);
 		}
 		return $list;
-	}
-
-	/**
-	 * Create module Backbone template
-	 * for administration
-	 *
-	 * @since  2.0
-	 * @return void
-	 */
-	public function template_condition() {
-		if(WPCACore::post_types()->has(get_post_type())) {
-			foreach($this->_get_taxonomies() as $taxonomy) {
-				$placeholder = "/".sprintf(__("%s Archives",WPCA_DOMAIN),$taxonomy->labels->singular_name);
-				$placeholder = $taxonomy->labels->all_items.$placeholder;
-				echo WPCAView::make("module/condition_".$this->id."_template",array(
-					'id'          => $this->id,
-					'placeholder' => $placeholder,
-					'taxonomy'    => $taxonomy->name
-				))->render();
-			}
-		}
 	}
 
 	/**
@@ -311,7 +304,7 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 			'search'         => ''
 		));
 
-		preg_match('/taxonomy-(.+)$/i', $args["item_object"], $matches);
+		preg_match('/taxonomy-(.+)$/i', $args['item_object'], $matches);
 		$args['item_object'] = isset($matches[1]) ? $matches[1] : "";
 
 		$taxonomy = get_taxonomy($args['item_object']);
@@ -320,26 +313,10 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 			return false;
 		}
 
-		$posts = $this->_get_content(array(
-			'taxonomy' => $args['item_object'],
-			'orderby'  => 'name',
-			'order'    => 'ASC',
-			'offset'   => $args['paged']-1,
-			'search'   => $args['search']
-		));
+		$args['taxonomy'] = $args['item_object'];
+		unset($args['item_object']);
 
-		$retval = array();
-
-		//Hierarchical taxonomies use ids instead of slugs
-		//see http://codex.wordpress.org/Function_Reference/wp_set_post_objects
-		$value_var = ($taxonomy->hierarchical ? 'term_id' : 'slug');
-
-		foreach ($posts as $post) {
-			//term names are encoded
-			$retval[$post->$value_var] = htmlspecialchars_decode($post->name);
-		}
-		return $retval;
-
+		return $this->_get_content($args);
 	}
 
 	/**
@@ -353,20 +330,20 @@ class WPCAModule_taxonomy extends WPCAModule_Base {
 		//parent::save_data($post_id);
 		$meta_key = WPCACore::PREFIX . $this->id;
 		$old = array_flip(get_post_meta($post_id, $meta_key, false));
-		$tax_input = isset($_POST['cas_condition'][$this->id]) ? $_POST['cas_condition'][$this->id] : array();
+		$tax_input = $_POST['conditions'];
 
 		//Save terms
 		//Loop through each public taxonomy
 		foreach($this->_get_taxonomies() as $taxonomy) {
 
 			//If no terms, maybe delete old ones
-			if(!isset($tax_input[$taxonomy->name])) {
+			if(!isset($tax_input[$this->id.'-'.$taxonomy->name])) {
 				$terms = array();
 				if(isset($old[$taxonomy->name])) {
 					delete_post_meta($post_id, $meta_key, $taxonomy->name);
 				}
 			} else {
-				$terms = $tax_input[$taxonomy->name];
+				$terms = $tax_input[$this->id.'-'.$taxonomy->name];
 
 				$found_key = array_search($taxonomy->name, $terms);
 				//If meta key found maybe add it

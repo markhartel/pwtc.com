@@ -23,7 +23,12 @@ module.exports = function(grunt) {
 			development: {
 				options: {
 					paths: ["css"],
-					cleancss: true,
+					compress: false,
+					ieCompat: false,
+					plugins: [
+						new (require('less-plugin-autoprefix'))({browsers: ["last 2 versions"]}),
+						new (require('less-plugin-clean-css'))({advanced:true})
+					]
 				},
 				files: {
 					"css/style.css": "css/style.less"
@@ -63,30 +68,6 @@ module.exports = function(grunt) {
 			}
 		},
 
-		tx_contributors: {
-			"content-aware-sidebars": {
-				options: {
-					templateFn: function(array) {
-						for(var i = 0; i < array.length; i++) {
-							array[i] = "["+array[i]+"](https://www.transifex.com/accounts/profile/"+array[i]+"/)";
-						}
-						return array.join(", ");
-					}
-				}
-			}
-		},
-
-		replace: {
-			readme: {
-				src: ['readme.txt'],
-				overwrite: true,
-				replacements: [{
-					from: /(\*{8}\n)([\S\s])*?(\n\*{8})/g,
-					to: "$1<%= tx_contributors %>$3"
-				}]
-			}
-		},
-
 		/**
 		 * Compile po files
 		 */
@@ -121,8 +102,7 @@ module.exports = function(grunt) {
 	/**
 	 * Register tasks
 	 */
-	grunt.registerTask('localize', ['transifex','potomo']);
-	grunt.registerTask('localize-contrib',['tx_contributors','replace:readme']);
+	grunt.registerTask('localize', ['potomo']);
 	grunt.registerTask('default', ['build']);
 	grunt.registerTask('build', ['less','uglify']);
 	grunt.registerTask('deploy', ['build','localize']);

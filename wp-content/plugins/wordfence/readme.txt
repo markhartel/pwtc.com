@@ -2,8 +2,8 @@
 Contributors: mmaunder 
 Tags: security, secure, security plugin, wordpress security, login security, firewall, malware, antivirus, web application firewall, block hackers, country blocking
 Requires at least: 3.9
-Tested up to: 4.8.0
-Stable tag: 6.3.12
+Tested up to: 4.8.1
+Stable tag: 6.3.17
 
 Secure your website with the most comprehensive WordPress security plugin. Firewall, malware scan, blocking, live traffic, login security & more.
 
@@ -159,6 +159,41 @@ Secure your website with Wordfence.
 7. The Advanced Options page allows technically-minded users fine-tune their security settings.
 
 == Changelog ==
+
+= 6.3.17 =
+* Improvement: Prepared code for upcoming scan improvement which will greatly increase scan performance by optimizing malware signatures.
+* Improvement: Updated the bundled GeoIP database.
+* Improvement: Better scan messaging when a publicly-reachable searchreplacedb2.php utility is found.
+* Improvement: The no-cache constant for database caching is now set for W3TC for plugin updates and scans.
+* Improvement: Added an additional home/siteurl resolution check for WPML installations.
+
+= 6.3.16 =
+* Improvement: Introduced a new scan stage to check for malicious URLs and content within WordPress core, plugin, and theme options.
+* Improvement: New scan stage includes a new check for TrafficTrade malware.
+* Improvement: Reduced net memory usage during forked scan stages by up to 50%.
+* Improvement: Reduced the number of queries executed for some configuration options.
+* Improvement: Modified the default whitelisting to include the new core AJAX action in WordPress 4.8.1.
+* Fix: Synchronized the scan option names between the main options page and smaller scan options page.
+* Fix: Fixed CSS positioning issue for dashboard metabox with IPv6.
+* Fix: Fixed a compatibility issue with determining the site's home_url when WPML is installed.
+
+= 6.3.15 =
+* Improvement: Reduced memory usage on scan forking and during the known files scan stage.
+* Improvement: Added additional scan options to allow for disabling the blacklist checks while still allowing malware scanning to be enabled.
+* Improvement: Added a Wordfence Application Firewall code block for the lsapi variant of LiteSpeed.
+* Improvement: Updated the bundled GeoIP database.
+* Fix: Added a validation check to IP range whitelisting to avoid log warnings if they're malformed.
+
+= 6.3.14 =
+* Improvement: Introduced smart scan distribution. Scan times are now distributed intelligently across servers to provide consistent server performance. 
+* Improvement: Introduced light-weight scan that runs frequently to perform checks that do not use any server resources. 
+* Improvement: If unable to successfully look up the status of an IP claiming to be Googlebot, the hit is now allowed.
+* Improvement: Scan issue results for abandoned plugins and unpatched vulnerabilities include more info.
+* Fix: Suppressed PHP notice with time formatting when a microtimestamp is passed.
+* Fix: Improved binary data to HTML entity conversion to avoid wpdb stripping out-of-range UTF-8 sequences.
+* Fix: Added better detection to SSL status, particularly for IIS.
+* Fix: Fixed PHP notice in the diff renderer.
+* Fix: Fixed typo in lockout alert.
 
 = 6.3.12 =
 * Improvement: Adjusted the password audit to use a better cryptographic padding option.

@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -29,7 +27,7 @@ class WPCAModule_bbpress extends WPCAModule_author {
 		parent::__construct();
 		$this->id = 'bb_profile';
 		$this->name = __('bbPress User Profiles',WPCA_DOMAIN);
-		$this->placeholder = __("All Profiles",WPCA_DOMAIN);
+		$this->placeholder = __('All Profiles',WPCA_DOMAIN);
 		$this->default_value = $this->id;
 		
 		}

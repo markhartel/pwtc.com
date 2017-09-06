@@ -6,9 +6,7 @@
  * @copyright 2017 by Joachim Jensen
  */
 
-if (!defined('CAS_App::PLUGIN_VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -282,14 +280,16 @@ final class CAS_Sidebar_Overview extends CAS_Admin {
 		foreach ( $bulk_messages as $key => $message ) {
 			if(isset($_REQUEST[$key] )) {
 				$count = absint( $_REQUEST[$key] );
-				$messages[] = sprintf(
-					translate_nooped_plural($message, $count ),
-					number_format_i18n( $count )
-				);
+				if($count) {
+					$messages[] = sprintf(
+						translate_nooped_plural($message, $count ),
+						number_format_i18n( $count )
+					);
 
-				if ( $key == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-					$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
-					$messages[] = '<a href="' . esc_url( wp_nonce_url( "admin.php?page=wpcas&doaction=undo&action=untrash&ids=$ids", "bulk-sidebars" ) ) . '">' . __('Undo') . '</a>';
+					if ( $key == 'trashed' && isset( $_REQUEST['ids'] ) ) {
+						$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
+						$messages[] = '<a href="' . esc_url( wp_nonce_url( "admin.php?page=wpcas&doaction=undo&action=untrash&ids=$ids", "bulk-sidebars" ) ) . '">' . __('Undo') . '</a>';
+					}
 				}
 			}
 		}

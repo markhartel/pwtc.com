@@ -45,6 +45,7 @@ var CAE = CAE || {};
 			defaults : {
 				'module'       : null,
 				'label'        : '',
+				'placeholder'  : '',
 				'values'       : [],
 				'default_value': null
 			},
@@ -97,6 +98,7 @@ var CAE = CAE || {};
 							}
 							list.push({
 								label  : model.label,
+								placeholder: model.placeholder,
 								module : key,
 								values : values,
 								default_value : model.default_value
@@ -186,12 +188,13 @@ var CAE = CAE || {};
 			model: CAE.Models.Condition,
 			tagName: "div",
 			className: "cas-condition",
+			templateName: '#wpca-template-condition',
 			events: {
 				"click .js-wpca-condition-remove": "removeModel"
 			},
 			initialize: function() {
 				this.listenTo( this.model, 'destroy', this.remove );
-				var $template = $('#wpca-template-'+this.model.get("module"));
+				var $template = $(this.templateName);
 				if($template.length) {
 					this.template = $template.html();
 					this.$el.append(this.template);
@@ -214,16 +217,20 @@ var CAE = CAE || {};
 					return;
 				}
 				var model = this.model,
-					data = this.model.get("values");
+					data = this.model.get("values"),
+					//some post type/taxonomy translations use special entities
+					//todo:consider decoding in backend
+					placeholder = $('<div></div>').html(model.get('placeholder')).text();
 
 				$elem.select2({
 					more: true,
 					cachedResults: {},
 					quietMillis: 400,
 					searchTimer: null,
-					type:this.model.get('module'),
+					type:model.get('module'),
 					theme:'wpca',
-					placeholder:$elem.data("wpca-placeholder"),
+					dir:WPCA.text_direction,
+					placeholder:placeholder,
 					minimumInputLength: 0,
 					closeOnSelect: true,//false not working properly when hiding selected
 					width:"100%",
@@ -359,7 +366,7 @@ var CAE = CAE || {};
 				if(collection.length) {
 					if(options.add) {
 						//save only on default value
-						if(model.get('default_value')) {
+						if(model.get('default_value') !== '') {
 							AutoSaver.start(this);
 						}
 					} else if(this.model.get("id")) {
@@ -383,6 +390,7 @@ var CAE = CAE || {};
 					var condition = new CAE.Models.Condition({
 						module: $select.val(),
 						label: $selected.text(),
+						placeholder: $selected.data('placeholder'),
 						default_value: $selected.data('default')
 					});
 					this.model.conditions.add(condition);
@@ -410,31 +418,16 @@ var CAE = CAE || {};
 				data.action = "wpca/add-rule";
 				data.token = wpca_admin.nonce;
 				data.current_id = wpca_admin.sidebarID;
+				data.post_type = WPCA.post_type;
+				data.conditions = {};
 
-				//todo: get data from model instead
-				//will require backend change?
-				this.$el.find("select").each(function(i,obj) {
-					var $obj = $(obj);
-					var key = $obj.attr("name");
-					if(key) {
-						var value = $obj.val();
-						if(~key.indexOf('cas_condition')) {
-							if(!value) {
-								if($obj.data("wpca-default") !== '') {
-									value = [$obj.data("wpca-default")];
-								}
-							} else if(!$.isArray(value)) {
-								//not pretty...
-								value = [value];
-							}
-							//fix for post types in same group
-							if(data[key]) {
-								value = value.concat(data[key]);
-							}
-						}
-						if(value) {
-							data[key] = value;
-						}
+				this.model.conditions.each(function(model) {
+					if(model.get('values').length) {
+						data.conditions[model.get('module')] = model.get('values').map(function(model) {
+							return model.id;
+						});
+					} else if(model.get('default_value') !== '') {
+						data.conditions[model.get('module')] = [model.get('default_value')];
 					}
 				});
 
@@ -501,6 +494,7 @@ var CAE = CAE || {};
 					var condition = new CAE.Models.Condition({
 						module: $select.val(),
 						label: $selected.text(),
+						placeholder: $selected.data('placeholder'),
 						default_value: $selected.data('default')
 					});
 					this.collection.add(group);
@@ -662,7 +656,7 @@ var CAE = CAE || {};
 	var wpca_admin = {
 
 		nonce: $('#_ca_nonce').val(),
-		sidebarID: $('#current_sidebar').val(),
+		sidebarID: $('#post_ID').val(),
 		alert: null,
 		wpcaDataAdapter:$.fn.select2.amd.require('select2/data/wpcaAdapter'),
 

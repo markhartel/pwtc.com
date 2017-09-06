@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -33,7 +31,7 @@ class WPCAModule_page_template extends WPCAModule_Base {
 	 */
 	public function __construct() {
 		parent::__construct('page_template',__('Page Templates',WPCA_DOMAIN));
-		$this->placeholder = __("All Templates",WPCA_DOMAIN);
+		$this->placeholder = __('All Templates',WPCA_DOMAIN);
 		$this->default_value = $this->id;
 	}
 	
@@ -76,9 +74,9 @@ class WPCAModule_page_template extends WPCAModule_Base {
 		if(isset($args['include'])) {
 			$templates = array_intersect_key($templates,array_flip($args['include']));
 		}
-		if(isset($args["search"]) && $args["search"]) {
-			$this->search_string = $args["search"];
-			$templates = array_filter($templates,array($this,"_filter_search"));
+		if(isset($args['search']) && $args['search']) {
+			$this->search_string = $args['search'];
+			$templates = array_filter($templates,array($this,'_filter_search'));
 		}
 		return $templates;
 	}
@@ -94,20 +92,4 @@ class WPCAModule_page_template extends WPCAModule_Base {
 		return mb_stripos($value, $this->search_string) !== false;
 	}
 
-	/**
-	 * Get content in JSON
-	 *
-	 * @since  2.0
-	 * @param  array  $args
-	 * @return array
-	 */
-	public function ajax_get_content($args) {
-		$args = wp_parse_args($args, array(
-			'paged'          => 1,
-			'search'         => ''
-		));
-
-		return $this->_get_content($args);
-	}
-	
 }

@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -62,11 +60,13 @@ abstract class WPCAModule_Base {
 	 * @param   string    $title
 	 * @param   string    $description
 	 */
-	public function __construct($id, $title, $description = "", $placeholder = "") {
+	public function __construct($id, $title, $description = '', $placeholder = '') {
 		$this->id = $id;
 		$this->name = $title;
 		$this->description = $description;
 		$this->placeholder = $placeholder;
+
+		$this->initiate();
 	}
 
 	/**
@@ -77,23 +77,9 @@ abstract class WPCAModule_Base {
 	 */
 	public function initiate() {
 		if(is_admin()) {
-			add_action('wpca/modules/save-data',
-				array($this,'save_data'));
-			// add_action('admin_footer-post.php',
-			// 	array($this,'template_condition'),1);
-			// add_action('admin_footer-post-new.php',
-			// 	array($this,'template_condition'),1);
 			add_action('wp_ajax_wpca/module/'.$this->id,
 				array($this,'ajax_print_content'));
-
-			add_filter('wpca/modules/list',
-				array($this,'list_module'));
-			add_filter('wpca/modules/group-data',
-				array($this,'get_group_data'),10,2);
 		}
-		
-		add_filter('wpca/modules/context-data',
-			array($this,'parse_context_data'));
 	}
 
 	/**
@@ -107,6 +93,7 @@ abstract class WPCAModule_Base {
 		//TODO: remove in favor of backbone objects
 		$list[$this->id] = array(
 			'name' => $this->name,
+			'placeholder' => $this->placeholder,
 			'default_value' => $this->default_value
 		);
 		return $list;
@@ -143,8 +130,8 @@ abstract class WPCAModule_Base {
 	 */
 	public function save_data($post_id) {
 		$meta_key = WPCACore::PREFIX . $this->id;
-		$new = isset($_POST['cas_condition'][$this->id]) ? $_POST['cas_condition'][$this->id] : '';
 		$old = array_flip(get_post_meta($post_id, $meta_key, false));
+		$new = isset($_POST['conditions'][$this->id]) ? $_POST['conditions'][$this->id] : '';
 
 		if (is_array($new)) {
 			//$new = array_unique($new);
@@ -178,9 +165,10 @@ abstract class WPCAModule_Base {
 		$data = get_post_custom_values(WPCACore::PREFIX . $this->id, $post_id);
 		if($data) {
 			$group_data[$this->id] = array(
-				"label" => $this->name,
-				"data" => $this->_get_content(array('include' => $data)),
-				"default_value" => $this->default_value
+				'label'         => $this->name,
+				'placeholder'   => $this->placeholder,
+				'data'          => $this->_get_content(array('include' => $data)),
+				'default_value' => $this->default_value
 			);
 		}
 		return $group_data;
@@ -212,32 +200,6 @@ abstract class WPCAModule_Base {
 	abstract public function get_context_data();
 
 	/**
-	 * Parse context data to sql query
-	 *
-	 * @since   1.0
-	 * @param   array|string    $data
-	 * @return  array
-	 */
-	final public function parse_context_data($data) {
-		if(apply_filters("wpca/module/{$this->id}/in-context", $this->in_context())) {
-			$data['JOIN'][$this->id] = apply_filters("wpca/module/{$this->id}/db-join", $this->db_join());
-
-			$context_data = $this->get_context_data();
-
-			if(is_array($context_data)) {
-				$context_data = "({$this->id}.meta_value IS NULL OR {$this->id}.meta_value IN ('".implode("','",$context_data) ."'))";
-			}
-			$data['WHERE'][$this->id] = apply_filters("wpca/module/{$this->id}/db-where", $context_data);
-
-		} else {
-			add_filter("wpca/modules/exclude-context",
-				array($this,"filter_excluded_context"));
-			$data['EXCLUDE'][] = $this->id;
-		}
-		return $data;
-	}
-
-	/**
 	 * Remove posts if they have data from
 	 * other contexts (meaning conditions arent met)
 	 *
@@ -262,7 +224,12 @@ abstract class WPCAModule_Base {
 	 * @return  string
 	 */
 	public function ajax_get_content($args) {
-		return '';
+		$args = wp_parse_args($args, array(
+			'paged'          => 1,
+			'search'         => ''
+		));
+
+		return $this->_get_content($args);
 	}
 
 	/**
@@ -284,7 +251,7 @@ abstract class WPCAModule_Base {
 		$response = $this->ajax_get_content(array(
 			'paged' => $paged,
 			'search' => $search,
-			'item_object' => $_POST["action"]
+			'item_object' => $_POST['action']
 		));
 
 		//ECMAScript has no standard to guarantee
@@ -302,22 +269,16 @@ abstract class WPCAModule_Base {
 	}
 
 	/**
-	 * Create module Backbone template
-	 * for administration
+	 * Destructor
 	 *
-	 * @since  2.0
-	 * @return void
+	 * @since 4.0
 	 */
-	public function template_condition() {
-		if(WPCACore::post_types()->has(get_post_type())) {
-			echo WPCAView::make("module/condition_template",array(
-				'id'          => $this->id,
-				'placeholder' => $this->placeholder,
-				'default'     => $this->default_value
-			))->render();
+	public function __destruct() {
+		if(is_admin()) {
+			remove_action('wp_ajax_wpca/module/'.$this->id,
+				array($this,'ajax_print_content'));
 		}
 	}
-	
 }
 
 //eol

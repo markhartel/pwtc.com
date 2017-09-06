@@ -102,6 +102,14 @@
 			if (!$type) $type = (preg_match('%\W(zip)$%i', basename($filePath))) ? 'zip' : false;
 			if (!$type) $type = (preg_match('%\W(gz)$%i', basename($filePath))) ? 'gz' : false;			
 
+            if(!$type){
+                $filePath = strtok($filePath, "?");
+                $type = (preg_match('%\W(csv|txt|dat|psv)$%i', basename($filePath))) ? 'csv' : false;
+                if (!$type) $type = (preg_match('%\W(xml)$%i', basename($filePath))) ? 'xml' : false;
+                if (!$type) $type = (preg_match('%\W(zip)$%i', basename($filePath))) ? 'zip' : false;
+                if (!$type) $type = (preg_match('%\W(gz)$%i', basename($filePath))) ? 'gz' : false;
+            }
+
 			return ($type) ? $type : false;
 		}
 	}	

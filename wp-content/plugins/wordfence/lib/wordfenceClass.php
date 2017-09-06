@@ -1,6 +1,7 @@
 <?php
 require_once('wordfenceConstants.php');
 require_once('wfScanEngine.php');
+require_once('wfScan.php');
 require_once('wfCrawl.php');
 require_once 'Diff.php';
 require_once 'Diff/Renderer/Html/SideBySide.php';
@@ -210,6 +211,12 @@ class wordfence {
 				wfConfig::set('lastDashboardCheck', time());
 				wfDashboard::processDashboardResponse($keyData['dashboard']);
 			}
+			if (isset($keyData['scanSchedule']) && is_array($keyData['scanSchedule'])) {
+				wfConfig::set_ser('noc1ScanSchedule', $keyData['scanSchedule']);
+				if (!wfScan::isManualScanSchedule()) {
+					wordfence::scheduleScans();
+				}
+			}
 		}
 		catch(Exception $e){
 			wordfence::status(4, 'error', "Could not verify Wordfence API Key: " . $e->getMessage());
@@ -281,6 +288,11 @@ class wordfence {
 		$report = new wfActivityReport();
 		$report->rotateIPLog();
 		self::_refreshUpdateNotification($report, true);
+		
+		$next = self::getNextScanStartTimestamp();
+		if ($next - time() > 3600 && wfScan::shouldRunScan(wfScanEngine::SCAN_MODE_QUICK)) {
+			wfScanEngine::startScan(false, wfScanEngine::SCAN_MODE_QUICK);
+		}
 	}
 	public static function _scheduleRefreshUpdateNotification($upgrader, $options) {
 		$defer = false;
@@ -364,6 +376,7 @@ class wordfence {
 		if (function_exists('ignore_user_abort')) {
 			ignore_user_abort(true);
 		}
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		$previous_version = ((is_multisite() && function_exists('get_network_option')) ? get_network_option(null, 'wordfence_version', '0.0.0') : get_option('wordfence_version', '0.0.0'));
 		if (is_multisite() && function_exists('update_network_option')) {
 			update_network_option(null, 'wordfence_version', WORDFENCE_VERSION); //In case we have a fatal error we don't want to keep running install.	
@@ -713,6 +726,15 @@ SQL
 			$wpdb->query("ALTER TABLE {$hooverTable} CHANGE `hostKey` `hostKey` VARBINARY(124) NULL DEFAULT NULL");
 		}
 		
+		//6.3.15
+		$scanFileContents = wfConfig::get('scansEnabled_fileContents', false);
+		if (!wfConfig::get('fileContentsGSB6315Migration', false)) {
+			if (!$scanFileContents) {
+				wfConfig::set('scansEnabled_fileContentsGSB', false);
+			}
+			wfConfig::set('fileContentsGSB6315Migration', 1);
+		}
+		
 		
 		//Check the How does Wordfence get IPs setting
 		wfUtils::requestDetectProxyCallback();
@@ -1013,10 +1035,11 @@ SQL
 	public static function ajax_doScan_callback(){
 		ignore_user_abort(true);
 		self::$wordfence_wp_version = false;
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		//This is messy, but not sure of a better way to do this without guaranteeing we get $wp_version
 		require(ABSPATH . 'wp-includes/version.php');
 		self::$wordfence_wp_version = $wp_version;
-		require('wfScan.php');
+		require_once('wfScan.php');
 		wfScan::wfScanMain();
 
 	} //END doScan
@@ -1188,7 +1211,7 @@ SQL
 		self::getLog()->lockOutIP(wfUtils::getIP(), $reason);
 		//Then we send the email because email sending takes time and we want to block the baddie asap. If we don't users can get a lot of emails about a single attacker getting locked out.
 		if(wfConfig::get('alertOn_loginLockout')){
-			wordfence::alert("User locked out from signing in", "A user with IP address $IP has been locked out from the signing in or using the password recovery form for the following reason: $reason", $IP);
+			wordfence::alert("User locked out from signing in", "A user with IP address {$IP} has been locked out from signing in or using the password recovery form for the following reason: {$reason}", $IP);
 		}
 	}
 	public static function isLockedOut($IP){
@@ -1971,6 +1994,7 @@ SQL
 		return $authUser;
 	}
 	public static function wfsnBatchReportBlockedAttempts() {
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		$threshold = wfConfig::get('lastBruteForceDataSendTime', 0);;
 		
 		$wfdb = new wfDB();
@@ -2032,6 +2056,7 @@ SQL
 		}
 	}
 	private static function wfsnScheduleBatchReportBlockedAttempts($timeToSend = null) {
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		if ($timeToSend === null) {
 			$timeToSend = time() + 30;
 		}
@@ -2048,11 +2073,13 @@ SQL
 		}
 	}
 	public static function wfsnReportBlockedAttempt($IP, $type){
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		self::wfsnScheduleBatchReportBlockedAttempts();
 		$endpointType = self::wfsnEndpointType();
 		self::getLog()->getCurrentRequest()->actionData = wfRequestModel::serializeActionData(array('type' => $endpointType));
 	}
 	public static function wfsnBatchReportFailedAttempts() {
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		$threshold = time();
 		
 		$wfdb = new wfDB();
@@ -2104,6 +2131,7 @@ SQL
 		}
 	}
 	private static function wfsnScheduleBatchReportFailedAttempts($timeToSend = null) {
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		if ($timeToSend === null) {
 			$timeToSend = time() + 30;
 		}
@@ -2120,6 +2148,7 @@ SQL
 		}
 	}
 	public static function wfsnIsBlocked($IP, $hitType){
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		$wfdb = new wfDB();
 		global $wpdb;
 		$p = $wpdb->base_prefix;
@@ -2592,20 +2621,20 @@ SQL
 		
 		return 'Next scan in ' . wfUtils::makeDuration($difference) . ' (' . date('M j, Y g:i:s A', $nextTime + (3600 * get_option('gmt_offset'))) . ')';
 	}
-	public static function wordfenceStartScheduledScan(){
+	public static function wordfenceStartScheduledScan($scheduledStartTime) {
 
 		//If scheduled scans are not enabled in the global config option, then don't run a scheduled scan.
 		if(wfConfig::get('scheduledScansEnabled') != '1'){
 			return;
 		}
 
-		//This prevents scheduled scans from piling up on low traffic blogs and all being run at once.
-		//Only one scheduled scan runs within a given 60 min window. Won't run if another scan has run within 30 mins.
+		$minimumFrequency = (wfScan::isManualScanSchedule() ? 1800 : 43200);
 		$lastScanStart = wfConfig::get('lastScheduledScanStart', 0);
-		if($lastScanStart && (time() - $lastScanStart) < 1800){
-			//A scheduled scan was started in the last 30 mins, so skip this one.
+		if($lastScanStart && (time() - $lastScanStart) < $minimumFrequency){
+			//A scheduled scan was started in the last 30 mins (manual schedule) or 12 hours (automatic schedule), so skip this one.
 			return;
 		}
+		wfConfig::set('originalScheduledScanStart', $scheduledStartTime);
 		wfConfig::set('lastScheduledScanStart', time());
 		wordfence::status(1, 'info', "Scheduled Wordfence scan starting at " . date('l jS \of F Y h:i:s A', current_time('timestamp')) );
 
@@ -2615,57 +2644,64 @@ SQL
 
 		wfScanEngine::startScan();
 	}
-	public static function scheduleScans(){ //Idempotent. Deschedules everything and schedules the following week.
+	public static function scheduleScans() { //Idempotent. Deschedules everything and schedules the following week.
 		self::unscheduleAllScans();
-		$sched = wfConfig::get_ser('scanSched', array());
-		$mode = wfConfig::get('schedMode');
-		if($mode == 'manual' && is_array($sched) && is_array($sched[0]) ){
-			//Use sched as it is
-		} else { //Default to setting scans to run once a day at a randomly selected time.
-			$sched = array();
-			$runAt = rand(0,23);
-			for($day = 0; $day <= 6; $day++){
-				$sched[$day] = array();
-				for($hour = 0; $hour <= 23; $hour++){
-					if($hour == $runAt){
-						$sched[$day][$hour] = 1;
-					} else {
-						$sched[$day][$hour] = 0;
+		if (wfScan::isManualScanSchedule()) {
+			$sched = wfConfig::get_ser('scanSched', array());
+			for ($scheduledDay = 0; $scheduledDay <= 6; $scheduledDay++) {
+				//0 is sunday
+				//6 is Saturday
+				for ($scheduledHour = 0; $scheduledHour <= 23; $scheduledHour++) {
+					if ($sched[$scheduledDay][$scheduledHour]) {
+						$wpTime = current_time('timestamp');
+						$currentDayOfWeek = date('w', $wpTime);
+						$daysInFuture = $scheduledDay - $currentDayOfWeek; //It's monday and scheduledDay is Wed (3) then result is 2 days in future. It's Wed and sched day is monday, then result is 3 - 1 = -2
+						if($daysInFuture < 0){ $daysInFuture += 7; } //Turns -2 into 5 days in future
+						$currentHour = date('G', $wpTime);
+						$secsOffset = ($scheduledHour - $currentHour) * 3600; //Offset from current hour, can be negative
+						$secondsInFuture = ($daysInFuture * 86400) + $secsOffset; //Can be negative, so we schedule those 1 week ahead
+						if($secondsInFuture < 1){
+							$secondsInFuture += (86400 * 7); //Add a week
+						}
+						$futureTime = time() - (time() % 3600) + $secondsInFuture; //Modulo rounds down to top of the hour
+						$futureTime += rand(0,3600); //Prevent a stampede of scans on our scanning server
+						wordfence::status(4, 'info', "Scheduled time for day $scheduledDay hour $scheduledHour is: " . date('l jS \of F Y h:i:s A', $futureTime));
+						self::scheduleSingleScan($futureTime);
 					}
 				}
 			}
 		}
-		for($scheduledDay = 0; $scheduledDay <= 6; $scheduledDay++){
-			//0 is sunday
-			//6 is Saturday
-			for($scheduledHour = 0; $scheduledHour <= 23; $scheduledHour++){
-				if($sched[$scheduledDay][$scheduledHour]){
-					$wpTime = current_time('timestamp');
-					$currentDayOfWeek = date('w', $wpTime);
-					$daysInFuture = $scheduledDay - $currentDayOfWeek; //It's monday and scheduledDay is Wed (3) then result is 2 days in future. It's Wed and sched day is monday, then result is 3 - 1 = -2
-					if($daysInFuture < 0){ $daysInFuture += 7; } //Turns -2 into 5 days in future
-					$currentHour = date('G', $wpTime);
-					$secsOffset = ($scheduledHour - $currentHour) * 3600; //Offset from current hour, can be negative
-					$secondsInFuture = ($daysInFuture * 86400) + $secsOffset; //Can be negative, so we schedule those 1 week ahead
-					if($secondsInFuture < 1){
-						$secondsInFuture += (86400 * 7); //Add a week
-					}
-					$futureTime = time() - (time() % 3600) + $secondsInFuture; //Modulo rounds down to top of the hour
-					$futureTime += rand(0,3600); //Prevent a stampede of scans on our scanning server
-					wordfence::status(4, 'info', "Scheduled time for day $scheduledDay hour $scheduledHour is: " . date('l jS \of F Y h:i:s A', $futureTime));
-					self::scheduleSingleScan($futureTime);
+		else {
+			$noc1ScanSchedule = wfConfig::get_ser('noc1ScanSchedule', array());
+			foreach ($noc1ScanSchedule as $timestamp) {
+				$timestamp = wfUtils::denormalizedTime($timestamp);
+				if ($timestamp > time()) {
+					self::scheduleSingleScan($timestamp);
 				}
 			}
 		}
 	}
-	public static function scheduleSingleScan($futureTime){
+	public static function scheduleSingleScan($futureTime, $originalTime = false) {
 		// Removed ability to activate on network site in v5.3.12
 		if (is_main_site()) {
-			wp_schedule_single_event($futureTime, 'wordfence_start_scheduled_scan');
+			if ($originalTime === false) {
+				$originalTime = $futureTime;
+			}
+			wp_schedule_single_event($futureTime, 'wordfence_start_scheduled_scan', array((int) $originalTime));
+			
+			//Saving our own copy of the schedule because the wp-cron functions all require the args list to act
+			$allScansScheduled = wfConfig::get_ser('allScansScheduled', array());
+			$allScansScheduled[] = array('timestamp' => $futureTime, 'args' => array((int) $originalTime));
+			wfConfig::set_ser('allScansScheduled', $allScansScheduled);
 		}
 	}
-	private static function unscheduleAllScans(){
+	private static function unscheduleAllScans() {
+		$allScansScheduled = wfConfig::get_ser('allScansScheduled', array());
+		foreach ($allScansScheduled as $entry) {
+			wp_unschedule_event($entry['timestamp'], 'wordfence_start_scheduled_scan', $entry['args']);
+		}
 		wp_clear_scheduled_hook('wordfence_start_scheduled_scan');
+		wfConfig::set_ser('allScansScheduled', array());
 	}
 	public static function ajax_saveCountryBlocking_callback(){
 		if(! wfConfig::get('isPaid')){
@@ -3070,6 +3106,12 @@ SQL
 				if (isset($keyData['dashboard'])) {
 					wfConfig::set('lastDashboardCheck', time());
 					wfDashboard::processDashboardResponse($keyData['dashboard']);
+				}
+				if (isset($keyData['scanSchedule']) && is_array($keyData['scanSchedule'])) {
+					wfConfig::set_ser('noc1ScanSchedule', $keyData['scanSchedule']);
+					if (!wfScan::isManualScanSchedule()) {
+						wordfence::scheduleScans();
+					}
 				}
 			}
 			catch (Exception $e){
@@ -4853,20 +4895,8 @@ HTML;
 		}
 		
 		if (is_admin()) { //Back end only
-			$homeurl = '';
-			if (function_exists('get_bloginfo') && empty($homeurl)) {
-				if (is_multisite()) {
-					$homeurl = network_home_url();
-					$homeurl = rtrim($homeurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
-				}
-				else {
-					$homeurl = home_url();
-				}
-				
-				if (wfConfig::get('wp_home_url') !== $homeurl) {
-					wfConfig::set('wp_home_url', $homeurl);
-				}
-			}
+			wfUtils::refreshCachedHomeURL();
+			wfUtils::refreshCachedSiteURL();
 		}
 
 		if (!WFWAF_AUTO_PREPEND || WFWAF_SUBDIRECTORY_INSTALL) {
@@ -5507,7 +5537,7 @@ document.location.href=$adminURL;
 						array("cgi", 'Apache + CGI/FastCGI', $serverInfo->isApache() &&
 							!$serverInfo->isApacheSuPHP() &&
 							($serverInfo->isCGI() || $serverInfo->isFastCGI())),
-						array("litespeed", 'LiteSpeed', $serverInfo->isLiteSpeed()),
+						array("litespeed", 'LiteSpeed/lsapi', $serverInfo->isLiteSpeed()),
 						array("nginx", 'NGINX', $serverInfo->isNGINX()),
 						array("iis", 'Windows (IIS)', $serverInfo->isIIS()),
 					);
@@ -5641,7 +5671,7 @@ vulnerable code runs. This PHP setting currently refers to the Wordfence file at
 								array("cgi", 'Apache + CGI/FastCGI', $serverInfo->isApache() &&
 									!$serverInfo->isApacheSuPHP() &&
 									($serverInfo->isCGI() || $serverInfo->isFastCGI())),
-								array("litespeed", 'LiteSpeed', $serverInfo->isLiteSpeed()),
+								array("litespeed", 'LiteSpeed/lsapi', $serverInfo->isLiteSpeed()),
 								array("nginx", 'NGINX', $serverInfo->isNGINX()),
 								array("iis", 'Windows (IIS)', $serverInfo->isIIS()),
 							);
@@ -6891,6 +6921,8 @@ to your httpd.conf if using Apache, or find documentation on how to disable dire
 	 */
 	public static function processAttackData() {
 		global $wpdb;
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
+		
 		$waf = wfWAF::getInstance();
 		if ($waf->getStorageEngine()->getConfig('attackDataKey', false) === false) {
 			$waf->getStorageEngine()->setConfig('attackDataKey', mt_rand(0, 0xfff));
@@ -7090,6 +7122,7 @@ LIMIT %d", $lastSendTime, $limit));
 
 	public static function syncAttackData($exit = true) {
 		global $wpdb;
+		if (!defined('DONOTCACHEDB')) { define('DONOTCACHEDB', true); }
 		$waf = wfWAF::getInstance();
 		$lastAttackMicroseconds = $wpdb->get_var("SELECT MAX(attackLogTime) FROM {$wpdb->base_prefix}wfHits");
 		if ($waf->getStorageEngine()->hasNewerAttackData($lastAttackMicroseconds)) {
@@ -7619,13 +7652,17 @@ $userIniHtaccessDirectives
 				break;
 
 			case 'litespeed':
+				$escapedBootstrapPath = addcslashes($bootstrapPath, "'");
 				$autoPrependDirective = sprintf("# Wordfence WAF
 <IfModule LiteSpeed>
 php_value auto_prepend_file '%s'
 </IfModule>
+<IfModule lsapi_module>
+php_value auto_prepend_file '%s'
+</IfModule>
 $userIniHtaccessDirectives
 # END Wordfence WAF
-", addcslashes($bootstrapPath, "'"));
+", $escapedBootstrapPath, $escapedBootstrapPath);
 				break;
 
 			case 'apache-suphp':

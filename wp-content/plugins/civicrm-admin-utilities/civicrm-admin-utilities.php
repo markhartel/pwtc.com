@@ -4,7 +4,7 @@ Plugin Name: CiviCRM Admin Utilities
 Plugin URI: http://haystack.co.uk
 Description: Custom code to modify CiviCRM's behaviour
 Author: Christian Wach
-Version: 0.2.7
+Version: 0.2.8
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-admin-utilities
 Domain Path: /languages
@@ -15,7 +15,7 @@ Depends: CiviCRM
 
 
 // set our version here
-define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.7' );
+define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.8' );
 
 // trigger logging of 'civicrm_pre' and 'civicrm_post'
 if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_DEBUG' ) ) {
@@ -163,6 +163,7 @@ class CiviCRM_Admin_Utilities {
 			// log pre and post database operations
 			add_action( 'civicrm_pre', array( $this, 'trace_pre' ), 10, 4 );
 			add_action( 'civicrm_post', array( $this, 'trace_post' ), 10, 4 );
+			add_action( 'civicrm_postProcess', array( $this, 'trace_postProcess' ), 10, 2 );
 
 		}
 
@@ -294,7 +295,7 @@ class CiviCRM_Admin_Utilities {
 
 
 	/**
-	 * Do not load the CiviCRM on sites other than the main site.
+	 * Do not load CiviCRM on sites other than the main site.
 	 *
 	 * @since 0.1
 	 */
@@ -312,6 +313,9 @@ class CiviCRM_Admin_Utilities {
 			// remove CiviCRM shortcode button
 			add_action( 'admin_head', array( $this, 'civi_button_remove' ) );
 
+			// remove notice
+			remove_action( 'admin_notices', array( civi_wp(), 'show_setup_warning' ) );
+
 		}
 
 	}
@@ -328,13 +332,15 @@ class CiviCRM_Admin_Utilities {
 	 */
 	public function trace_pre( $op, $objectName, $objectId, $objectRef ) {
 
+		$e = new Exception;
+		$trace = $e->getTraceAsString();
 		error_log( print_r( array(
 			'method' => __METHOD__,
 			'op' => $op,
 			'objectName' => $objectName,
 			'objectId' => $objectId,
 			'objectRef' => $objectRef,
-			'backtrace' => civicrm_utils_debug_backtrace_summary(),
+			'backtrace' => $trace,
 		), true ) );
 
 	}
@@ -351,13 +357,36 @@ class CiviCRM_Admin_Utilities {
 	 */
 	public function trace_post( $op, $objectName, $objectId, $objectRef ) {
 
+		$e = new Exception;
+		$trace = $e->getTraceAsString();
 		error_log( print_r( array(
 			'method' => __METHOD__,
 			'op' => $op,
 			'objectName' => $objectName,
 			'objectId' => $objectId,
 			'objectRef' => $objectRef,
-			'backtrace' => civicrm_utils_debug_backtrace_summary(),
+			'backtrace' => $trace,
+		), true ) );
+
+	}
+
+
+
+	/**
+	 * Utility for tracing calls to hook_civicrm_postProcess.
+	 *
+	 * @param string $formName The name of the form
+	 * @param object $form The form object
+	 */
+	public function trace_postProcess( $formName, &$form ) {
+
+		$e = new Exception;
+		$trace = $e->getTraceAsString();
+		error_log( print_r( array(
+			'method' => __METHOD__,
+			'formName' => $formName,
+			'form' => $form,
+			'backtrace' => $trace,
 		), true ) );
 
 	}

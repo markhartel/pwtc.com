@@ -247,13 +247,16 @@
 					$tax_classes = array_filter( array_map( 'trim', explode( "\n", get_option( 'woocommerce_tax_classes' ) ) ) );
 					$classes_options = array();
 					$classes_options[''] = __( 'Standard', 'wpai_woocommerce_addon_plugin' );
-		    		if ( $tax_classes )
-		    			foreach ( $tax_classes as $class )
-		    				$classes_options[ sanitize_title( $class ) ] = esc_html( $class );										
+
+		    		if ( $tax_classes ){
+						foreach ( $tax_classes as $class ){
+							$classes_options[ sanitize_title( $class ) ] = esc_html( $class );
+						}
+					}
 					?>
 					<select class="select short" name="multiple_product_tax_class">
 						<?php foreach ($classes_options as $key => $value):?>
-							<option value="<?php echo $key; ?>" <?php echo $key == $post['multiple_product_tax_class'] ? 'selected="selected"': '' ?>><?php echo $value; ?></option>
+							<option value="<?php echo $key; ?>" <?php echo selected( esc_attr( $key ), esc_attr( $post['multiple_product_tax_class'] ), false ); ?>><?php echo $value; ?></option>
 						<?php endforeach; ?>											
 					</select>
 				</span>

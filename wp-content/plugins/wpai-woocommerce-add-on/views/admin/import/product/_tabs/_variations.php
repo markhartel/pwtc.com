@@ -28,15 +28,20 @@
 	
 		<p class="form-field wpallimport-radio-field">
 			<input type="radio" id="auto_matching_parent_first_is_parent_id" class="switcher" name="matching_parent" value="first_is_parent_id" <?php echo 'first_is_parent_id' == $post['matching_parent'] ? 'checked="checked"': '' ?> style="float:left;"/>
-			<label for="auto_matching_parent_first_is_parent_id" style="width:95%"><?php _e('All products with variations are grouped with a unique identifier that is the same for each variation and unique for each product.', 'wpai_woocommerce_addon_plugin' )?></label>
+			<label for="auto_matching_parent_first_is_parent_id" style="width:95%"><?php _e('All products with variations are grouped with a unique value that is the same for each variation and unique for each product.', 'wpai_woocommerce_addon_plugin' )?></label>
 		</p>
 
 		<div class="switcher-target-auto_matching_parent_first_is_parent_id"  style="padding-left:25px;">									
 			<p class="form-field">
-				<label style="width:105px; padding-top: 3px;"><?php _e("Unique Identifier", "wpai_woocommerce_addon_plugin"); ?></label> 
+				<label style="width:105px; padding-top: 3px;"><?php _e("Unique Value", "wpai_woocommerce_addon_plugin"); ?></label> 
 				<input type="text" class="short" placeholder="" name="single_product_id_first_is_parent_id" value="<?php echo esc_attr($post['single_product_id_first_is_parent_id']) ?>"/>
 				<a href="#help" class="wpallimport-help" title="<?php _e('Group ID column in the below example.', 'wpai_woocommerce_addon_plugin') ?>" style="position:relative;">?</a>
-			</p>										
+			</p>
+			<p class="form-field">
+				<label style="width:105px; padding-top: 3px;"><?php _e("Parent SKU", "wpai_woocommerce_addon_plugin"); ?></label>
+				<input type="text" class="short" placeholder="" name="single_product_first_is_parent_id_parent_sku" value="<?php echo esc_attr($post['single_product_first_is_parent_id_parent_sku']) ?>"/>
+				<a href="#help" class="wpallimport-help" title="<?php _e('Leave empty to use SKU settings from general tab.', 'wpai_woocommerce_addon_plugin') ?>" style="position:relative;">?</a>
+			</p>
 			<p class="form-field">
 				<strong><?php _e("Example Data For Use With This Option","wpai_woocommerce_addon_plugin");?> </strong> - <a href="http://www.wpallimport.com/wp-content/uploads/2014/10/data-example-2.csv" tatger="_blank"><?php _e("download","wpai_woocommerce_addon_plugin");?></a>
 				<span class="wpallimport-clear"></span>
@@ -73,6 +78,11 @@
 			<p class="form-field">
 				<label style="width:85px; padding-top: 3px;"><?php _e("Product Title"); ?></label> 
 				<input type="text" class="short" placeholder="" name="single_product_id_first_is_variation" value="<?php echo ($post['single_product_id_first_is_variation']) ? esc_attr($post['single_product_id_first_is_variation']) : ((!empty(PMXI_Plugin::$session->options['title'])) ? esc_attr(PMXI_Plugin::$session->options['title']) : ''); ?>"/>
+			</p>
+			<p class="form-field">
+				<label style="width:105px; padding-top: 3px;"><?php _e("Parent SKU", "wpai_woocommerce_addon_plugin"); ?></label>
+				<input type="text" class="short" placeholder="" name="single_product_first_is_parent_title_parent_sku" value="<?php echo esc_attr($post['single_product_first_is_parent_title_parent_sku']) ?>"/>
+				<a href="#help" class="wpallimport-help" title="<?php _e('Leave empty to use SKU settings from general tab.', 'wpai_woocommerce_addon_plugin') ?>" style="position:relative;">?</a>
 			</p>
 			<p class="form-field">
 				<strong><?php _e("Example Data For Use With This Option","wpai_woocommerce_addon_plugin");?> </strong> - <a href="http://www.wpallimport.com/wp-content/uploads/2014/10/data-example-4.csv" tatger="_blank"><?php _e("download","wpai_woocommerce_addon_plugin");?></a>

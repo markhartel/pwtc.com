@@ -3,8 +3,8 @@ Contributors: needle, cuny-academic-commons
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PZSKM8T5ZP3SC
 Tags: civicrm, member, membership, sync
 Requires at least: 3.9
-Tested up to: 4.7
-Stable tag: 0.3.1
+Tested up to: 4.8
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ It may sometimes be necessary to manually synchronize users. Click on the "Manua
 
 
 == Changelog ==
+
+= 0.3.2 =
+
+* Add filter for username prior to creation of WordPress user
 
 = 0.3.1 =
 

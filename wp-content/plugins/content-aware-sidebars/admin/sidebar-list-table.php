@@ -7,8 +7,6 @@
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
@@ -25,10 +23,9 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 	private $is_trash;
 
 	public function __construct( $args = array() ) {
-		$post_type_object = get_post_type_object(CAS_App::TYPE_SIDEBAR);
 		parent::__construct(array(
-			'singular' => $post_type_object->labels->singular_name,
-			'plural'   => $post_type_object->labels->name, 
+			'singular' => 'sidebar',
+			'plural'   => 'sidebars', 
 			'ajax'     => false,
 			'screen'   => isset( $args['screen'] ) ? $args['screen'] : null
 		));
@@ -194,7 +191,8 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 				'All <span class="count">(%s)</span>',
 				'All <span class="count">(%s)</span>',
 				$total_posts,
-				'sidebars'
+				'sidebars',
+				'content-aware-sidebars'
 			),
 			number_format_i18n( $total_posts )
 		);
@@ -443,21 +441,30 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 		$return = "";
 		if($metadata) {
 			$return = $metadata->get_list_data($post->ID);
-			if($metadata->get_data($post->ID) != 2) {
-				$host = CAS_App::instance()->manager()->metadata()->get('host')->get_list_data($post->ID);
-				$return .= ": " . ($host ? $host : '<span style="color:red;">' . __('Please update Host Sidebar', "content-aware-sidebars") . '</span>');
-			
+			switch($metadata->get_data($post->ID)) {
+				case 0:
+				case 1:
+				case 3:
+					$host = CAS_App::instance()->manager()->metadata()->get('host')->get_list_data($post->ID);
+					$return .= ": " . ($host ? $host : '<span style="color:red;">' . __('Please update Host Sidebar', "content-aware-sidebars") . '</span>');
+					if($metadata->get_data($post->ID) != 3) {
+						$pos = CAS_App::instance()->manager()->metadata()->get("merge_pos")->get_data($post->ID,true);
+						$pos_icon = $pos ? "up" : "down";
+						$pos_title = array(
+							__("Add sidebar at the top during merge","content-aware-sidebars"),
+							__("Add sidebar at the bottom during merge","content-aware-sidebars")
+						);
+						$return .= '<span title="'.$pos_title[$pos].'" class="dashicons dashicons-arrow-'.$pos_icon.'-alt"></span>';
+					}
+					break;
+				case 2:
+					$return = "<input type='text' value='[ca-sidebar id=\"$post->ID\"]' readonly>";
+					break;
+				case 4:
+					break;
+				default:
+					break;
 			}
-			if($metadata->get_data($post->ID) != 3) {
-				$pos = CAS_App::instance()->manager()->metadata()->get("merge_pos")->get_data($post->ID,true);
-				$pos_icon = $pos ? "up" : "down";
-				$pos_title = array(
-					__("Add sidebar at the top during merge","content-aware-sidebars"),
-					__("Add sidebar at the bottom during merge","content-aware-sidebars")
-				);
-				$return .= '<span title="'.$pos_title[$pos].'" class="dashicons dashicons-arrow-'.$pos_icon.'-alt"></span>';
-			}
-			
 		}
 		echo $return;
 	}
@@ -510,7 +517,7 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 	public function column_status( $post ) {
 		switch ($post->post_status) {
 			case CAS_App::STATUS_ACTIVE:
-				echo '<strong>'.__( 'Active' ).'</strong>';
+				echo '<strong>'.__( 'Active','content-aware-sidebars').'</strong>';
 				$deactivate_date = get_post_meta($post->ID, CAS_App::META_PREFIX.'deactivate_time',true);
 				if($deactivate_date) {
 					// translators: Sidebar status date format, see http://php.net/date
@@ -536,7 +543,7 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 				echo '<br /><abbr title="' . $t_time . '">' . $h_time . '</abbr>';
 				break;
 			default:
-				_e( 'Inactive' );
+				_e( 'Inactive','content-aware-sidebars');
 				break;
 		}
 	}

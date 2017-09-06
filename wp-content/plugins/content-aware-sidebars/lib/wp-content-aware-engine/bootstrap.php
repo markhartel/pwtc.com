@@ -6,8 +6,6 @@
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
@@ -15,7 +13,7 @@ if (!defined('ABSPATH')) {
  * Version of this WPCA
  * @var string
  */
-$this_wpca_version = '3.2.1';
+$this_wpca_version = '4.1';
 
 /**
  * Class to make sure the latest

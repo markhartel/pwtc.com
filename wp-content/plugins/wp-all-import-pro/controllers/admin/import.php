@@ -1890,7 +1890,7 @@ class PMXI_Admin_Import extends PMXI_Controller_Admin {
 				}
 			}
 			if ('manual' != $post['duplicate_matching'] and '' == $post['unique_key']) {
-				$this->errors->add('form-validation', __('Expression for `Post Unique Key` must be set, use the same expression as specified for post title if you are not sure what to put there', 'wp_all_import_plugin'));
+				$this->errors->add('form-validation', __('Unique ID is currently empty and must be set. If you are not sure what to use as a Unique ID, click Auto-detect.', 'wp_all_import_plugin'));
 			} elseif ('manual' != $post['duplicate_matching']) {
 				$this->_validate_template($post['unique_key'], __('Post Unique Key', 'wp_all_import_plugin'));
 			}			

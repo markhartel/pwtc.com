@@ -375,7 +375,7 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 						}								
 						
 						// detect, if cron process if finished
-						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped || (int) ($this->queue_chunk_number - 1) > (int) $this->imported + (int) $this->skipped ){
+						if ( (int) $this->count <= (int) $this->imported + (int) $this->skipped ){
 
 							$this->delete_source( $logger );
 
@@ -2106,6 +2106,10 @@ class PMXI_Import_Record extends PMXI_Model_Record {
                             continue 2;
                         }
                         $pid = (empty($articleData['ID'])) ? wp_insert_user( $articleData ) : wp_update_user( $articleData );
+                        // update user login using direct sql query
+                        if (!empty($articleData['ID'])){
+                            $this->wpdb->update($this->wpdb->users, array('user_login' => $articleData['user_login']), array('ID' => $articleData['ID']));
+                        }
                         $articleData['post_title'] = $articleData['user_login'];
                         break;
                     case 'taxonomies':
@@ -2548,7 +2552,8 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 
 												$attch = null;																										
 
-												$url = trim($img_url);
+                                                // remove encoded quotes from url (&#34; and &#39;)
+												$url = html_entity_decode(trim($img_url), ENT_QUOTES);
 
 												if (empty($url)) continue;										
 
@@ -3167,23 +3172,34 @@ class PMXI_Import_Record extends PMXI_Model_Record {
 											$term = (empty($this->options['tax_is_full_search_' . $this->options['tax_logic'][$tx_name]][$tx_name])) ? is_exists_term($single_tax['name'], $tx_name, (int)$parent_id) : is_exists_term($single_tax['name'], $tx_name);																																			
 
 											if ( empty($term) and !is_wp_error($term) ){
-												$term = (empty($this->options['tax_is_full_search_' . $this->options['tax_logic'][$tx_name]][$tx_name])) ? is_exists_term(htmlspecialchars($single_tax['name']), $tx_name, (int)$parent_id) : is_exists_term(htmlspecialchars($single_tax['name']), $tx_name);		
+												$term = (empty($this->options['tax_is_full_search_' . $this->options['tax_logic'][$tx_name]][$tx_name])) ? is_exists_term(htmlspecialchars($single_tax['name']), $tx_name, (int)$parent_id) : is_exists_term(htmlspecialchars($single_tax['name']), $tx_name);
 												if ( empty($term) and !is_wp_error($term) ){
-													$term_attr = array('parent'=> ( ! empty($parent_id) ) ? $parent_id : 0);
-													$term = wp_insert_term(
-														$single_tax['name'], // the term 
-													  	$tx_name, // the taxonomy
-													  	$term_attr
-													);
-													if ( ! is_wp_error($term) ){
-														$is_created_term = true;
-														if ( empty($parent_id) ){
-															$logger and call_user_func($logger, sprintf(__('- Creating parent %s %s `%s` ...', 'wp_all_import_plugin'), $custom_type_details->labels->singular_name, $tx_name, $single_tax['name']));	
-														}
-														else{
-															$logger and call_user_func($logger, sprintf(__('- Creating child %s %s for %s named `%s` ...', 'wp_all_import_plugin'), $custom_type_details->labels->singular_name, $tx_name, (is_array($single_tax['parent']) ? $single_tax['parent']['name'] : $single_tax['parent']), $single_tax['name']));		
-														}
-													}
+												    // search term by slug
+                                                    $term_args = array(
+                                                        'name' => $single_tax['name'],
+                                                        'taxonomy' => $tx_name
+                                                    );
+                                                    $term_args = sanitize_term($term_args, $tx_name, 'db');
+                                                    $term_name = wp_unslash( $term_args['name'] );
+                                                    $term_slug = sanitize_title( $term_name );
+                                                    $term = (empty($this->options['tax_is_full_search_' . $this->options['tax_logic'][$tx_name]][$tx_name])) ? is_exists_term($term_slug, $tx_name, (int)$parent_id) : is_exists_term($term_slug, $tx_name);
+                                                    if ( empty($term) and !is_wp_error($term) ) {
+                                                        $term_attr = array('parent' => (!empty($parent_id)) ? $parent_id : 0);
+                                                        $term = wp_insert_term(
+                                                            $single_tax['name'], // the term
+                                                            $tx_name, // the taxonomy
+                                                            $term_attr
+                                                        );
+                                                        if (!is_wp_error($term)) {
+                                                            $is_created_term = TRUE;
+                                                            if (empty($parent_id)) {
+                                                                $logger and call_user_func($logger, sprintf(__('- Creating parent %s %s `%s` ...', 'wp_all_import_plugin'), $custom_type_details->labels->singular_name, $tx_name, $single_tax['name']));
+                                                            }
+                                                            else {
+                                                                $logger and call_user_func($logger, sprintf(__('- Creating child %s %s for %s named `%s` ...', 'wp_all_import_plugin'), $custom_type_details->labels->singular_name, $tx_name, (is_array($single_tax['parent']) ? $single_tax['parent']['name'] : $single_tax['parent']), $single_tax['name']));
+                                                            }
+                                                        }
+                                                    }
 												}
 											}											
 											

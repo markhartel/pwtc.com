@@ -6,9 +6,7 @@
  * @copyright 2017 by Joachim Jensen
  */
 
-if (!defined('CAS_App::PLUGIN_VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -34,8 +32,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			array($this,'remove_sidebar_widgets'));
 		add_action('save_post_'.CAS_App::TYPE_SIDEBAR,
 			array($this,'save_post'),10,2);
-		add_action('wpca/meta_box/before',
-			array($this,'show_description'));
 		add_action('cas/admin/add_meta_boxes',
 			array($this,'create_meta_boxes'));
 
@@ -49,15 +45,12 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		if (cas_fs()->is_not_paying() )  {
 			add_action('wp_ajax_cas_dismiss_review_notice',
 				array($this,'ajax_review_clicked'));
-			add_action('wpca/meta_box/after',
-				array($this,'show_review_link'));
 			add_filter('wpca/modules/list',
 				array($this,'add_to_module_list'),99);
+			add_action( 'admin_enqueue_scripts',
+				array($this,'add_general_scripts_styles'));
 			add_action( 'all_admin_notices',
 				array($this,'admin_notice_review'));
-			add_action( 'admin_enqueue_scripts',
-				array($this,'add_general_scripts_styles')
-			);
 		}
 	}
 
@@ -81,6 +74,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		if(get_post_type() == CAS_App::TYPE_SIDEBAR) {
 			$list[''] = array(
 				'name' =>__('URLs (Pro Feature)','content-aware-sidebars'),
+				'placeholder' => '',
 				'default_value' => ''
 			);
 		}
@@ -96,29 +90,8 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function show_description($post_type) {
 		if($post_type == CAS_App::TYPE_SIDEBAR) {
-			_e('Display this sidebar only on content that meets the following conditions:');
+			_e('Display this sidebar only on content that meets the following conditions:','content-aware-sidebars');
 			echo '<p></p>';
-		}
-	}
-
-	/**
-	 * Render support description
-	 *
-	 * @since  3.3
-	 * @param  string  $post_type
-	 * @return void
-	 */
-	public function show_review_link($post_type) {
-		//$url = cas_fs()->get_upgrade_url();
-		$url = 'https://dev.institute/wordpress/sidebars-pro/pricing/?utm_source=plugin&utm_medium=referral&utm_content=upgrade-bottom&utm_campaign=cas';
-		if($post_type == CAS_App::TYPE_SIDEBAR) {
-			echo '<div style="overflow: hidden; padding: 2px 0px;">';
-			echo '<div style="float:right;"><a href="'.esc_url($url).'" class="button button-cas-upgrade button-small" target="_blank">'.__('Upgrade to Pro','content-aware-sidebars').'</a></div>';
-			echo '<div style="line-height:24px;">';
-			echo '<span class="cas-heart">❤</span> ';
-			printf(__('Like it? %1$sSupport the plugin with a %2$s Review%3$s','content-aware-sidebars'),'<b><a target="_blank" href="https://wordpress.org/support/plugin/content-aware-sidebars/reviews/?rate=5#new-post">','5★','</a></b>');
-			echo '</div>';
-			echo '</div>';
 		}
 	}
 
@@ -235,6 +208,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		$nav_tabs = array(
 			'conditions' => __('Conditions','content-aware-sidebars'),
 			'schedule'   => __('Schedule'),
+			'design'     => __('Design'),
 			'advanced'   => __('Advanced')
 		);
 		$nav_tabs = apply_filters('cas/admin/nav-tabs', $nav_tabs);
@@ -394,7 +368,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 
 		global $nav_tabs, $post, $title, $active_post_lock;
 
-		$post_ID = $post->ID;
 		$post_type_object = get_post_type_object( $post->post_type );
 
 		$message = false;
@@ -415,7 +388,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			$form_extra .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
 		}
 		// else {
-		// 	$autosave = wp_get_post_autosave( $post_ID );
+		// 	$autosave = wp_get_post_autosave( $post->ID );
 		// }
 
 		// Detect if there exists an autosave newer than the post and if that autosave is different than the post
@@ -452,13 +425,13 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		} 
 		echo '<form name="post" action="admin.php?page=wpcas-edit" method="post" id="post">';
 		$referer = wp_get_referer();
-		wp_nonce_field('update-post_' . $post_ID);
+		wp_nonce_field('update-post_' . $post->ID);
 		echo '<input type="hidden" id="user-id" name="user_ID" value="'.(int)get_current_user_id().'" />';
 		echo '<input type="hidden" id="hiddenaction" name="action" value="editpost" />';
 		echo '<input type="hidden" id="post_author" name="post_author" value="'.esc_attr($post->post_author).'" />';
 		echo '<input type="hidden" id="original_post_status" name="original_post_status" value="'.esc_attr( $post->post_status).'" />';
 		echo '<input type="hidden" id="referredby" name="referredby" value="'.($referer ? esc_url( $referer ) : '').'" />';
-		echo '<input type="hidden" id="post_ID" name="sidebar_id" value="'.esc_attr($post_ID).'" />';
+		echo '<input type="hidden" id="post_ID" name="sidebar_id" value="'.esc_attr($post->ID).'" />';
 		if ( ! empty( $active_post_lock ) ) {
 			echo '<input type="hidden" id="active_post_lock" value="'.esc_attr(implode( ':', $active_post_lock )).'" />';
 		}
@@ -683,7 +656,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			array(
 				'content'   => sprintf( '<h3>%s</h3><p>%s</p>',
 					'2. '.__( 'Condition Groups', 'content-aware-sidebars' ),
-					wpautop(__( "Click on the input field and select the content you want.\n\nIf you can't find the right content in the list, type something to search.\n\n You can add several types of content to the same group, try e.g. \"All Posts\" and an Author to target all posts written by that author. Awesome!\n\nRemember to save the changes on each group.", 'content-aware-sidebars' ) )),
+					wpautop(__( "Click on the input field and select the content you want.\n\nIf you can't find the right content in the list, type something to search.\n\n You can add several types of content to the same group, try e.g. \"All Posts\" and an Author to target all posts written by that author. Awesome!", 'content-aware-sidebars' ) )),
 				'ref_id'    => '#cas-groups > ul',
 				'position'  => array(
 					'edge'      => 'top',
@@ -724,42 +697,59 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 
 		$this->create_pointers();
 		CAS_App::instance()->manager()->populate_metadata();
+		$path = plugin_dir_path( __FILE__ ).'../view/';
+
+		$cas_fs = cas_fs();
+
+		add_action('wpca/meta_box/before',
+			array($this,'show_description'));
 
 		$boxes = array();
 		$boxes[] = array(
 			'id'       => 'submitdiv',
 			'title'    => __('Publish'),
-			'callback' => 'meta_box_submit',
+			'view'     => 'submit',
 			'context'  => 'side',
 			'priority' => 'high'
 		);
 		$boxes[] = array(
 			'id'       => 'cas-status',
 			'title'    => __('Sidebar Status', 'content-aware-sidebars'),
-			'callback' => 'meta_box_status',
+			'view'     => 'status',
 			'context'  => 'section-schedule',
+			'priority' => 'default'
+		);
+		$boxes[] = array(
+			'id'       => 'cas-widget-html',
+			'title'    => __('Layout', 'content-aware-sidebars'),
+			'view'     => 'html',
+			'context'  => 'section-design',
 			'priority' => 'default'
 		);
 		$boxes[] = array(
 			'id'       => 'cas-advanced',
 			'title'    => __('Advanced', 'content-aware-sidebars'),
-			'callback' => 'meta_box_advanced',
+			'view'     => 'advanced',
 			'context'  => 'section-advanced',
 			'priority' => 'default'
 		);
 
-		if ( cas_fs()->is_not_paying() ) {
+		if ( $cas_fs->is_not_paying() ) {
+			$view = $template = WPCAView::make($path.'conditions_after.php');
+			add_action('wpca/meta_box/after',
+				array($view,'render'));
+
 			$boxes[] = array(
 				'id'       => 'cas-plugin-links',
 				'title'    => __('Content Aware Sidebars', 'content-aware-sidebars'),
-				'callback' => 'meta_box_support',
+				'view'     => 'support',
 				'context'  => 'side',
 				'priority' => 'default'
 			);
 			$boxes[] = array(
 				'id'       => 'cas-schedule',
 				'title'    => __('Time Schedule', 'content-aware-sidebars'),
-				'callback' => 'meta_box_schedule',
+				'view'     => 'schedule',
 				'context'  => 'section-schedule',
 				'priority' => 'default'
 			);
@@ -776,10 +766,18 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 
 		//Add meta boxes
 		foreach($boxes as $box) {
+			if(isset($box['view'])) {
+				$view = $template = WPCAView::make($path.'meta_box_'.$box['view'].'.php',array(
+					'post'=> $post
+				));
+				$callback = array($view,'render');
+			} else {
+				$callback = array($this, $box['callback']);
+			}
 			add_meta_box(
 				$box['id'],
 				$box['title'],
-				array($this, $box['callback']),
+				$callback,
 				CAS_App::BASE_SCREEN.'-edit',
 				$box['context'],
 				$box['priority']
@@ -801,106 +799,14 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 * @return void
 	 */
 	public function admin_notice_review() {
-
 		$has_reviewed = get_user_option(CAS_App::META_PREFIX.'cas_review');
-		if($has_reviewed === false) {
-			$tour_taken = (int) $this->_tour_manager->get_user_option();
-			if($tour_taken && (time() - $tour_taken) >= WEEK_IN_SECONDS) {
-				$current_user = wp_get_current_user();
-				//updated class for wp4.0 and below
-				echo '<div class="notice notice-success updated js-cas-notice-review">';
-				echo '<p>';
-				printf(__("Hey %s, it's Joachim from %s. You have used this free plugin for some time now, and I hope you like it!",'content-aware-sidebars'),
-					'<strong>'.$current_user->display_name.'</strong>',
-					'<strong>Content Aware Sidebars</strong>'
-				);
-				echo '<br>';
-				printf(__("I have spent countless hours developing it, and it would mean a lot to me if you %ssupport it with a quick review on WordPress.org.%s",'content-aware-sidebars'),
-					'<strong><a target="_blank" href="https://wordpress.org/support/plugin/content-aware-sidebars/reviews/?rate=5#new-post">',
-					'</a></strong>'
-				);
-				echo '</p>';
-				echo '<p><a target="_blank" class="button-primary" href="https://wordpress.org/support/plugin/content-aware-sidebars/reviews/?rate=5#new-post">'.__('Review Content Aware Sidebars','content-aware-sidebars').'</a> <button class="button-secondary">'.__("No thanks",'content-aware-sidebars').'</button></p>';
-				echo '</div>';
-			}
+		$tour_taken = (int) $this->_tour_manager->get_user_option();
+		if($has_reviewed === false && $tour_taken && (time() - $tour_taken) >= WEEK_IN_SECONDS) {
+			$path = plugin_dir_path( __FILE__ ).'../view/';
+			$view = WPCAView::make($path.'notice_review.php',array(
+				'current_user' => wp_get_current_user()
+			))->render();
 		}
-	}
-
-	public function meta_box_status($post) {
-		$activate_date = $post->post_status == CAS_App::STATUS_SCHEDULED ? $post->post_date : '';
-		$deactivate_date = get_post_meta($post->ID, CAS_App::META_PREFIX.'deactivate_time',true);
-
-		echo '<table class="form-table cas-form-table" width="100%"><tbody>';
-		echo '<tr><td scope="row">'.__("Status",'content-aware-sidebars').'</td>';
-		echo '<td>';
-		echo '<label class="cae-toggle">';
-		echo '<input class="js-cas-status" type="checkbox" name="post_status" value="'.CAS_App::STATUS_ACTIVE.'" '.checked( in_array($post->post_status,array(CAS_App::STATUS_ACTIVE,'auto-draft')),true,false).' />';
-		echo '<div class="cae-toggle-bar"></div></label>';
-		echo '</td></tr>';
-
-		echo '<tr><td scope="row">'.__("Activate",'content-aware-sidebars').'</td>';
-		echo '<td>';
-		echo '<span class="js-cas-activation">';
-		echo '<input type="text" name="sidebar_activate" value="'.$activate_date.'" data-input placeholder="'.esc_attr__('Select date','content-aware-sidebars').'">';
-		echo '<button type="button" class="button button-small" data-toggle><span class="dashicons dashicons-calendar"></span></button>';
-		echo '<button type="button" class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></button>';
-		echo '</span>';
-		echo '</td></tr>';
-
-		echo '<tr><td scope="row">'.__("Deactivate",'content-aware-sidebars').'</td>';
-		echo '<td>';
-		echo '<span class="js-cas-expiry">';
-		echo '<input type="text" name="sidebar_deactivate" value="'.$deactivate_date.'" data-input placeholder="'.esc_attr__('Never','content-aware-sidebars').'">';
-		echo '<button type="button" class="button button-small" data-toggle><span class="dashicons dashicons-calendar"></span></button>';
-		echo '<button type="button" class="button button-small" data-clear><span class="dashicons dashicons-no-alt"></span></button>';
-		echo '</span>';
-		echo '</td></tr>';
-
-		echo '</tbody></table>';
-
-	}
-
-	public function meta_box_schedule($post) {
-		global $wp_locale;
-
-		echo '<p>'.__('Display sidebar only in given time ranges on select days.').' <span class="cas-pro-label">'.__('Pro','content-aware-sidebars').'</span></p>';
-		echo '<div>';
-
-		$i = $start = get_option('start_of_week',0);
-		$count = count($wp_locale->weekday);
-		$days = array_values($wp_locale->weekday);
-		do {
-			echo '<div>';
-			echo '<label>';
-			echo '<input type="checkbox" class="js-cas-pro-notice" data-url="https://dev.institute/wordpress/sidebars-pro/pricing/?utm_source=plugin&utm_medium=popup&utm_content=time-schedule&utm_campaign=cas" /> '.ucfirst($days[$i]).' (8:00 - 17:00)';
-			echo '</label>';
-			echo '<div class="cas-schedule-slide ui-slider ui-slider-horizontal ui-state-disabled ui-slider-disabled">';
-			echo '<div class="ui-slider-range" style="left: 30%; width: 40%;"></div>';
-			echo '<span class="ui-slider-handle ui-state-default" style="left: 30%;"></span>';
-			echo '<span class="ui-slider-handle ui-state-default" style="left: 70%;"></span>';
-			echo '</div>';
-			echo '</div>';
-			$i = ($i + 1) % $count;
-		} while($i != $start);
-		echo '</div>';
-	}
-
-	public function meta_box_advanced($post) {
-		echo '<div>';
-		echo '<strong>'.__('Order').'</strong>';
-		echo '<p><label for="menu_order" class="screen-reader-text">'.__('Order').'</label>';
-		echo '<input type="number" value="'.$post->menu_order.'" id="menu_order" size="4" name="menu_order"></p></div>';
-
-		if ( current_user_can( "delete_post", $post->ID ) ) {
-			echo '<div style="overflow:hidden;">';
-			if ( !EMPTY_TRASH_DAYS )
-				$delete_text = __('Delete Permanently');
-			else
-				$delete_text = __('Move to Trash');
-
-			echo '<a class="wpca-pull-right cas-delete" href="'.get_delete_post_link($post->ID).'">'.$delete_text.'</a>';
-			echo '</div>';
-		} 
 	}
 
 	/**
@@ -931,118 +837,13 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		$visibility = CAS_App::instance()->manager()->metadata()->get('visibility');
 
 		echo '<span>';
-		echo '<strong>'.__('Visibility').'</strong>';
-		echo '<p><label for="visibility" class="screen-reader-text">'.__('Visibility').'</label>';
+		echo '<strong>'.__('Visibility','content-aware-sidebars').'</strong>';
+		echo '<p><label for="visibility" class="screen-reader-text">'.__('Visibility','content-aware-sidebars').'</label>';
 
 		echo '<div><select style="width:250px;" class="js-cas-visibility" multiple="multiple"  name="visibility[]" data-value="'.implode(",", $visibility->get_data($post->ID,true,false)).'"></select></div>';
 		
 		echo '</p></span>';
 
-	}
-
-	/**
-	 * Meta box for info and support
-	 *
-	 * @since  3.0
-	 * @return void 
-	 */
-	public function meta_box_support() {
-		$locale = get_locale();
-?>
-			<div style="overflow:hidden;">
-				<ul>
-<?php if($locale != "en_US") : ?>
-					<li><a href="https://translate.wordpress.org/projects/wp-plugins/content-aware-sidebars" target="_blank"><?php _e('Translate the plugin into your language','content-aware-sidebars'); ?></a></li>
-<?php endif; ?>
-					<li><a href="https://dev.institute/docs/content-aware-sidebars/?utm_source=plugin&amp;utm_medium=referral&amp;utm_content=info-box&amp;utm_campaign=cas" target="_blank"><?php _e('Documentation','content-aware-sidebars'); ?></a></li>
-					<li><a href="https://dev.institute/docs/content-aware-sidebars/getting-started/?utm_source=plugin&amp;utm_medium=referral&amp;utm_content=info-box&amp;utm_campaign=cas" target="_blank"><?php _e('Get Started','content-aware-sidebars'); ?></a></li>
-					<li><a href="https://dev.institute/docs/content-aware-sidebars/faq/?utm_source=plugin&amp;utm_medium=referral&amp;utm_content=info-box&amp;utm_campaign=cas" target="_blank"><?php _e('FAQ','content-aware-sidebars'); ?></a></li>
-					<!--<li><a href="<?php echo esc_url(cas_fs()->get_upgrade_url()); ?>"><?php _e('Priority Email Support','content-aware-sidebars'); ?></a></li>-->
-					<li><a href="https://wordpress.org/support/plugin/content-aware-sidebars/" target="_blank"><?php _e('Forum Support','content-aware-sidebars'); ?></a></li>
-				</ul>
-			</div>
-		<?php
-	}
-	
-	/**
-	 * Meta box to submit form fields
-	 * Overwrites default meta box
-	 *
-	 * @see function post_submit_meta_box
-	 *
-	 * @since  3.2
-	 * @param  WP_Post  $post
-	 * @param  array    $args
-	 * @return void
-	 */
-	public function meta_box_submit( $post, $args = array() ) {
-
-?>
-
-	<div class="cas-save">
-
-	<div class="wpca-pull-right">
-	<?php
-	if ( $post->post_status == 'auto-draft' ) {
-		submit_button( __( 'Save' ), 'primary button-large', 'publish', false );
-	} else {
-		submit_button( __( 'Update' ), 'primary button-large', 'save', false );
-	} ?>
-	</div>
-	</div>
-	<ul class="cas-overview-actions">
-	<li><span class="dashicons dashicons-post-status"></span> <?php _e("Status:"); ?>
-	<strong>
-	<?php
-
-	/* translators: Publish box date format, see http://php.net/date */
-	$datef = __( 'M j, Y' );
-	$date = date_i18n( $datef, strtotime( $post->post_date ) );
-
-	switch ($post->post_status) {
-		case CAS_App::STATUS_SCHEDULED:
-			$stamp = __('Activates on <b>%1$s</b>');
-			break;
-		case CAS_App::STATUS_ACTIVE:
-			$stamp = __('Active');
-			break;
-		case CAS_App::STATUS_INACTIVE:
-			$stamp = __('Inactive');
-			break;
-		default:
-			$stamp = __('New');
-			$date = date_i18n( $datef, strtotime( current_time('mysql') ) );
-			break;
-	}
-
-	printf($stamp,$date);
-	echo '</strong> <a class="js-nav-link" href="#top#section-schedule">'.__('Edit').'</a>';
-
-	if ( post_type_supports($post->post_type, 'revisions') ) {
-		$revisions = wp_get_post_revisions( $post->ID );
-		$revision_count = count($revisions);
-		reset( $revisions ); // Reset pointer for key()
-		$revision_id = key( $revisions );
- ?>
-			<li><span class="dashicons dashicons-backup"></span>
-				<?php printf( __( 'Widget Revisions: %s', 'content-aware-sidebars' ), '<b>' . number_format_i18n( $revision_count ) . '</b>' ); ?>
-				<a class="hide-if-no-js" href="<?php echo esc_url( get_edit_post_link( $revision_id ) ); ?>" title="<?php esc_attr_e( 'Browse revisions' ); ?>"><?php _ex( 'Browse', 'revisions' ); ?></a>
-			</li>
-			<?php
-		
-	} elseif (cas_fs()->is_not_paying() ) {
-?>
-		<li><span class="dashicons dashicons-backup"></span>
-			<?php printf( __( 'Widget Revisions: %s', 'content-aware-sidebars' ), '<b>0</b>' );
-			echo ' <b><a href="'.esc_url(cas_fs()->get_upgrade_url()).'">'.__( 'Enable').'</a></b>'; ?>
-		</li>
-		<?php
-	}
-?>
-
-	</ul>
-
-	<?php
 	}
 
 	/**
@@ -1281,7 +1082,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 
 		WPCACore::enqueue_scripts_styles('');
 
-		wp_register_script('flatpickr', plugins_url('../js/flatpickr.min.js', __FILE__), array(), '2.3.4', false);
+		wp_register_script('flatpickr', plugins_url('../js/flatpickr.min.js', __FILE__), array(), '3.0.6', false);
 
 		wp_register_script('cas/admin/edit', plugins_url('../js/cas_admin.min.js', __FILE__), array('jquery','flatpickr'), CAS_App::PLUGIN_VERSION, false);
 		

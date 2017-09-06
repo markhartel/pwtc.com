@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -73,22 +71,6 @@ class WPCAModule_wpml extends WPCAModule_Base {
 			$langs = array_intersect_key($langs,array_flip($args['include']));
 		}
 		return $langs;
-	}
-
-	/**
-	 * Get content in JSON
-	 *
-	 * @since  2.0
-	 * @param  array  $args
-	 * @return array
-	 */
-	public function ajax_get_content($args) {
-		$args = wp_parse_args($args, array(
-			'paged'          => 1,
-			'search'         => ''
-		));
-
-		return $this->_get_content($args);
 	}
 
 }

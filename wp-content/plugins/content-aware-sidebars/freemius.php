@@ -6,13 +6,9 @@
  * @license GPLv3
  * @copyright 2017 by Joachim Jensen
  */
-
-if ( !defined( 'CAS_App::PLUGIN_VERSION' ) ) {
-    header( 'Status: 403 Forbidden' );
-    header( 'HTTP/1.1 403 Forbidden' );
+if ( !defined( 'ABSPATH' ) ) {
     die;
 }
-
 // Create a helper function for easy SDK access.
 function cas_fs()
 {
@@ -64,18 +60,8 @@ function cas_fs_connect_message_update(
     );
 }
 
-$cas_fs->add_filter(
-    'connect_message_on_update',
-    'cas_fs_connect_message_update',
-    10,
-    6
-);
-$cas_fs->add_filter(
-    'connect_message',
-    'cas_fs_connect_message_update',
-    10,
-    6
-);
+// $cas_fs->add_filter('connect_message_on_update', 'cas_fs_connect_message_update', 10, 6);
+// $cas_fs->add_filter('connect_message', 'cas_fs_connect_message_update', 10, 6);
 function cas_fs_upgrade()
 {
     global  $cas_fs ;

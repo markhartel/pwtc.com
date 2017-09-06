@@ -68,23 +68,33 @@
 	<div class="options_group">
 		
 		<p class="form-field"><?php _e('Catalog visibility','wpai_woocommerce_addon_plugin');?></p>
-		
-		<p class="form-field wpallimport-radio-field">
-			<input type="radio" id="product_visibility_visible" class="switcher" name="is_product_visibility" value="visible" <?php echo 'visible' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
-			<label for="product_visibility_visible"><?php _e("Catalog/search", "wpai_woocommerce_addon_plugin"); ?></label>
-		</p>
-		<p class="form-field wpallimport-radio-field">
-			<input type="radio" id="product_visibility_catalog" class="switcher" name="is_product_visibility" value="catalog" <?php echo 'catalog' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
-			<label for="product_visibility_catalog"><?php _e("Catalog", "wpai_woocommerce_addon_plugin"); ?></label>
-		</p>
-		<p class="form-field wpallimport-radio-field">
-			<input type="radio" id="product_visibility_search" class="switcher" name="is_product_visibility" value="search" <?php echo 'search' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
-			<label for="product_visibility_search"><?php _e("Search", "wpai_woocommerce_addon_plugin"); ?></label>
-		</p>
-		<p class="form-field wpallimport-radio-field">
-			<input type="radio" id="product_visibility_hidden" class="switcher" name="is_product_visibility" value="hidden" <?php echo 'hidden' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
-			<label for="product_visibility_hidden"><?php _e("Hidden", "wpai_woocommerce_addon_plugin"); ?></label>
-		</p>
+
+		<?php if (function_exists('wc_get_product_visibility_options')): ?>
+			<?php $visibility_options = wc_get_product_visibility_options();?>
+			<?php foreach ($visibility_options as $visibility_option_key => $visibility_option_name):?>
+			<p class="form-field wpallimport-radio-field">
+				<input type="radio" id="product_visibility_<?php echo $visibility_option_key;?>" class="switcher" name="is_product_visibility" value="<?php echo $visibility_option_key; ?>" <?php echo $post['is_product_visibility'] == $visibility_option_key ? 'checked="checked"': '' ?>/>
+				<label for="product_visibility_<?php echo $visibility_option_key;?>"><?php echo $visibility_option_name; ?></label>
+			</p>
+			<?php endforeach; ?>
+		<?php else: ?>
+			<p class="form-field wpallimport-radio-field">
+				<input type="radio" id="product_visibility_visible" class="switcher" name="is_product_visibility" value="visible" <?php echo 'visible' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
+				<label for="product_visibility_visible"><?php _e("Catalog/search", "wpai_woocommerce_addon_plugin"); ?></label>
+			</p>
+			<p class="form-field wpallimport-radio-field">
+				<input type="radio" id="product_visibility_catalog" class="switcher" name="is_product_visibility" value="catalog" <?php echo 'catalog' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
+				<label for="product_visibility_catalog"><?php _e("Catalog", "wpai_woocommerce_addon_plugin"); ?></label>
+			</p>
+			<p class="form-field wpallimport-radio-field">
+				<input type="radio" id="product_visibility_search" class="switcher" name="is_product_visibility" value="search" <?php echo 'search' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
+				<label for="product_visibility_search"><?php _e("Search", "wpai_woocommerce_addon_plugin"); ?></label>
+			</p>
+			<p class="form-field wpallimport-radio-field">
+				<input type="radio" id="product_visibility_hidden" class="switcher" name="is_product_visibility" value="hidden" <?php echo 'hidden' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
+				<label for="product_visibility_hidden"><?php _e("Hidden", "wpai_woocommerce_addon_plugin"); ?></label>
+			</p>
+		<?php endif; ?>
 		<div class="form-field wpallimport-radio-field">
 			<input type="radio" id="product_visibility_xpath" class="switcher" name="is_product_visibility" value="xpath" <?php echo 'xpath' == $post['is_product_visibility'] ? 'checked="checked"': '' ?>/>
 			<label for="product_visibility_xpath"><?php _e('Set with XPath', 'wpai_woocommerce_addon_plugin' )?></label>

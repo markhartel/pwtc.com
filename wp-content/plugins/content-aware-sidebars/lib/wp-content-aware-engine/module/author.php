@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -27,7 +25,7 @@ class WPCAModule_author extends WPCAModule_Base {
 	 */
 	public function __construct() {
 		parent::__construct('author',__('Authors',WPCA_DOMAIN));
-		$this->placeholder = __("All Authors",WPCA_DOMAIN);
+		$this->placeholder = __('All Authors',WPCA_DOMAIN);
 		$this->default_value = $this->id;
 	}
 	
@@ -64,11 +62,19 @@ class WPCAModule_author extends WPCAModule_Base {
 	 * @return array
 	 */
 	protected function _get_content($args = array()) {
+		$args = wp_parse_args($args, array(
+			'number'  => 20,
+			'fields'  => array('ID','display_name'),
+			'orderby' => 'display_name',
+			'order'   => 'ASC',
+			'paged'   => 1,
+			'search'  => '',
+			'include' => ''
+		));
+		$args['offset'] = ($args['paged']-1)*$args['number'];
+		unset($args['paged']);
 
-		$args['number'] = 20;
-		$args['fields'] = array('ID','display_name');
-
-		if(isset($args['search']) && $args['search']) {
+		if($args['search']) {
 			$args['search'] = '*'.$args['search'].'*';
 			//display_name does not seem to be recognized, add it anyway
 			$args['search_columns'] = array( 'user_nicename', 'user_login', 'display_name' );
@@ -85,28 +91,6 @@ class WPCAModule_author extends WPCAModule_Base {
 			}
 		}
 		return $author_list;
-	}
-
-	/**
-	 * Get content in JSON
-	 *
-	 * @since   1.0
-	 * @param   array    $args
-	 * @return  array
-	 */
-	public function ajax_get_content($args) {
-		$args = wp_parse_args($args, array(
-			'item_object'    => '',
-			'paged'          => 1,
-			'search'         => ''
-		));
-
-		return $this->_get_content(array(
-			'orderby'   => 'display_name',
-			'order'     => 'ASC',
-			'offset'    => ($args['paged']-1)*20,
-			'search'    => $args['search']
-		));
 	}
 
 	/**

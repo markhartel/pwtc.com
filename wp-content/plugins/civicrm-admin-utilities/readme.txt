@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: civicrm, admin, utility, styling, menu
 Requires at least: 3.9
 Tested up to: 4.7
-Stable tag: 0.2.7
+Stable tag: 0.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ This plugin requires a minimum of *WordPress 3.9* and *CiviCRM 4.6-alpha1*. For 
 
 
 == Changelog ==
+
+= 0.2.8 =
+
+Remove install notice from subsites when restricting CiviCRM to main site only
 
 = 0.2.7 =
 

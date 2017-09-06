@@ -3,7 +3,7 @@
 Plugin Name: WP All Import Pro
 Plugin URI: http://www.wpallimport.com/
 Description: The most powerful solution for importing XML and CSV files to WordPress. Import to Posts, Pages, and Custom Post Types. Support for imports that run on a schedule, ability to update existing imports, and much more.
-Version: 4.4.6
+Version: 4.4.8
 Author: Soflyy
 */
 
@@ -31,7 +31,7 @@ if ( is_plugin_active('wp-all-import/plugin.php') ){
 }
 else {
 
-	define('PMXI_VERSION', '4.4.6');
+	define('PMXI_VERSION', '4.4.8');
 
 	define('PMXI_EDITION', 'paid');
 
@@ -136,6 +136,8 @@ else {
 		public static $csv_path = false;
 
 		public static $capabilities = 'manage_options';
+
+		public static $cache_key = '';
 
 		/**
 		 * WP All Import logs folder
@@ -262,6 +264,10 @@ else {
 				require_once $filePath;
 			}
 
+			$plugin_basename = plugin_basename( __FILE__ );
+
+			self::$cache_key = md5( 'edd_plugin_' . sanitize_key( $plugin_basename ) . '_version_info' );
+
 			// init plugin options
 			$option_name = get_class($this) . '_Options';
 			$options_default = PMXI_Config::createFromFile(self::ROOT_DIR . '/config/options.php')->toArray();
@@ -291,7 +297,7 @@ else {
 			}
 
 			// add custom message when PRO not activated but update available
-			add_action('in_plugin_update_message-' . plugin_basename( __FILE__ ), array($this, 'in_plugin_update_message'), 10, 2 );
+			//add_action('in_plugin_update_message-' . plugin_basename( __FILE__ ), array($this, 'in_plugin_update_message'), 10, 2 );
 
 			// register filter handlers
 			if (is_dir(self::ROOT_DIR . '/filters')) foreach (PMXI_Helper::safe_glob(self::ROOT_DIR . '/filters/*.php', PMXI_Helper::GLOB_RECURSE | PMXI_Helper::GLOB_PATH) as $filePath) {
@@ -331,9 +337,9 @@ else {
 				return;
 			}
 
-			$m = __('To enable updates, please enter your license key on the <a href="%s">Licenses</a> page. If you don\'t have a licence key, please see <a href="%s">details & pricing</a>', 'wpallimport-plugin');
+			$m = __('<strong>A valid license is required to enable updates - enter your license key on the <a href="%s">Licenses</a> page.</strong> If you don\'t have a licence key, please see <a href="%s">details & pricing</a>. If you do have a license key, you can access it at the <a href="%s">customer portal</a>.', 'wp_all_import_plugin');
 
-			echo '<br />' . sprintf( $m, admin_url('admin.php?page=pmxi-admin-settings'), 'http://www.wpallimport.com/order-now/');
+			echo '<br />' . sprintf( $m, admin_url('admin.php?page=pmxi-admin-settings'), 'http://www.wpallimport.com/order-now/', 'http://www.wpallimport.com/portal/');
 		}
 
 		/**
@@ -343,9 +349,17 @@ else {
 		public function fix_options(){
 
 			global $wpdb;
+
 			$installed_ver = get_option( "wp_all_import_db_version" );
 
 			if ( $installed_ver == PMXI_VERSION ) return true;
+
+			delete_transient(PMXI_Plugin::$cache_key);
+
+			$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", 'wp-all-import-pro_' . PMXI_Plugin::$cache_key) );
+			$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", 'wp-all-import-pro_timeout_' . PMXI_Plugin::$cache_key) );
+
+			delete_site_transient('update_plugins');
 
 			$imports = new PMXI_Import_List();
 			$post    = new PMXI_Post_Record();
@@ -777,6 +791,13 @@ else {
 			require self::ROOT_DIR . '/schema.php';
 			global $wpdb;
 
+			delete_transient(PMXI_Plugin::$cache_key);
+
+			$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", 'wp-all-import-pro_' . PMXI_Plugin::$cache_key) );
+			$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name = %s", 'wp-all-import-pro_timeout_' . PMXI_Plugin::$cache_key) );
+
+			delete_site_transient('update_plugins');
+
 			if (function_exists('is_multisite') && is_multisite()) {
 		        // check if it is a network activation - if so, run the activation function for each blog id
 		        if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1)) {
@@ -1103,6 +1124,7 @@ else {
 				'scheduled_period' => '',
 				'friendly_name' => '',
 				'records_per_request' => 20,
+				'auto_records_per_request' => 1,
 				'auto_rename_images' => 0,
 				'auto_rename_images_suffix' => '',
 				'images_name' => 'filename',
@@ -1126,6 +1148,8 @@ else {
 				'is_fast_mode' => 0,
 				'chuncking' => 1,
 				'import_processing' => 'ajax',
+				'processing_iteration_logic' => 'auto',
+				'records_per_request_detected' => 0,
 				'save_template_as' => 0,
 
 				'title' => '',
@@ -1178,7 +1202,8 @@ else {
 				'taxonomy_type' => '',
 				'taxonomy_parent' => '',
 				'taxonomy_slug' => 'auto',
-				'taxonomy_slug_xpath' => ''
+				'taxonomy_slug_xpath' => '',
+				'import_img_tags' => 1
 			);
 		}
 
