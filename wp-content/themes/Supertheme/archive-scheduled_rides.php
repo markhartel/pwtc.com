@@ -16,11 +16,14 @@ $data = require_once __DIR__ . '/app/bootstrap-theme.php';
 // note that current date is refering to the selected month not the current date.
 // if none is selected it will default to the current date
 
-// get current month
-$current_datetime = new DateTime(date('F'),  new \DateTimeZone(supertheme_get_timezone_string()));
+// get timezone
+$timezone = new \DateTimeZone(supertheme_get_timezone_string());
+
+// get current month (use WP 'current_time' function to return local time instead of UTC time)
+$current_datetime = new DateTime(date('Y-m-01', current_time('timestamp')), $timezone);
 $data['invalid_date'] = false;
 if(isset($_GET['month']) && $_GET['month']) {
-    $valid_date = DateTime::createFromFormat('F-d', $_GET['month'].'-01');
+    $valid_date = DateTime::createFromFormat('Y-m-d', $_GET['month'].'-01');
     if (!$valid_date) {
         $data['invalid_date'] = true;
     } else {
@@ -28,31 +31,44 @@ if(isset($_GET['month']) && $_GET['month']) {
     }
 }
 
+// get current time
+$now_datetime = new DateTime(null, $timezone);
+
 // get the first and last days of the selected month so we can get the previous/next month by adding or subtracting one day
 // using months would add/suntract 31 days which would cause issues for february
 // we will also need these to fill the calendar with the dates of the other months
-$current_first_day = new DateTime($current_datetime->format('F').' 1st');
-$current_last_day = new DateTime($current_datetime->format('F t'));
-$previous_month_datetime = $current_first_day->sub(new DateInterval('P1D'));
-$next_month_datetime = $current_last_day->add(new DateInterval('P1D'));
+$current_first_day = new DateTime($current_datetime->format('Y-m').'-01', $timezone);
+$current_last_day = new DateTime($current_datetime->format('Y-m-t'), $timezone);
+
+// clone the first day of the month and subtract one day to get the previous month
+$previous_month_datetime = clone $current_first_day;
+$previous_month_datetime->sub(new DateInterval('P1D'));
+
+// clone the last day of the month and add one day to get the next month
+$next_month_datetime = clone $current_last_day;
+$next_month_datetime->add(new DateInterval('P1D'));
 
 // set some data for twig
 $data['month_current'] = $current_datetime->format('F');
 $data['year_current'] = $current_datetime->format('Y');
 $data['month_previous'] = $previous_month_datetime->format('F');
+$data['month_previous_val'] = $previous_month_datetime->format('Y-m');
 $data['month_next'] = $next_month_datetime->format('F');
-$data['month_current_numeric'] = $current_datetime ->format('n');
+$data['month_next_val'] = $next_month_datetime->format('Y-m');
+$data['month_current_numeric'] = $current_datetime->format('Ym');
+$data['month_now_numeric'] = $now_datetime->format('Ym');
 
+// clone the first day of the month and subtract days to retard it to the previous Sunday
+$calendar_start_datetime = clone $current_first_day;
+$calendar_start_datetime->sub(new DateInterval('P'.$current_first_day->format('w').'D'));
 
-// get the first and last days for the calendar
-$calendar_start_datetime = $current_first_day->sub(new DateInterval('P'.$current_first_day->format('w').'D'));
-$calendar_end_datetime = $current_last_day->add(new DateInterval('P'.(6-$current_last_day->format('w')).'D'));
+// clone the last day of the month and add days to advance it to the next Saturday
+$calendar_end_datetime = clone $current_last_day;
+$calendar_end_datetime->add(new DateInterval('P'.(6-$current_last_day->format('w')).'D'));
 
-// create values to build the calandar array
-$now_datetime = new DateTime(null,  new \DateTimeZone(supertheme_get_timezone_string()));
-$loop_datetime = $current_first_day;
-$loop_until_datetime = $current_last_day->add(new DateInterval('P1D'));
-$current_last_day->sub(new DateInterval('P1D'));
+// create start and end dates to build the calandar array
+$loop_datetime = clone $calendar_start_datetime;
+$loop_until_datetime = clone $calendar_end_datetime;
 
 // get all the scheduled events in the time range
 $data['args'] = [
@@ -69,7 +85,7 @@ $query_args = [
     'meta_query' => [
         [
             'key' => 'date',
-            'value' =>  [$loop_datetime->format('Y-m-d 00:00:00'), $loop_until_datetime->format('Y-m-d 00:00:00')],
+            'value' =>  [$loop_datetime->format('Y-m-d 00:00:00'), $loop_until_datetime->format('Y-m-d 23:59:59')],
             'compare' => 'BETWEEN',
             'type' => 'DATETIME'
         ],
