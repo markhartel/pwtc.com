@@ -9,10 +9,10 @@
 
             {% block months %}
                 <div class="clearfix">
-                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_previous }}" class="button float-left">
+                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_previous_val }}" class="button float-left">
                         <i class="fa fa-chevron-left"></i> {{ month_previous }}
                     </a>
-                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_next }}" class="button float-right">
+                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_next_val }}" class="button float-right">
                         {{ month_next }}
                         <i class="fa fa-chevron-right"></i>
                     </a>
@@ -78,10 +78,10 @@
                 </li>
             </ul>
 
-            {% if month_current_numeric == 'now'|date('n') %}
+            {% if month_current_numeric == month_now_numeric %}
                 <a href="#" class="dark button hide-for-medium toggle-previous-days">Show Hidden Days</a>
             {% endif %}
-            <div class="rides-calendar {% if month_current_numeric < 'now'|date('n') %}previous{% endif %}">
+            <div class="rides-calendar {% if month_current_numeric < month_now_numeric %}previous{% endif %}">
                 {% for week in calendar|batch(7, false) %}
                     <div class="week header">
                         {% for day in week %}
