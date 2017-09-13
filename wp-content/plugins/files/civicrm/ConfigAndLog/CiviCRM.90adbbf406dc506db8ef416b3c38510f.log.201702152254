@@ -1,0 +1,356 @@
+Jan 18 13:36:49  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:36:49  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:37:46  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:37:46  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:37:55  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:37:55  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:48:18  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:48:18  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:48:40  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:48:40  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:48:59  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:48:59  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:49:33  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:49:33  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:54:59  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:54:59  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 18 13:55:25  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 18 13:55:25  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 19 19:32:04  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 19 19:32:04  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 19 19:32:12  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 19 19:32:12  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 19 19:33:41  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.&lt;br /&gt;&lt;br /&gt;Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.&lt;br /&gt;&lt;br /&gt;Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Jan 19 19:33:41  [info] $backTrace = #0 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Error.php(371): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(833): CRM_Core_Error::fatal("We can't load the requested web page. This page requires cookies to be enable...")
+#2 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(853): CRM_Core_Controller->invalidKeyCommon()
+#3 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(74): CRM_Core_Controller->invalidKeyRedirect()
+#4 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(312): CRM_Contribute_Controller_Contribution->invalidKey()
+#5 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Controller.php(204): CRM_Core_Controller->key("CRM_Contribute_Controller_Contribution", TRUE, FALSE)
+#6 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Contribute\Controller\Contribution.php(55): CRM_Core_Controller->__construct("CiviContribute", "null")
+#7 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(307): CRM_Contribute_Controller_Contribution->__construct("CiviContribute", TRUE, "null", NULL, "false")
+#8 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(86): CRM_Core_Invoke::runItem((Array:15))
+#9 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\CRM\Core\Invoke.php(54): CRM_Core_Invoke::_invoke((Array:3))
+#10 C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm.php(1227): CRM_Core_Invoke::invoke((Array:3))
+#11 [internal function](): CiviCRM_For_WordPress->invoke(Object(WP))
+#12 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(298): call_user_func_array((Array:2), (Array:1))
+#13 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp-hook.php(323): WP_Hook->apply_filters("", (Array:1))
+#14 C:\xampp5.6\htdocs\pwtc.com\wp-includes\plugin.php(515): WP_Hook->do_action((Array:1))
+#15 C:\xampp5.6\htdocs\pwtc.com\wp-includes\class-wp.php(746): do_action_ref_array("wp", (Array:1))
+#16 C:\xampp5.6\htdocs\pwtc.com\wp-includes\functions.php(955): WP->main("")
+#17 C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php(16): wp()
+#18 C:\xampp5.6\htdocs\pwtc.com\index.php(17): require("C:\xampp5.6\htdocs\pwtc.com\wp-blog-header.php")
+#19 {main}
+
+
+Jan 19 19:34:40  [info] Contribution record updated successfully
+
+Jan 19 19:34:41  [info] Outbound mail has been disabled. Click <a href='http://localhost:8056/pwtc.com/civicrm/?page=CiviCRM&amp;q=civicrm/admin/setting/smtp&amp;reset=1'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.
+
+Jan 19 19:34:41  [info] Receipt sent
+
+Jan 19 19:34:41  [info] Success: Database updated
+

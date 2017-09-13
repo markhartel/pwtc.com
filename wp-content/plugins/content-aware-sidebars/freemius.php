@@ -4,15 +4,11 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
-
-if ( !defined( 'CAS_App::PLUGIN_VERSION' ) ) {
-    header( 'Status: 403 Forbidden' );
-    header( 'HTTP/1.1 403 Forbidden' );
+if ( !defined( 'ABSPATH' ) ) {
     die;
 }
-
 // Create a helper function for easy SDK access.
 function cas_fs()
 {
@@ -24,6 +20,7 @@ function cas_fs()
         $cas_fs = fs_dynamic_init( array(
             'id'             => '259',
             'slug'           => 'content-aware-sidebars',
+            'type'           => 'plugin',
             'public_key'     => 'pk_75513325effa77f024565ef74c9d6',
             'is_premium'     => false,
             'has_addons'     => false,
@@ -41,6 +38,8 @@ function cas_fs()
 
 // Init Freemius.
 cas_fs();
+// Signal that SDK was initiated.
+do_action( 'cas_fs_loaded' );
 global  $cas_fs ;
 function cas_fs_connect_message_update(
     $message,
@@ -61,24 +60,14 @@ function cas_fs_connect_message_update(
     );
 }
 
-$cas_fs->add_filter(
-    'connect_message_on_update',
-    'cas_fs_connect_message_update',
-    10,
-    6
-);
-$cas_fs->add_filter(
-    'connect_message',
-    'cas_fs_connect_message_update',
-    10,
-    6
-);
+// $cas_fs->add_filter('connect_message_on_update', 'cas_fs_connect_message_update', 10, 6);
+// $cas_fs->add_filter('connect_message', 'cas_fs_connect_message_update', 10, 6);
 function cas_fs_upgrade()
 {
     global  $cas_fs ;
     $flag = 'cas_pro';
     $upgrade_flag = (int) $cas_fs->can_use_premium_code();
-    if ( $upgrade_flag != get_option( $flag, 0 ) ) {
+    if ( $upgrade_flag != (int) get_option( $flag, 0 ) ) {
         if ( !$upgrade_flag ) {
             //downgrade
             update_option( $flag, $upgrade_flag );
@@ -86,7 +75,7 @@ function cas_fs_upgrade()
     }
 }
 
-add_action( 'admin_footer', 'cas_fs_upgrade', 99 );
+add_action( 'admin_init', 'cas_fs_upgrade', 999 );
 function cas_fs_uninstall()
 {
     require plugin_dir_path( __FILE__ ) . '/cas_uninstall.php';

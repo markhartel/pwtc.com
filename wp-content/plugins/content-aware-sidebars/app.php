@@ -3,7 +3,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -17,7 +17,7 @@ final class CAS_App {
 	/**
 	 * Plugin version
 	 */
-	const PLUGIN_VERSION       = '3.4.1';
+	const PLUGIN_VERSION       = '3.6.2';
 
 	/**
 	 * Prefix for sidebar id
@@ -32,9 +32,9 @@ final class CAS_App {
 	/**
 	 * Sidebar statuses
 	 */
-	const STATUS_ACTIVE    = 'publish';
-	const STATUS_INACTIVE  = 'draft';
-	const STATUS_SCHEDULED = 'future';
+	const STATUS_ACTIVE        = 'publish';
+	const STATUS_INACTIVE      = 'draft';
+	const STATUS_SCHEDULED     = 'future';
 
 	/**
 	 * Capability to manage sidebars
@@ -73,12 +73,12 @@ final class CAS_App {
 
 	public function __construct() {
 
-		//__('Manage and show sidebars according to the content being viewed.','content-aware-sidebars');
-		//__('Content Aware Sidebars','content-aware-sidebars');
-
 		$this->_manager = new CAS_Sidebar_Manager();
 
 		if(is_admin()) {
+			new CAS_Sidebar_Overview();
+			new CAS_Sidebar_Edit();
+			new CAS_Post_Type_Sidebar();
 			new CAS_Admin_Screen_Widgets();
 		}
 
@@ -122,10 +122,6 @@ final class CAS_App {
 			$file = plugin_basename( plugin_dir_path( __FILE__ )).'/content-aware-sidebars.php';
 			add_filter('plugin_action_links_'.$file,
 				array($this,'plugin_action_links'), 10, 4 );
-			if ( cas_fs()->is_not_paying() )  {
-				add_filter('admin_footer_text',
-					array($this,'admin_footer_text'),99);
-			}
 		}
 	}
 
@@ -160,26 +156,6 @@ final class CAS_App {
 	}
 
 	/**
-	 * Admin footer text on plugin specific pages
-	 *
-	 * @since  3.1
-	 * @param  string  $text
-	 * @return string
-	 */
-	public function admin_footer_text($text) {
-		$screen = get_current_screen();
-		if($screen->post_type == self::TYPE_SIDEBAR || $screen->id == 'widgets') {
-			$text .= ' '.sprintf('Please support future development of %sContent Aware Sidebars%s with a %s%s review on WordPress.org%s',
-				'<a target="_blank" href="http://www.intox.dk/plugin/content-aware-sidebars/">',
-				'</a>',
-				'<a target="_blank" href="https://wordpress.org/support/view/plugin-reviews/content-aware-sidebars?filter=5#postform">',
-				'5★',
-				'</a>');
-		}
-		return $text;
-	}
-
-	/**
 	 * Add actions to plugin in Plugins screen
 	 * @version 2.4
 	 * @param   array     $actions
@@ -191,7 +167,6 @@ final class CAS_App {
 	public function plugin_action_links($actions, $plugin_file, $plugin_data, $context) {
 
 		$new_actions = array(
-			'<a href="https://dev.institute/wordpress/sidebars-pro/faq/?utm_source=plugin&utm_medium=referral&utm_content=plugin-list&utm_campaign=cas" target="_blank">'.__('FAQ','content-aware-sidebars').'</a>',
 			'<a href="https://wordpress.org/support/plugin/content-aware-sidebars" target="_blank">'.__('Get Support','content-aware-sidebars').'</a>'
 		);
 

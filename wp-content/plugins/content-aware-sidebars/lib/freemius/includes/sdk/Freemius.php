@@ -15,9 +15,11 @@
 	 * under the License.
 	 */
 
-	require_once( dirname( __FILE__ ) . '/FreemiusBase.php' );
+	require_once dirname( __FILE__ ) . '/FreemiusBase.php';
 
-	define( 'FS_SDK__USER_AGENT', 'fs-php-' . Freemius_Api_Base::VERSION );
+	if ( ! defined( 'FS_SDK__USER_AGENT' ) ) {
+		define( 'FS_SDK__USER_AGENT', 'fs-php-' . Freemius_Api_Base::VERSION );
+	}
 
 	if ( ! defined( 'FS_SDK__SIMULATE_NO_CURL' ) ) {
 		define( 'FS_SDK__SIMULATE_NO_CURL', false );
@@ -31,15 +33,39 @@
 		define( 'FS_SDK__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', false );
 	}
 
-	define( 'FS_SDK__HAS_CURL', ! FS_SDK__SIMULATE_NO_CURL && function_exists( 'curl_version' ) );
+	if ( ! defined( 'FS_SDK__HAS_CURL' ) ) {
+		if ( FS_SDK__SIMULATE_NO_CURL ) {
+			define( 'FS_SDK__HAS_CURL', false );
+		} else {
+			$curl_required_methods = array(
+				'curl_version',
+				'curl_exec',
+				'curl_init',
+				'curl_close',
+				'curl_setopt',
+				'curl_setopt_array',
+				'curl_error',
+			);
 
-	if ( ! FS_SDK__HAS_CURL ) {
-		$curl_version = array( 'version' => '7.0.0' );
-	} else {
-		$curl_version = curl_version();
+			$has_curl = true;
+			foreach ( $curl_required_methods as $m ) {
+				if ( ! function_exists( $m ) ) {
+					$has_curl = false;
+					break;
+				}
+			}
+
+			define( 'FS_SDK__HAS_CURL', $has_curl );
+		}
 	}
 
-	define( 'FS_API__PROTOCOL', version_compare( $curl_version['version'], '7.37', '>=' ) ? 'https' : 'http' );
+	$curl_version = FS_SDK__HAS_CURL ?
+		curl_version() :
+		array( 'version' => '7.37' );
+
+	if ( ! defined( 'FS_API__PROTOCOL' ) ) {
+		define( 'FS_API__PROTOCOL', version_compare( $curl_version['version'], '7.37', '>=' ) ? 'https' : 'http' );
+	}
 
 	if ( ! defined( 'FS_API__LOGGER_ON' ) ) {
 		define( 'FS_API__LOGGER_ON', false );
@@ -50,6 +76,10 @@
 	}
 	if ( ! defined( 'FS_API__SANDBOX_ADDRESS' ) ) {
 		define( 'FS_API__SANDBOX_ADDRESS', '://sandbox-api.freemius.com' );
+	}
+
+	if ( class_exists( 'Freemius_Api' ) ) {
+		return;
 	}
 
 	class Freemius_Api extends Freemius_Api_Base {
@@ -81,7 +111,9 @@
 			return $address . $pCanonizedPath;
 		}
 
-		#region Servers Clock Diff ------------------------------------------------------
+		#----------------------------------------------------------------------------------
+		#region Servers Clock Diff
+		#----------------------------------------------------------------------------------
 
 		/**
 		 * @var int Clock diff in seconds between current server to API server.
@@ -112,7 +144,7 @@
 			return ( $time - strtotime( $pong->timestamp ) );
 		}
 
-		#endregion Servers Clock Diff ------------------------------------------------------
+		#endregion
 
 		/**
 		 * @var string http or https
@@ -312,11 +344,8 @@
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_TIMEOUT        => 60,
 				CURLOPT_USERAGENT      => FS_SDK__USER_AGENT,
+				CURLOPT_HTTPHEADER     => array(),
 			);
-
-			if ( ! isset( $opts[ CURLOPT_HTTPHEADER ] ) || ! is_array( $opts[ CURLOPT_HTTPHEADER ] ) ) {
-				$opts[ CURLOPT_HTTPHEADER ] = array();
-			}
 
 			if ( 'POST' === $pMethod || 'PUT' === $pMethod ) {
 				if ( is_array( $pParams ) && 0 < count( $pParams ) ) {
@@ -328,14 +357,14 @@
 				$opts[ CURLOPT_RETURNTRANSFER ] = true;
 			}
 
-			$request_url = Freemius_Api::GetUrl( $pCanonizedPath, $pIsSandbox );
+			$request_url = self::GetUrl( $pCanonizedPath, $pIsSandbox );
 
 			$opts[ CURLOPT_URL ]           = $request_url;
 			$opts[ CURLOPT_CUSTOMREQUEST ] = $pMethod;
 
 			$resource = explode( '?', $pCanonizedPath );
 
-			// disable the 'Expect: 100-continue' behaviour. This causes CURL to wait
+			// Disable the 'Expect: 100-continue' behaviour. This causes CURL to wait
 			// for 2 seconds if the server does not support this header.
 			$opts[ CURLOPT_HTTPHEADER ][] = 'Expect:';
 
@@ -451,8 +480,9 @@
 			);
 		}
 
-		#region Connectivity Test ------------------------------------------------------
-
+		#----------------------------------------------------------------------------------
+		#region Connectivity Test
+		#----------------------------------------------------------------------------------
 		/**
 		 * If successful connectivity to the API endpoint using ping.json endpoint.
 		 *
@@ -502,9 +532,11 @@
 			return $result;
 		}
 
-		#endregion Connectivity Test ------------------------------------------------------
+		#endregion
 
-		#region Connectivity Exceptions ------------------------------------------------------
+		#----------------------------------------------------------------------------------
+		#region Connectivity Exceptions
+		#----------------------------------------------------------------------------------
 
 		/**
 		 * @param resource $pCurlHandler
@@ -530,13 +562,32 @@
 		 * @throws Freemius_Exception
 		 */
 		private static function ThrowNoCurlException( $pResult = '' ) {
+			$curl_required_methods = array(
+				'curl_version',
+				'curl_exec',
+				'curl_init',
+				'curl_close',
+				'curl_setopt',
+				'curl_setopt_array',
+				'curl_error',
+			);
+
+			// Find all missing methods.
+			$missing_methods = array();
+			foreach ( $curl_required_methods as $m ) {
+				if ( ! function_exists( $m ) ) {
+					$missing_methods[] = $m;
+				}
+			}
+
 			throw new Freemius_Exception( array(
-				'error' => (object) array(
+				'error'           => (object) array(
 					'type'    => 'cUrlMissing',
 					'message' => $pResult,
 					'code'    => 'curl_missing',
 					'http'    => 402
-				)
+				),
+				'missing_methods' => $missing_methods,
 			) );
 		}
 
@@ -572,5 +623,5 @@
 			) );
 		}
 
-		#endregion Connectivity Exceptions ------------------------------------------------------
+		#endregion
 	}

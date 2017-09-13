@@ -1,8 +1,12 @@
 <?php
+/**
+ * @package Content Aware Sidebars
+ * @author Joachim Jensen <jv@intox.dk>
+ * @license GPLv3
+ * @copyright 2017 by Joachim Jensen
+ */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
@@ -19,10 +23,9 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 	private $is_trash;
 
 	public function __construct( $args = array() ) {
-		$post_type_object = get_post_type_object(CAS_App::TYPE_SIDEBAR);
 		parent::__construct(array(
-			'singular' => $post_type_object->labels->singular_name,
-			'plural'   => $post_type_object->labels->name, 
+			'singular' => 'sidebar',
+			'plural'   => 'sidebars', 
 			'ajax'     => false,
 			'screen'   => isset( $args['screen'] ) ? $args['screen'] : null
 		));
@@ -188,7 +191,8 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 				'All <span class="count">(%s)</span>',
 				'All <span class="count">(%s)</span>',
 				$total_posts,
-				'sidebars'
+				'sidebars',
+				'content-aware-sidebars'
 			),
 			number_format_i18n( $total_posts )
 		);
@@ -437,21 +441,30 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 		$return = "";
 		if($metadata) {
 			$return = $metadata->get_list_data($post->ID);
-			if($metadata->get_data($post->ID) != 2) {
-				$host = CAS_App::instance()->manager()->metadata()->get('host')->get_list_data($post->ID);
-				$return .= ": " . ($host ? $host : '<span style="color:red;">' . __('Please update Host Sidebar', "content-aware-sidebars") . '</span>');
-			
+			switch($metadata->get_data($post->ID)) {
+				case 0:
+				case 1:
+				case 3:
+					$host = CAS_App::instance()->manager()->metadata()->get('host')->get_list_data($post->ID);
+					$return .= ": " . ($host ? $host : '<span style="color:red;">' . __('Please update Host Sidebar', "content-aware-sidebars") . '</span>');
+					if($metadata->get_data($post->ID) != 3) {
+						$pos = CAS_App::instance()->manager()->metadata()->get("merge_pos")->get_data($post->ID,true);
+						$pos_icon = $pos ? "up" : "down";
+						$pos_title = array(
+							__("Add sidebar at the top during merge","content-aware-sidebars"),
+							__("Add sidebar at the bottom during merge","content-aware-sidebars")
+						);
+						$return .= '<span title="'.$pos_title[$pos].'" class="dashicons dashicons-arrow-'.$pos_icon.'-alt"></span>';
+					}
+					break;
+				case 2:
+					$return = "<input type='text' value='[ca-sidebar id=\"$post->ID\"]' readonly>";
+					break;
+				case 4:
+					break;
+				default:
+					break;
 			}
-			if($metadata->get_data($post->ID) != 3) {
-				$pos = CAS_App::instance()->manager()->metadata()->get("merge_pos")->get_data($post->ID,true);
-				$pos_icon = $pos ? "up" : "down";
-				$pos_title = array(
-					__("Add sidebar at the top during merge","content-aware-sidebars"),
-					__("Add sidebar at the bottom during merge","content-aware-sidebars")
-				);
-				$return .= '<span title="'.$pos_title[$pos].'" class="dashicons dashicons-arrow-'.$pos_icon.'-alt"></span>';
-			}
-			
 		}
 		echo $return;
 	}
@@ -504,10 +517,12 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 	public function column_status( $post ) {
 		switch ($post->post_status) {
 			case CAS_App::STATUS_ACTIVE:
-				echo '<strong>'.__( 'Active' ).'</strong>';
+				echo '<strong>'.__( 'Active','content-aware-sidebars').'</strong>';
 				$deactivate_date = get_post_meta($post->ID, CAS_App::META_PREFIX.'deactivate_time',true);
 				if($deactivate_date) {
+					// translators: Sidebar status date format, see http://php.net/date
 					$h_time = mysql2date( __( 'Y/m/d' ), $deactivate_date );
+					// translators: Sidebar status date and time format, see http://php.net/date
 					$t_time = mysql2date( __( 'Y/m/d g:i:s a' ), $deactivate_date );
 					echo '<br />'.sprintf(__('Until %s','content-aware-sidebars'),'<abbr title="' . $t_time . '">' . $h_time . '</abbr>');
 				}
@@ -528,7 +543,7 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 				echo '<br /><abbr title="' . $t_time . '">' . $h_time . '</abbr>';
 				break;
 			default:
-				_e( 'Inactive' );
+				_e( 'Inactive','content-aware-sidebars');
 				break;
 		}
 	}
@@ -579,14 +594,22 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 		$post_type_object = get_post_type_object( $post->post_type );
 		$actions = array();
 		$title = _draft_or_post_title();
+		$cas_fs = cas_fs();
 
 		if (current_user_can( 'edit_post', $post->ID ) && $post->post_status != 'trash') {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link( $post->ID ),
-				/* translators: %s: post title */
+				/* translators: %s: sidebar title */
 				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
 				__( 'Edit' )
+			);
+			$actions['duplicate'] = sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				esc_url($cas_fs->get_upgrade_url()),
+				/* translators: %s: sidebar title */
+				esc_attr( sprintf( __( 'Duplicate %s', 'content-aware-sidebars' ), $title ) ),
+				__( 'Duplicate', 'content-aware-sidebars' )
 			);
 
 			$link = admin_url('post.php?post='.$post->ID);
@@ -622,7 +645,9 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 			}
 		}
 
-		return $this->row_actions( $actions );
+		return $this->row_actions(
+			apply_filters( 'cas/admin/row_actions', $actions, $post )
+		);
 	}
 
 }

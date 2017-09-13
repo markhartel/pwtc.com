@@ -6,12 +6,10 @@
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
-if(!class_exists("WPCAObjectManager")) {
+if(!class_exists('WPCAObjectManager')) {
 	/**
 	 * Manage a list of objects nicely
 	 */

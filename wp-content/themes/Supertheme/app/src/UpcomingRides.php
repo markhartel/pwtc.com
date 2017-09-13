@@ -28,16 +28,16 @@ class UpcomingRides extends \WP_Widget {
             echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
         }
 
-        $today = new \DateTime();
+        $today = new \DateTime(null, new \DateTimeZone(supertheme_get_timezone_string()));
         $rides_query = new \WP_Query([
-            'posts_per_page'	=> 10,
+            'posts_per_page'	=> 6,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [
                     'key' => 'date',
-                    'value' =>  $today->getTimestamp(),
+                    'value' =>  $today->format('Y-m-d 00:00:00'),
                     'compare' => '>=',
-                    'type'	=> 'TIMESTAMP'
+                    'type'	=> 'DATETIME'
                 ],
             ],
             'orderby' => ['date' => 'ASC'],
@@ -49,6 +49,7 @@ class UpcomingRides extends \WP_Widget {
                 echo "<li><a href='" . get_the_permalink() . "'>" . get_the_title() . "</a></li>";
             }
             echo "</ul>";
+            echo "<a href='" . site_url('scheduled_rides') . "' class='dark button'>More Rides</a>";
         } else {
             echo "No upcoming rides";
         }

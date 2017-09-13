@@ -6,12 +6,10 @@
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
-if(!class_exists("WPCAMeta")) {
+if(!class_exists('WPCAMeta')) {
 	/**
 	 * Post Meta
 	 */
@@ -61,10 +59,10 @@ if(!class_exists("WPCAMeta")) {
 		public function __construct(
 			$id,
 			$title,
-			$default_value = "",
-			$input_type    = "text",
+			$default_value = '',
+			$input_type    = 'text',
 			$input_list    = array(),
-			$description   = ""
+			$description   = ''
 		) {
 			$this->id            = $id;
 			$this->title         = $title;

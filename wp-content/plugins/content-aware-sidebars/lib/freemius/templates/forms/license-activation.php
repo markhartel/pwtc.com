@@ -16,33 +16,11 @@
 	$slug = $VARS['slug'];
 	$fs   = freemius( $slug );
 
-	if ($fs->is_registered()) {
-		// The URL to redirect to after successfully activating the license from the "Plugins" page.
-		if ( $fs->is_addon() ) {
-			$sync_license_url = $fs->get_parent_instance()->_get_sync_license_url( $fs->get_id(), true );
-		} else {
-			$sync_license_url = $fs->_get_sync_license_url( $fs->get_id(), true );
-		}
-
-		/**
-		 * Trigger license sync after valid license activation.
-		 */
-		$after_license_activation_url = $sync_license_url;
-	}
-	else
-	{
-		/**
-		 * If user not yet registered, the license activation triggers
-		 * an opt-in, which automatically sync the license.
-		 */
-		$after_license_activation_url = $fs->get_account_url();
-	}
-
-	$cant_find_license_key_text = __fs( 'cant-find-license-key', $slug );
-	$message_above_input_field  = __fs( 'activate-license-message', $slug );
+	$cant_find_license_key_text = fs_text( 'cant-find-license-key', $slug );
+	$message_above_input_field  = fs_text( 'activate-license-message', $slug );
 	$message_below_input_field  = '';
 
-	$header_title = __fs( $fs->is_free_plan() ? 'activate-license' : 'update-license', $slug );
+	$header_title = fs_text( $fs->is_free_plan() ? 'activate-license' : 'update-license', $slug );
 
 	if ( $fs->is_registered() ) {
 		$activate_button_text = $header_title;
@@ -54,13 +32,19 @@
 
 		$freemius_link = '<a href="' . $freemius_site_url . '" target="_blank" tabindex="0">freemius.com</a>';
 
-		$message_below_input_field = sprintf( __fs( 'license-sync-disclaimer', $slug ), $freemius_link );
+		$message_below_input_field = sprintf( fs_text( 'license-sync-disclaimer', $slug ), $freemius_link );
 
-		$activate_button_text = __fs( 'agree-activate-license', $slug );
+		$activate_button_text = fs_text( 'agree-activate-license', $slug );
 	}
 
-	$license_key_text = __fs(  'license-key' , $slug );
+	$license_key_text = fs_text(  'license-key' , $slug );
 
+	/**
+	 * IMPORTANT:
+	 *  DO NOT ADD MAXLENGTH OR LIMIT THE LICENSE KEY LENGTH SINCE
+	 *  WE DO WANT TO ALLOW INPUT OF LONGER KEYS (E.G. WooCommerce Keys)
+	 *  FOR MIGRATED MODULES.
+	 */
 	$modal_content_html = <<< HTML
 	<div class="notice notice-error inline license-activation-message"><p></p></div>
 	<p>{$message_above_input_field}</p>
@@ -79,15 +63,15 @@ HTML;
 				'<div class="fs-modal fs-modal-license-activation">'
 				+ '	<div class="fs-modal-dialog">'
 				+ '		<div class="fs-modal-header">'
-				+ '		    <h4><?php echo $header_title ?></h4>'
-				+ '         <a href="!#" class="fs-close"><i class="dashicons dashicons-no" title="<?php _efs( 'dismiss' ) ?>"></i></a>'
+				+ '		    <h4><?php echo esc_js($header_title) ?></h4>'
+				+ '         <a href="!#" class="fs-close"><i class="dashicons dashicons-no" title="<?php fs_esc_attr_echo( 'dismiss', $slug ) ?>"></i></a>'
 				+ '		</div>'
 				+ '		<div class="fs-modal-body">'
 				+ '			<div class="fs-modal-panel active">' + modalContentHtml + '</div>'
 				+ '		</div>'
 				+ '		<div class="fs-modal-footer">'
-				+ '			<button class="button button-secondary button-close" tabindex="4"><?php _efs('deactivation-modal-button-cancel', $slug); ?></button>'
-				+ '			<button class="button button-primary button-activate-license"  tabindex="3"><?php echo $activate_button_text; ?></button>'
+				+ '			<button class="button button-secondary button-close" tabindex="4"><?php fs_esc_js_echo( 'cancel', $slug ) ?></button>'
+				+ '			<button class="button button-primary button-activate-license"  tabindex="3"><?php echo esc_js( $activate_button_text ) ?></button>'
 				+ '		</div>'
 				+ '	</div>'
 				+ '</div>',
@@ -96,8 +80,7 @@ HTML;
 			$activateLicenseButton    = $modal.find('.button-activate-license'),
 			$licenseKeyInput          = $modal.find('input.license_key'),
 			$licenseActivationMessage = $modal.find( '.license-activation-message' ),
-			pluginSlug                = '<?php echo $slug ?>',
-			afterActivationUrl        = '<?php echo $after_license_activation_url ?>';
+			pluginSlug                = '<?php echo $slug ?>';
 
 		$modal.appendTo($('body'));
 
@@ -150,12 +133,13 @@ HTML;
 					url: ajaxurl,
 					method: 'POST',
 					data: {
-						action     : 'fs_activate_license_' + pluginSlug,
+						action     : '<?php echo $fs->get_ajax_action( 'activate_license' ) ?>',
+						security   : '<?php echo $fs->get_ajax_security( 'activate_license' ) ?>',
 						slug       : pluginSlug,
 						license_key: licenseKey
 					},
 					beforeSend: function () {
-						$activateLicenseButton.text( '<?php _efs( 'activating-license', $slug ); ?>' );
+						$activateLicenseButton.text( <?php fs_json_encode_echo( 'activating-license', $slug ) ?> );
 					},
 					success: function( result ) {
 						var resultObj = $.parseJSON( result );
@@ -163,9 +147,9 @@ HTML;
 							closeModal();
 
 							// Redirect to the "Account" page and sync the license.
-							window.location.href = afterActivationUrl;
+							window.location.href = resultObj.next_page;
 						} else {
-							showError( resultObj.error );
+							showError( resultObj.error.message ? resultObj.error.message : resultObj.error );
 							resetActivateLicenseButton();
 						}
 					}
@@ -198,7 +182,7 @@ HTML;
 
 		function resetActivateLicenseButton() {
 			enableActivateLicenseButton();
-			$activateLicenseButton.text( '<?php echo $activate_button_text; ?>' );
+			$activateLicenseButton.text( <?php echo json_encode( $activate_button_text ) ?> );
 		}
 
 		function resetModal() {

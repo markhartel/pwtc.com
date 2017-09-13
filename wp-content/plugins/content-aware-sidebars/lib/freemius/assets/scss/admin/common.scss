@@ -1,5 +1,18 @@
 @import "../start";
 
+#iframe {
+    line-height: 0;
+    font-size: 0;
+}
+
+.fs-full-size-wrapper {
+    margin: 0 0 -65px -20px;
+
+    @media (max-width: $admin_mobile_max_width) {
+        margin: 0 0 -65px -10px;
+    }
+}
+
 .fs-notice
 {
     position: relative;
@@ -137,4 +150,24 @@ span.fs-submenu-item.fs-sub:before
         // Add small RTL arrow.
         content: '\21B2';
     }
+}
+
+.fs-submenu-item
+{
+    &.pricing
+    {
+        &.upgrade-mode
+        {
+            color: greenyellow;
+        }
+
+        &.trial-mode
+        {
+            color: #83e2ff;
+        }
+    }
+}
+
+#adminmenu .update-plugins.fs-trial {
+    background-color: #00b9eb;
 }

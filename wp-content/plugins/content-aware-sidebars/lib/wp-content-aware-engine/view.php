@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -70,7 +68,7 @@ class WPCAView {
 	 * @return  mixed
 	 */
 	public function __call($method,$args) {
-		if(substr($method,0,3) == "set" && count($args) == 1) {
+		if(substr($method,0,3) == 'set' && count($args) == 1) {
 			$this->_params[strtolower(substr($method,2))] = $args[0];
 			return $this;
 		}
@@ -87,7 +85,7 @@ class WPCAView {
 		if(stripos(strrev($this->_path), 'php.') === 0) {
 			return $this->_path;
 		} else {
-			return plugin_dir_path( __FILE__ ).'view/'.str_replace(".", "/",$this->_path).".php";
+			return WPCA_PATH.'view/'.str_replace('.', '/',$this->_path).'.php';
 		}
 	}
 

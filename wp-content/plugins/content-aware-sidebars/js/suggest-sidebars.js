@@ -2,7 +2,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
 (function($) {
@@ -48,39 +48,34 @@
 		suggestSidebars: function() {
 			var $elem = $('.js-cas-sidebars');
 			$elem.each(function() {
-				$this = $(this);
-				$this.select2({
-					containerCssClass:'cas-select2',
-					dropdownCssClass: 'cas-select2',
+				$(this).select2({
+					theme:'wpca',
 					minimumInputLength: 0,
 					closeOnSelect: true,//does not work properly on false
 					allowClear:false,
-					multiple: true,
-					//maximumSelectionSize: 1,
-					data:$this.data('sidebars'),
+					//maximumSelectionLength: 0,
 					width:"100%",
-					//tokenSeparators: ['|'],
-					// nextSearchTerm: function(selectedObject, currentSearchTerm) {
-					// 	return currentSearchTerm;
-					// },
-					createSearchChoice:function(term, data) {
-						if (CAS.canCreate && term && $(data).filter(function() {
-						  return this.text.localeCompare(term) === 0;
-						}).length === 0) {
-						  return {
-							id: '_'+term.replace(",","_"),
-							text: term
-						  };
+					//multiple:true,//defined in html for 3.5 compat
+					//tags: CAS.canCreate, defined in html for 3.5 compat
+					escapeMarkup:function (m) {return m;},
+					createTag: function (params) {
+						var term = $.trim(params.term);
+						if (term === '') {
+							return null;
 						}
-						return null;
+						return {
+							id: '_'+term.replace(",","__"),
+							text: term,
+							new:true
+						}
 					},
-					formatSelection: function(term) {
-						return (term.id > 0 ? "" : "<b>("+CAS.labelNew+")</b> ") + term.text;
+					templateSelection: function(term) {
+						return (term.new ? "<b>("+CAS.labelNew+")</b> " : "") + term.text;
 					},
-					formatResult: function(term) {
-						return (term.id > 0 ? "" : "<b>"+CAS.createNew+":</b> ") + term.text;
+					templateResult: function(term) {
+						return (term.new ? "<b>"+CAS.createNew+":</b> " : "") + term.text;
 					},
-					formatNoMatches: function(term) {
+					templateNoMatches: function(term) {
 						return CAS.notFound;
 					}
 				});

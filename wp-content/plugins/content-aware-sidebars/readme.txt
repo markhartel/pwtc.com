@@ -1,45 +1,44 @@
-=== Plugin Name ===
+=== Content Aware Sidebars - Unlimited Widget Areas ===
 Contributors: intoxstudio, devinstitute, freemius
-Donate link:
-Tags: sidebar, sidebars, custom sidebars, page sidebars, replace sidebar, create sidebars, replace widget area, bbpress, buddypress, polylang, pods, conditional
-Requires at least: 3.9
-Tested up to: 4.7
-Stable tag: 3.4.1
+Donate link: #
+Tags: custom sidebars, page sidebar, replace sidebar, create sidebars, create widget area, bbpress, buddypress, polylang, pods, sidebar manager, sidebar
+Requires at least: 4.0
+Tested up to: 4.8
+Stable tag: 3.6.2
 License: GPLv3
 
 Display custom sidebars on any post, page, category etc. Supports bbPress, BuddyPress, WooCommerce, Easy Digital Downloads and more.
 
 == Description ==
 
-#### The Best Sidebar Plugin for WordPress
+**Display tailored sidebars and widget areas on any post, page or custom post type on your WordPress site. No coding required!**
 
-Boost on-site SEO, upsell your products or add better-converting CTAs by displaying different sidebars for different contexts. Create post sidebars, page sidebars, category sidebars and more.
-The sidebar manager makes it incredibly easy for anyone to create custom sidebars in any theme.
+Use Content Aware Sidebars to boost on-site SEO, upsell your products or get better-converting Call-to-Actions by displaying different sidebars on different conditions. The Sidebar Manager makes it incredibly easy to create and manage widget areas in any theme.
 
-Developed with scalability and performance in mind, Content Aware Sidebars is the only plugin of its kind that will never slow down your site no matter the size.
+The Content Aware Sidebars plugin is built to scale and will never slow down your site no matter the size.
 
-No coding required!
+####Create Unlimited Sidebars and Widget Areas
 
-####Create unlimited sidebars and widget areas
-
-* Easy-to-use Sidebar Manager
-* **[NEW]** Create or select sidebars directly when editing a post
+* All-in-one Sidebar Manager
+* Create or select sidebars directly when editing a post or page
 * Merge with, replace and hide sidebars in any theme
-* Automatic support for Custom Post Types and Taxonomies
-* Schedule sidebars for later activation
-* **[NEW]** Schedule sidebars for later deactivation
-* Enhanced widget manager
+* Activate and deactivate sidebars on schedule
+* Sidebar Visibility for All or Logged-in Users
+* Enhanced Widget Manager with sidebar and widget search
+* Change markup of widget areas
 * Optional Template Tag to display custom sidebars anywhere in your theme
 * Optional Shortcode to display custom sidebars anywhere in your content
-* Comes in 38 languages ([help translate!](https://www.transifex.com/projects/p/content-aware-sidebars/))
-* **[NEW]** Sidebar Visibility for All or Logged-in Users
+* Multilingual and Translation Ready ([help translate!](https://translate.wordpress.org/projects/wp-plugins/content-aware-sidebars))
 
-####Display sidebars on any content
+####Display Different Sidebars on Any Page
 
-* Singulars, eg. posts or pages
-* Custom Post Types
-* Singulars with given taxonomies, eg. categories, tags or post formats
-* Singulars by a given author
+Create a post sidebar, page sidebar, category sidebar, or any custom sidebar you need. Content Aware Sidebars even allows you to combine conditions in any way you like very efficiently. This means that you e.g. can display a custom sidebar on all posts in Category X written by author Y.
+
+For each widget area you create, you can use the following conditions:
+
+* Singulars, eg. each post, page, or custom post type
+* Content with select taxonomies, eg. categories or tags
+* Content written by a select author
 * Page Templates
 * Post Type Archives
 * Author Archives
@@ -48,16 +47,15 @@ No coding required!
 * Search Results
 * 404 Not Found Page
 * Front Page
+* Blog Page
 * bbPress User Profiles
 * BuddyPress Member Pages
-* Languages (qTranslate, Polylang, Transposh, WPML)
+* Languages (qTranslate X, Polylang, Transposh, WPML)
 * Pods Pages
 
-Mix conditions in any way you like, e.g. display a sidebar on posts in Category X by author Y.
+####Sidebar Plugin Integrations and Support
 
-Negate conditions, e.g. display a sidebar on all pages except Page X.
-
-####Sidebar Integrations and Support
+Content Aware Sidebars automatically supports Custom Post Types and Taxonomies created by any plugin or theme. Moreover, it comes with built-in support for some of the most popular WordPress plugins. This means that you e.g. can create WooCommerce sidebars for select products or BuddyPress sidebars for your member sections!
 
 * [bbPress](https://dev.institute/wordpress/sidebars-pro/bbpress/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
 * [BuddyPress](https://dev.institute/wordpress/sidebars-pro/buddypress/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
@@ -69,21 +67,23 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 * [WooCommerce](https://dev.institute/wordpress/sidebars-pro/woocommerce/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
 * [WPML](https://dev.institute/wordpress/sidebars-pro/multilingual-plugins/?utm_source=readme&utm_medium=referral&utm_content=integration&utm_campaign=cas)
 
-> ####Content Aware Sidebars Pro
->
-> [Complete control for your custom sidebars](https://dev.institute/wordpress/sidebars-pro/?utm_source=readme&utm_medium=referral&utm_content=title&utm_campaign=cas):
->
-> * Priority Email Support
-> * Widget Revisions
-> * Display sidebars on URLs + wildcards
-> * Display sidebars on content from any day, month, year
-> * Display sidebars in select time ranges on given days
-> * Sidebar Visibility for Roles and Guests
-> * 1-click Sidebar Activation
-> * Sync Widgets on Theme Switch
-> * [and more...](https://dev.institute/wordpress/sidebars-pro/features/?utm_source=readme&utm_medium=referral&utm_content=more&utm_campaign=cas)
->
-> Install the free version and upgrade at any time directly from the admin panel via [Freemius](http://freemius.com/)!
+####Premium Widget Area Manager - Content Aware Sidebars Pro
+
+[Complete control for your custom sidebars](https://dev.institute/wordpress/sidebars-pro/?utm_source=readme&utm_medium=referral&utm_content=title&utm_campaign=cas):
+
+* Priority Email Support
+* Automatic Widgets Backup
+* Display sidebars on URLs + wildcards
+* Display sidebars on content from any day, month, year
+* Display sidebars in select time ranges on given days
+* Sidebar Visibility for Roles and Guests
+* Widget to use sidebars as reusable blocks
+* Duplicate Sidebars & Sidebar Conditions
+* Disable Widgets
+* Sync Sidebar Widgets on Theme Switch
+* [and more...](https://dev.institute/wordpress/sidebars-pro/features/?utm_source=readme&utm_medium=referral&utm_content=more&utm_campaign=cas)
+
+You can upgrade at any time securely from your Admin Dashboard via [Freemius](http://freemius.com/)!
 
 ####More Information
 
@@ -93,10 +93,11 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 
 == Installation ==
 
-1. Unzip and upload the `content-aware-sidebars` folder to your `/wp-content/plugins/` directory via FTP or install the plugin through *Plugins* in the administration 
-1. Activate the plugin through *Plugins* in the administration
-1. Create your first sidebar under the menu *Sidebars > Add New*
-1. Add widgets to the sidebar like any other sidebar
+1. Unzip and upload the `content-aware-sidebars` folder to your `/wp-content/plugins/` directory via FTP or install the plugin in *Plugins* in the Admin Dashboard 
+1. Activate the sidebar plugin in *Plugins* in the Admin Dashboard
+1. Create your first custom sidebar under the menu *Sidebars > Add New*
+1. Add widgets to the new sidebar like any other sidebar
+1. That's it!
 
 [Click here to get started with Content Aware Sidebars.](https://dev.institute/docs/content-aware-sidebars/getting-started/?utm_source=readme&utm_medium=referral&utm_content=install&utm_campaign=cas)
 
@@ -105,36 +106,135 @@ Negate conditions, e.g. display a sidebar on all pages except Page X.
 
 == Frequently Asked Questions ==
 
-[Click here to view the FAQs for Content Aware Sidebars.](https://dev.institute/docs/content-aware-sidebars/faq/?utm_source=readme&utm_medium=referral&utm_content=faq&utm_campaign=cas)
+= Will this sidebar plugin work with my theme? =
 
-== Translations ==
+Yes!
 
-Arabic, Bulgarian, Basque, Catalan, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French (Canada), French (France), German, Greek, Hebrew, Hungarian, Indonesian, Italian, Japanese, Korean, Latvian, Lithuanian, Norwegian Bokmål, Persian, Polish, Portuguese (Brazil), Portuguese (Portugal), Russian, Serbian, Slovak, Slovenian, Spanish, Swedish, Turkish, Ukranian, Vietnamese
+If your theme already has WordPress sidebars and widget areas, you can create new custom sidebars to replace, merge with or hide those on certain conditions.
 
-Thanks to the following people for their translation contributions:
+If it doesn't, it is still possible to display custom sidebars using the function ca_display_sidebar() in your theme or using the sidebar shortcode [ca-sidebar] in your content.
 
-********
-[Dr.Outlander](https://www.transifex.com/accounts/profile/Dr.Outlander/), [allo.babi](https://www.transifex.com/accounts/profile/allo.babi/), [gattiken](https://www.transifex.com/accounts/profile/gattiken/), [DCLXVI](https://www.transifex.com/accounts/profile/DCLXVI/), [eliuzunova](https://www.transifex.com/accounts/profile/eliuzunova/), [keystorm](https://www.transifex.com/accounts/profile/keystorm/), [kaotiko](https://www.transifex.com/accounts/profile/kaotiko/), [tkjune](https://www.transifex.com/accounts/profile/tkjune/), [wcybrick](https://www.transifex.com/accounts/profile/wcybrick/), [MrRajic](https://www.transifex.com/accounts/profile/MrRajic/), [luka.peharda](https://www.transifex.com/accounts/profile/luka.peharda/), [7GRAFIX](https://www.transifex.com/accounts/profile/7GRAFIX/), [denisbeckers](https://www.transifex.com/accounts/profile/denisbeckers/), [SynergiaWeb](https://www.transifex.com/accounts/profile/SynergiaWeb/), [MSTannu](https://www.transifex.com/accounts/profile/MSTannu/), [addicted2web](https://www.transifex.com/accounts/profile/addicted2web/), [Fastfuel](https://www.transifex.com/accounts/profile/Fastfuel/), [ewx](https://www.transifex.com/accounts/profile/ewx/), [akuhl](https://www.transifex.com/accounts/profile/akuhl/), [TheFluffyDonkey](https://www.transifex.com/accounts/profile/TheFluffyDonkey/), [henrik.heil](https://www.transifex.com/accounts/profile/henrik.heil/), [milan.bolland](https://www.transifex.com/accounts/profile/milan.bolland/), [18micha48](https://www.transifex.com/accounts/profile/18micha48/), [mcpitten](https://www.transifex.com/accounts/profile/mcpitten/), [tabakisp](https://www.transifex.com/accounts/profile/tabakisp/), [Dimis13](https://www.transifex.com/accounts/profile/Dimis13/), [cyberwani](https://www.transifex.com/accounts/profile/cyberwani/), [Neftigon](https://www.transifex.com/accounts/profile/Neftigon/), [Lucky65](https://www.transifex.com/accounts/profile/Lucky65/), [tkfmkjm](https://www.transifex.com/accounts/profile/tkfmkjm/), [ashf](https://www.transifex.com/accounts/profile/ashf/), [zanpress](https://www.transifex.com/accounts/profile/zanpress/), [saynim](https://www.transifex.com/accounts/profile/saynim/), [phpkalemi](https://www.transifex.com/accounts/profile/phpkalemi/), [syruas](https://www.transifex.com/accounts/profile/syruas/), [PaalJoachim](https://www.transifex.com/accounts/profile/PaalJoachim/), [khalil.delavaran](https://www.transifex.com/accounts/profile/khalil.delavaran/), [mayones](https://www.transifex.com/accounts/profile/mayones/), [artilogic](https://www.transifex.com/accounts/profile/artilogic/), [ibushi](https://www.transifex.com/accounts/profile/ibushi/), [greenspiracje](https://www.transifex.com/accounts/profile/greenspiracje/), [marcelo.ghelman](https://www.transifex.com/accounts/profile/marcelo.ghelman/), [ovelhaaa](https://www.transifex.com/accounts/profile/ovelhaaa/), [luismartins](https://www.transifex.com/accounts/profile/luismartins/), [Aakurb](https://www.transifex.com/accounts/profile/Aakurb/), [NikitaM](https://www.transifex.com/accounts/profile/NikitaM/), [Almaz](https://www.transifex.com/accounts/profile/Almaz/), [Rakhmanov](https://www.transifex.com/accounts/profile/Rakhmanov/), [jurcc](https://www.transifex.com/accounts/profile/jurcc/), [javitopo](https://www.transifex.com/accounts/profile/javitopo/), [horacio.salazar](https://www.transifex.com/accounts/profile/horacio.salazar/), [killawabbit](https://www.transifex.com/accounts/profile/killawabbit/), [adrianb](https://www.transifex.com/accounts/profile/adrianb/), [IBsweden](https://www.transifex.com/accounts/profile/IBsweden/), [eebrutas](https://www.transifex.com/accounts/profile/eebrutas/), [ahmetyilmaz](https://www.transifex.com/accounts/profile/ahmetyilmaz/), [auludag](https://www.transifex.com/accounts/profile/auludag/), [Dikhotheta](https://www.transifex.com/accounts/profile/Dikhotheta/)
-********
+= Can I really display sidebars and widget areas on any page? =
 
-Do you want to contribute and see your name here?
+Yep.
 
-[Click here to go to Transifex.com to translate Content Aware Sidebars into your language](https://www.transifex.com/projects/p/content-aware-sidebars/).
+In the Sidebar Editor, you can select on what conditions your sidebar should be displayed. Create a sidebar for each page, a sidebar for posts in a category, or any sidebar you need.
+You can also select sidebars directly when you're editing a post or page.
+
+[Click here to read more about sidebar conditions](https://dev.institute/docs/content-aware-sidebars/getting-started/display-sidebar-simple/?utm_source=readme&utm_medium=referral&utm_content=faq&utm_campaign=cas).
+
+= I have other questions, can you help? =
+
+Of course! Check out the links below:
+
+* [Getting Started with Content Aware Sidebars](https://dev.institute/docs/content-aware-sidebars/getting-started/?utm_source=readme&utm_medium=referral&utm_content=faq&utm_campaign=cas)
+* [Documentation and FAQ](https://dev.institute/docs/content-aware-sidebars/?utm_source=readme&utm_medium=referral&utm_content=faq&utm_campaign=cas)
+* [Support Forums](https://wordpress.org/support/plugin/content-aware-sidebars)
 
 == Screenshots ==
 
-[Click here to view the latest screenshots and examples of Content Aware Sidebars.](https://dev.institute/wordpress/sidebars-pro/?utm_source=readme&utm_medium=referral&utm_content=screenshots&utm_campaign=cas)
+1. Easily create custom sidebars and display them on any content
+1. See your widget areas at a glance in the easy Sidebar Manager
+1. Filter widgets and sidebars in the Enhanced Widget Manager
 
 == Upgrade Notice ==
 
-= 3.4 = 
+= 3.5.1 = 
 
 * Content Aware Sidebars data in your database will be updated automatically. It is highly recommended to backup this data before updating the plugin.
 * Data from version 0.8 and below will not be updated during this process.
 
 == Changelog ==
 
-[View development on GitHub](https://github.com/intoxstudio/content-aware-sidebars)
+[Follow development on GitHub](https://github.com/intoxstudio/content-aware-sidebars)
+
+= 3.6.2 =
+
+[View Release Notes](https://dev.institute/style-widget-areas-content-aware-sidebars-3-6/?utm_source=readme&utm_medium=referral&utm_content=changelog&utm_campaign=cas)
+
+* Added: UI improvements
+* Added: better support for RTL languages
+* Fixed: forced replace action now always takes priority
+* Fixed: archives would in rare cases not display correct sidebar if a post was password protected
+* Fixed: special characters in translations of conditions
+* Fixed: post type conditions with no titles
+
+**Pro Plan:**
+
+* Added: changes in sidebar title no longer adds revision
+* Fixed: edit links in sidebar admin columns for post types
+
+= 3.6.1 =
+
+* Fixed: UI improvements
+* Fixed: better plugin compatibility for sidebars quick select
+
+**Pro Plan:**
+
+* Fixed: unable to disable widgets
+* Fixed: javascript would in rare cases not be loaded correctly in sidebar editor
+
+= 3.6 =
+
+* Added: ability to wrap sidebar in html
+* Added: ability to change widget html
+* Added: danish and german translations now use automatic language packs
+* Added: performance and memory improvements
+* Added: UI improvements
+* Added: wordpress 4.8 support
+* Fixed: widget manager could behave unexpectedly in cases with many inactive widget areas
+* Fixed: sidebars quick select could cause nested sidebars to be removed from posts
+* Fixed: sidebar bulk messages
+* Updated: wp-content-aware-engine
+* Updated: freemius sdk
+
+**Pro Plan:**
+
+* Added: widget to insert widgets from other sidebars
+* Added: 1-click automatic install on checkout
+* Fixed: avoid auto-draft sidebar adding extra revision 
+
+= 3.5.2 =
+
+[View Release Notes](https://dev.institute/content-aware-sidebars-version-3-5-released/?utm_source=readme&utm_medium=referral&utm_content=changelog&utm_campaign=cas)
+
+* Added: woocommerce 3.0 compat
+* Added: badgeos compat
+* Added: UI improvements in widget manager
+
+= 3.5.1 =
+
+* Fixed: database upgrade script
+
+= 3.5 =
+
+* Added: 1-click sidebar activation
+* Added: improved design on widgets screen
+* Added: autosave conditions
+* Added: simplify option to autoselect conditions
+* Added: UI improvements
+* Added: minimum requirement wordpress 4.0
+* Added: freemius sdk updated
+* Added: actions and filters for developers
+
+**Pro Plan:**
+
+* Added: duplicate sidebars and conditions
+* Added: disable widgets
+* Fixed: improved upgrade routine
+
+= 3.4.3 =
+
+* Added: preparation for automatic translation packages
+* Added: prevent adding duplicate sidebar titles
+* Fixed: sidebar quick select would in rare cases not show sidebars
+* Fixed: UI improvements
+
+= 3.4.2 =
+
+* Added: freemius sdk updated
+* Fixed: sidebar editor now works properly in IE browser
+* Fixed: UI improvements
 
 = 3.4.1 =
 
@@ -279,32 +379,5 @@ Do you want to contribute and see your name here?
 * Added: sidebar column for post type overviews
 * Added: widget synchronization across themes
 * Added: white label admin screens
-
-= 3.1.2 =
-
-* Added: wordpress 4.5 support
-* Added: module javascript more extensible
-* Fixed: styling for autocomplete input fields
-* Fixed: updated translations
-
-= 3.1.1 =
-
-* Added: pods pages module, props @sc0ttkclark @herold
-* Fixed: better compat when other themes or plugins load breaking scripts
-
-= 3.1 =
-
-* Added: completely rewritten sidebar editor ui
-* Added: refactored plugin into more logical abstractions
-* Added: wp-db-updater now handles database updates
-* Added: tour reflects new sidebar editor ui
-* Added: review notice after 2 weeks use
-* Added: admin footer text on relevant pages
-* Added: minified some scripts
-* Added: qtranslate x module
-* Fixed: sidebar and widget filtering for wp4.4+
-* Fixed: bug making attachments not selectable
-* Fixed: bumped versions for integrated plugins
-* Removed: qtranslate module
 
 See changelog.txt for previous changes.

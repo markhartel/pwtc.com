@@ -17,10 +17,10 @@ $data = require_once __DIR__ . '/app/bootstrap-theme.php';
 // if none is selected it will default to the current date
 
 // get current month
-$current_datetime = new DateTime(date('F'));
+$current_datetime = new DateTime(date('F'),  new \DateTimeZone(supertheme_get_timezone_string()));
 $data['invalid_date'] = false;
 if(isset($_GET['month']) && $_GET['month']) {
-    $valid_date = DateTime::createFromFormat('M', $_GET['month']);
+    $valid_date = DateTime::createFromFormat('F-d', $_GET['month'].'-01');
     if (!$valid_date) {
         $data['invalid_date'] = true;
     } else {
@@ -37,17 +37,19 @@ $previous_month_datetime = $current_first_day->sub(new DateInterval('P1D'));
 $next_month_datetime = $current_last_day->add(new DateInterval('P1D'));
 
 // set some data for twig
-$data['month_current'] = $current_datetime ->format('F');
+$data['month_current'] = $current_datetime->format('F');
+$data['year_current'] = $current_datetime->format('Y');
 $data['month_previous'] = $previous_month_datetime->format('F');
 $data['month_next'] = $next_month_datetime->format('F');
 $data['month_current_numeric'] = $current_datetime ->format('n');
+
 
 // get the first and last days for the calendar
 $calendar_start_datetime = $current_first_day->sub(new DateInterval('P'.$current_first_day->format('w').'D'));
 $calendar_end_datetime = $current_last_day->add(new DateInterval('P'.(6-$current_last_day->format('w')).'D'));
 
 // create values to build the calandar array
-$now_datetime = new DateTime();
+$now_datetime = new DateTime(null,  new \DateTimeZone(supertheme_get_timezone_string()));
 $loop_datetime = $current_first_day;
 $loop_until_datetime = $current_last_day->add(new DateInterval('P1D'));
 $current_last_day->sub(new DateInterval('P1D'));

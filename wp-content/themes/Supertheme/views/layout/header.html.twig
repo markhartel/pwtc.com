@@ -5,15 +5,12 @@
             <!-- top row -->
             <div class="top clearfix">
                 {% if isLoggedIn is defined and isLoggedIn %}
-                    <ul class="dropdown menu hide-for-small-only float-right" data-dropdown-menu>
+                    <ul class="dropdown menu hide-for-small-only float-right" data-dropdown-menu data-close-on-click-inside="false">
                         <li>
                             <a href="#">
                                 {{ avatar }}
                             </a>
-                            <ul class="menu">
-                                <li><a href="{{ url }}/my-account">My Account</a></li>
-                                <li><a href="{{ logoutLink }}">Log out</a></li>
-                            </ul>
+                            {{ memberMenu }}
                         </li>
                     </ul>
                 {% else %}
@@ -38,15 +35,12 @@
             </div>
             <div class="title-bar-right">
                 {% if isLoggedIn is defined and isLoggedIn %}
-                    <ul class="dropdown menu float-left" data-dropdown-menu>
+                    <ul class="dropdown menu float-left" data-dropdown-menu data-close-on-click-inside="false">
                         <li>
                             <a class="mobile-account-menu">
                                 {{ avatar }}
                             </a>
-                            <ul class="menu">
-                                <li><a href="{{ editProfileLink }}">My Account</a></li>
-                                <li><a href="{{ logoutLink }}">Log out</a></li>
-                            </ul>
+                            {{ memberMenu }}
                         </li>
                     </ul>
                 {% else %}

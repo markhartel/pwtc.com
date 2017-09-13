@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -27,6 +25,7 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 * 
 	 * @var array
 	 */
+	private $_post_types_obj;
 	private $_post_types;
 
 	/**
@@ -39,7 +38,7 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('post_type',__('Post Types',WPCACore::DOMAIN));
+		parent::__construct('post_type',__('Post Types',WPCA_DOMAIN));
 	}
 
 	/**
@@ -54,8 +53,9 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		add_action('transition_post_status',
 			array($this,'post_ancestry_check'),10,3);
 
-		foreach ($this->_post_types()->get_all() as $post_type) {
-			add_action('wp_ajax_wpca/module/'.$this->id.'-'.$post_type->name,array($this,'ajax_print_content'));
+		foreach ($this->post_types() as $post_type) {
+			add_action('wp_ajax_wpca/module/'.$this->id.'-'.$post_type,
+				array($this,'ajax_print_content'));
 		}
 	}
 
@@ -85,8 +85,8 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		}
 
 		$post_status = array('publish','private','future','draft');
-		if($args["post_type"] == "attachment") {
-			$post_status = "inherit";
+		if($args['post_type'] == 'attachment') {
+			$post_status = 'inherit';
 		}
 
 		//WordPress searches in title and content by default
@@ -128,21 +128,44 @@ class WPCAModule_post_type extends WPCAModule_Base {
 			$posts = $query->posts;
 		}
 
-		return $posts;
+		$retval = array();
+		foreach ($posts as $post) {
+			$retval[$post->ID] = $this->post_title($post);
+		}
+
+		return $retval;
+	}
+
+	/**
+	 * Get registered public post types
+	 * Content Aware Sidebars 3.5.2 relies on this
+	 *
+	 * @deprecated 4.0
+	 * @since   1.0
+	 * @return  array
+	 */
+	public function _post_types() {
+		if(!$this->_post_types_obj) {
+			// List public post types
+			$this->_post_types_obj = new WPCAObjectManager();
+			foreach (get_post_types(array('public' => true), 'objects') as $post_type) {
+				$this->_post_types_obj->add($post_type,$post_type->name);
+			}
+		}
+		return $this->_post_types_obj;
 	}
 
 	/**
 	 * Get registered public post types
 	 *
-	 * @since   1.0
+	 * @since   4.0
 	 * @return  array
 	 */
-	public function _post_types() {
+	public function post_types() {
 		if(!$this->_post_types) {
-			$this->_post_types = new WPCAPostTypeManager();
 			// List public post types
-			foreach (get_post_types(array('public' => true), 'objects') as $post_type) {
-				$this->_post_types->add($post_type);
+			foreach (get_post_types(array('public' => true), 'names') as $post_type) {
+				$this->_post_types[$post_type] = $post_type;
 			}
 		}
 		return $this->_post_types;
@@ -160,26 +183,28 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		$ids = get_post_custom_values(WPCACore::PREFIX . $this->id, $post_id);
 		if($ids) {
 			$lookup = array_flip((array)$ids);
-			foreach($this->_post_types()->get_all() as $post_type) {
-				$data = $this->_get_content(array('include' => $ids, 'posts_per_page' => -1, 'post_type' => $post_type->name, 'orderby' => 'title', 'order' => 'ASC'));
+			foreach($this->post_types() as $post_type) {
+				$post_type_obj = get_post_type_object($post_type);
+				$data = $this->_get_content(array(
+					'include'        => $ids,
+					'posts_per_page' => -1,
+					'post_type'      => $post_type
+				));
 
-				if($data || isset($lookup[$post_type->name]) || isset($lookup[WPCACore::PREFIX.'sub_' . $post_type->name])) {
-					$group_data[$this->id."-".$post_type->name] = array(
-						"label" => $post_type->label
+				if($data || isset($lookup[$post_type])) {
+
+					$placeholder = $post_type_obj->has_archive ? '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name) : '';
+					$placeholder = $post_type == 'post' ? '/'.__('Blog Page',WPCA_DOMAIN) : $placeholder;
+					$placeholder = $post_type_obj->labels->all_items.$placeholder;
+
+					$group_data[$this->id.'-'.$post_type] = array(
+						'label' => $post_type_obj->label,
+						'placeholder' => $placeholder,
+						'default_value' => $post_type
 					);
 
 					if($data) {
-						$posts = array();
-						foreach ($data as $post) {
-							$posts[$post->ID] = $post->post_title.$this->_post_states($post);
-						}
-						$group_data[$this->id."-".$post_type->name]["data"] = $posts;
-					}
-
-					if(isset($lookup[WPCACore::PREFIX.'sub_' . $post_type->name])) {
-						$group_data[$this->id."-".$post_type->name]["options"] = array(
-							WPCACore::PREFIX.'sub_' . $post_type->name => true
-						);
+						$group_data[$this->id.'-'.$post_type]['data'] = $data;
 					}
 				}
 			}
@@ -232,7 +257,7 @@ class WPCAModule_post_type extends WPCAModule_Base {
 			'search'         => ''
 		));
 
-		preg_match('/post_type-(.+)$/i', $args["item_object"], $matches);
+		preg_match('/post_type-(.+)$/i', $args['item_object'], $matches);
 		$args['item_object'] = isset($matches[1]) ? $matches[1] : "";
 
 		$post_type = get_post_type_object($args['item_object']);
@@ -240,20 +265,10 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		if(!$post_type) {
 			return false;
 		}
+		$args['post_type'] = $post_type->name;
+		unset($args['item_object']);
 
-		$posts = $this->_get_content(array(
-			'post_type' => $post_type->name,
-			'orderby'   => 'title',
-			'order'     => 'ASC',
-			'paged'     => $args['paged'],
-			'search'    => $args['search']
-		));
-
-		$retval = array();
-		foreach ($posts as $post) {
-			$retval[$post->ID] = $post->post_title.$this->_post_states($post);
-		}
-		return $retval;
+		return $this->_get_content($args);
 
 	}
 
@@ -265,77 +280,99 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 * @return array
 	 */
 	public function list_module($list) {
-		foreach($this->_post_types()->get_all() as $post_type) {
-			$list[$this->id."-".$post_type->name] = $post_type->label;
+		foreach($this->post_types() as $post_type) {
+			$post_type_obj = get_post_type_object($post_type);
+			$placeholder = $post_type_obj->has_archive ? '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name) : '';
+			$placeholder = $post_type == 'post' ? '/'.__('Blog Page',WPCA_DOMAIN) : $placeholder;
+			$placeholder = $post_type_obj->labels->all_items.$placeholder;
+			$list[$this->id.'-'.$post_type] = array(
+				'name' => $post_type_obj->label,
+				'placeholder' => $placeholder,
+				'default_value' => $post_type
+			);
 		}
 		return $list;
 	}
 
 	/**
-	 * Create module Backbone template
-	 * for administration
+	 * Get post title and state
 	 *
-	 * @since  2.0
-	 * @return void
-	 */
-	public function template_condition() {
-		if(WPCACore::post_types()->has(get_post_type())) {
-			foreach($this->_post_types()->get_all() as $post_type) {
-
-				$placeholder = $post_type->has_archive ? "/".sprintf(__("%s Archives",WPCACore::DOMAIN),$post_type->labels->singular_name) : "";
-				$placeholder = $post_type->name == "post" ? "/".__("Blog Page",WPCACore::DOMAIN) : $placeholder;
-				$placeholder = $post_type->labels->all_items.$placeholder;
-
-				echo WPCAView::make("module/condition_".$this->id."_template",array(
-					'id'          => $this->id,
-					'placeholder' => $placeholder,
-					'post_type'   => $post_type->name,
-					'autoselect'  => WPCACore::PREFIX.'sub_'.$post_type->name
-				))->render();
-			}
-		}
-	}
-
-	/**
-	 * Get post states
-	 *
-	 * @since  1.0
-	 * @see    _post_states()
+	 * @since  3.7
 	 * @param  WP_Post  $post
 	 * @return string
 	 */
-	public function _post_states($post) {
+	public function post_title($post) {
 		$post_states = array();
 
-		if ( !empty($post->post_password) )
+		if ( !empty($post->post_password) ) {
 			$post_states['protected'] = __('Password protected');
-		if ( 'private' == $post->post_status)
-			$post_states['private'] = __('Private');
-		if ( 'draft' == $post->post_status)
-			$post_states['draft'] = __('Draft');
-		if ( 'pending' == $post->post_status)
-			/* translators: post state */
-			$post_states['pending'] = _x('Pending', 'post state');
-		if ( is_sticky($post->ID) )
-			$post_states['sticky'] = __('Sticky');
-		if ( 'future' === $post->post_status ) {
-			$post_states['scheduled'] = __( 'Scheduled' );
 		}
- 
-		/**
-		 * Filter the default post display states used in the posts list table.
-		 *
-		 * @since 2.8.0
-		 *
-		 * @param array $post_states An array of post display states.
-		 * @param int   $post        The post ID.
-		 */
+
+		if ( is_sticky($post->ID) ) {
+			$post_states['sticky'] = __('Sticky');
+		}
+
+		switch($post->post_status) {
+			case 'private':
+				$post_states['private'] = __('Private');
+				break;
+			case 'draft':
+				$post_states['draft'] = __('Draft');
+				break;
+			case 'pending':
+				/* translators: post state */
+				$post_states['pending'] = _x('Pending', 'post state');
+				break;
+			case 'scheduled':
+				$post_states['scheduled'] = __( 'Scheduled' );
+				break;
+		}
+
+		$post_title = $post->post_title ? $post->post_title : __('(no title)');
 		$post_states = apply_filters( 'display_post_states', $post_states, $post );
 
-		return $post_states ? " (".implode(", ", $post_states).")" : "";
+		return $post_title . ' ' . ($post_states ? " (".implode(", ", $post_states).")" : "");
 	}
 
-	
+	/**
+	 * Save data on POST
+	 *
+	 * @since  1.0
+	 * @param  int  $post_id
+	 * @return void
+	 */
+	public function save_data($post_id) {
+		$meta_key = WPCACore::PREFIX . $this->id;
+		$old = array_flip(get_post_meta($post_id, $meta_key, false));
+		$new = array();
+
+		foreach($this->post_types() as $post_type) {
+			$id = $this->id.'-'.$post_type;
+			if(isset($_POST['conditions'][$id])) {
+				$new = array_merge($new,$_POST['conditions'][$id]);
+			}
+		}
+
+		if ($new) {
+			//$new = array_unique($new);
+			// Skip existing data or insert new data
+			foreach ($new as $new_single) {
+				if (isset($old[$new_single])) {
+					unset($old[$new_single]);
+				} else {
+					add_post_meta($post_id, $meta_key, $new_single);
+				}
+			}
+			// Remove existing data that have not been skipped
+			foreach ($old as $old_key => $old_value) {
+				delete_post_meta($post_id, $meta_key, $old_key);
+			}
+		} elseif (!empty($old)) {
+			// Remove any old values when $new is empty
+			delete_post_meta($post_id, $meta_key);
+		}
+	}
+
 	/**
 	 * Check if post ancestors have sidebar conditions
 	 *
@@ -366,8 +403,8 @@ class WPCAModule_post_type extends WPCAModule_Base {
 						'meta_query' => array(
 						'relation'   => 'AND',
 							array(
-								'key'     => WPCACore::PREFIX . $this->id,
-								'value'   => WPCACore::PREFIX.'sub_' . $post->post_type,
+								'key'     => WPCACore::PREFIX . 'autoselect',
+								'value'   => 1,
 								'compare' => '='
 							),
 							array(

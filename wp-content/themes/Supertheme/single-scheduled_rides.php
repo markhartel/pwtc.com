@@ -18,27 +18,31 @@ if(get_field('attach_map')) {
     $terrain = [];
     $maps = [];
     foreach (get_field('maps') as $map) {
-        $map_id = $map->ID;
+        $map_id = $map;
 
-        // set length to the lowest length
-        if (!$length) {
-            $length = get_field('length', $map_id);
-        } else if ($length && get_field('length', $map_id) < $length) {
+        if($length) {
+            $length = min(get_field('length', $map_id), $length);
+        } else {
             $length = get_field('length', $map_id);
         }
 
-        // set max length to the highest max length
-        if (!$maxLength) {
-            $maxLength = get_field('max_length', $map_id);
-        } else if ($maxLength && get_field('max_length', $map_id) < $maxLength) {
-            $maxLength = get_field('max_length', $map_id);
+
+        if($maxLength) {
+            $maxLength = max(get_field('max_length', $map_id), $maxLength, get_field('length', $map_id));
+        } else {
+            $maxLength = get_field('max_length', $map_id) ?: get_field('length', $map_id);
         }
 
         $terrain = array_merge($terrain, get_field('terrain', $map_id));
-        $maps = array_merge($maps, get_field('maps', $map_id));
+        $raw_map = get_field('maps', $map_id);
+        $raw_map[0]['title'] = $map->post_title;
+        $maps = array_merge($maps, $raw_map);
+    }
+    if($length == $maxLength) {
+        $maxLength = null;
     }
 }
-$data['terrain'] = isset($terrain) ? $terrain : get_field('terrain');
+$data['terrain'] = isset($terrain) ? array_unique($terrain) : get_field('terrain');
 $data['length'] = isset($length) ? $length : get_field('length');
 $data['max_length'] = isset($maxLength) ? $maxLength : get_field('max_length');
 $data['maps'] = isset($maps) ? $maps : false;

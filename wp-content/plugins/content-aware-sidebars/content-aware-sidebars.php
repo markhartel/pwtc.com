@@ -3,13 +3,13 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 /*
 Plugin Name: Content Aware Sidebars
 Plugin URI: https://dev.institute/wordpress/sidebars-pro/
-Description: Unlimited custom sidebars for any post, page, category etc.
-Version: 3.4.1
+Description: Unlimited custom sidebars and widget areas for any post, page, category etc.
+Version: 3.6.2
 Author: Joachim Jensen
 Author URI: https://dev.institute
 Text Domain: content-aware-sidebars
@@ -17,7 +17,7 @@ Domain Path: /lang/
 License: GPLv3
 
 	Content Aware Sidebars Plugin
-	Copyright (C) 2011-2016 Joachim Jensen - jv@intox.dk
+	Copyright (C) 2011-2017 Joachim Jensen - jv@intox.dk
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ License: GPLv3
 */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 

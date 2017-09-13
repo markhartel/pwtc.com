@@ -3,12 +3,10 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
-if (!defined('CAS_App::PLUGIN_VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -18,6 +16,52 @@ $cas_db_updater->register_version_update('2.0','cas_update_to_20');
 $cas_db_updater->register_version_update('3.0','cas_update_to_30');
 $cas_db_updater->register_version_update('3.1','cas_update_to_31');
 $cas_db_updater->register_version_update('3.4','cas_update_to_34');
+$cas_db_updater->register_version_update('3.5.1','cas_update_to_351');
+$cas_db_updater->register_version_update('3.6','cas_update_to_36');
+
+/**
+ * Update to version 3.6
+ * Remove old review data
+ *
+ * @since  3.6
+ * @return boolean
+ */
+function cas_update_to_36() {
+	global $wpdb;
+
+	$wpdb->query("
+		DELETE FROM $wpdb->usermeta 
+		WHERE meta_key = 'wp__ca_cas_review' 
+		AND meta_value != '1' 
+		AND CAST(meta_value AS DECIMAL) <= 1467331200
+	");
+
+	return true;
+}
+
+/**
+ * Update to version 3.5.1
+ * Simplify auto select option
+ *
+ * @since  3.5.1
+ * @return boolean
+ */
+function cas_update_to_351() {
+	global $wpdb;
+
+	$group_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_value LIKE '_ca_sub_%'");
+	foreach ($group_ids as $group_id) {
+		add_post_meta($group_id,'_ca_autoselect',1,true);
+	}
+
+	$wpdb->query("
+		DELETE FROM $wpdb->postmeta 
+		WHERE meta_value LIKE '_ca_sub_%'
+	");
+
+	return true;
+}
+
 
 /**
  * Version 3.3.3 -> 3.4

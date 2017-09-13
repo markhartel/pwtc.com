@@ -6,20 +6,19 @@
  */
 ?>
 <?php echo $nonce; ?>
-<input type="hidden" id="current_sidebar" value="<?php the_ID(); ?>" />
 <div id="cas-groups">
 	<?php do_action('wpca/meta_box/before',$post_type); ?>
-	<ul></ul>
-	<div class="cas-group-sep">
-		<?php _e('Or',WPCACore::DOMAIN); ?>
+	<ul data-vm="collection:$collection"></ul>
+	<div class="cas-group-sep" data-vm="toggle:length($collection)">
+		<?php _e('Or',WPCA_DOMAIN); ?>
 	</div>
 	<div class="cas-group-new">
 		<select class="js-wpca-add-or">
-			<option value="0">-- <?php _e("Select content type",WPCACore::DOMAIN); ?> --</option>
+			<option value="0">-- <?php _e('Select content type',WPCA_DOMAIN); ?> --</option>
 <?php
-				foreach ($options as $key => $value) {
-					echo '<option value="'.$key.'">'.$value.'</option>';
-				}
+			foreach ($options as $key => $value) {
+				echo '<option data-placeholder="'.$value['placeholder'].'" data-default="'.$value['default_value'].'" value="'.$key.'">'.$value['name'].'</option>';
+			}
 
 ?>
 		</select>

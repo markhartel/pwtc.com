@@ -30,7 +30,7 @@ while(have_rows('content_rows')) {
             $teaser_data = [];
             $teaser_data['title'] = get_the_title($post['ID']);
             $teaser_data['excerpt'] = excerpt();
-            $teaser_data['image'] = get_the_post_thumbnail($post['ID'], 'teaser');
+            $teaser_data['image'] = get_the_post_thumbnail($post['ID'], [280,280]);
             $teaser_data['link'] = get_the_permalink($post['ID']);
             $teaser_data['format'] = get_field('format', $post['ID']);
             $teasers[] = $twig->render("teasers/post.html.twig", $teaser_data);
@@ -40,9 +40,9 @@ while(have_rows('content_rows')) {
     }
     elseif(get_row_layout() == "rides")
     {
-        $today = new DateTime();
+        $today = new DateTime(null, new DateTimeZone(supertheme_get_timezone_string()));
         $rides_query = new WP_Query([
-            'posts_per_page'	=> 10,
+            'posts_per_page' => 6,
             'post_type' => 'scheduled_rides',
             'meta_query' => [
                 [
@@ -65,8 +65,8 @@ while(have_rows('content_rows')) {
             $rides_data[$date][] = [
                 'title' => get_the_title(),
                 'link' => get_the_permalink(),
-                'date' => $datetime->getTimestamp(),
-                'time' => $datetime->getTimestamp(),
+                'date' => get_field('date'),
+                'time' => get_field('date'),
             ];
         }
         $data['rides'] = $rides_data;

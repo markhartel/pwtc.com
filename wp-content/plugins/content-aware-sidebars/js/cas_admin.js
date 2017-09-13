@@ -2,7 +2,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
 (function($) {
@@ -13,63 +13,63 @@
 		sections: [],
 
 		init: function() {
-
-			this.upgradeNoticeHandler();
 			this.tabController();
 			this.addHandleListener();
-			this.reviewNoticeHandler();
 			this.suggestVisibility();
 			this.initSidebarActivation();
 
-		},
-
-		upgradeNoticeHandler: function() {
-			$('.js-cas-pro-notice').on('click',function(e) {
-				e.preventDefault();
-				$('.js-cas-pro-read-more').attr('href',$(this).data('url'));
-				$('.js-cas-pro-popup').trigger('click');
-			});
+			$('.js-cas-html').on('change',function(e) {
+				var $this = $(this);
+				$($this.data('target')).attr('disabled',!$this.is(':checked'));
+			}).trigger('change');
 		},
 
 		initSidebarActivation: function() {
-			Flatpickr.l10n.weekdays = CASAdmin.weekdays;
-			Flatpickr.l10n.months = CASAdmin.months;
-			Flatpickr.l10n.firstDayOfWeek = CASAdmin.weekStart;
+			flatpickr.l10ns.default.weekdays = CASAdmin.weekdays;
+			flatpickr.l10ns.default.months = CASAdmin.months;
+			flatpickr.l10ns.default.firstDayOfWeek = CASAdmin.weekStart;
 
-			var config = {
-					wrap: true,
-					clickOpens: true,
-					enableTime: true,
-					time_24hr: true,
-					allowInput: true,
-					enableSeconds: true,
-					altInput: true,
-					altFormat: CASAdmin.dateFormat + ' @ H:i:S'
-				},
-				$activate = $('.js-cas-activation'),
-				$deactivate = $('.js-cas-expiry'), 
-				activate = $activate.flatpickr(config),
-				deactivate = $deactivate.flatpickr(config);
-			
-			activate.config.onChange = function(dateObj, dateStr, instance) {
-				deactivate.set("minDate", dateStr != '' ? new Date(dateObj).fp_incr(1) : null);
-				var $toggle = $('.js-cas-status');
-				if(dateStr != '') {
-					$toggle.prop('checked',false);
-				} else if(!$toggle.is(':checked')) {
-					deactivate.clear();
+			var activate = flatpickr('.js-cas-activation',{
+				wrap: true,
+				clickOpens: true,
+				enableTime: true,
+				time_24hr: true,
+				allowInput: true,
+				enableSeconds: true,
+				altInput: true,
+				altFormat: CASAdmin.dateFormat + ' @ H:i:S',
+				onChange: function(dateObj, dateStr, instance) {
+					console.log("activate");
+					if(dateStr || deactivate.config.minDate) {
+						deactivate.set("minDate", dateStr ? new Date(dateObj).fp_incr(1) : null);
+					}
+					if(dateStr) {
+						$toggle.prop('checked',false);
+					} else if(!$toggle.is(':checked')) {
+						deactivate.clear();
+					}
 				}
-			};
+			}),
+			deactivate = flatpickr('.js-cas-expiry',{
+				wrap: true,
+				clickOpens: true,
+				enableTime: true,
+				time_24hr: true,
+				allowInput: true,
+				enableSeconds: true,
+				altInput: true,
+				altFormat: CASAdmin.dateFormat + ' @ H:i:S',
+				onChange: function(dateObj, dateStr, instance) {
+					console.log("deactivate");
+					if(dateStr || activate.config.maxDate) {
+						activate.set("maxDate", dateStr ? new Date(dateObj).fp_incr(-1) : null);
+					}
+				}
+			}),
+			$toggle = $('.js-cas-status');
 
-			deactivate.config.onChange = function(dateObj, dateStr, instance) {
-				activate.set("maxDate", new Date(dateObj).fp_incr(-1));
-			};
-
-			$('.js-cas-status').on('change',function(e) {
-				var $this = $(this),
-					isActive = $this.is(':checked');
-
-				if(isActive) {
+			$toggle.on('change',function(e) {
+				if($(this).is(':checked')) {
 					activate.clear();
 				} else if(!activate.selectedDates.length) {
 					deactivate.clear();
@@ -90,7 +90,6 @@
 					var section = this.href.substr(start);
 					cas_options.sections.push(section);
 					$(section).hide();
-					//.find("input, select").attr("disabled",true);
 				}
 			});
 		},
@@ -207,37 +206,6 @@
 			if($elem.data('value')) {
 				$elem.val($elem.data('value').toString().split(',')).trigger('change');
 			}
-		},
-
-		/**
-		 * Handle clicks on review notice
-		 * Sends dismiss event to backend
-		 *
-		 * @since  3.1
-		 * @return {void}
-		 */
-		reviewNoticeHandler: function() {
-			$notice = $(".js-cas-notice-review");
-			$notice.on("click","a, button", function(e) {
-				$this = $(this);
-				$.ajax({
-					url: ajaxurl,
-					data:{
-						'action': 'cas_dismiss_review_notice',
-						'dismiss': $this.attr("href") ? 1 : 0
-					},
-					dataType: 'JSON',
-					type: 'POST',
-					success:function(data){
-						$notice.fadeOut(400,function() {
-							$notice.remove();
-						});
-					},
-					error: function(xhr, desc, e) {
-						console.log(xhr.responseText);
-					}
-				});
-			});
 		}
 	};
 

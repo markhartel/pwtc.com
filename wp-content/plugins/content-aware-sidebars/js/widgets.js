@@ -2,7 +2,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2016 by Joachim Jensen
+ * @copyright 2017 by Joachim Jensen
  */
 
 (function($) {
@@ -11,7 +11,6 @@
 
 		$sidebarContainer: $(".widget-liquid-right"),
 		$widgetContainer: $('#available-widgets'),
-		$widgets:null,
 
 		/**
 		 * Initiate
@@ -23,7 +22,63 @@
 
 			this.addSidebarToolbar();
 			this.addWidgetSearch();
+			this.toggleSidebarStatus();
+			this.enhancedWidgetManager();
 
+		},
+
+		/**
+		 * Enable enhanced widget manager
+		 *
+		 * @since  3.6
+		 * @return {void}
+		 */
+		enhancedWidgetManager: function() {
+			if($('body').hasClass('cas-widget-manager')) {
+				this.$widgetContainer.find('.widget').draggable('option','scroll',false);
+
+				var that = this,
+					$inactiveSidebars = $('#widgets-left .inactive-sidebar');
+				$inactiveSidebars.toggle(this.$widgetContainer.hasClass('closed'));
+				this.$widgetContainer.find('.sidebar-name').click(function(e) {
+					$inactiveSidebars.toggle(that.$widgetContainer.hasClass('closed'));
+				});
+			}
+		},
+
+		/**
+		 * Call backend on 1-click activation
+		 *
+		 * @since  3.3
+		 * @return {void}
+		 */
+		toggleSidebarStatus: function() {
+			$(".widget-liquid-right").on('change','.sidebar-status-input',function(e) {
+				var $this = $(this),
+					status = $this.is(':checked');
+
+				if(!($this.hasClass('sidebar-status-future') && !confirm(CASAdmin.enableConfirm))) {
+					$.post(
+					    ajaxurl, 
+					    {
+							'action'    : 'cas_sidebar_status',
+							'sidebar_id': $this.val(),
+							'status'    : status
+					    }, 
+					    function(response){
+					    	if(response.success) {
+					    		//change title attr
+					    		$this.next().attr('title',response.data.title);
+					    		$this.removeClass('sidebar-status-future');
+					    	} else {
+					    		$this.attr('checked',!status);
+					    	}
+					    }
+					);
+				} else {
+					$this.attr('checked',!status);
+				}
+			});
 		},
 		/**
 		 * Add search input for widgets
@@ -31,9 +86,9 @@
 		 * @since 3.0
 		 */
 		addWidgetSearch: function() {
-			this.$widgets = $(".widget",this.$widgetContainer).get().reverse();
+			var $widgets = $(".widget",this.$widgetContainer).get().reverse();
 			$(".sidebar-description",this.$widgetContainer).prepend('<input type="search" class="js-cas-widget-filter cas-filter-widget" placeholder="'+CASAdmin.filterWidgets+'...">');
-			this.searchWidgetListener();
+			this.searchWidgetListener($widgets);
 		},
 		/**
 		 * Listen to widget filter
@@ -41,11 +96,11 @@
 		 * @since  3.0
 		 * @return {void}
 		 */
-		searchWidgetListener: function() {
+		searchWidgetListener: function($widgets) {
 			var that = this,
 				filterTimer,
 				cachedFilter = "";
-			this.$widgetContainer.on('keyup', '.js-cas-widget-filter',function(e) {
+			this.$widgetContainer.on('input', '.js-cas-widget-filter',function(e) {
 				var filter = $(this).val();
 				if(filter != cachedFilter) {
 					cachedFilter = filter;
@@ -53,7 +108,7 @@
 						clearTimeout(filterTimer);
 					}
 					filterTimer = setTimeout(function(){
-						$(that.$widgets).each(function(key,widget) {
+						$($widgets).each(function(key,widget) {
 							var $widget = $(widget);
 							if ($widget.find(".widget-title :nth-child(1)").text().search(new RegExp(filter, "i")) < 0) {
 								$widget.fadeOut();
@@ -75,10 +130,10 @@
 		addSidebarToolbar: function() {
 
 			var box = '<div class="wp-filter cas-filter-sidebar">'+
-			'<a href="post-new.php?post_type=sidebar" class="button button-primary">'+CASAdmin.addNew+'</a>'+
+			'<a href="admin.php?page=wpcas-edit" class="button button-primary">'+CASAdmin.addNew+'</a>'+
 			'<input type="search" class="js-cas-filter" placeholder="'+CASAdmin.filterSidebars+'...">'+
-			'<a href="#" class="js-sidebars-toggle sidebars-toggle" data-toggle="0">'+CASAdmin.collapse+'</a>'+
-			'<a href="#" class="js-sidebars-toggle sidebars-toggle" data-toggle="1">'+CASAdmin.expand+'</a>'+
+			'<a href="#" title="'+CASAdmin.collapse+'" class="js-sidebars-toggle sidebars-toggle" data-toggle="0"><span class="dashicons dashicons-arrow-up-alt2"></span></a>'+
+			'<a href="#" title="'+CASAdmin.expand+'" class="js-sidebars-toggle sidebars-toggle" data-toggle="1"><span class="dashicons dashicons-arrow-down-alt2"></span></a>'+
 			'</div>';
 
 			this.$sidebarContainer.prepend(box);
@@ -121,7 +176,7 @@
 			var that = this,
 				filterTimer,
 				cachedFilter = "";
-			this.$sidebarContainer.on('keyup', '.js-cas-filter',function(e) {
+			this.$sidebarContainer.on('input', '.js-cas-filter',function(e) {
 				var filter = $(this).val();
 				if(filter != cachedFilter) {
 					cachedFilter = filter;

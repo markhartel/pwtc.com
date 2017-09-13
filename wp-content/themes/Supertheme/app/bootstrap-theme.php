@@ -13,9 +13,15 @@ $data['url'] = get_site_url();
 $data['desktopMenu'] = wp_nav_menu([
     'echo' => false,
     'container' => false,
-    'items_wrap' => '<ul id="%1$s" class="%2$s dropdown menu hide-for-small-only float-right" data-dropdown-menu>%3$s</ul>',
+    'items_wrap' => '<ul id="%1$s" class="%2$s dropdown menu hide-for-small-only float-right" data-dropdown-menu data-close-on-click-inside="false">%3$s</ul>',
     'theme_location' => 'primary_menu',
     'walker' => new DropDownMenuWalker(),
+]);
+$data['memberMenu'] = wp_nav_menu([
+    'echo' => false,
+    'container' => false,
+    'items_wrap' => '<ul id="%1$s" class="%2$s menu">%3$s</ul>',
+    'theme_location' => 'member_menu',
 ]);
 $data['mobileMenu'] = wp_nav_menu([
     'echo' => false,

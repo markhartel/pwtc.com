@@ -5,9 +5,7 @@
  * @license GPLv3
  */
 
-if (!defined('WPCACore::VERSION')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -32,9 +30,9 @@ class WPCAModule_bp_member extends WPCAModule_Base {
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('bp_member',__('BuddyPress Profiles',WPCACore::DOMAIN));
+		parent::__construct('bp_member',__('BuddyPress Profiles',WPCA_DOMAIN));
 		$this->default_value = 0;
-		$this->placeholder = __('All Sections',WPCACore::DOMAIN);
+		$this->placeholder = __('All Sections',WPCA_DOMAIN);
 	}
 
 	/**
@@ -131,22 +129,6 @@ class WPCAModule_bp_member extends WPCAModule_Base {
 		return $data;
 	}
 
-	/**
-	 * Get content in JSON
-	 *
-	 * @since   2.0
-	 * @param   array    $args
-	 * @return  array
-	 */
-	public function ajax_get_content($args) {
-		$args = wp_parse_args($args, array(
-			'paged'          => 1,
-			'search'         => ''
-		));
-
-		return $this->_get_content($args);
-	}
-	
 	/**
 	 * Avoid collision with content of static module
 	 * Somehow buddypress pages pass is_404()

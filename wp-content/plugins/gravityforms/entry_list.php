@@ -182,7 +182,7 @@ class GFEntryList {
 
 		$option_values = get_user_option( 'gform_entries_screen_options' );
 
-		if ( empty( $option_values ) ) {
+		if ( empty( $option_values ) || ! is_array( $option_values ) ) {
 			$option_values = array();
 		}
 		$option_values = array_merge( $default_values, $option_values );
@@ -219,8 +219,6 @@ class GFEntryList {
 
 			<?php
 			GFForms::top_toolbar();
-
-			if ( $table->has_items() ) :
 				?>
 
 				<div id="entry_search_container">
@@ -229,8 +227,6 @@ class GFEntryList {
 					   href="javascript:Search('<?php echo esc_js( $table->get_orderby() ); ?>', '<?php echo esc_js( $table->get_order() ) ?>', <?php echo absint( $form_id ); ?>, jQuery('.gform-filter-value').val(), '<?php echo esc_js( $table->get_filter() ) ?>', jQuery('.gform-filter-field').val(), jQuery('.gform-filter-operator').val());"><?php esc_html_e( 'Search', 'gravityforms' ) ?></a>
 
 				</div>
-
-			<?php endif; ?>
 
 			<form id="entry_list_form" method="post">
 				<?php
@@ -927,8 +923,8 @@ final class GF_Entry_List_Table extends WP_List_Table {
 		$search_field_id = rgget( 'field_id' );
 		$search_operator = rgget( 'operator' );
 
-		$orderby = $this->get_order();
-		$order   = $this->get_orderby();
+		$order   = $this->get_order();
+		$orderby = $this->get_orderby();
 
 		$search_qs  = empty( $search ) ? '' : '&s=' . esc_attr( urlencode( $search ) );
 		$orderby_qs = empty( $orderby ) ? '' : '&orderby=' . esc_attr( $orderby );
@@ -941,7 +937,7 @@ final class GF_Entry_List_Table extends WP_List_Table {
 
 		$position = ( $page_size * $page_index ) + $this->row_index;
 
-		$edit_url = 'page=gf_entries&view=entry&id=' . absint( $form_id ) . '&lid=' . esc_attr( $entry['id'] . $search_qs . $orderby_qs . $order_qs . $filter_qs ) . '&paged=' . $page_num .'&pos=' . $position .'&field_id=' . esc_attr( $search_field_id ) .  '&operator=' .  esc_attr( $search_operator );
+		$edit_url = 'page=gf_entries&view=entry&id=' . absint( $form_id ) . '&lid=' . esc_attr( $entry['id'] ) . $search_qs . $orderby_qs . $order_qs . $filter_qs . '&paged=' . $page_num .'&pos=' . $position .'&field_id=' . esc_attr( $search_field_id ) .  '&operator=' .  esc_attr( $search_operator );
 		return $edit_url;
 	}
 
@@ -954,7 +950,8 @@ final class GF_Entry_List_Table extends WP_List_Table {
 	 */
 	function get_detail_url( $entry ) {
 		$query_string = $this->get_detail_query_string( $entry );
-		$url = admin_url( 'admin.php?' . $query_string );
+		$url          = admin_url( 'admin.php?' . $query_string );
+
 		return $url;
 	}
 
@@ -1367,8 +1364,8 @@ final class GF_Entry_List_Table extends WP_List_Table {
 	function output_scripts() {
 
 		$form_id = $this->get_form_id();
-		$form       = $this->get_form();
-		$search     = stripslashes( rgget( 's' ) );
+		$form    = $this->get_form();
+		$search  = isset( $_GET['s'] ) ? stripslashes( $_GET['s'] ) : null;
 
 		$orderby      = empty( $_GET['orderby'] ) ? 0 : $_GET['orderby'];
 		$order = empty( $_GET['order'] ) ? 'ASC' : strtoupper( $_GET['order'] );

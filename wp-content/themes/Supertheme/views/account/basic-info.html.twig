@@ -1,24 +1,35 @@
 <div id="basic-form" class="">
     <div class="row column"><h3>Basic Info</h3></div>
-    <form action="" id="basicInfo">
+    <form action="" id="basicInfo" data-abide novalidate>
         <div class="row">
             <div class="small-12 medium-6 large-4 columns">
                 <label for="">Profile</label>
                 {{ SP.WordPress.getAvatar(200) }}
-                <input type="file">
             </div>
             <div class="small-12 medium-6 large-8 columns">
-                <label for="">First Name<input name="first" type="text" value="{{ user.first_name }}"></label>
-                <label for="">Last Name<input name="last" type="text" value="{{ user.last_name }}"></label>
+                <label for="">
+                    First Name
+                    <input name="first" type="text" value="{{ user.first_name }}" required pattern="alpha">
+                    <span class="form-error">A valid first name is required. Only a-z characters are allowed</span>
+                </label>
+                <label for="">
+                    Last Name
+                    <input name="last" type="text" value="{{ user.last_name }}" required pattern="alpha">
+                    <span class="form-error">A valid last name is required. Only a-z characters are allowed</span>
+                </label>
                 {% for email in user.email %}
                     {% if loop.first %}
                         <div class="row">
                             <div class="small-6 columns">
-                                <label for="">Email<input name="email" type="text" value="{{ email.email }}"></label>
+                                <label for="">
+                                    Email
+                                    <input name="email" type="text" value="{{ email.email }}" required pattern="email">
+                                    <span class="form-error">A valid email is required.</span>
+                                </label>
                             </div>
                             <div class="small-6 columns">
                                 <label for="">Location
-                                    <select name="email_location" id="">
+                                    <select name="email_location" id="" required>
                                         <option value="5" {% if email.location_type_id == 5 %}selected="selected"{% endif %}>Billing</option>
                                         <option value="1" {% if email.location_type_id == 1 %}selected="selected"{% endif %}>Home</option>
                                         <option value="3" {% if email.location_type_id == 3 %}selected="selected"{% endif %}>Main</option>
@@ -212,7 +223,7 @@
         <div class="row column">
             <input type="hidden" name="action" value="basic_info"/>
             <input type="hidden" name="contact_id" value="{{ contact_id }}"/>
-            <a href="#" class="primary button">Submit</a>
+            <button type="submit" class="primary button">Submit</button>
         </div>
     </form>
 </div>
