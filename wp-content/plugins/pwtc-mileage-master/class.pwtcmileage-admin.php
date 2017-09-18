@@ -332,8 +332,8 @@ class PwtcMileage_Admin {
 							'startdate' => $startdate, 
 							'leaders' => $leaders,
 							'mileage' => $mileage);
-						$guid = pwtc_mileage_fetch_post_guid(intval($postid));
-						if ($guid !== null) {
+						$guid = get_permalink(intval($postid));
+						if ($guid) {
 							$response['post_guid'] = $guid;
 						}
 						echo wp_json_encode($response);
@@ -436,8 +436,8 @@ class PwtcMileage_Admin {
 						'leaders' => $leaders,
 						'mileage' => $mileage);
 					if ($postid > 0) {
-						$guid = pwtc_mileage_fetch_post_guid($postid);
-						if ($guid !== null) {
+						$guid = get_permalink($postid);
+						if ($guid) {
 							$response['post_guid'] = $guid;
 						}
 					}
