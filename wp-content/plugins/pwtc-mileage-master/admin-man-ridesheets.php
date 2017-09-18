@@ -380,14 +380,19 @@ jQuery(document).ready(function($) {
 		var title = $("#ridesheet-ride-page .ride-search-frm input[name='title']").val().trim();
 		var startdate = $("#ridesheet-ride-page .ride-search-frm input[name='fmtdate']").val().trim();
 		var enddate = $("#ridesheet-ride-page .ride-search-frm input[name='tofmtdate']").val().trim();
-		var action = $('#ridesheet-ride-page .ride-search-frm').attr('action');
-		var data = {
-			'action': 'pwtc_mileage_lookup_rides',
-			'title': title,
-			'startdate': startdate,
-			'enddate': enddate
-		};
-		$.post(action, data, lookup_rides_cb);
+		if (title.length > 0 || startdate.length > 0 || enddate.length > 0) {
+			var action = $('#ridesheet-ride-page .ride-search-frm').attr('action');
+			var data = {
+				'action': 'pwtc_mileage_lookup_rides',
+				'title': title,
+				'startdate': startdate,
+				'enddate': enddate
+			};
+			$.post(action, data, lookup_rides_cb);
+		}		
+		else {		
+			$('#ridesheet-ride-page .rides-div').empty();		
+		}
 	}
 
 	function remove_leader_cb(response) {
