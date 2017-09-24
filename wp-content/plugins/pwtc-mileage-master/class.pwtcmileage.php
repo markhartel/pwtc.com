@@ -721,14 +721,14 @@ class PwtcMileage {
 			$id = pwtc_mileage_get_member_id();
 			$result = PwtcMileage_DB::fetch_rider($id);
 			if (count($result) > 0) {
-				$out .= $result[0]['first_name'] . ' ' . $result[0]['last_name'];
+				$out .= $result[0]['first_name'] . ' ' . $result[0]['last_name'] . 
+					', your rider ID is ' . $id . '.'; 
 			}
 			else {
-				$out .= 'Member ' . $id;
+				$out .= 'Your rider ID is ' . $id . '.';
 			}
-			$out .= ', ';
 			if ($a['type'] == 'mileage' or $a['type'] == 'both') {
-				$out .= 'you have ridden <strong>';
+				$out .= ' You have ridden <strong>';
 				$out .= PwtcMileage_DB::get_ytd_rider_mileage($id);
 				$out .= '</strong> miles with the club so far this year. Last year you rode <strong>';
 				$out .= PwtcMileage_DB::get_ly_rider_mileage($id);
@@ -737,12 +737,7 @@ class PwtcMileage {
 				$out .= '</strong> miles.';
 			}
 			if ($a['type'] == 'leader' or $a['type'] == 'both') {
-				if ($a['type'] == 'both') {
-					$out .= ' You have led <strong>';
-				}
-				else {
-					$out .= 'you have led <strong>';
-				}
+				$out .= ' You have led <strong>';
 				$out .= PwtcMileage_DB::get_ytd_rider_led($id);
 				$out .= '</strong> club rides so far this year. Last year you led <strong>';
 				$out .= PwtcMileage_DB::get_ly_rider_led($id);

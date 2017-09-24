@@ -30,6 +30,7 @@ jQuery(document).ready(function($) {
                     'action': 'pwtc_mileage_get_rider',
                     'member_id': $(this).parent().parent().attr('memberid')
                 };
+                $('body').addClass('waiting');
                 $.post(action, data, modify_rider_cb);
             });
             $('#rider-inspect-section .riders-div .remove-btn').on('click', function(evt) {
@@ -41,11 +42,13 @@ jQuery(document).ready(function($) {
                     'nonce': '<?php echo wp_create_nonce('pwtc_mileage_remove_rider'); ?>'
                 };
     <?php if ($plugin_options['disable_delete_confirm']) { ?>
+                $('body').addClass('waiting');
                 $.post(action, data, remove_rider_cb);
     <?php } else { ?>
                 open_confirm_dialog(
                     'Are you sure you want to delete rider ID ' + data.member_id + '?', 
                     function() {
+                        $('body').addClass('waiting');
                         $.post(action, data, remove_rider_cb);
                     }
                 );
@@ -64,9 +67,11 @@ jQuery(document).ready(function($) {
         $("#rider-inspect-section .search-frm input[name='firstname']").val(res.firstname);
         $("#rider-inspect-section .search-frm input[name='lastname']").val(res.lastname);
 		populate_riders_table(res.members);
-	}   
+        $('body').removeClass('waiting');
+    }   
 
 	function create_rider_cb(response) {
+        $('body').removeClass('waiting');
         var res = JSON.parse(response);
 		if (res.error) {
             open_error_dialog(res.error);
@@ -77,7 +82,7 @@ jQuery(document).ready(function($) {
             });
             load_rider_table();
         }
-	}   
+    }   
 
 	function modify_rider_cb(response) {
         var res = JSON.parse(response);
@@ -110,9 +115,11 @@ jQuery(document).ready(function($) {
                 $("#rider-inspect-section .add-blk .add-frm input[name='firstname']").focus();          
             });
         }
+        $('body').removeClass('waiting');
 	}   
 
 	function remove_rider_cb(response) {
+        $('body').removeClass('waiting');
         var res = JSON.parse(response);
 		if (res.error) {
             open_error_dialog(res.error);
@@ -139,6 +146,7 @@ jQuery(document).ready(function($) {
                 'firstname': firstname,
                 'active': active
             };
+            $('body').addClass('waiting');
             $.post(action, data, lookup_riders_cb); 
         }
         else {
@@ -195,9 +203,12 @@ jQuery(document).ready(function($) {
 			'firstname': $("#rider-inspect-section .add-blk .add-frm input[name='firstname']").val(),
 			'exp_date': $("#rider-inspect-section .add-blk .add-frm input[name='fmtdate']").val()
 		};
-		$.post(action, data, create_rider_cb);
+        $('body').addClass('waiting');
+        $.post(action, data, create_rider_cb);
     });
 
+    $("#rider-inspect-section .search-frm input[type='text']").val('');
+    
     $("#rider-inspect-section .search-frm input[name='memberid']").focus();
 
 });
