@@ -1217,8 +1217,9 @@ class PwtcMileage_DB {
 		}
 
 		$result = $wpdb->query('create or replace view ' . self::LY_LT_ACHVMNT_VIEW . 
-			' (member_id, first_name, last_name, mileage, achievement)' . 
-			' as select a.member_id, a.first_name, a.last_name, a.mileage, concat(floor(a.mileage/10000),\'0K\')' . 
+			' (member_id, first_name, last_name, mileage, achievement, nachievement)' . 
+			' as select a.member_id, a.first_name, a.last_name, a.mileage,' .
+			' concat(floor(a.mileage/10000),\'0K\'), floor(a.mileage/10000)' . 
 			' from ' . self::LY_LT_MILES_VIEW . ' as a inner join ' . self::YBL_LT_MILES_VIEW . ' as b on a.member_id = b.member_id' . 
 			' where floor(a.mileage/10000) > floor(b.mileage/10000)');
 		if (false === $result) {
