@@ -24,6 +24,7 @@ function getPrettyDate(d) {
     return fmt.formatDate(fmt.parseDate(d, 'Y-m-d'), 'D M j Y');
 }
 
+// TODO: this function does not work for certain dates.
 function getInternalDate(d) {
     var fmt = new DateFormatter();
    return fmt.formatDate(fmt.parseDate(d, 'D M j Y'), 'Y-m-d');

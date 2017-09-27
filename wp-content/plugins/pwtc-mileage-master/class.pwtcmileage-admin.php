@@ -1076,7 +1076,7 @@ class PwtcMileage_Admin {
 					switch ($reportid) {
 						case "award_achvmnt":
 							$meta = PwtcMileage_DB::meta_ly_lt_achvmnt();
-							$data = PwtcMileage_DB::fetch_ly_lt_achvmnt(ARRAY_N, 'mileage');
+							$data = PwtcMileage_DB::fetch_ly_lt_achvmnt(ARRAY_N, 'nachievement, last_name, first_name');
 							break;
 						case "award_top_miles":
 							$meta = PwtcMileage_DB::meta_ly_miles();
@@ -1156,6 +1156,13 @@ class PwtcMileage_Admin {
     	$position = $plugin_options['plugin_menu_location'];
 		add_menu_page($page_title, $menu_title, $capability, $parent_menu_slug, $function, $icon_url, $position);
 
+		$page_title = $plugin_options['plugin_menu_label'] . ' - Create Ride Sheets';
+    	$menu_title = 'Create Ride Sheets';
+    	$menu_slug = 'pwtc_mileage_create_ride_sheets';
+    	$capability = PwtcMileage::EDIT_MILEAGE_CAP;
+    	$function = array( 'PwtcMileage_Admin', 'page_create_ride_sheets');
+		add_submenu_page($parent_menu_slug, $page_title, $menu_title, $capability, $menu_slug, $function);
+
     	$page_title = $plugin_options['plugin_menu_label'] . ' - Manage Ride Sheets';
     	$menu_title = 'Manage Ride Sheets';
     	$menu_slug = 'pwtc_mileage_manage_ride_sheets';
@@ -1200,10 +1207,19 @@ class PwtcMileage_Admin {
 	public static function plugin_menu_page() {
 	}
 
+	public static function page_create_ride_sheets() {
+		$plugin_options = PwtcMileage::get_plugin_options();
+		$running_jobs = PwtcMileage_DB::num_running_jobs();
+		$capability = PwtcMileage::EDIT_MILEAGE_CAP;
+		$create_mode = true;
+		include('admin-man-ridesheets.php');
+	}
+
 	public static function page_manage_ride_sheets() {
 		$plugin_options = PwtcMileage::get_plugin_options();
 		$running_jobs = PwtcMileage_DB::num_running_jobs();
 		$capability = PwtcMileage::EDIT_MILEAGE_CAP;
+		$create_mode = false;
 		include('admin-man-ridesheets.php');
 	}
 

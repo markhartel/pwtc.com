@@ -38,6 +38,7 @@ jQuery(document).ready(function($) {
             $('#rider-lookup-results .lookup-tlb tr').remove();
             $('#rider-lookup-results .error-msg').html('No riders found!');
         }
+        $('body').removeClass('waiting');
     } 
 
     $('#rider-lookup-results .lookup-frm').on('submit', function(evt) {
@@ -54,6 +55,7 @@ jQuery(document).ready(function($) {
             'firstname': $("#rider-lookup-results .lookup-frm input[name='firstname']").val(),
             'active': active
 		};
+        $('body').addClass('waiting');
         $.post(action, data, lookup_riders_cb);
     });
 

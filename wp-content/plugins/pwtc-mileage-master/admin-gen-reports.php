@@ -58,6 +58,7 @@ jQuery(document).ready(function($) {
                 history.pushState(res.state, '');
             }
         }
+        $('body').removeClass('waiting');
 	}   
 
 	function restore_report_cb(response) {
@@ -68,6 +69,7 @@ jQuery(document).ready(function($) {
         else {
             show_report_section(res.title, res.header, res.data);
         }
+        $('body').removeClass('waiting');
 	}   
 
     $('#report-main-section .ride-mileage a').on('click', function(evt) {
@@ -89,6 +91,7 @@ jQuery(document).ready(function($) {
                 'report_id': $(this).attr('report-id'),
                 'sort': $('#report-main-section .mileage-sort-slt').val()
             };
+            $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
         }
     });
@@ -112,6 +115,7 @@ jQuery(document).ready(function($) {
                 'report_id': $(this).attr('report-id'),
                 'sort': $('#report-main-section .leader-sort-slt').val()
             };
+            $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
         }
     });
@@ -142,6 +146,7 @@ jQuery(document).ready(function($) {
                     'member_id': memberid,
                     'name': $('#report-main-section .ridername').html()
                 };
+                $('body').addClass('waiting');
                 $.post(action, data, generate_report_cb);
             }
         }
@@ -163,6 +168,7 @@ jQuery(document).ready(function($) {
                 'action': 'pwtc_mileage_generate_report',
                 'report_id': $(this).attr('report-id')
             };
+            $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
         }
     });
@@ -183,6 +189,7 @@ jQuery(document).ready(function($) {
                 'action': 'pwtc_mileage_generate_report',
                 'report_id': $(this).attr('report-id')
             };
+            $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
         }
     });
@@ -212,6 +219,7 @@ jQuery(document).ready(function($) {
             if (state !== null) {
                 //console.log("Popstate event, state is " + JSON.stringify(state));
                 var action = '<?php echo admin_url('admin-ajax.php'); ?>';
+                $('body').addClass('waiting');
                 $.post(action, state, restore_report_cb);
             }
             else {
@@ -246,6 +254,15 @@ if ($running_jobs > 0) {
             </select>
         </p>
         <div class='report-sec'>
+        <h3><?php echo(intval(date('Y'))-1); ?> Award Reports</h3>
+        <div class='awards'>
+            <div><a href='#' report-id='award_achvmnt'>Accumulative mileage achievement</a></div>
+            <div><a href='#' report-id='award_top_miles'>Top annual mileage</a></div>
+            <div><a href='#' report-id='award_members'>Member annual and accumulative mileage</a></div>
+            <div><a href='#' report-id='award_leaders'>Ride leaders</a></div>
+        </div>
+        </div>
+        <div class='report-sec'>
         <h3>Ride Mileage Reports</h3>
         <p>Sort by: 
             <select class='mileage-sort-slt'>
@@ -256,7 +273,6 @@ if ($running_jobs > 0) {
         <div class='ride-mileage'>
             <div><a href='#' report-id='ytd_miles'>Year-to-date mileage</a></div>
             <div><a href='#' report-id='ly_miles'><?php echo(intval(date('Y'))-1); ?> mileage</a></div>
-            <div><a href='#' report-id='pre_ly_miles'>Pre-<?php echo(intval(date('Y'))-1); ?> mileage</a></div>
             <div><a href='#' report-id='lt_miles'>Lifetime mileage</a></div>
         </div>
         </div>
@@ -285,15 +301,6 @@ if ($running_jobs > 0) {
             <div><a href='#' report-id='ly_rides'><?php echo(intval(date('Y'))-1); ?> rides</a></div>
             <div><a href='#' report-id='ytd_rides_led'>Year-to-date rides led</a></div>
             <div><a href='#' report-id='ly_rides_led'><?php echo(intval(date('Y'))-1); ?> rides led</a></div>
-        </div>
-        </div>
-        <div class='report-sec'>
-        <h3><?php echo(intval(date('Y'))-1); ?> Award Reports</h3>
-        <div class='awards'>
-            <div><a href='#' report-id='award_achvmnt'>Accumulative mileage achievement</a></div>
-            <div><a href='#' report-id='award_top_miles'>Top annual mileage</a></div>
-            <div><a href='#' report-id='award_members'>Member annual and accumulative mileage</a></div>
-            <div><a href='#' report-id='award_leaders'>Ride leaders</a></div>
         </div>
         </div>
         <div class='report-sec'>

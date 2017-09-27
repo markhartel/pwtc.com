@@ -1,4 +1,8 @@
 
+body.waiting * {
+  cursor: progress;
+}
+
 .initially-hidden {
   display: none;  
 }

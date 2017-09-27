@@ -20,10 +20,12 @@ and delete the plugin.
 ## Rider Mileage Admin Pages
 This menu group is added to the Wordpress admin menu bar. Users with the **administrator**
 and **statistician** roles will have the right to access these menu pages.
-### Manage Ride Sheets
-This menu page allows a user to create, edit and delete ridesheets. A ridesheet records 
-the leaders of a scheduled ride and the mileage of the riders. The title and date of the ride is
+### Create Ride Sheets
+This menu page allows a user to create new ridesheets from scheduled rides. A ridesheet records 
+the leaders of a ride and the mileage of the riders. The title and date of the ride is
 also recorded.
+### Manage Ride Sheets
+This menu page allows a user to edit and delete existing ridesheets.
 ### Manage Riders
 This menu page allows a user to create, edit and delete riders.
 ### View Reports
@@ -188,16 +190,17 @@ The following views are used to generate rider mileage and leader reports:
 - `admin-man-yearend.php` *client-side logic for Database Ops admin page*
 - `admin-man-settings.php` *client-side logic for Settings admin page*
 - `admin-rider-lookup.php` *client-side logic for rider lookup dialog*
+- `admin-scripts.js` *javascript utility functions for admin pages*
+- `admin-style.css` *stylesheet for admin pages*
+- `reports-style.css` *stylesheet for report shortcodes*
+- `pwtc_logo.png` *image for membership card generation*
+### Third-party Open Source Files
 - `fpdf.php` *open source pdf generator - from [fpdf.org](http://www.fpdf.org)*
 - `helvetica.php` *font definition for pdf generator*
 - `helveticai.php` *font definition for pdf generator*
 - `helveticab.php` *font definition for pdf generator*
 - `helveticabi.php` *font definition for pdf generator*
-- `dbf_class.php` *open source DBF file reader - from [phpclasses.org](https://www.phpclasses.org/package/1302-PHP-Extract-information-from-a-DBF-database-file.html)*
-- `admin-scripts.js` *javascript utility functions for admin pages*
+- `dbf_class.php` *open source DBF file reader (modified to improve error handling) - from [phpclasses.org](https://www.phpclasses.org/package/1302-PHP-Extract-information-from-a-DBF-database-file.html)*
 - `php-date-formatter.js` *javascript utility for PHP-style date formats - from [github](https://github.com/kartik-v/php-date-formatter)*
 - `php-date-formatter.min.js` *minimized version of above file - from [github](https://github.com/kartik-v/php-date-formatter)*
-- `admin-style.css` *stylesheet for admin pages*
-- `reports-style.css` *stylesheet for report shortcodes*
 - `datepicker.css` *stylesheet for Wordpress jQueryUI datepicker - from [github](https://github.com/stuttter/wp-datepicker-styling)*
-- `pwtc_logo.png` *image for membership card generation*
