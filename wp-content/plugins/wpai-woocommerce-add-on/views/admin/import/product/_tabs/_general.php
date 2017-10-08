@@ -1,5 +1,5 @@
 <div class="panel woocommerce_options_panel" id="general_product_data">
-	<div class="options_group hide_if_grouped">
+	<div class="options_group">
 		<p class="form-field">
 			<label><?php _e("SKU", "wpai_woocommerce_addon_plugin"); ?></label>
 			<input type="text" class="short" name="single_product_sku" style="" value="<?php echo esc_attr($post['single_product_sku']) ?>"/>			
@@ -128,7 +128,7 @@
 		</div>
 	</div-->
 
-	<div class="options_group">
+	<div class="options_group show_if_simple show_if_external show_if_variable">
 		
 			<p class="form-field wpallimport-radio-field">
 				<input type="radio" id="is_product_virtual_yes" class="switcher" name="is_product_virtual" value="yes" <?php echo 'yes' == $post['is_product_virtual'] ? 'checked="checked"': '' ?>/>
@@ -151,7 +151,7 @@
 			</div>
 		
 	</div>
-	<div class="options_group">
+	<div class="options_group show_if_simple show_if_external show_if_variable">
 		
 		<p class="form-field wpallimport-radio-field">
 			<input type="radio" id="is_product_downloadable_yes" class="switcher" name="is_product_downloadable" value="yes" <?php echo 'yes' == $post['is_product_downloadable'] ? 'checked="checked"': '' ?>/>

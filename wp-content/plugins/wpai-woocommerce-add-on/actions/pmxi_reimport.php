@@ -28,6 +28,33 @@ function pmwi_pmxi_reimport($post_type, $post){
 				<input type="checkbox" id="is_update_product_type_<?php echo $post_type; ?>" name="is_update_product_type" value="1" <?php echo $post['is_update_product_type'] ? 'checked="checked"': '' ?>  class="switcher"/>
 				<label for="is_update_product_type_<?php echo $post_type; ?>"><?php _e('Product Type', 'wpai_woocommerce_addon_plugin') ?></label>
 			</div>
+
+			<?php if ( PMXI_EDITION == 'paid' && version_compare(PMXI_VERSION, '4.4.9-beta-1.7') < 0 || PMXI_EDITION == 'free' && version_compare(PMXI_VERSION, '3.4.5') < 0 ): ?>
+			<div class="input">
+				<input type="hidden" name="attributes_list" value="0" />
+				<input type="hidden" name="is_update_advanced_options" value="0" />
+				<input type="checkbox" id="is_update_advanced_options_<?php echo $post_type; ?>" name="is_update_advanced_options" value="1" <?php echo $post['is_update_advanced_options'] ? 'checked="checked"': '' ?>  class="switcher"/>
+				<label for="is_update_advanced_options_<?php echo $post_type; ?>"><?php _e('Advanced WooCommerce Options', 'wpai_woocommerce_addon_plugin') ?></label>
+				<div class="switcher-target-is_update_advanced_options_<?php echo $post_type; ?>" style="padding-left:17px;">
+					<div class="input">
+						<input type="hidden" name="is_update_catalog_visibility" value="0" />
+						<input type="checkbox" id="is_update_catalog_visibility_<?php echo $post_type; ?>" name="is_update_catalog_visibility" value="1" <?php echo $post['is_update_catalog_visibility'] ? 'checked="checked"': '' ?>  class="switcher"/>
+						<label for="is_update_catalog_visibility_<?php echo $post_type; ?>"><?php _e('Update Catalog Visibility', 'wpai_woocommerce_addon_plugin') ?></label>
+					</div>
+					<div class="input">
+						<input type="hidden" name="is_update_featured_status" value="0" />
+						<input type="checkbox" id="is_update_featured_status_<?php echo $post_type; ?>" name="is_update_featured_status" value="1" <?php echo $post['is_update_featured_status'] ? 'checked="checked"': '' ?>  class="switcher"/>
+						<label for="is_update_featured_status_<?php echo $post_type; ?>"><?php _e('Update Featured Status', 'wpai_woocommerce_addon_plugin') ?></label>
+					</div>
+				</div>
+				<div class="wp_all_import_woocommerce_deprecated_fields_notice_template">
+					<?php _e('As of WooCommerce 3.0 this data is no longer stored as a custom field - use the advanced options above.', 'wpai_woocommerce_addon_plugin'); ?>
+				</div>
+				<div class="wp_all_import_woocommerce_stock_status_notice_template">
+					<?php _e('As of WooCommerce 3.0 stock status is automatically updated when stock is updated.', 'wpai_woocommerce_addon_plugin'); ?>
+				</div>
+			</div>
+			<?php endif; ?>
 			<div class="input">		
 				<input type="hidden" name="attributes_list" value="0" />			
 				<input type="hidden" name="is_update_attributes" value="0" />

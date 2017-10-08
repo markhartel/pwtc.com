@@ -4,7 +4,7 @@ Plugin Name: CiviCRM Admin Utilities
 Plugin URI: http://haystack.co.uk
 Description: Custom code to modify CiviCRM's behaviour
 Author: Christian Wach
-Version: 0.2.8
+Version: 0.2.9
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-admin-utilities
 Domain Path: /languages
@@ -15,7 +15,7 @@ Depends: CiviCRM
 
 
 // set our version here
-define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.8' );
+define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.2.9' );
 
 // trigger logging of 'civicrm_pre' and 'civicrm_post'
 if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_DEBUG' ) ) {
@@ -154,8 +154,8 @@ class CiviCRM_Admin_Utilities {
 		// run after the CiviCRM menu hook has been registered
 		add_action( 'init', array( $this, 'civicrm_only_on_main_site_please' ) );
 
-		// admin style tweaks
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+		// style tweaks for CiviCRM
+		add_action( 'admin_print_styles-toplevel_page_CiviCRM', array( $this, 'enqueue_admin_scripts' ) );
 
 		// if the debugging flag is set
 		if ( CIVICRM_ADMIN_UTILITIES_DEBUG === true ) {
@@ -213,10 +213,34 @@ class CiviCRM_Admin_Utilities {
 		// bail if disabled
 		if ( $this->admin->setting_get( 'prettify_menu' ) == '0' ) return;
 
+		// set default CSS file
+		$css = 'civicrm-admin-utilities.css';
+
+		// test for presence of Shoreditch Extension
+		if ( function_exists( 'shoreditch_civicrm_config' ) ) {
+
+			// init CiviCRM just in case
+			if ( civi_wp()->initialize() ) {
+
+				// get the current Custom CSS URL
+				$config = CRM_Core_Config::singleton();
+
+				// has the Shoreditch CSS been activated?
+				if ( strstr( $config->customCSSURL, 'org.civicrm.shoreditch' ) !== false ) {
+
+					// use specific CSS file for Shoreditch
+					$css = 'civicrm-admin-utilities-shoreditch.css';
+
+				}
+
+			}
+
+		}
+
 		// add custom stylesheet
 		wp_enqueue_style(
 			'civicrm_admin_utilities_admin_tweaks',
-			plugins_url( 'civicrm-admin-utilities.css', CIVICRM_ADMIN_UTILITIES_FILE ),
+			plugins_url( $css, CIVICRM_ADMIN_UTILITIES_FILE ),
 			false,
 			CIVICRM_ADMIN_UTILITIES_VERSION, // version
 			'all' // media

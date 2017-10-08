@@ -1,57 +1,23 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WP All Import - ACF Add-On\n"
-"POT-Creation-Date: 2017-03-24 11:34+0900\n"
-"PO-Revision-Date: 2017-03-24 11:39+0900\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.12\n"
-"X-Poedit-Basepath: ../..\n"
-"X-Poedit-WPHeader: wpai-acf-add-on.php\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: ACF Add-On Pro\n"
+"Language: ja\n"
 
 #: actions/admin_notices.php:10
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All "
-"Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target="
-"\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid "
-"edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport."
-"com/</a>"
-msgstr ""
-"<b>%s プラグイン</b>: WP すべてインポートする必要がありますインストールされて"
-"います。<a href=\"http://wordpress.org/plugins/wp-all-import/\" target="
-"\"_blank\">Http://wordpress.org/plugins/wp-all-import/</a>と<a href=\"http://"
-"www.wpallimport.com/\">http://www.wpallimport.com/</a>で有料版で WP すべてイ"
-"ンポートの無料版"
+msgid "<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target=\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport.com/</a>"
+msgstr "<b>%s プラグイン</b>: WP すべてインポートする必要がありますインストールされています。<a href=\"http://wordpress.org/plugins/wp-all-import/\" target=\"_blank\">Http://wordpress.org/plugins/wp-all-import/</a>と<a href=\"http://www.wpallimport.com/\">http://www.wpallimport.com/</a>で有料版で WP すべてインポートの無料版"
 
 #: actions/admin_notices.php:24
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: Please update your WP All Import to the latest version"
-msgstr ""
-"<b>%s Plugin</b>: WP All Import Userアドオンを最新バージョンに更新してくださ"
-"い"
+msgid "<b>%s Plugin</b>: Please update your WP All Import to the latest version"
+msgstr "<b>%s Plugin</b>: WP All Import Userアドオンを最新バージョンに更新してください"
 
 #: actions/admin_notices.php:37
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: <a target=\"_blank\" href=\"http://wordpress.org/plugins/"
-"advanced-custom-fields/\">Advanced Custom Fields</a> must be installed"
-msgstr ""
-"<b>%s プラグイン</b>:<a target=\"_blank\" href=\"http://wordpress.org/"
-"plugins/advanced-custom-fields/\">高度なユーザー設定フィールド</a>をインス"
-"トール必要があります"
+msgid "<b>%s Plugin</b>: <a target=\"_blank\" href=\"http://wordpress.org/plugins/advanced-custom-fields/\">Advanced Custom Fields</a> must be installed"
+msgstr "<b>%s プラグイン</b>:<a target=\"_blank\" href=\"http://wordpress.org/plugins/advanced-custom-fields/\">高度なユーザー設定フィールド</a>をインストール必要があります"
 
 #: actions/pmxi_reimport.php:61
 msgid "Advanced Custom Fields"
@@ -61,9 +27,9 @@ msgstr "すべてのアドバンスカスタムフィールド"
 msgid "Update all ACF fields"
 msgstr "ACF のすべてのフィールドを更新します。"
 
-#: actions/pmxi_reimport.php:69
-msgid "Update only mapped ACF groups"
-msgstr "マップされた ACF グループのみを更新します。"
+#: actions/pmxi_reimport.php:65
+msgid "Update only mapped ACF fields"
+msgstr "登録されたACFフィールドのみを更新する"
 
 #: actions/pmxi_reimport.php:73
 msgid "Update only these ACF fields, leave the rest alone"
@@ -71,8 +37,7 @@ msgstr "これらのカスタムフィールドのみを更新し、残りはそ
 
 #: actions/pmxi_reimport.php:82
 msgid "Leave these ACF fields alone, update all other ACF fields"
-msgstr ""
-"単独でこれらの ACF フィールドを残して、他のすべての ACF フィールドを更新"
+msgstr "単独でこれらの ACF フィールドを残して、他のすべての ACF フィールドを更新"
 
 #: actions/wp_ajax_get_acf.php:6 actions/wp_ajax_get_acf.php:10
 msgid "Security check"
@@ -86,41 +51,9 @@ msgstr "WP All Import - WooCommerce アドオン プロ変更履歴を表示し�
 msgid "Changelog"
 msgstr "変更履歴"
 
-#: classes/updater.php:209
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
-msgstr ""
-"%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\"> %3$s バージョンの詳細を表示</a>"
-
-#: classes/updater.php:216
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s"
-"\">update now</a>."
-msgstr ""
-"%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">%3$s バージョンの詳細を表示</a> か <a href=\"%4$s"
-"\">今すぐ更新</a>"
-
-#: classes/updater.php:368
-msgid "You do not have permission to install plugin updates"
-msgstr "あなたはプラグインの更新プログラムをインストールする権限がありません"
-
-#: classes/updater.php:368
-msgid "Error"
-msgstr "エラー"
-
 #: helpers/pmai_render_field.php:45
-msgid ""
-"Specify the user ID, username, or user e-mail address. Separate multiple "
-"values with commas."
-msgstr ""
-"ユーザー ID、ユーザー名、またはユーザーの電子メール アドレスを指定します。複"
-"数の値をコンマで区切ります。"
+msgid "Specify the user ID, username, or user e-mail address. Separate multiple values with commas."
+msgstr "ユーザー ID、ユーザー名、またはユーザーの電子メール アドレスを指定します。複数の値をコンマで区切ります。"
 
 #: helpers/pmai_render_field.php:52
 msgid "Specify the form ID."
@@ -128,16 +61,11 @@ msgstr "フォーム ID を指定します。"
 
 #: helpers/pmai_render_field.php:59
 msgid "Enter the ID, slug, or Title. Separate multiple entries with commas."
-msgstr ""
-"ID、スラグ、またはタイトルを入力します。複数のエントリをカンマで区切ります。"
+msgstr "ID、スラグ、またはタイトルを入力します。複数のエントリをカンマで区切ります。"
 
 #: helpers/pmai_render_field.php:67
-msgid ""
-"Enter the ID, slug, or Title. Separate multiple entries with separator "
-"character."
-msgstr ""
-"ID、スラグ、またはタイトルを入力します。複数エントリの区切り文字で区切りま"
-"す。"
+msgid "Enter the ID, slug, or Title. Separate multiple entries with separator character."
+msgstr "ID、スラグ、またはタイトルを入力します。複数エントリの区切り文字で区切ります。"
 
 #: helpers/pmai_render_field.php:74 helpers/pmai_render_field.php:84
 msgid "Specify the URL to the image or file."
@@ -145,35 +73,21 @@ msgstr "画像やファイルの URL を指定します。"
 
 #: helpers/pmai_render_field.php:77 helpers/pmai_render_field.php:87
 #: helpers/pmai_render_field.php:99
-msgid ""
-"Search through the Media Library for existing images before importing new "
-"images"
-msgstr ""
-"新しい画像をインポートする前に、既存の画像をメディアライブラリから検索する"
+msgid "Search through the Media Library for existing images before importing new images"
+msgstr "新しい画像をインポートする前に、既存の画像をメディアライブラリから検索する"
 
 #: helpers/pmai_render_field.php:78 helpers/pmai_render_field.php:88
 #: helpers/pmai_render_field.php:100
-msgid ""
-"If an image with the same file name is found in the Media Library then that "
-"image will be attached to this record instead of importing a new image. "
-"Disable this setting if your import has different images with the same file "
-"name."
-msgstr ""
-"同じファイル名の画像はメディア ライブラリで見つかった、新しいイメージをイン"
-"ポートする代わりにこのレコードにそのイメージがアタッチされます。インポートは"
-"同じファイル名を持つ画像を持っている場合は、この設定を無効にします。"
+msgid "If an image with the same file name is found in the Media Library then that image will be attached to this record instead of importing a new image. Disable this setting if your import has different images with the same file name."
+msgstr "同じファイル名の画像はメディア ライブラリで見つかった、新しいイメージをインポートする代わりにこのレコードにそのイメージがアタッチされます。インポートは同じファイル名を持つ画像を持っている場合は、この設定を無効にします。"
 
 #: helpers/pmai_render_field.php:94
 msgid "Enter image URL one per line, or separate them with a"
 msgstr "画像URLを1行に1つずつ入力するか、または"
 
 #: helpers/pmai_render_field.php:103
-msgid ""
-"Append only new images and do not touch existing during updating gallery "
-"field."
-msgstr ""
-"新しい画像のみを追加し、ギャラリー フィールドの更新時に既存に触れないでくださ"
-"い。"
+msgid "Append only new images and do not touch existing during updating gallery field."
+msgstr "新しい画像のみを追加し、ギャラリー フィールドの更新時に既存に触れないでください。"
 
 #: helpers/pmai_render_field.php:111
 msgid "Specify the hex code the color preceded with a # - e.g. #ea5f1a."
@@ -186,6 +100,184 @@ msgstr "Strtotime は PHP の関数でサポートされている任意の形式
 #: helpers/pmai_render_field.php:147
 msgid "Use H:i:s format."
 msgstr "H:i:s フォーマットを使用します。"
+
+#: helpers/pmai_render_field.php:267 helpers/pmai_render_field.php:342
+msgid "Select value for all records"
+msgstr "すべてのレコードの値を選択"
+
+#: helpers/pmai_render_field.php:313 helpers/pmai_render_field.php:383
+msgid "Set with XPath"
+msgstr "XPathで設定"
+
+#: helpers/pmai_render_field.php:323
+msgid "Specify the value. For multiple values, separate with commas. If the choices are of the format option : Option, option-2 : Option 2, use option and option-2 for values."
+msgstr "値を指定します。複数の値をコンマで区切ります。選択肢形式オプションの場合: オプション、オプション 2: オプション 2、オプションと値のオプション 2。"
+
+#: helpers/pmai_render_field.php:327
+msgid "Specify the 0 for false, 1 for true."
+msgstr "False で、true の 1 として 0 を指定します。"
+
+#: helpers/pmai_render_field.php:415 helpers/pmai_render_field.php:424
+#: helpers/pmai_render_field.php:432
+msgid "Assign post to the taxonomy."
+msgstr "投稿をタクソノミーに割り当てます。"
+
+#: helpers/pmai_render_field.php:441
+msgid "Add more"
+msgstr "追加詳細"
+
+#: helpers/pmai_render_field.php:462
+msgid "Fixed Repeater Mode"
+msgstr "固定のリピータ モード"
+
+#: helpers/pmai_render_field.php:470
+msgid "Ignore blank fields"
+msgstr "空白のフィールドを無視します。"
+
+#: helpers/pmai_render_field.php:471
+msgid "If the value of the element or column in your file is blank, it will be ignored. Use this option when some records in your file have a different number of repeating elements than others."
+msgstr "要素またはファイル内の列の値が空白の場合は、無視されます。このオプションを使用して、ファイルの一部のレコードが別繰り返すよりも他の要素の数。"
+
+#: helpers/pmai_render_field.php:477
+msgid "Variable Repeater Mode (XML)"
+msgstr "変数のリピータ モード (XML)"
+
+#: helpers/pmai_render_field.php:481
+msgid "Variable Repeater Mode (CSV)"
+msgstr "変数のリピータ モード (CSV)"
+
+#: helpers/pmai_render_field.php:489
+msgid "(documentation)"
+msgstr "ドキュメント"
+
+#: helpers/pmai_render_field.php:499
+msgid "Use this option when importing a CSV file with a column or columns that contains the repeating data, separated by separators. For example, if you had a repeater with two fields - image URL and caption, and your CSV file had two columns, image URL and caption, with values like 'url1,url2,url3' and 'caption1,caption2,caption3', use this option and specify a comma as the separator."
+msgstr "列または列の区切り記号で区切られた繰り返しのデータを含む CSV ファイルをインポートするときは、このオプションを使用します。たとえば、CSV ファイルが 2 つの列と 2 つのフィールド - 画像の URL とキャプションを持つ repeater をした、画像 URL とキャプション、'url1、url2、url3' のような値を持つと「caption1、caption2、caption3」、このオプションを使用して、区切り記号としてコンマを指定します。"
+
+#: helpers/pmai_render_field.php:719
+msgid "Delete Row"
+msgstr "行を削除します。"
+
+#: helpers/pmai_render_field.php:722
+msgid "Add Row"
+msgstr "行追加"
+
+#: helpers/pmai_render_field.php:832 helpers/pmai_render_field.php:1253
+msgid "This field type is not supported. E-mail support@soflyy.com with the details of the custom ACF field you are trying to import to, as well as a link to download the plugin to install to add this field type to ACF, and we will investigate the possiblity ot including support for it in the ACF add-on."
+msgstr "このフィールドの種類はサポートされていません。ACF のユーザー設定フィールドの詳細を電子メール support@soflyy.com を同様に、ACF にこの種類のフィールドを追加するをインストールするプラグインをダウンロードするリンク、インポートしようとしているし、我々 は可能性を調査 ot ACF アドオンでそれのためのサポートを含みます。"
+
+#: helpers/pmai_render_field.php:1239
+msgid "Delete Layout"
+msgstr "レイアウトを削除します。"
+
+#: models/import/record.php:48
+msgid "Composing advanced custom fields..."
+msgstr "カスタム フィールドの詳細設定を構成する."
+
+#: models/import/record.php:940
+msgid "<strong>ACF ADD-ON:</strong>"
+msgstr "<strong>ACF アドオン:</strong>"
+
+#: models/import/record.php:964
+msgid "- Importing field `%s`"
+msgstr "- '%s' フィールドをインポートします。"
+
+#: models/import/record.php:968
+msgid "- Field `%s` is skipped attempted to import options"
+msgstr "- '%s' フィールドをスキップしオプションをインポートする"
+
+#: models/import/record.php:1545
+msgid "- Field `%s` updated with value `%s`"
+msgstr "- '%s' フィールドの '%s' 値を更新"
+
+#: models/import/record.php:1631
+msgid "- <b>WARNING</b>: Image %s not found in media gallery."
+msgstr "-<b>警告</b>: イメージ %s メディア ギャラリー内に見つかりません。"
+
+#: models/import/record.php:1634
+msgid "- Using existing image `%s`..."
+msgstr "- 既存のイメージ `%s`を使用して..."
+
+#: models/import/record.php:1665
+msgid "- <b>WARNING</b>: File %s cannot be saved locally as %s"
+msgstr "- <b>警告</b>: ファイル%sをローカルに%sとして保存することはできません"
+
+#: models/import/record.php:1674
+msgid "- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one"
+msgstr "- <b>警告</b>: ファイル%sは有効な画像ではないため、特典として設定することはできません"
+
+#: models/import/record.php:1704 models/import/record.php:1784
+#: models/import/record.php:1810
+msgid "- <b>WARNING</b>"
+msgstr "- <b>警告</b>"
+
+#: models/import/record.php:1755
+msgid "- <b>WARNING</b>: File %s is not a valid image and cannot be set as ACF image"
+msgstr "-<b>警告</b>: ファイル %s は有効なイメージではない、ACF 画像として設定することはできません"
+
+#: models/import/record.php:1766
+msgid "- <b>WARNING</b>: Attachment file %s cannot be saved locally as %s"
+msgstr "- <b>警告</ b>：添付ファイル%sをローカルで%sとして保存することはできません"
+
+#: models/import/record.php:1770
+msgid "- <b>WARNING</b>: Can't detect attachment file type %s"
+msgstr "- <b>警告</b>: 添付ファイルの種類%sを検出できません"
+
+#: models/import/record.php:1864
+msgid "<b>ERROR</b> Could not insert term relationship into the database"
+msgstr "<b>エラー</b> データベースに用語の関係を挿入できませんでした"
+
+#: views/admin/import/index.php:4
+msgid "Advanced Custom Fields Add-On"
+msgstr "Advanced Custom Fields アドオン"
+
+#: views/admin/import/index.php:54
+msgid "Please choose your Field Groups."
+msgstr "フィールド グループを選択してください。"
+
+#: views/admin/import/index.php:81
+msgid "Please create Field Groups."
+msgstr "フィールドのグループを作成してください。"
+
+#. Name of the plugin
+#: 
+msgid "WP All Import - ACF Add-On"
+msgstr "WP すべてインポート - ACF アドオン"
+
+#. Description of the plugin
+#: 
+msgid "Import to Advanced Custom Fields. Requires WP All Import & Advanced Custom Fields."
+msgstr "カスタム フィールドの詳細をインポートします。WP すべてインポート & 高度なカスタム フィールドが必要です。"
+
+#. URI of the plugin
+#: 
+msgid "http://www.wpallimport.com/"
+msgstr "http://www.wpallimport.com/"
+
+#. Author of the plugin
+#: 
+msgid "Soflyy"
+msgstr "Soflyy"
+
+#: actions/pmxi_reimport.php:69
+msgid "Update only mapped ACF groups"
+msgstr "マップされた ACF グループのみを更新します。"
+
+#: classes/updater.php:209
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
+msgstr "%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class=\"thickbox\" href=\"%2$s\"> %3$s バージョンの詳細を表示</a>"
+
+#: classes/updater.php:216
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s\">update now</a>."
+msgstr "%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">%3$s バージョンの詳細を表示</a> か <a href=\"%4$s\">今すぐ更新</a>"
+
+#: classes/updater.php:368
+msgid "You do not have permission to install plugin updates"
+msgstr "あなたはプラグインの更新プログラムをインストールする権限がありません"
+
+#: classes/updater.php:368
+msgid "Error"
+msgstr "エラー"
 
 #: helpers/pmai_render_field.php:153 helpers/pmai_render_field.php:170
 msgid "Address"
@@ -223,227 +315,15 @@ msgstr "アイテム概要"
 msgid "Price"
 msgstr "価格"
 
-#: helpers/pmai_render_field.php:267 helpers/pmai_render_field.php:342
-msgid "Select value for all records"
-msgstr "すべてのレコードの値を選択"
-
-#: helpers/pmai_render_field.php:313 helpers/pmai_render_field.php:383
-msgid "Set with XPath"
-msgstr "XPathで設定"
-
-#: helpers/pmai_render_field.php:323
-msgid ""
-"Specify the value. For multiple values, separate with commas. If the choices "
-"are of the format option : Option, option-2 : Option 2, use option and "
-"option-2 for values."
-msgstr ""
-"値を指定します。複数の値をコンマで区切ります。選択肢形式オプションの場合: オ"
-"プション、オプション 2: オプション 2、オプションと値のオプション 2。"
-
-#: helpers/pmai_render_field.php:327
-msgid "Specify the 0 for false, 1 for true."
-msgstr "False で、true の 1 として 0 を指定します。"
-
-#: helpers/pmai_render_field.php:415 helpers/pmai_render_field.php:424
-#: helpers/pmai_render_field.php:432
-msgid "Assign post to the taxonomy."
-msgstr "投稿をタクソノミーに割り当てます。"
-
-#: helpers/pmai_render_field.php:441
-msgid "Add more"
-msgstr "追加詳細"
-
-#: helpers/pmai_render_field.php:462
-msgid "Fixed Repeater Mode"
-msgstr "固定のリピータ モード"
-
-#: helpers/pmai_render_field.php:470
-msgid "Ignore blank fields"
-msgstr "空白のフィールドを無視します。"
-
-#: helpers/pmai_render_field.php:471
-msgid ""
-"If the value of the element or column in your file is blank, it will be "
-"ignored. Use this option when some records in your file have a different "
-"number of repeating elements than others."
-msgstr ""
-"要素またはファイル内の列の値が空白の場合は、無視されます。このオプションを使"
-"用して、ファイルの一部のレコードが別繰り返すよりも他の要素の数。"
-
-#: helpers/pmai_render_field.php:477
-msgid "Variable Repeater Mode (XML)"
-msgstr "変数のリピータ モード (XML)"
-
-#: helpers/pmai_render_field.php:481
-msgid "Variable Repeater Mode (CSV)"
-msgstr "変数のリピータ モード (CSV)"
-
 #: helpers/pmai_render_field.php:488
-#, php-format
 msgid "For each %s do ..."
 msgstr "各 %s 操作を行います."
 
-#: helpers/pmai_render_field.php:489
-msgid "(documentation)"
-msgstr "ドキュメント"
-
 #: helpers/pmai_render_field.php:498
-#, php-format
 msgid "Separator Character %s"
 msgstr "区切り文字 %s"
 
-#: helpers/pmai_render_field.php:499
-msgid ""
-"Use this option when importing a CSV file with a column or columns that "
-"contains the repeating data, separated by separators. For example, if you "
-"had a repeater with two fields - image URL and caption, and your CSV file "
-"had two columns, image URL and caption, with values like 'url1,url2,url3' "
-"and 'caption1,caption2,caption3', use this option and specify a comma as the "
-"separator."
-msgstr ""
-"列または列の区切り記号で区切られた繰り返しのデータを含む CSV ファイルをイン"
-"ポートするときは、このオプションを使用します。たとえば、CSV ファイルが 2 つの"
-"列と 2 つのフィールド - 画像の URL とキャプションを持つ repeater をした、画"
-"像 URL とキャプション、'url1、url2、url3' のような値を持つと「caption1、"
-"caption2、caption3」、このオプションを使用して、区切り記号としてコンマを指定"
-"します。"
-
-#: helpers/pmai_render_field.php:719
-msgid "Delete Row"
-msgstr "行を削除します。"
-
-#: helpers/pmai_render_field.php:722
-msgid "Add Row"
-msgstr "行追加"
-
-#: helpers/pmai_render_field.php:832 helpers/pmai_render_field.php:1253
-msgid ""
-"This field type is not supported. E-mail support@soflyy.com with the details "
-"of the custom ACF field you are trying to import to, as well as a link to "
-"download the plugin to install to add this field type to ACF, and we will "
-"investigate the possiblity ot including support for it in the ACF add-on."
-msgstr ""
-"このフィールドの種類はサポートされていません。ACF のユーザー設定フィールドの"
-"詳細を電子メール support@soflyy.com を同様に、ACF にこの種類のフィールドを追"
-"加するをインストールするプラグインをダウンロードするリンク、インポートしよう"
-"としているし、我々 は可能性を調査 ot ACF アドオンでそれのためのサポートを含み"
-"ます。"
-
-#: helpers/pmai_render_field.php:1239
-msgid "Delete Layout"
-msgstr "レイアウトを削除します。"
-
-#: models/import/record.php:48
-msgid "Composing advanced custom fields..."
-msgstr "カスタム フィールドの詳細設定を構成する."
-
-#: models/import/record.php:940
-msgid "<strong>ACF ADD-ON:</strong>"
-msgstr "<strong>ACF アドオン:</strong>"
-
-#: models/import/record.php:964
-#, php-format
-msgid "- Importing field `%s`"
-msgstr "- '%s' フィールドをインポートします。"
-
-#: models/import/record.php:968
-#, php-format
-msgid "- Field `%s` is skipped attempted to import options"
-msgstr "- '%s' フィールドをスキップしオプションをインポートする"
-
-#: models/import/record.php:1545
-#, php-format
-msgid "- Field `%s` updated with value `%s`"
-msgstr "- '%s' フィールドの '%s' 値を更新"
-
-#: models/import/record.php:1631
-#, php-format
-msgid "- <b>WARNING</b>: Image %s not found in media gallery."
-msgstr "-<b>警告</b>: イメージ %s メディア ギャラリー内に見つかりません。"
-
-#: models/import/record.php:1634
-#, php-format
-msgid "- Using existing image `%s`..."
-msgstr "- 既存のイメージ `%s`を使用して..."
-
-#: models/import/record.php:1665
-#, php-format
-msgid "- <b>WARNING</b>: File %s cannot be saved locally as %s"
-msgstr "- <b>警告</b>: ファイル%sをローカルに%sとして保存することはできません"
-
-#: models/import/record.php:1674
-#, php-format
-msgid ""
-"- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured "
-"one"
-msgstr ""
-"- <b>警告</b>: ファイル%sは有効な画像ではないため、特典として設定することはで"
-"きません"
-
-#: models/import/record.php:1704 models/import/record.php:1784
-#: models/import/record.php:1810
-msgid "- <b>WARNING</b>"
-msgstr "- <b>警告</b>"
-
-#: models/import/record.php:1755
-#, php-format
-msgid ""
-"- <b>WARNING</b>: File %s is not a valid image and cannot be set as ACF image"
-msgstr ""
-"-<b>警告</b>: ファイル %s は有効なイメージではない、ACF 画像として設定するこ"
-"とはできません"
-
-#: models/import/record.php:1766
-#, php-format
-msgid "- <b>WARNING</b>: Attachment file %s cannot be saved locally as %s"
-msgstr ""
-"- <b>警告</ b>：添付ファイル%sをローカルで%sとして保存することはできません"
-
-#: models/import/record.php:1770
-#, php-format
-msgid "- <b>WARNING</b>: Can't detect attachment file type %s"
-msgstr "- <b>警告</b>: 添付ファイルの種類%sを検出できません"
-
-#: models/import/record.php:1864
-msgid "<b>ERROR</b> Could not insert term relationship into the database"
-msgstr "<b>エラー</b> データベースに用語の関係を挿入できませんでした"
-
-#: views/admin/import/index.php:4
-msgid "Advanced Custom Fields Add-On"
-msgstr "Advanced Custom Fields アドオン"
-
-#: views/admin/import/index.php:54
-msgid "Please choose your Field Groups."
-msgstr "フィールド グループを選択してください。"
-
-#: views/admin/import/index.php:81
-msgid "Please create Field Groups."
-msgstr "フィールドのグループを作成してください。"
-
 #: wpai-acf-add-on.php:35
-msgid ""
-"Please de-activate and remove the free version of the ACF add-on before "
-"activating the paid version."
-msgstr ""
-"非アクティブにしてくださいとアドオン有料版をアクティブにする前にWooCommerceの"
-"無料版を削除します。"
+msgid "Please de-activate and remove the free version of the ACF add-on before activating the paid version."
+msgstr "非アクティブにしてくださいとアドオン有料版をアクティブにする前にWooCommerceの無料版を削除します。"
 
-#. Plugin Name of the plugin/theme
-msgid "WP All Import - ACF Add-On"
-msgstr "WP すべてインポート - ACF アドオン"
-
-#. Plugin URI of the plugin/theme
-msgid "http://www.wpallimport.com/"
-msgstr "http://www.wpallimport.com/"
-
-#. Description of the plugin/theme
-msgid ""
-"Import to Advanced Custom Fields. Requires WP All Import & Advanced Custom "
-"Fields."
-msgstr ""
-"カスタム フィールドの詳細をインポートします。WP すべてインポート & 高度なカス"
-"タム フィールドが必要です。"
-
-#. Author of the plugin/theme
-msgid "Soflyy"
-msgstr "Soflyy"

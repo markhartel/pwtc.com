@@ -1,8 +1,8 @@
 <?php
 /**
  * Common logic for all shortcodes plugin implements
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 abstract class PMWI_Controller {
 	/**

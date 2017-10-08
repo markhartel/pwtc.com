@@ -1,48 +1,25 @@
-#, fuzzy
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"Project-Id-Version: WP All Import - WooCommerce Add-On Pro\n"
-"POT-Creation-Date: 2017-01-20 17:54+0700\n"
-"PO-Revision-Date: 2017-01-20 17:54+0700\n"
-"Last-Translator: \n"
-"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
-"X-Poedit-Basepath: ../..\n"
-"X-Poedit-WPHeader: wpai-woocommerce-add-on.php\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: WooCommerce Add-On Pro\n"
+"Language: en-us\n"
 
 #: actions/admin_notices.php:10
-#, php-format
 msgid "<b>%s Plugin</b>: WooCommerce must be installed."
 msgstr ""
 
 #: actions/admin_notices.php:24
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All "
-"Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target="
-"\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid "
-"edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport."
-"com/</a>"
+msgid "<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target=\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport.com/</a>"
 msgstr ""
 
 #: actions/admin_notices.php:38
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: Please update your WP All Import to the latest version"
+msgid "<b>%s Plugin</b>: Please update your WP All Import to the latest version"
 msgstr ""
 
 #: actions/admin_notices.php:51
-#, php-format
 msgid "<b>%s Plugin</b>: Please update your WooCommerce to the latest version"
 msgstr ""
 
@@ -75,18 +52,11 @@ msgid "Changelog"
 msgstr ""
 
 #: classes/updater.php:258
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
 msgstr ""
 
 #: classes/updater.php:265
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s"
-"\">update now</a>."
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s\">update now</a>."
 msgstr ""
 
 #: classes/updater.php:448
@@ -98,10 +68,7 @@ msgid "Error"
 msgstr ""
 
 #: controllers/controller/admin.php:55
-msgid ""
-"Remove this item? If you have previously reduced this item's stock, or this "
-"order was submitted by a customer, will need to manually restore the item's "
-"stock."
+msgid "Remove this item? If you have previously reduced this item's stock, or this order was submitted by a customer, will need to manually restore the item's stock."
 msgstr ""
 
 #: controllers/controller/admin.php:56
@@ -147,33 +114,23 @@ msgid "Enter a name for the new attribute term:"
 msgstr ""
 
 #: controllers/controller/admin.php:65
-msgid ""
-"Calculate totals based on order items, discount amount, and shipping? Note, "
-"you will need to (optionally) calculate tax rows and cart discounts manually."
+msgid "Calculate totals based on order items, discount amount, and shipping? Note, you will need to (optionally) calculate tax rows and cart discounts manually."
 msgstr ""
 
 #: controllers/controller/admin.php:66
-msgid ""
-"Calculate line taxes? This will calculate taxes based on the customers "
-"country. If no billing/shipping is set it will use the store base country."
+msgid "Calculate line taxes? This will calculate taxes based on the customers country. If no billing/shipping is set it will use the store base country."
 msgstr ""
 
 #: controllers/controller/admin.php:67
-msgid ""
-"Copy billing information to shipping information? This will remove any "
-"currently entered shipping information."
+msgid "Copy billing information to shipping information? This will remove any currently entered shipping information."
 msgstr ""
 
 #: controllers/controller/admin.php:68
-msgid ""
-"Load the customer's billing information? This will remove any currently "
-"entered billing information."
+msgid "Load the customer's billing information? This will remove any currently entered billing information."
 msgstr ""
 
 #: controllers/controller/admin.php:69
-msgid ""
-"Load the customer's shipping information? This will remove any currently "
-"entered shipping information."
+msgid "Load the customer's shipping information? This will remove any currently entered shipping information."
 msgstr ""
 
 #: controllers/controller/admin.php:70
@@ -242,12 +199,10 @@ msgstr ""
 #: libraries/XmlImportWooCommerceProduct.php:1101
 #: libraries/XmlImportWooCommerceProduct.php:2294
 #: libraries/XmlImportWooCommerceProduct.php:2341
-#, php-format
 msgid "Variation #%s of %s"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:1871
-#, php-format
 msgid "<b>CREATED</b>: %s variations for parent product %s."
 msgstr ""
 
@@ -256,22 +211,18 @@ msgid "- Importing Variations"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2341
-#, php-format
 msgid "- `%s`: variation created successfully"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2347
-#, php-format
 msgid "- `%s`: variation updated successfully"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2350
-#, php-format
 msgid "Deleting attachments for `%s`"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2355
-#, php-format
 msgid "Deleting images for `%s`"
 msgstr ""
 
@@ -280,51 +231,40 @@ msgid "- <b>WARNING</b>: Product SKU must be unique."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2761
-#, php-format
 msgid "- <b>WARNING</b>: Image %s not found in media gallery."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2765
-#, php-format
 msgid "- Using existing image `%s` for post `%s` ..."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2783
-#, php-format
 msgid "- Searching for existing image `%s` in `%s` folder"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2789
 #: libraries/XmlImportWooCommerceProduct.php:2825
-#, php-format
-msgid ""
-"- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured "
-"one"
+msgid "- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2793
-#, php-format
 msgid "- Image `%s` has been successfully found"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2799
-#, php-format
 msgid "- Downloading image from `%s`"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2809
 #: libraries/XmlImportWooCommerceProduct.php:2829
-#, php-format
 msgid "- Image `%s` has been successfully downloaded"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2820
-#, php-format
 msgid "- <b>WARNING</b>: File %s cannot be saved locally as %s"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2846
-#, php-format
 msgid "- Creating an attachment for image `%s`"
 msgstr ""
 
@@ -333,17 +273,14 @@ msgid "- <b>WARNING</b>"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2900
-#, php-format
 msgid "- Attachment has been successfully updated for image `%s`"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:2904
-#, php-format
 msgid "- Attachment has been successfully created for image `%s`"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3282
-#, php-format
 msgid "Added to %s list of product ID %d."
 msgstr ""
 
@@ -352,32 +289,22 @@ msgid "<b>ERROR</b> Could not insert term relationship into the database"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3664
-#, php-format
-msgid ""
-"- <b>WARNING</b>: Slug “%s” is not allowed because it is a reserved term. "
-"Change it, please."
+msgid "- <b>WARNING</b>: Slug “%s” is not allowed because it is a reserved term. Change it, please."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3697
-#, php-format
-msgid ""
-"- <b>CREATED</b>: Taxonomy attribute “%s” have been successfully created."
+msgid "- <b>CREATED</b>: Taxonomy attribute “%s” have been successfully created."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3701
-#, php-format
-msgid ""
-"- <b>WARNING</b>: Taxonomy “%s” name is more than 28 characters. Change it, "
-"please."
+msgid "- <b>WARNING</b>: Taxonomy “%s” name is more than 28 characters. Change it, please."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3810
-#, php-format
 msgid "- <b>WARNING</b>: Unable to create cloaked link for %s"
 msgstr ""
 
 #: libraries/XmlImportWooCommerceProduct.php:3890
-#, php-format
 msgid "Product `%s` with ID `%d` added to %s list."
 msgstr ""
 
@@ -386,25 +313,20 @@ msgid "Composing shop order data..."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:683
-#, php-format
 msgid "- Importing billing & shipping information for Order ID `%s`."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:695
-#, php-format
 msgid "- %s Existing customer with ID `%s` founded for Order `%s`."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:701
 #: libraries/XmlImportWooCommerceShopOrder.php:711
 #: libraries/XmlImportWooCommerceShopOrder.php:729
-#, php-format
-msgid ""
-"- Billing field `%s` has been updated with value `%s` for order `%s` ..."
+msgid "- Billing field `%s` has been updated with value `%s` for order `%s` ..."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:717
-#, php-format
 msgid "<b>WARNING</b>: Existing customer not found for Order `%s`."
 msgstr ""
 
@@ -414,23 +336,18 @@ msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:753
 #: libraries/XmlImportWooCommerceShopOrder.php:771
-#, php-format
-msgid ""
-"- Shipping field `%s` has been updated with value `%s` for order `%s` ..."
+msgid "- Shipping field `%s` has been updated with value `%s` for order `%s` ..."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:812
-#, php-format
 msgid "- %s email notification has beed sent. ..."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:1036
-#, php-format
 msgid "<b>SKIPPED</b>: %s Existing customer not found for Order `%s`."
 msgstr ""
 
 #: libraries/XmlImportWooCommerceShopOrder.php:1091
-#, php-format
 msgid "<b>SKIPPED</b>: Existing product `%s` not found for Order `%s`."
 msgstr ""
 
@@ -564,12 +481,10 @@ msgid "Only ACF presented in import options"
 msgstr ""
 
 #: views/admin/import/confirm.php:65
-#, php-format
 msgid "Only these ACF : %s"
 msgstr ""
 
 #: views/admin/import/confirm.php:68
-#, php-format
 msgid "All ACF except these: %s"
 msgstr ""
 
@@ -578,12 +493,10 @@ msgid "All custom fields"
 msgstr ""
 
 #: views/admin/import/confirm.php:81
-#, php-format
 msgid "Only these custom fields : %s"
 msgstr ""
 
 #: views/admin/import/confirm.php:84
-#, php-format
 msgid "All custom fields except these: %s"
 msgstr ""
 
@@ -592,8 +505,7 @@ msgid "When WP All Import finds new or changed data..."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:4
-msgid ""
-"If this import is run again and WP All Import finds new or changed data..."
+msgid "If this import is run again and WP All Import finds new or changed data..."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:9
@@ -601,9 +513,7 @@ msgid "Create new orders from records newly present in your file"
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:11
-msgid ""
-"New orders will only be created when ID column is present and value in ID "
-"column is unique."
+msgid "New orders will only be created when ID column is present and value in ID column is unique."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:18
@@ -611,9 +521,7 @@ msgid "Delete orders that are no longer present in your file"
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:20
-msgid ""
-"Records removed from the import file can only be deleted when importing into "
-"New Items. This feature cannot be enabled when importing into Existing Items."
+msgid "Records removed from the import file can only be deleted when importing into New Items. This feature cannot be enabled when importing into Existing Items."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:27
@@ -644,9 +552,7 @@ msgid "Update existing orders with changed data in your file"
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:59
-msgid ""
-"These options will only be used if you run this import again later. All data "
-"is imported the first time you run an import."
+msgid "These options will only be used if you run this import again later. All data is imported the first time you run an import."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:63
@@ -678,11 +584,7 @@ msgid "Custom Fields"
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:160
-msgid ""
-"If Keep Custom Fields box is checked, it will keep all Custom Fields, and "
-"add any new Custom Fields specified in Custom Fields section, as long as "
-"they do not overwrite existing fields. If 'Only keep this Custom Fields' is "
-"specified, it will only keep the specified fields."
+msgid "If Keep Custom Fields box is checked, it will keep all Custom Fields, and add any new Custom Fields specified in Custom Fields section, as long as they do not overwrite existing fields. If 'Only keep this Custom Fields' is specified, it will only keep the specified fields."
 msgstr ""
 
 #: views/admin/import/options/_reimport_options.php:164
@@ -707,15 +609,11 @@ msgid "Choose how exported data will be re-imported."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:28
-#, php-format
 msgid "WP All Import will create new %s for each unique record in your file."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:42
-#, php-format
-msgid ""
-"WP All Import will associate records in your file with %s it has already "
-"created from previous runs of this import based on the Unique Identifier."
+msgid "WP All Import will associate records in your file with %s it has already created from previous runs of this import based on the Unique Identifier."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:45
@@ -737,52 +635,30 @@ msgid "Warning: Are you sure you want to edit the Unique Identifier?"
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:56
-#, php-format
-msgid ""
-"It is recommended you delete all %s associated with this import before "
-"editing the unique identifier."
+msgid "It is recommended you delete all %s associated with this import before editing the unique identifier."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:57
-#, php-format
-msgid ""
-"Editing the unique identifier will dissociate all existing %s linked to this "
-"import. Future runs of the import will result in duplicates, as WP All "
-"Import will no longer be able to update these %s."
+msgid "Editing the unique identifier will dissociate all existing %s linked to this import. Future runs of the import will result in duplicates, as WP All Import will no longer be able to update these %s."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:58
-msgid ""
-"You really should just re-create your import, and pick the right unique "
-"identifier to start with."
+msgid "You really should just re-create your import, and pick the right unique identifier to start with."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:68
-msgid ""
-"Drag an element, or combo of elements, to the box above. The Unique "
-"Identifier should be unique for each record in your file, and should stay "
-"the same even if your file is updated. Things like product IDs, titles, and "
-"SKUs are good Unique Identifiers because they probably won't change. Don't "
-"use a description or price, since that might be changed."
+msgid "Drag an element, or combo of elements, to the box above. The Unique Identifier should be unique for each record in your file, and should stay the same even if your file is updated. Things like product IDs, titles, and SKUs are good Unique Identifiers because they probably won't change. Don't use a description or price, since that might be changed."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:69
-#, php-format
-msgid ""
-"If you run this import again with an updated file, the Unique Identifier "
-"allows WP All Import to correctly link the records in your updated file with "
-"the %s it will create right now. If multiple records in this file have the "
-"same Unique Identifier, only the first will be created. The others will be "
-"detected as duplicates."
+msgid "If you run this import again with an updated file, the Unique Identifier allows WP All Import to correctly link the records in your updated file with the %s it will create right now. If multiple records in this file have the same Unique Identifier, only the first will be created. The others will be detected as duplicates."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:84
-#, php-format
 msgid "WP All Import will merge data into existing %s."
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:94
-#, php-format
 msgid "Records in your file will be matched with %ss on your site based on..."
 msgstr ""
 
@@ -813,9 +689,7 @@ msgid "Block email notifications during import"
 msgstr ""
 
 #: views/admin/import/options/_reimport_template.php:142
-msgid ""
-"If enabled, WP All Import will prevent WordPress from sending notification "
-"emails to customers when their orders are imported or updated."
+msgid "If enabled, WP All Import will prevent WordPress from sending notification emails to customers when their orders are imported or updated."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_advanced.php:5
@@ -921,8 +795,7 @@ msgstr ""
 #: views/admin/import/product/_tabs/_variations.php:529
 #: views/admin/import/product/_tabs/_variations.php:696
 #: views/admin/import/product/_tabs/_variations.php:758
-msgid ""
-"The value of presented XPath should be one of the following: ('yes', 'no')."
+msgid "The value of presented XPath should be one of the following: ('yes', 'no')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_advanced.php:70
@@ -946,9 +819,7 @@ msgid "Hidden"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_advanced.php:95
-msgid ""
-"The value of presented XPath should be one of the following: ('visible', "
-"'catalog', 'search', 'hidden')."
+msgid "The value of presented XPath should be one of the following: ('visible', 'catalog', 'search', 'hidden')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_attributes.php:8
@@ -1051,10 +922,7 @@ msgid "Link all variations"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_attributes.php:415
-msgid ""
-"This option will create all possible variations for the presented "
-"attributes. Works just like the Link All Variations option inside "
-"WooCommerce."
+msgid "This option will create all possible variations for the presented attributes. Works just like the Link All Variations option inside WooCommerce."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:4
@@ -1080,7 +948,6 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:23
 #: views/admin/import/product/_tabs/_general.php:46
-#, php-format
 msgid "Regular Price (%s)"
 msgstr ""
 
@@ -1090,7 +957,6 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:27
 #: views/admin/import/product/_tabs/_general.php:58
-#, php-format
 msgid "Sale Price (%s)"
 msgstr ""
 
@@ -1123,9 +989,7 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:52
 #: views/admin/import/product/_tabs/_general.php:64
-msgid ""
-"Leave blank or enter in 100% to keep the price as is. Enter in 110% to "
-"markup by 10%. Enter in 50% to cut prices in half."
+msgid "Leave blank or enter in 100% to keep the price as is. Enter in 110% to markup by 10%. Enter in 50% to cut prices in half."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:53
@@ -1146,10 +1010,7 @@ msgid "Convert decimal separator to a period"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:83
-msgid ""
-"Prices must be imported using a period as the decimal separator. If you'd "
-"like to change the decimal separator you can do so by editing your "
-"WooCommerce settings."
+msgid "Prices must be imported using a period as the decimal separator. If you'd like to change the decimal separator you can do so by editing your WooCommerce settings."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:89
@@ -1157,11 +1018,7 @@ msgid "Attempt to convert incorrectly formatted prices to WooCommerce format"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:90
-msgid ""
-"WP All Import will attempt to correct the formatting of prices presented "
-"incorrectly, but this doesn't always work. Try unchecking this option if "
-"your prices are not appearing correctly, or enter your prices in your import "
-"file using the same format you would when entering them in WooCommerce."
+msgid "WP All Import will attempt to correct the formatting of prices presented incorrectly, but this doesn't always work. Try unchecking this option if your prices are not appearing correctly, or enter your prices in your import file using the same format you would when entering them in WooCommerce."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:94
@@ -1181,9 +1038,7 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:108
 #: views/admin/import/product/_tabs/_variations.php:741
-msgid ""
-"This option is the same as the Enabled checkbox when editing an individual "
-"variation in WooCommerce."
+msgid "This option is the same as the Enabled checkbox when editing an individual variation in WooCommerce."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:135
@@ -1214,10 +1069,7 @@ msgid "File paths"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:182
-msgid ""
-"File paths/URLs, comma separated. The delimiter is used when an XML element "
-"contains multiple URLs/paths - i.e. <code>http://files.com/1.doc, http://"
-"files.com/2.doc</code>."
+msgid "File paths/URLs, comma separated. The delimiter is used when an XML element contains multiple URLs/paths - i.e. <code>http://files.com/1.doc, http://files.com/2.doc</code>."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:185
@@ -1227,9 +1079,7 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:188
 #: views/admin/import/product/_tabs/_variations.php:486
-msgid ""
-"File names, comma separated. The delimiter is used when an XML element "
-"contains multiple names - i.e. <code>1.doc, 2.doc</code>."
+msgid "File names, comma separated. The delimiter is used when an XML element contains multiple names - i.e. <code>1.doc, 2.doc</code>."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:191
@@ -1247,8 +1097,7 @@ msgid "Download Expiry"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:198
-msgid ""
-"Enter the number of days before a download link expires, or leave blank."
+msgid "Enter the number of days before a download link expires, or leave blank."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:201
@@ -1256,9 +1105,7 @@ msgid "Download Type"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:203
-msgid ""
-"The value of presented XPath should be one of the following: ('application', "
-"'music')."
+msgid "The value of presented XPath should be one of the following: ('application', 'music')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:211
@@ -1282,9 +1129,7 @@ msgid "Set tax status with XPath"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:231
-msgid ""
-"Value should be the slug for the tax status - 'taxable', 'shipping', and "
-"'none' are the default slugs."
+msgid "Value should be the slug for the tax status - 'taxable', 'shipping', and 'none' are the default slugs."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:241
@@ -1303,9 +1148,7 @@ msgid "Set tax class with XPath"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_general.php:271
-msgid ""
-"Value should be the slug for the tax class - 'reduced-rate' and 'zero-rate', "
-"are the default slugs."
+msgid "Value should be the slug for the tax class - 'reduced-rate' and 'zero-rate', are the default slugs."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:4
@@ -1346,17 +1189,13 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:48
 #: views/admin/import/product/_tabs/_variations.php:724
-msgid ""
-"Set the stock status to In Stock for positive Stock Qty values, and Out Of "
-"Stock if Stock Qty is 0 or blank."
+msgid "Set the stock status to In Stock for positive Stock Qty values, and Out Of Stock if Stock Qty is 0 or blank."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:57
 #: views/admin/import/product/_tabs/_variations.php:216
 #: views/admin/import/product/_tabs/_variations.php:733
-msgid ""
-"The value of presented XPath should be one of the following: ('instock', "
-"'outofstock')."
+msgid "The value of presented XPath should be one of the following: ('instock', 'outofstock')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:66
@@ -1381,9 +1220,7 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:87
 #: views/admin/import/product/_tabs/_variations.php:245
-msgid ""
-"The value of presented XPath should be one of the following: ('no', "
-"'notify', 'yes')."
+msgid "The value of presented XPath should be one of the following: ('no', 'notify', 'yes')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_inventory.php:95
@@ -1396,8 +1233,7 @@ msgstr ""
 
 #: views/admin/import/product/_tabs/_linked_product.php:6
 #: views/admin/import/product/_tabs/_linked_product.php:11
-msgid ""
-"Products can be matched by SKU, ID, or Title, and must be comma separated."
+msgid "Products can be matched by SKU, ID, or Title, and must be comma separated."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_linked_product.php:9
@@ -1421,9 +1257,7 @@ msgid "Manual Grouped Product Matching"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_linked_product.php:68
-msgid ""
-"Product will be assigned as the child of an already created product matching "
-"the specified criteria."
+msgid "Product will be assigned as the child of an already created product matching the specified criteria."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_linked_product.php:75
@@ -1443,10 +1277,7 @@ msgid "Set out of stock status for missing records"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_options.php:11
-msgid ""
-"Option to set the stock status to out of stock instead of deleting the "
-"product entirely. This option doesn't work when 'Delete missing records' "
-"option is enabled."
+msgid "Option to set the stock status to out of stock instead of deleting the product entirely. This option doesn't work when 'Delete missing records' option is enabled."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_options.php:17
@@ -1454,9 +1285,7 @@ msgid "Disable auto SKU generation"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_options.php:18
-msgid ""
-"Plugin will NOT automaticaly generate the SKU for each product based on md5 "
-"algorithm, if SKU option is empty."
+msgid "Plugin will NOT automaticaly generate the SKU for each product based on md5 algorithm, if SKU option is empty."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_options.php:23
@@ -1464,20 +1293,14 @@ msgid "Don't check for duplicate SKUs"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_options.php:24
-msgid ""
-"Each product should have a unique SKU. If this box is checked, WP All Import "
-"won't check for duplicate SKUs, which speeds up the import process. Make "
-"sure the SKU for each of your products is unique. If this box is unchecked, "
-"WP All Import will import products with duplicate SKUs with a blank SKU."
+msgid "Each product should have a unique SKU. If this box is checked, WP All Import won't check for duplicate SKUs, which speeds up the import process. Make sure the SKU for each of your products is unique. If this box is unchecked, WP All Import will import products with duplicate SKUs with a blank SKU."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_shipping.php:5
-#, php-format
 msgid "Weight (%s)"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_shipping.php:9
-#, php-format
 msgid "Dimensions (%s)"
 msgstr ""
 
@@ -1509,16 +1332,11 @@ msgid "Set product shipping class with XPath"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_shipping.php:49
-msgid ""
-"Value should be the name, ID, or slug for the shipping class. Default slugs "
-"are 'taxable', 'shipping' and 'none'."
+msgid "Value should be the name, ID, or slug for the shipping class. Default slugs are 'taxable', 'shipping' and 'none'."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:7
-msgid ""
-"All my variable products have SKUs or some other unique identifier. Each "
-"variation is linked to its parent with its parent's SKU or other unique "
-"identifier."
+msgid "All my variable products have SKUs or some other unique identifier. Each variation is linked to its parent with its parent's SKU or other unique identifier."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:11
@@ -1552,9 +1370,7 @@ msgid "download"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:31
-msgid ""
-"All products with variations are grouped with a unique identifier that is "
-"the same for each variation and unique for each product."
+msgid "All products with variations are grouped with a unique identifier that is the same for each variation and unique for each product."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:38
@@ -1562,9 +1378,7 @@ msgid "Group ID column in the below example."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:51
-msgid ""
-"All variations for a particular product have the same title as the parent "
-"product."
+msgid "All variations for a particular product have the same title as the parent product."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:56
@@ -1573,9 +1387,7 @@ msgid "Product Title"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:70
-msgid ""
-"All variations for a particular product have the same title. There are no "
-"parent products."
+msgid "All variations for a particular product have the same title. There are no parent products."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:88
@@ -1626,10 +1438,7 @@ msgid "XPath Is From Parent"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:135
-msgid ""
-"Images are imported according to the options set in the Images section "
-"below. There you can import images to the parent products, and here you can "
-"import images to the product variations."
+msgid "Images are imported according to the options set in the Images section below. There you can import images to the parent products, and here you can import images to the product variations."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:187
@@ -1637,9 +1446,7 @@ msgid "Enable this checkbox to determine XPath from parent element."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:207
-msgid ""
-"Set the stock status to In Stock for positive or blank Stock Qty values, and "
-"Out Of Stock if Stock Qty is 0."
+msgid "Set the stock status to In Stock for positive or blank Stock Qty values, and Out Of Stock if Stock Qty is 0."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:253
@@ -1667,9 +1474,7 @@ msgid "Dimensions (L×W×H)"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:391
-msgid ""
-"The value of presented XPath should be one of the following: ('taxable', "
-"'shipping', 'none')."
+msgid "The value of presented XPath should be one of the following: ('taxable', 'shipping', 'none')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:419
@@ -1681,15 +1486,11 @@ msgid "Set product tax class with XPath"
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:435
-msgid ""
-"The value of presented XPath should be one of the following: ('reduced-"
-"rate', 'zero-rate')."
+msgid "The value of presented XPath should be one of the following: ('reduced-rate', 'zero-rate')."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:480
-msgid ""
-"File paths/URLs, comma separated. The delimiter option uses when xml element "
-"contains few paths/URLs (http://files.com/1.doc, http://files.com/2.doc)."
+msgid "File paths/URLs, comma separated. The delimiter option uses when xml element contains few paths/URLs (http://files.com/1.doc, http://files.com/2.doc)."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:538
@@ -1711,9 +1512,7 @@ msgid "Set the default selection in the attributes dropdowns."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:771
-msgid ""
-"The attributes for the first variation will be automatically selected on the "
-"frontend."
+msgid "The attributes for the first variation will be automatically selected on the frontend."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:776
@@ -1737,15 +1536,11 @@ msgid "Save variation image to the gallery."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:801
-msgid ""
-"Set _stock value for parent product to the _stock value for the first "
-"variation."
+msgid "Set _stock value for parent product to the _stock value for the first variation."
 msgstr ""
 
 #: views/admin/import/product/_tabs/_variations.php:802
-msgid ""
-"This option works when there are no parent products in your feed ( cases 2 "
-"and 4 on Variations tab)."
+msgid "This option works when there are no parent products in your feed ( cases 2 and 4 on Variations tab)."
 msgstr ""
 
 #: views/admin/import/product/index.php:4
@@ -1773,9 +1568,7 @@ msgid "Set Product Type With XPath"
 msgstr ""
 
 #: views/admin/import/product/index.php:44
-msgid ""
-"The value of presented XPath should be one of the following: ('simple', "
-"'grouped', 'external', 'variable')."
+msgid "The value of presented XPath should be one of the following: ('simple', 'grouped', 'external', 'variable')."
 msgstr ""
 
 #: views/admin/import/product/index.php:55
@@ -2113,9 +1906,7 @@ msgid "Add Product"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:242
-msgid ""
-"Manually import product order data and do not try to match to existing "
-"products"
+msgid "Manually import product order data and do not try to match to existing products"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:243
@@ -2192,16 +1983,11 @@ msgid "Shipping Method"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:53
-#, php-format
-msgid ""
-"Shipping method can be matched by Name or ID: %s. If shipping method is not "
-"found then no shipping information will be imported."
+msgid "Shipping method can be matched by Name or ID: %s. If shipping method is not found then no shipping information will be imported."
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:98
-msgid ""
-"Shipping method can be matched by Nmae or ID. If shipping method is not "
-"found then no shipping information will be imported."
+msgid "Shipping method can be matched by Nmae or ID. If shipping method is not found then no shipping information will be imported."
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:110
@@ -2230,10 +2016,7 @@ msgid "Tax Rate"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:66
-#, php-format
-msgid ""
-"Tax rate method can be matched by ID: %s. If tax method is not found then no "
-"tax information will be imported."
+msgid "Tax rate method can be matched by ID: %s. If tax method is not found then no tax information will be imported."
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:100
@@ -2241,9 +2024,7 @@ msgid "Select"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:114
-msgid ""
-"Tax rate method can be matched by ID. If tax method is not found then no tax "
-"information will be imported."
+msgid "Tax rate method can be matched by ID. If tax method is not found then no tax information will be imported."
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:144
@@ -2256,10 +2037,7 @@ msgid "Payment Method"
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_payment.php:25
-#, php-format
-msgid ""
-"Payment method can be matched by title or slug: %s. If payment method is not "
-"found 'N/A' will be applied to order."
+msgid "Payment method can be matched by title or slug: %s. If payment method is not found 'N/A' will be applied to order."
 msgstr ""
 
 #: views/admin/import/shop_order/_tabs/_order_payment.php:36
@@ -2311,18 +2089,13 @@ msgid "Order Status"
 msgstr ""
 
 #: views/admin/import/shop_order/order_details_section.php:29
-#, php-format
-msgid ""
-"Order status can be matched by title or slug: %s. If order status is not "
-"found 'Pending Payment' will be applied to order."
+msgid "Order status can be matched by title or slug: %s. If order status is not found 'Pending Payment' will be applied to order."
 msgstr ""
 
 #: views/admin/import/shop_order/order_details_section.php:39
 #: views/admin/import/shop_order/order_notes_section.php:39
 #: views/admin/import/shop_order/order_notes_section.php:103
-msgid ""
-"Use any format supported by the PHP <b>strtotime</b> function. That means "
-"pretty much any human-readable date will work."
+msgid "Use any format supported by the PHP <b>strtotime</b> function. That means pretty much any human-readable date will work."
 msgstr ""
 
 #: views/admin/import/shop_order/order_items_section.php:4
@@ -2379,25 +2152,26 @@ msgid "Multiple notes separated by"
 msgstr ""
 
 #: wpai-woocommerce-add-on.php:35
-msgid ""
-"Please de-activate and remove the free version of the WooCommere add-on "
-"before activating the paid version."
+msgid "Please de-activate and remove the free version of the WooCommere add-on before activating the paid version."
 msgstr ""
 
 #. Plugin Name of the plugin/theme
+#: 
 msgid "WP All Import - WooCommerce Add-On Pro"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
+#: 
 msgid "http://www.wpallimport.com/"
 msgstr ""
 
 #. Description of the plugin/theme
-msgid ""
-"Import to WooCommerce. Adds a section to WP All Import that looks just like "
-"WooCommerce. Requires WP All Import."
+#: 
+msgid "Import to WooCommerce. Adds a section to WP All Import that looks just like WooCommerce. Requires WP All Import."
 msgstr ""
 
 #. Author of the plugin/theme
+#: 
 msgid "Soflyy"
 msgstr ""
+

@@ -52,7 +52,7 @@
 
 										<ul style="" class="product_data_tabs wc-tabs">
 
-											<li class="general_options hide_if_grouped active"><a href="javascript:void(0);" rel="general_product_data"><?php _e('General','wpai_woocommerce_addon_plugin');?></a></li>
+											<li class="general_options active"><a href="javascript:void(0);" rel="general_product_data"><?php _e('General','wpai_woocommerce_addon_plugin');?></a></li>
 
 											<li class="inventory_tab show_if_simple show_if_variable show_if_grouped inventory_options" style="display: block;"><a href="javascript:void(0);" rel="inventory_product_data"><?php _e('Inventory', 'wpai_woocommerce_addon_plugin');?></a></li>
 

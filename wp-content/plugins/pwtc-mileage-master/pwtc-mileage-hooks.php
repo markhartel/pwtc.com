@@ -24,6 +24,29 @@ function pwtc_mileage_fetch_membership() {
     return array();
 }
 
+function pwtc_mileage_fetch_civi_member_id($email) {
+    $member_id = null;
+    $result = civicrm_api3('contact', 'get', array(
+        'sequential' => 1,
+        'email' => $email
+    ));
+    if ($result['values']) {
+        $contact_id = $result['values'][0]['contact_id'];
+        $result = civicrm_api3('CustomValue', 'get', array(
+            'sequential' => 1,
+            'entity_id' => $contact_id,
+            'return.custom_5' => 1
+        ));
+        if ($result['values']) {
+            $member_id = trim($result['values'][0]['latest']);
+            if (strlen($member_id) == 0) {
+                $member_id = null;    
+            }
+        }
+    }
+    return $member_id;
+}
+
 /*
 Returns a string that contains the member ID of the logged on user.
 (Throws an exception if the user is not logged on or his member ID is not set.)
@@ -35,6 +58,12 @@ function pwtc_mileage_get_member_id() {
         throw new Exception('notloggedin');
     }
     else {
+        civicrm_initialize();
+        $id = pwtc_mileage_fetch_civi_member_id($current_user->user_email);
+        if (!$id) {
+            throw new Exception('idnotfound');
+        }
+/*
         $test_date = PwtcMileage::get_date_for_expir_check();
         $result = PwtcMileage_DB::fetch_riders_by_name(trim($current_user->user_lastname), 
             trim($current_user->user_firstname), $test_date);
@@ -46,6 +75,7 @@ function pwtc_mileage_get_member_id() {
             throw new Exception('multidfound');
         }
         $id = $result[0]['member_id'];
+*/
     }
     return $id;
 }
@@ -97,7 +127,13 @@ function pwtc_mileage_fetch_ride_leader_ids($post_id) {
     $leaders = get_field('ride_leaders', $post_id);
     if ($leaders) {
         //pwtc_mileage_write_log($leaders);
+        civicrm_initialize();
         foreach ($leaders as $leader) {
+            $id = pwtc_mileage_fetch_civi_member_id($leader['user_email']);
+            if ($id) {
+                array_push($leaders_array, $id);
+            }
+/*
             $fname = $leader['user_firstname'];
             $lname = $leader['user_lastname'];
             $test_date = PwtcMileage::get_date_for_expir_check();
@@ -106,6 +142,7 @@ function pwtc_mileage_fetch_ride_leader_ids($post_id) {
                 $id = $result[0]['member_id'];
                 array_push($leaders_array, $id);
             }
+*/
         }
     }
 

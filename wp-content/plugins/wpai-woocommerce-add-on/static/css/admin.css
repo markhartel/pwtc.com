@@ -5,6 +5,15 @@
 	width: 580px;
 	height:200px;
 }
+
+.wpallimport-plugin #woocommerce-coupon-data ul.wc-tabs li a::before,
+.wpallimport-plugin #woocommerce-product-data ul.wc-tabs li a::before,
+.wpallimport-plugin .woocommerce ul.wc-tabs li a::before {
+	top: 2px;
+    right: 4px;
+    position: relative;
+}
+
 .pmxi_checkbox{
 	position: relative;
 	top: -2px;
