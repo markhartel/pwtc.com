@@ -254,15 +254,14 @@ HTML
         $username_id = username_exists($username);
         $email_id = email_exists($email);
         if (!$username_id && !$email_id) {
-            $random_password = wp_generate_password(12, false);
-            $user_id = wp_create_user($username, $random_password, $email);
+            $user_id = register_new_user($username, $email);
             $user_id = wp_update_user(['ID' => $user_id, 'first_name' => $first_name, 'last_name' => $last_name]);
         } else {
             $user_id = $email_id;
         }
         
         if(!$user_id) {
-            echo "Error. Failed to create them a WordPress account";
+            echo "Error. Failed to create the WordPress account";
             die();
         }
 
