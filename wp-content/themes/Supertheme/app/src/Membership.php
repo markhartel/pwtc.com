@@ -270,7 +270,7 @@ HTML
             <p>$first_name $last_name has been added to {$wordpress_user->user_firstname} {$wordpress_user->user_lastname} family membership.</p>
             <ul>
                 <li>WordPress ID: $user_id</li>
-                <li>CiviCRM ID: $contact_id</li>
+                <li>CiviCRM ID: $household_member_id</li>
             </ul>
 HTML
         );
