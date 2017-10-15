@@ -63,6 +63,7 @@ foreach($memberships['values'] as $membership) {
 $data['renew'] = get_field('membership_renewal_link', 'option');
 // use the api to find the households
 $data['household_members'] = [];
+$data['is_head'] = false;
 if($civi_contact->relationship["data"]) {
 	$relationships = [];
 	foreach($civi_contact->relationship["data"] as $relationship) {
@@ -77,6 +78,9 @@ if($civi_contact->relationship["data"]) {
 	// get data on all users in the household
 	if($result['values']) {
 		foreach($result['values'] as $member) {
+		    if($member['relationship_type_id'] == 7) {
+		        $data['is_head'] = true;
+            }
 			$member_result = civicrm_api3('contact', 'get', array(
 				'sequential' => 1,
 				'contact_id' => $member['contact_id_a'],
@@ -91,5 +95,6 @@ if($civi_contact->relationship["data"]) {
 	}
 }
 $data['contact_id'] = $contact_id;
+
 // render
 echo $twig->render('my-account.html.twig', $data);
