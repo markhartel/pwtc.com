@@ -210,10 +210,12 @@ HTML
             ));
         }
 
-        // check if user already has a contact by looking for the email
+        // get data
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
         $email = $_POST['email'];
+
+        // check if user already has a contact by looking for the email
         $result = civicrm_api3('contact', 'get', array(
             'sequential' => 1,
             'email' => $email,
@@ -234,10 +236,36 @@ HTML
                 'contact_id' => $household_member_id,
                 'email' => $email,
             ));
-
-            //@todo add primary address?
         } else {
             $household_member_id = $result['values'][0]['contact_id'];
+
+            // cant have same email as current user
+            if (strcasecmp($wordpress_user->user_email, $email) == 0) {
+                echo "Error. You cannot add yourself as a family member.";
+                die();
+            }
+
+            // cant already be the head of a household
+            $result = civicrm_api3('Relationship', 'get', array(
+                    'sequential' => 1,
+                    'relationship_type_id' => 6,
+                    'contact_id_a' => $household_member_id)
+            );
+            if($result['values']) {
+                echo "Error. Email " . $email . " is already the head of a household.";
+                die();
+            }
+
+            // cant already be the member of a household
+            $result = civicrm_api3('Relationship', 'get', array(
+                    'sequential' => 1,
+                    'relationship_type_id' => 7,
+                    'contact_id_a' => $household_member_id)
+            );
+            if($result['values']) {
+                echo "Error. Email " . $email . " is already a member of a household.";
+                die();
+            }
         }
 
         // new user household
