@@ -163,6 +163,10 @@ class PMAI_Import_Record extends PMAI_Model_Record {
 
     public function parse_field($field, $CurrentFieldXpath, $fieldPath = "", $xpath_suffix = "", $repeater_count_rows = 0, $inside_repeater = FALSE) {
 
+        global $acf;
+
+        $version = ($acf) ? $acf->settings['version'] : false;
+
         $cxpath = $this->parsing_data['xpath_prefix'] . $this->parsing_data['import']->xpath . $xpath_suffix;
 
         $currentIsMultipleField = (isset($this->parsing_data['import']->options['is_multiple_field_value'][$field['key']])) ? $this->parsing_data['import']->options['is_multiple_field_value'][$field['key']] : FALSE;
@@ -299,6 +303,7 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                 break;
             case 'date_picker':
                 if ("" != $CurrentFieldXpath) {
+
                     $values = XmlImportParser::factory($xml, $cxpath, $CurrentFieldXpath, $file)
                         ->parse();
                     $tmp_files[] = $file;
@@ -309,11 +314,9 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                         } // Replace 'now' with the WordPress local time to account for timezone offsets (WordPress references its local time during publishing rather than the server’s time so it should use that)
                         $time = strtotime($d);
                         if (FALSE === $time) {
-                            $values[$i] = $d;
+                            $time = $d;
                         }
-                        else {
-                            $values[$i] = date('Ymd', $time);
-                        }
+                        $values[$i] = date('Ymd', $time);
                     }
                 }
                 break;
@@ -331,7 +334,7 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                         if (FALSE === $time) {
                             $time = $d;//time();
                         }
-                        $values[$i] = $time;
+                        $values[$i] = ($version and version_compare($version, '5.0.0') >= 0) ? date('Y-m-d H:i:s', $time) : $time;
                     }
                 }
                 break;
@@ -841,6 +844,7 @@ class PMAI_Import_Record extends PMAI_Model_Record {
 
                                 if (!empty($sub_fields)):
                                     foreach ($sub_fields as $n => $sub_field) {
+
                                         if (is_object($sub_field)) {
                                             $sub_fieldData = (!empty($sub_field->post_content)) ? unserialize($sub_field->post_content) : array();
                                             $sub_fieldData['ID'] = $sub_field->ID;
@@ -851,7 +855,6 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                                         else {
                                             $sub_fieldData = $sub_field;
                                         }
-
                                         $row_array[$sub_fieldData['key']] = $this->parse_field($sub_fieldData, $row_fields[$sub_fieldData['key']], $fieldPath . "[" . $field['key'] . "][rows][" . $key . "]", "", 0, TRUE);
                                         if (empty($is_variable) and is_array($row_fields[$sub_fieldData['key']]) and !empty($row_fields[$sub_fieldData['key']]['separator'])) {
                                             $is_variable = $row_fields[$sub_fieldData['key']]['separator'];
@@ -997,29 +1000,31 @@ class PMAI_Import_Record extends PMAI_Model_Record {
             case 'google_map_extended':
             case 'google_map':
 
-                // build serach query
+                // build search query
                 $search = '';
-                if (empty($field['values']['address'][$i]) and !empty($field['values']['lat'][$i]) and !empty($field['values']['lng'][$i])) {
+                if (!empty($field['values']['lat'][$i]) and !empty($field['values']['lng'][$i])) {
                     $search = 'latlng=' . rawurlencode($field['values']['lat'][$i] . ',' . $field['values']['lng'][$i]);
                 }
                 if (!empty($field['values']['address'][$i]) and empty($field['values']['lat'][$i]) and empty($field['values']['lng'][$i])) {
                     $search = 'address=' . rawurlencode($field['values']['address'][$i]);
                 }
-                // build api key
-                if ($field['values']['address_geocode'][$i] == 'address_google_developers' && !empty($field['values']['address_google_developers_api_key'][$i])) {
 
-                    $api_key = '&key=' . $field['values']['address_google_developers_api_key'][$i];
+                // build api key
+                if ($field['values']['address_geocode'] == 'address_google_developers' && !empty($field['values']['api_key'][$i])) {
+
+                    $api_key = '&key=' . $field['values']['api_key'][$i];
 
                 }
-                elseif ($field['values']['address_geocode'][$i] == 'address_google_for_work' && !empty($field['values']['address_google_for_work_client_id'][$i]) && !empty($field['values']['address_google_for_work_signature'][$i])) {
+                elseif ($field['values']['address_geocode'] == 'address_google_for_work' && !empty($field['values']['client_id'][$i]) && !empty($field['values']['signature'][$i])) {
 
-                    $api_key = '&client=' . $field['values']['address_google_for_work_client_id'][$i] . '&signature=' . $field['values']['address_google_for_work_signature'][$i];
+                    $api_key = '&client=' . $field['values']['client_id'][$i] . '&signature=' . $field['values']['signature'][$i];
 
                 }
 
                 if (!empty($search)) {
                     // build $request_url for api call
                     $request_url = 'https://maps.googleapis.com/maps/api/geocode/json?' . $search . $api_key;
+
                     $curl = curl_init();
 
                     curl_setopt($curl, CURLOPT_URL, $request_url);
@@ -1272,18 +1277,16 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                     $entries = explode(",", $field['values'][$i]);
                     if (!empty($entries) and is_array($entries)) {
                         foreach ($entries as $ev) {
-                            $args = array(
-                                'name' => $ev,
-                                'post_type' => 'any',
-                                'post_status' => 'any',
-                                'numberposts' => 1
-                            );
-                            $my_posts = get_posts($args);
-                            if ($my_posts) {
-                                $post_ids[] = $my_posts[0]->ID;
+
+                            if (ctype_digit($ev)) {
+                                $post_ids[] = (string) $ev;
                             }
-                            elseif (ctype_digit($ev)) {
-                                $post_ids[] = $ev;
+                            else {
+                                $relation = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->wpdb->posts} WHERE post_type != %s AND ( post_title = %s OR post_name = %s )", 'revision', $ev, sanitize_title_for_query($ev)));
+
+                                if ($relation) {
+                                    $post_ids[] = (string) $relation->ID;
+                                }
                             }
                         }
                     }
@@ -1319,19 +1322,11 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                             $post_ids[] = (string) $ev;
                         }
                         else {
-                            $args = array(
-                                'name' => $ev,
-                                'post_type' => 'any',
-                                'post_status' => 'any',
-                                'numberposts' => 1
-                            );
-                            $my_posts = get_posts($args);
+                            $relation = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->wpdb->posts} WHERE post_type != %s AND post_type != %s AND ( post_title = %s OR post_name = %s )", 'revision', 'attachment', $ev, sanitize_title_for_query($ev)));
 
-                            if ($my_posts) {
-                                $post_ids[] = (string) $my_posts[0]->ID;
+                            if ($relation) {
+                                $post_ids[] = (string) $relation->ID;
                             }
-
-                            wp_reset_postdata();
                         }
                     }
 
@@ -1398,99 +1393,101 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                                             $is_row_import_allowed = TRUE;
                                             break;
                                         }
+                                        if ($sub_field_check['type'] == 'taxonomy'){
+                                            foreach ($sub_field_check['values'] as $tx_name => $tx_terms) {
+                                                if (!empty($tx_terms[$i])){
+                                                    $is_row_import_allowed = TRUE;
+                                                    break(2);
+                                                }
+                                            }
+                                        }
+                                        if ($sub_field_check['type'] == 'google_map'){
+                                            foreach ($sub_field_check['values'] as $map_setting => $map_setting_values) {
+                                                if (!empty($map_setting_values[$i])){
+                                                    $is_row_import_allowed = TRUE;
+                                                    break(2);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-
                                 if ($is_row_import_allowed) {
                                     if ($field['is_variable'] !== FALSE and $field['is_variable'] != '') {
                                         $countCSVrows = 0;
                                         foreach ($row as $sub_field_key => $sub_field) {
                                             if ($sub_field['type'] != 'repeater') {
-                                                if ($sub_field['type'] == 'taxonomy') {
-                                                    if (!empty($sub_field['values'])) {
-                                                        foreach ($sub_field['values'] as $tx_name => $tx_terms) {
-                                                            $is_array = is_array($tx_terms[$i]);
-                                                            if ($is_array) {
-                                                                foreach ($tx_terms[$i] as $tx_term) {
-                                                                    if (!empty($parentRepeater)) {
-                                                                        $parent_tx_rows = explode($parentRepeater['delimiter'], $tx_term['name']);
-                                                                        $tx_rows = explode($field['is_variable'], $parent_tx_rows[$parentRepeater['row']]);
-                                                                    }
-                                                                    else {
-                                                                        $tx_rows = explode($field['is_variable'], $tx_term['name']);
-                                                                    }
-                                                                    if (count($tx_rows) > $countCSVrows) {
-                                                                        $countCSVrows = count($tx_rows);
-                                                                    }
-                                                                }
+                                                $tmpCountCSVrows = pmai_get_rows_count($field, $sub_field, $i, $parentRepeater);
+                                                if ($tmpCountCSVrows > $countCSVrows){
+                                                    $countCSVrows = $tmpCountCSVrows;
+                                                }
+                                            }
+                                            elseif(count($row) === 1){
+                                                // in case we have only one sub field and this sub field is repeater
+                                                foreach ($sub_field['values'] as $s_row_number => $s_row) {
+                                                    if ($sub_field['is_variable'] !== FALSE and $sub_field['is_variable'] != '') {
+                                                        foreach ($s_row as $s_sub_field_key => $s_sub_field) {
+                                                            $tmpCountCSVrows = pmai_get_rows_count($field, $s_sub_field, $i, $parentRepeater);
+                                                            if ($tmpCountCSVrows > $countCSVrows){
+                                                                $countCSVrows = $tmpCountCSVrows;
                                                             }
                                                         }
-                                                    }
-                                                }
-                                                else {
-                                                    if (!empty($parentRepeater)) {
-                                                        $parent_entries = explode($parentRepeater['delimiter'], $sub_field['values'][$i]);
-                                                        $entries = explode($field['is_variable'], $parent_entries[$parentRepeater['row']]);
-                                                    }
-                                                    else {
-                                                        $entries = explode($field['is_variable'], $sub_field['values'][$i]);
-                                                    }
-
-                                                    if (count($entries) > $countCSVrows) {
-                                                        $countCSVrows = count($entries);
                                                     }
                                                 }
                                             }
                                         }
-
                                         for ($k = 0; $k < $countCSVrows; $k++) {
                                             foreach ($row as $sub_field_key => $sub_field) {
                                                 if ($sub_field['type'] !== 'repeater') {
-                                                    if ($sub_field['type'] == 'taxonomy') {
-                                                        if (!empty($sub_field['values'])) {
-                                                            foreach ($sub_field['values'] as $tx_name => $tx_terms) {
-                                                                $is_array = is_array($tx_terms[$i]);
-                                                                if ($is_array) {
-                                                                    $entries = array();
-                                                                    foreach ($tx_terms[$i] as $tx_term) {
+                                                    switch ($sub_field['type']){
+                                                        case 'taxonomy':
+                                                            if (!empty($sub_field['values'])) {
+                                                                foreach ($sub_field['values'] as $tx_name => $tx_terms) {
+                                                                    $is_array = is_array($tx_terms[$i]);
+                                                                    if ($is_array) {
+                                                                        $entries = array();
+                                                                        foreach ($tx_terms[$i] as $tx_term) {
 
-                                                                        $current = $tx_term['name'];
+                                                                            $current = $tx_term['name'];
 
-                                                                        if (!empty($parentRepeater)) {
-                                                                            $tx_rows = explode($parentRepeater['delimiter'], $current);
-                                                                            $current = $tx_rows[$parentRepeater['row']];
+                                                                            if (!empty($parentRepeater)) {
+                                                                                $tx_rows = explode($parentRepeater['delimiter'], $current);
+                                                                                $current = $tx_rows[$parentRepeater['row']];
+                                                                            }
+
+                                                                            $tx_rows = explode($field['is_variable'], $current);
+                                                                            $current = empty($tx_rows[$k]) ? '' : $tx_rows[$k];
+
+                                                                            if (!empty($current)) {
+                                                                                $entries[] = array(
+                                                                                    'name' => $current,
+                                                                                    'parent' => $tx_term['parent'],
+                                                                                    'assign' => 1
+                                                                                );
+                                                                            }
                                                                         }
-
-                                                                        $tx_rows = explode($field['is_variable'], $current);
-                                                                        $current = empty($tx_rows[$k]) ? '' : $tx_rows[$k];
-
-                                                                        if (!empty($current)) {
-                                                                            $entries[] = array(
-                                                                                'name' => $current,
-                                                                                'parent' => $tx_term['parent'],
-                                                                                'assign' => 1
-                                                                            );
-                                                                        }
+                                                                        $sub_field['values'][$tx_name][$i] = $entries;
                                                                     }
-                                                                    $sub_field['values'][$tx_name][$i] = $entries;
                                                                 }
                                                             }
-                                                        }
-                                                    }
-                                                    else {
-                                                        $is_array = is_array($sub_field['values'][$i]);
-                                                        if ($is_array) {
-                                                            $sub_field['values'][$i] = array(implode(",", $sub_field['values'][$i]));
-                                                        }
-                                                        else {
-                                                            if (!empty($parentRepeater)) {
-                                                                $parent_entries = explode($parentRepeater['delimiter'], $sub_field['values'][$i]);
-                                                                $sub_field['values'][$i] = isset($parent_entries[$parentRepeater['row']]) ? $parent_entries[$parentRepeater['row']] : '';
+                                                            break;
+                                                        case 'google_map':
+
+                                                            break;
+                                                        default:
+                                                            $is_array = is_array($sub_field['values'][$i]);
+                                                            if ($is_array) {
+                                                                $sub_field['values'][$i] = array(implode(",", $sub_field['values'][$i]));
                                                             }
-                                                        }
-                                                        $sub_field['values'][$i] = $is_array ? array_shift($sub_field['values'][$i]) : $sub_field['values'][$i];
-                                                        $entries = explode($field['is_variable'], $sub_field['values'][$i]);
-                                                        $sub_field['values'][$i] = (!isset($entries[$k])) ? '' : ($is_array ? explode(",", $entries[$k]) : $entries[$k]);
+                                                            else {
+                                                                if (!empty($parentRepeater)) {
+                                                                    $parent_entries = explode($parentRepeater['delimiter'], $sub_field['values'][$i]);
+                                                                    $sub_field['values'][$i] = isset($parent_entries[$parentRepeater['row']]) ? $parent_entries[$parentRepeater['row']] : '';
+                                                                }
+                                                            }
+                                                            $sub_field['values'][$i] = $is_array ? array_shift($sub_field['values'][$i]) : $sub_field['values'][$i];
+                                                            $entries = explode($field['is_variable'], $sub_field['values'][$i]);
+                                                            $sub_field['values'][$i] = (!isset($entries[$k])) ? '' : ($is_array ? explode(",", $entries[$k]) : $entries[$k]);
+                                                            break;
                                                     }
                                                 }
 
@@ -1650,18 +1647,22 @@ class PMAI_Import_Record extends PMAI_Model_Record {
             $image_filename = wp_unique_filename($uploads['path'], $image_name);
             $image_filepath = $uploads['path'] . '/' . $image_filename;
 
+            $logger and call_user_func($logger, sprintf(__('- Downloading image from `%s`', 'wp_all_import_plugin'), $url));
+
             $request = get_file_curl($url, $image_filepath);
 
             if ((is_wp_error($request) or $request === FALSE) and !@file_put_contents($image_filepath, @file_get_contents($url))) {
                 @unlink($image_filepath); // delete file since failed upload may result in empty file created
             }
-            elseif (($image_info = @getimagesize($image_filepath)) and in_array($image_info[2], array(
-                    IMAGETYPE_GIF,
-                    IMAGETYPE_JPEG,
-                    IMAGETYPE_PNG
-                ))
-            ) {
-                $create_image = TRUE;
+            else{
+                if( preg_match('%\W(svg)$%i', PMAI_Compatibility::basename($image_filepath)) or $image_info = apply_filters('pmxi_getimagesize', @getimagesize($image_filepath), $image_filepath) and in_array($image_info[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+                    $create_image = true;
+                    $logger and call_user_func($logger, sprintf(__('- Image `%s` has been successfully downloaded', 'wp_all_import_plugin'), $url));
+                }
+                else
+                {
+                    $logger and call_user_func($logger, sprintf(__('- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one', 'wp_all_import_plugin'), $url));
+                }
             }
 
             if (!$create_image) {
@@ -1674,25 +1675,30 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                     $logger and call_user_func($logger, sprintf(__('- <b>WARNING</b>: File %s cannot be saved locally as %s', 'wp_all_import_acf_add_on'), $url, $image_filepath));
                     @unlink($image_filepath); // delete file since failed upload may result in empty file created
                 }
-                elseif (!($image_info = @getimagesize($image_filepath)) or !in_array($image_info[2], array(
-                        IMAGETYPE_GIF,
-                        IMAGETYPE_JPEG,
-                        IMAGETYPE_PNG
-                    ))
-                ) {
-                    $logger and call_user_func($logger, sprintf(__('- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one', 'wp_all_import_acf_add_on'), $url));
-                    @unlink($image_filepath);
-                }
-                else {
-                    $create_image = TRUE;
+                else{
+                    if( preg_match('%\W(svg)$%i', PMAI_Compatibility::basename($image_filepath)) or $image_info = apply_filters('pmxi_getimagesize', @getimagesize($image_filepath), $image_filepath) and in_array($image_info[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+                        $create_image = true;
+                        $logger and call_user_func($logger, sprintf(__('- Image `%s` has been successfully downloaded', 'wp_all_import_plugin'), $url));
+                    } else {
+                        $logger and call_user_func($logger, sprintf(__('- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one', 'wp_all_import_plugin'), $url));
+                        @unlink($image_filepath);
+                    }
                 }
             }
         }
 
         if ($create_image) {
 
+            $file_mime_type = '';
+
+            if ( ! empty($image_info) )
+            {
+                $file_mime_type = image_type_to_mime_type($image_info[2]);
+            }
+            $file_mime_type = apply_filters('wp_all_import_image_mime_type', $file_mime_type, $image_filepath);
+
             $attachment = array(
-                'post_mime_type' => image_type_to_mime_type($image_info[2]),
+                'post_mime_type' => $file_mime_type,
                 'guid' => $uploads['url'] . '/' . $image_filename,
                 'post_title' => $image_filename,
                 'post_content' => '',
@@ -1780,28 +1786,7 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                 $logger and call_user_func($logger, sprintf(__('- <b>WARNING</b>: Can\'t detect attachment file type %s', 'wp_all_import_acf_add_on'), trim($atch_url)));
             }
             else {
-
-                $attachment_data = array(
-                    'guid' => $uploads['baseurl'] . '/' . _wp_relative_upload_path($attachment_filepath),
-                    'post_mime_type' => $wp_filetype['type'],
-                    'post_title' => preg_replace('/\.[^.]+$/', '', basename($attachment_filepath)),
-                    'post_content' => '',
-                    'post_status' => 'inherit'
-                );
-                $attach_id = wp_insert_attachment($attachment_data, $attachment_filepath, $pid);
-
-                if (is_wp_error($attach_id)) {
-                    $logger and call_user_func($logger, __('- <b>WARNING</b>', 'wp_all_import_acf_add_on') . ': ' . $pid->get_error_message());
-                }
-                else {
-                    // you must first include the image.php file
-                    // for the function wp_generate_attachment_metadata() to work
-                    require_once(ABSPATH . 'wp-admin/includes/image.php');
-
-                    do_action('pmxi_attachment_uploaded', $pid, $attach_id, $attachment_filepath);
-                    wp_update_attachment_metadata($attach_id, wp_generate_attachment_metadata($attach_id, $attachment_filepath));
-                    return $attach_id;
-                }
+                $create_file = TRUE;
             }
         }
 
@@ -1814,7 +1799,7 @@ class PMAI_Import_Record extends PMAI_Model_Record {
                 'post_status' => 'inherit'
             );
 
-            $attach_id = wp_insert_attachment($attachment_data, $attachment_filepath, $pid);
+            $attach_id = wp_insert_attachment($attachment_data, $attachment_filepath);
 
             if (is_wp_error($attach_id)) {
                 $logger and call_user_func($logger, __('- <b>WARNING</b>', 'wp_all_import_acf_add_on') . ': ' . $pid->get_error_message());

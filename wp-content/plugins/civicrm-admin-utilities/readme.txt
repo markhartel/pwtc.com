@@ -3,8 +3,8 @@ Contributors: needle, cuny-academic-commons
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PZSKM8T5ZP3SC
 Tags: civicrm, admin, utility, styling, menu
 Requires at least: 3.9
-Tested up to: 4.7
-Stable tag: 0.2.8
+Tested up to: 4.8
+Stable tag: 0.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ This plugin requires a minimum of *WordPress 3.9* and *CiviCRM 4.6-alpha1*. For 
 
 
 == Changelog ==
+
+= 0.2.9 =
+
+Add basic support for the Shoreditch theme for CiviCRM
 
 = 0.2.8 =
 

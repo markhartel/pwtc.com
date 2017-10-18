@@ -1,56 +1,25 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WP All Import - WooCommerce Add-On Pro\n"
-"POT-Creation-Date: 2017-03-24 11:33+0900\n"
-"PO-Revision-Date: 2017-03-24 11:33+0900\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.8.12\n"
-"X-Poedit-Basepath: ../..\n"
-"X-Poedit-WPHeader: wpai-woocommerce-add-on.php\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: WooCommerce Add-On Pro\n"
+"Language: ja\n"
 
 #: actions/admin_notices.php:10
-#, php-format
 msgid "<b>%s Plugin</b>: WooCommerce must be installed."
-msgstr ""
-"<b>%s プラグイン</b>: WooCommerce がインストールされている必要があります。"
+msgstr "<b>%s プラグイン</b>: WooCommerce がインストールされている必要があります。"
 
 #: actions/admin_notices.php:24
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All "
-"Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target="
-"\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid "
-"edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport."
-"com/</a>"
-msgstr ""
-"<b>%s プラグイン</b>: WP すべてインポートする必要がありますインストールされて"
-"います。<a href=\"http://wordpress.org/plugins/wp-all-import/\" target="
-"\"_blank\">Http://wordpress.org/plugins/wp-all-import/</a>と<a href=\"http://"
-"www.wpallimport.com/\">http://www.wpallimport.com/</a>で有料版で WP すべてイ"
-"ンポートの無料版"
+msgid "<b>%s Plugin</b>: WP All Import must be installed. Free edition of WP All Import at <a href=\"http://wordpress.org/plugins/wp-all-import/\" target=\"_blank\">http://wordpress.org/plugins/wp-all-import/</a> and the paid edition at <a href=\"http://www.wpallimport.com/\">http://www.wpallimport.com/</a>"
+msgstr "<b>%s プラグイン</b>: WP すべてインポートする必要がありますインストールされています。<a href=\"http://wordpress.org/plugins/wp-all-import/\" target=\"_blank\">Http://wordpress.org/plugins/wp-all-import/</a>と<a href=\"http://www.wpallimport.com/\">http://www.wpallimport.com/</a>で有料版で WP すべてインポートの無料版"
 
 #: actions/admin_notices.php:38
-#, php-format
-msgid ""
-"<b>%s Plugin</b>: Please update your WP All Import to the latest version"
-msgstr ""
-"<b>%s Plugin</b>: WP All Import Userアドオンを最新バージョンに更新してくださ"
-"い"
+msgid "<b>%s Plugin</b>: Please update your WP All Import to the latest version"
+msgstr "<b>%s Plugin</b>: WP All Import Userアドオンを最新バージョンに更新してください"
 
 #: actions/admin_notices.php:51
-#, php-format
 msgid "<b>%s Plugin</b>: Please update your WooCommerce to the latest version"
 msgstr "<b>%s のプラグイン</b>：最新バージョンにWooCommerceを更新してください"
 
@@ -83,24 +52,12 @@ msgid "Changelog"
 msgstr "変更履歴"
 
 #: classes/updater.php:258
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
-msgstr ""
-"%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\"> %3$s バージョンの詳細を表示</a>"
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a>."
+msgstr "%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class=\"thickbox\" href=\"%2$s\"> %3$s バージョンの詳細を表示</a>"
 
 #: classes/updater.php:265
-#, php-format
-msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s"
-"\">update now</a>."
-msgstr ""
-"%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">%3$s バージョンの詳細を表示</a> か <a href=\"%4$s"
-"\">今すぐ更新</a>"
+msgid "There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s\">update now</a>."
+msgstr "%1$s の利用可能な新しいバージョンがあります。<a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">%3$s バージョンの詳細を表示</a> か <a href=\"%4$s\">今すぐ更新</a>"
 
 #: classes/updater.php:448
 msgid "You do not have permission to install plugin updates"
@@ -111,13 +68,8 @@ msgid "Error"
 msgstr "エラー"
 
 #: controllers/controller/admin.php:55
-msgid ""
-"Remove this item? If you have previously reduced this item's stock, or this "
-"order was submitted by a customer, will need to manually restore the item's "
-"stock."
-msgstr ""
-"この項目を削除しますか。以前このアイテムの在庫を減らした場合、この注文が顧客"
-"によって送信されたアイテムのストックを手動で復元する必要があります。"
+msgid "Remove this item? If you have previously reduced this item's stock, or this order was submitted by a customer, will need to manually restore the item's stock."
+msgstr "この項目を削除しますか。以前このアイテムの在庫を減らした場合、この注文が顧客によって送信されたアイテムのストックを手動で復元する必要があります。"
 
 #: controllers/controller/admin.php:56
 msgid "Remove this attribute?"
@@ -147,9 +99,7 @@ msgstr "値(s)"
 
 #: controllers/controller/admin.php:61
 msgid "Enter some text, or some attributes by pipe (|) separating values."
-msgstr ""
-"テキストを入力してください。いくつか属性がある場合は、（ | ）で区切ってくださ"
-"い。"
+msgstr "テキストを入力してください。いくつか属性がある場合は、（ | ）で区切ってください。"
 
 #: controllers/controller/admin.php:62
 msgid "Visible on the product page"
@@ -164,43 +114,24 @@ msgid "Enter a name for the new attribute term:"
 msgstr "新しい属性の用語の名前を入力します:"
 
 #: controllers/controller/admin.php:65
-msgid ""
-"Calculate totals based on order items, discount amount, and shipping? Note, "
-"you will need to (optionally) calculate tax rows and cart discounts manually."
-msgstr ""
-"注文項目、割引額、および出荷に基づいて合計を計算？あなたは（必要に応じて）手"
-"動税行とカートの割引を計算する必要があります、注意してください。"
+msgid "Calculate totals based on order items, discount amount, and shipping? Note, you will need to (optionally) calculate tax rows and cart discounts manually."
+msgstr "注文項目、割引額、および出荷に基づいて合計を計算？あなたは（必要に応じて）手動税行とカートの割引を計算する必要があります、注意してください。"
 
 #: controllers/controller/admin.php:66
-msgid ""
-"Calculate line taxes? This will calculate taxes based on the customers "
-"country. If no billing/shipping is set it will use the store base country."
-msgstr ""
-"税明細を計算しますか? これにより、お客様の国に基づいて税金を計算します。請求"
-"と配送が設定されていない場合は、店舗所在地を基本の国に使用します。"
+msgid "Calculate line taxes? This will calculate taxes based on the customers country. If no billing/shipping is set it will use the store base country."
+msgstr "税明細を計算しますか? これにより、お客様の国に基づいて税金を計算します。請求と配送が設定されていない場合は、店舗所在地を基本の国に使用します。"
 
 #: controllers/controller/admin.php:67
-msgid ""
-"Copy billing information to shipping information? This will remove any "
-"currently entered shipping information."
-msgstr ""
-"コピーの請求情報は配送情報に？ここでは、現在入力お届け先情報を削除します。"
+msgid "Copy billing information to shipping information? This will remove any currently entered shipping information."
+msgstr "コピーの請求情報は配送情報に？ここでは、現在入力お届け先情報を削除します。"
 
 #: controllers/controller/admin.php:68
-msgid ""
-"Load the customer's billing information? This will remove any currently "
-"entered billing information."
-msgstr ""
-"お客様情報を読み込みますか? （注意）現在入力してあるお客様情報は削除されま"
-"す。"
+msgid "Load the customer's billing information? This will remove any currently entered billing information."
+msgstr "お客様情報を読み込みますか? （注意）現在入力してあるお客様情報は削除されます。"
 
 #: controllers/controller/admin.php:69
-msgid ""
-"Load the customer's shipping information? This will remove any currently "
-"entered shipping information."
-msgstr ""
-"お客様の配送先住所を読み込みますか? （注意）現在入力してある配送先住所は削除"
-"されます。"
+msgid "Load the customer's shipping information? This will remove any currently entered shipping information."
+msgstr "お客様の配送先住所を読み込みますか? （注意）現在入力してある配送先住所は削除されます。"
 
 #: controllers/controller/admin.php:70
 #: views/admin/import/product/_tabs/_advanced.php:44
@@ -253,152 +184,127 @@ msgstr "オートコンプリートすべてのWooCommerceオーダー"
 msgid "WooCommerce Coupons"
 msgstr "WooCommerce クーポン"
 
-#: libraries/XmlImportWooCommerceProduct.php:48
+#: libraries/XmlImportWooCommerceProduct.php:43
 msgid "Composing product data..."
 msgstr "製品データを構成します..."
 
-#: libraries/XmlImportWooCommerceProduct.php:266
+#: libraries/XmlImportWooCommerceProduct.php:261
 msgid "Composing variations attributes..."
 msgstr "バリエーション属性を構成する."
 
-#: libraries/XmlImportWooCommerceProduct.php:538
+#: libraries/XmlImportWooCommerceProduct.php:533
 msgid "<b>WARNING</b>: Product SKU must be unique."
 msgstr "<b>警告</b>: 製品の SKU は一意でなければなりません。"
 
-#: libraries/XmlImportWooCommerceProduct.php:1108
-#: libraries/XmlImportWooCommerceProduct.php:2302
-#: libraries/XmlImportWooCommerceProduct.php:2349
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:1101
+#: libraries/XmlImportWooCommerceProduct.php:2294
+#: libraries/XmlImportWooCommerceProduct.php:2341
 msgid "Variation #%s of %s"
 msgstr "バリエーション#%s の %s"
 
-#: libraries/XmlImportWooCommerceProduct.php:1879
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:1871
 msgid "<b>CREATED</b>: %s variations for parent product %s."
 msgstr "<b>作成</b>: 親製品 %s の %s のバリエーション。"
 
-#: libraries/XmlImportWooCommerceProduct.php:1901
+#: libraries/XmlImportWooCommerceProduct.php:1893
 msgid "- Importing Variations"
 msgstr "販売者の商品種類をインポートしています"
 
-#: libraries/XmlImportWooCommerceProduct.php:2349
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2341
 msgid "- `%s`: variation created successfully"
 msgstr "-'%s': バリエーションが正常に作成されました"
 
-#: libraries/XmlImportWooCommerceProduct.php:2355
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2347
 msgid "- `%s`: variation updated successfully"
 msgstr "-'%s': 正常に更新された変化"
 
-#: libraries/XmlImportWooCommerceProduct.php:2358
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2350
 msgid "Deleting attachments for `%s`"
 msgstr "`%s`のための添付ファイルを削除"
 
-#: libraries/XmlImportWooCommerceProduct.php:2363
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2355
 msgid "Deleting images for `%s`"
 msgstr "`%s`のための削除画像"
 
-#: libraries/XmlImportWooCommerceProduct.php:2537
+#: libraries/XmlImportWooCommerceProduct.php:2529
 msgid "- <b>WARNING</b>: Product SKU must be unique."
 msgstr "<b>警告</b>: 製品の SKU は一意でなければなりません。"
 
-#: libraries/XmlImportWooCommerceProduct.php:2771
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2761
 msgid "- <b>WARNING</b>: Image %s not found in media gallery."
 msgstr "-<b>警告</b>: イメージ %s メディア ギャラリー内に見つかりません。"
 
-#: libraries/XmlImportWooCommerceProduct.php:2775
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2765
 msgid "- Using existing image `%s` for post `%s` ..."
 msgstr "-ポスト '%s' を '%s' の既存のイメージを使用して."
 
-#: libraries/XmlImportWooCommerceProduct.php:2793
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2783
 msgid "- Searching for existing image `%s` in `%s` folder"
 msgstr "- 既存のイメージ `%s`を`%s`フォルダ内で検索しています"
 
-#: libraries/XmlImportWooCommerceProduct.php:2799
-#: libraries/XmlImportWooCommerceProduct.php:2835
-#, php-format
-msgid ""
-"- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured "
-"one"
-msgstr ""
-"- <b>警告</b>: ファイル%sは有効な画像ではないため、特典として設定することはで"
-"きません"
+#: libraries/XmlImportWooCommerceProduct.php:2789
+#: libraries/XmlImportWooCommerceProduct.php:2825
+msgid "- <b>WARNING</b>: File %s is not a valid image and cannot be set as featured one"
+msgstr "- <b>警告</b>: ファイル%sは有効な画像ではないため、特典として設定することはできません"
 
-#: libraries/XmlImportWooCommerceProduct.php:2803
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2793
 msgid "- Image `%s` has been successfully found"
 msgstr "- 画像`%s` が正常に見つかりました"
 
-#: libraries/XmlImportWooCommerceProduct.php:2809
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2799
 msgid "- Downloading image from `%s`"
 msgstr "- `%s`から画像をダウンロードしています"
 
-#: libraries/XmlImportWooCommerceProduct.php:2819
-#: libraries/XmlImportWooCommerceProduct.php:2839
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2809
+#: libraries/XmlImportWooCommerceProduct.php:2829
 msgid "- Image `%s` has been successfully downloaded"
 msgstr "- 画像`%s`が正常にダウンロードされました"
 
-#: libraries/XmlImportWooCommerceProduct.php:2830
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2820
 msgid "- <b>WARNING</b>: File %s cannot be saved locally as %s"
 msgstr "- <b>警告</b>: ファイル%sをローカルに%sとして保存することはできません"
 
-#: libraries/XmlImportWooCommerceProduct.php:2856
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2846
 msgid "- Creating an attachment for image `%s`"
 msgstr "- 画像 `%s`の添付ファイルを作成しています"
 
-#: libraries/XmlImportWooCommerceProduct.php:2877
+#: libraries/XmlImportWooCommerceProduct.php:2867
 msgid "- <b>WARNING</b>"
 msgstr "- <b>警告</b>"
 
-#: libraries/XmlImportWooCommerceProduct.php:2910
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2900
 msgid "- Attachment has been successfully updated for image `%s`"
 msgstr "-添付ファイル イメージ '%s' を正常に更新しました"
 
-#: libraries/XmlImportWooCommerceProduct.php:2914
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:2904
 msgid "- Attachment has been successfully created for image `%s`"
 msgstr "- 画像`%s`の添付ファイルが正常に作成されました"
 
-#: libraries/XmlImportWooCommerceProduct.php:3297
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:3282
 msgid "Added to %s list of product ID %d."
 msgstr "%sの一覧にプロダクト ID %dを追加"
 
-#: libraries/XmlImportWooCommerceProduct.php:3367
+#: libraries/XmlImportWooCommerceProduct.php:3352
 msgid "<b>ERROR</b> Could not insert term relationship into the database"
 msgstr "<b>エラー</b> データベースに用語の関係を挿入できませんでした"
 
-#: libraries/XmlImportWooCommerceProduct.php:3715
-#, php-format
-msgid ""
-"- <b>CREATED</b>: Taxonomy attribute “%s” have been successfully created."
+#: libraries/XmlImportWooCommerceProduct.php:3664
+msgid "- <b>WARNING</b>: Slug “%s” is not allowed because it is a reserved term. Change it, please."
+msgstr "- <b>警告</b>: スラッグ“%s”は予約語であるため許可されていません。 それを変更してください。"
+
+#: libraries/XmlImportWooCommerceProduct.php:3697
+msgid "- <b>CREATED</b>: Taxonomy attribute “%s” have been successfully created."
 msgstr "-<b>作成</b>: 分類属性\"%s\"が正常に作成されています。"
 
-#: libraries/XmlImportWooCommerceProduct.php:3719
-#, php-format
-msgid ""
-"- <b>WARNING</b>: Taxonomy “%s” name is more than 28 characters. Change it, "
-"please."
+#: libraries/XmlImportWooCommerceProduct.php:3701
+msgid "- <b>WARNING</b>: Taxonomy “%s” name is more than 28 characters. Change it, please."
 msgstr "-<b>警告</b>:\"%s\"の分類名は以上 28 文字。くださいそれを変更します。"
 
-#: libraries/XmlImportWooCommerceProduct.php:3837
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:3810
 msgid "- <b>WARNING</b>: Unable to create cloaked link for %s"
 msgstr "<b>警告</b> ：%sのクロークリンクを作成することができません。"
 
-#: libraries/XmlImportWooCommerceProduct.php:3917
-#, php-format
+#: libraries/XmlImportWooCommerceProduct.php:3890
 msgid "Product `%s` with ID `%d` added to %s list."
 msgstr "製品 '%s' ID '%d' が %s の一覧に追加します。"
 
@@ -407,25 +313,20 @@ msgid "Composing shop order data..."
 msgstr "ショップの受注データを作成する."
 
 #: libraries/XmlImportWooCommerceShopOrder.php:683
-#, php-format
 msgid "- Importing billing & shipping information for Order ID `%s`."
 msgstr "-注文 ID の請求・発送情報 '%s' をインポートします。"
 
 #: libraries/XmlImportWooCommerceShopOrder.php:695
-#, php-format
 msgid "- %s Existing customer with ID `%s` founded for Order `%s`."
 msgstr "-%s 既存顧客 id '%s' が '%s' のために設立されました。"
 
 #: libraries/XmlImportWooCommerceShopOrder.php:701
 #: libraries/XmlImportWooCommerceShopOrder.php:711
 #: libraries/XmlImportWooCommerceShopOrder.php:729
-#, php-format
-msgid ""
-"- Billing field `%s` has been updated with value `%s` for order `%s` ..."
+msgid "- Billing field `%s` has been updated with value `%s` for order `%s` ..."
 msgstr "ビリング フィールド '%s' 注文 '%s' の値 '%s' で更新されました."
 
 #: libraries/XmlImportWooCommerceShopOrder.php:717
-#, php-format
 msgid "<b>WARNING</b>: Existing customer not found for Order `%s`."
 msgstr "<b>警告</b>: 既存の顧客のため '%s' が見つかりませんでした。"
 
@@ -435,23 +336,18 @@ msgstr "課金情報の配送をコピー."
 
 #: libraries/XmlImportWooCommerceShopOrder.php:753
 #: libraries/XmlImportWooCommerceShopOrder.php:771
-#, php-format
-msgid ""
-"- Shipping field `%s` has been updated with value `%s` for order `%s` ..."
+msgid "- Shipping field `%s` has been updated with value `%s` for order `%s` ..."
 msgstr "-配送フィールド '%s' は、順序 '%s' の値 '%s' で更新されました."
 
 #: libraries/XmlImportWooCommerceShopOrder.php:812
-#, php-format
 msgid "- %s email notification has beed sent. ..."
 msgstr "-%s 電子メール通知されて送信されます。..."
 
 #: libraries/XmlImportWooCommerceShopOrder.php:1036
-#, php-format
 msgid "<b>SKIPPED</b>: %s Existing customer not found for Order `%s`."
 msgstr "<b>スキップ</b>: %s 既存顧客のため '%s' が見つかりませんでした。"
 
 #: libraries/XmlImportWooCommerceShopOrder.php:1091
-#, php-format
 msgid "<b>SKIPPED</b>: Existing product `%s` not found for Order `%s`."
 msgstr "<b>スキップ</b>: 既存の製品 '%s' 注文 '%s' が見つかりませんでした。"
 
@@ -464,39 +360,39 @@ msgstr "-<b>警告</b>順序ライン製品を作成できません。"
 msgid "- <b>WARNING</b> order line fee is not added."
 msgstr "-<b>警告</b>注文ライン料金は追加されません。"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:1677
+#: libraries/XmlImportWooCommerceShopOrder.php:1675
 msgid "- <b>WARNING</b> Unable to create order coupon line."
 msgstr "-<b>警告</b>クーポンの注文明細行を作成できません。"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:1801
+#: libraries/XmlImportWooCommerceShopOrder.php:1799
 msgid "- <b>WARNING</b> Unable to create order shipping line."
 msgstr "-配送の注文明細行を作成する<b>警告</b>できません。"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:1904
+#: libraries/XmlImportWooCommerceShopOrder.php:1902
 msgid "- <b>WARNING</b> Unable to create order tax line."
 msgstr "-税の注文明細行を作成する<b>警告</b>できません。"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:1960
+#: libraries/XmlImportWooCommerceShopOrder.php:1958
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:2050
+#: libraries/XmlImportWooCommerceShopOrder.php:2048
 msgid "Search customer by "
 msgstr "顧客を検索"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:2056
+#: libraries/XmlImportWooCommerceShopOrder.php:2054
 msgid "username"
 msgstr "ユーザー名"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:2062
+#: libraries/XmlImportWooCommerceShopOrder.php:2060
 msgid "email"
 msgstr "Eメール"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:2068
+#: libraries/XmlImportWooCommerceShopOrder.php:2066
 msgid "custom field"
 msgstr "カスタムフィールド"
 
-#: libraries/XmlImportWooCommerceShopOrder.php:2074
+#: libraries/XmlImportWooCommerceShopOrder.php:2072
 msgid "ID"
 msgstr "ID"
 
@@ -585,12 +481,10 @@ msgid "Only ACF presented in import options"
 msgstr "唯一のACFインポートオプションで提供"
 
 #: views/admin/import/confirm.php:65
-#, php-format
 msgid "Only these ACF : %s"
 msgstr "これらのACF : %s"
 
 #: views/admin/import/confirm.php:68
-#, php-format
 msgid "All ACF except these: %s"
 msgstr "これらを除くすべてのACF: %s"
 
@@ -599,12 +493,10 @@ msgid "All custom fields"
 msgstr "すべてのカスタムフィールド"
 
 #: views/admin/import/confirm.php:81
-#, php-format
 msgid "Only these custom fields : %s"
 msgstr "これらのカスタムフィールドのみ : %s"
 
 #: views/admin/import/confirm.php:84
-#, php-format
 msgid "All custom fields except these: %s"
 msgstr "すべてのカスタム フィールドを除くこれら: %s"
 
@@ -613,20 +505,15 @@ msgid "When WP All Import finds new or changed data..."
 msgstr "WP All Importは、新規または変更されたデータを見つけます..."
 
 #: views/admin/import/options/_reimport_options.php:4
-msgid ""
-"If this import is run again and WP All Import finds new or changed data..."
-msgstr ""
-"このインポートを再度実行するかどうか、新しい検索 WP をすべてインポートまたは"
-"変更されたデータ."
+msgid "If this import is run again and WP All Import finds new or changed data..."
+msgstr "このインポートを再度実行するかどうか、新しい検索 WP をすべてインポートまたは変更されたデータ."
 
 #: views/admin/import/options/_reimport_options.php:9
 msgid "Create new orders from records newly present in your file"
 msgstr "あなたのファイルに新しく存在レコードから、新しい投稿を作成します。"
 
 #: views/admin/import/options/_reimport_options.php:11
-msgid ""
-"New orders will only be created when ID column is present and value in ID "
-"column is unique."
+msgid "New orders will only be created when ID column is present and value in ID column is unique."
 msgstr "新規注文は、ID 列があり、ID 列の値が一意場合にのみ作成されます。"
 
 #: views/admin/import/options/_reimport_options.php:18
@@ -634,13 +521,8 @@ msgid "Delete orders that are no longer present in your file"
 msgstr "ファイルに存在しなくなった投稿を削除する"
 
 #: views/admin/import/options/_reimport_options.php:20
-msgid ""
-"Records removed from the import file can only be deleted when importing into "
-"New Items. This feature cannot be enabled when importing into Existing Items."
-msgstr ""
-"インポート ファイルから削除されたレコードは、新しいアイテムにインポートする場"
-"合にのみ削除できます。既存のアイテムにインポートする場合、この機能を有効にで"
-"きません。"
+msgid "Records removed from the import file can only be deleted when importing into New Items. This feature cannot be enabled when importing into Existing Items."
+msgstr "インポート ファイルから削除されたレコードは、新しいアイテムにインポートする場合にのみ削除できます。既存のアイテムにインポートする場合、この機能を有効にできません。"
 
 #: views/admin/import/options/_reimport_options.php:27
 msgid "Do not remove attachments"
@@ -670,12 +552,8 @@ msgid "Update existing orders with changed data in your file"
 msgstr "既存の投稿をファイル内の変更されたデータで更新する"
 
 #: views/admin/import/options/_reimport_options.php:59
-msgid ""
-"These options will only be used if you run this import again later. All data "
-"is imported the first time you run an import."
-msgstr ""
-"後で再びこのインポートを実行する場合、これらのオプションは使用されます。すべ"
-"てのデータは、インポートを最初に実行したときにインポートされます。"
+msgid "These options will only be used if you run this import again later. All data is imported the first time you run an import."
+msgstr "後で再びこのインポートを実行する場合、これらのオプションは使用されます。すべてのデータは、インポートを最初に実行したときにインポートされます。"
 
 #: views/admin/import/options/_reimport_options.php:63
 msgid "Update all data"
@@ -706,17 +584,8 @@ msgid "Custom Fields"
 msgstr "ユーザー設定フィールド"
 
 #: views/admin/import/options/_reimport_options.php:160
-msgid ""
-"If Keep Custom Fields box is checked, it will keep all Custom Fields, and "
-"add any new Custom Fields specified in Custom Fields section, as long as "
-"they do not overwrite existing fields. If 'Only keep this Custom Fields' is "
-"specified, it will only keep the specified fields."
-msgstr ""
-"キープカスタムフィールドのチェックボックスをオンにすると、それはすべてのカス"
-"タムフィールドを維持し、限り、彼らは既存のフィールドを上書きしないように、カ"
-"スタムフィールド]セクションで指定された新しいカスタムフィールドを追加しま"
-"す。 'のみ続けるこのカスタムフィールド」が指定されている場合、それだけで指定"
-"したフィールドを保持します。"
+msgid "If Keep Custom Fields box is checked, it will keep all Custom Fields, and add any new Custom Fields specified in Custom Fields section, as long as they do not overwrite existing fields. If 'Only keep this Custom Fields' is specified, it will only keep the specified fields."
+msgstr "キープカスタムフィールドのチェックボックスをオンにすると、それはすべてのカスタムフィールドを維持し、限り、彼らは既存のフィールドを上書きしないように、カスタムフィールド]セクションで指定された新しいカスタムフィールドを追加します。 'のみ続けるこのカスタムフィールド」が指定されている場合、それだけで指定したフィールドを保持します。"
 
 #: views/admin/import/options/_reimport_options.php:164
 msgid "Update all Custom Fields"
@@ -728,8 +597,7 @@ msgstr "これらのカスタムフィールドのみを更新し、残りはそ
 
 #: views/admin/import/options/_reimport_options.php:176
 msgid "Leave these fields alone, update all other Custom Fields"
-msgstr ""
-"他のすべてのカスタムフィールドを更新し、単独でこれらのフィールドを残します"
+msgstr "他のすべてのカスタムフィールドを更新し、単独でこれらのフィールドを残します"
 
 #: views/admin/import/options/_reimport_template.php:14
 #: views/admin/import/options/_reimport_template.php:82
@@ -741,20 +609,12 @@ msgid "Choose how exported data will be re-imported."
 msgstr "エクスポートされたデータをどのように再インポートするかを選択します。"
 
 #: views/admin/import/options/_reimport_template.php:28
-#, php-format
 msgid "WP All Import will create new %s for each unique record in your file."
-msgstr ""
-"WP All Importは、新しい%sのあなたのファイル内の各一意のレコードのために作成さ"
-"れます。"
+msgstr "WP All Importは、新しい%sのあなたのファイル内の各一意のレコードのために作成されます。"
 
 #: views/admin/import/options/_reimport_template.php:42
-#, php-format
-msgid ""
-"WP All Import will associate records in your file with %s it has already "
-"created from previous runs of this import based on the Unique Identifier."
-msgstr ""
-"WP All Importは、%sのそれは既に一意識別子に基づいて、このインポートの以前の実"
-"行から作成していると、ファイル内のレコードを関連付けます。"
+msgid "WP All Import will associate records in your file with %s it has already created from previous runs of this import based on the Unique Identifier."
+msgstr "WP All Importは、%sのそれは既に一意識別子に基づいて、このインポートの以前の実行から作成していると、ファイル内のレコードを関連付けます。"
 
 #: views/admin/import/options/_reimport_template.php:45
 #: views/admin/import/product/_tabs/_variations.php:36
@@ -775,69 +635,30 @@ msgid "Warning: Are you sure you want to edit the Unique Identifier?"
 msgstr "警告：あなたは一意の識別子を編集してもよろしいですか？"
 
 #: views/admin/import/options/_reimport_template.php:56
-#, php-format
-msgid ""
-"It is recommended you delete all %s associated with this import before "
-"editing the unique identifier."
-msgstr ""
-"あなたが一意の識別子を編集する前に、このインポートに関連付けられているすべて"
-"の%sを削除することをお勧めします。"
+msgid "It is recommended you delete all %s associated with this import before editing the unique identifier."
+msgstr "あなたが一意の識別子を編集する前に、このインポートに関連付けられているすべての%sを削除することをお勧めします。"
 
 #: views/admin/import/options/_reimport_template.php:57
-#, php-format
-msgid ""
-"Editing the unique identifier will dissociate all existing %s linked to this "
-"import. Future runs of the import will result in duplicates, as WP All "
-"Import will no longer be able to update these %s."
-msgstr ""
-"一意の識別子を編集すると、このインポートにリンクされているすべての既存の%sが"
-"分離されます。 WP All Importはこれらの%sを更新することができなくなるので、イ"
-"ンポートの将来の実行は重複を招きます。"
+msgid "Editing the unique identifier will dissociate all existing %s linked to this import. Future runs of the import will result in duplicates, as WP All Import will no longer be able to update these %s."
+msgstr "一意の識別子を編集すると、このインポートにリンクされているすべての既存の%sが分離されます。 WP All Importはこれらの%sを更新することができなくなるので、インポートの将来の実行は重複を招きます。"
 
 #: views/admin/import/options/_reimport_template.php:58
-msgid ""
-"You really should just re-create your import, and pick the right unique "
-"identifier to start with."
-msgstr ""
-"あなたは本当に自分のインポートを再作成し、で開始する権利一意の識別子を選択す"
-"る必要があります。"
+msgid "You really should just re-create your import, and pick the right unique identifier to start with."
+msgstr "あなたは本当に自分のインポートを再作成し、で開始する権利一意の識別子を選択する必要があります。"
 
 #: views/admin/import/options/_reimport_template.php:68
-msgid ""
-"Drag an element, or combo of elements, to the box above. The Unique "
-"Identifier should be unique for each record in your file, and should stay "
-"the same even if your file is updated. Things like product IDs, titles, and "
-"SKUs are good Unique Identifiers because they probably won't change. Don't "
-"use a description or price, since that might be changed."
-msgstr ""
-"上のボックスに、要素、または要素のコンボをドラッグします。一意識別子は、ファ"
-"イル内のレコードごとに一意である必要があり、あなたのファイルが更新されていて"
-"も同じままである必要があります。彼らはおそらく変更されませんので、製品ID、タ"
-"イトル、およびSKUのようなものが良いユニークな識別子です。それは変更される場合"
-"がありますので、説明や価格を使用しないでください。"
+msgid "Drag an element, or combo of elements, to the box above. The Unique Identifier should be unique for each record in your file, and should stay the same even if your file is updated. Things like product IDs, titles, and SKUs are good Unique Identifiers because they probably won't change. Don't use a description or price, since that might be changed."
+msgstr "上のボックスに、要素、または要素のコンボをドラッグします。一意識別子は、ファイル内のレコードごとに一意である必要があり、あなたのファイルが更新されていても同じままである必要があります。彼らはおそらく変更されませんので、製品ID、タイトル、およびSKUのようなものが良いユニークな識別子です。それは変更される場合がありますので、説明や価格を使用しないでください。"
 
 #: views/admin/import/options/_reimport_template.php:69
-#, php-format
-msgid ""
-"If you run this import again with an updated file, the Unique Identifier "
-"allows WP All Import to correctly link the records in your updated file with "
-"the %s it will create right now. If multiple records in this file have the "
-"same Unique Identifier, only the first will be created. The others will be "
-"detected as duplicates."
-msgstr ""
-"あなたが更新されたファイルで再びこのインポートを実行する場合は、一意の識別子"
-"がWPすべてのインポートが正しく%sのあなたの更新されたファイル内のレコードをリ"
-"ンクすることができ、それは今作成されます。このファイルに複数のレコードが同じ"
-"一意の識別子を使用している場合は、最初に作成されます。他の人が重複として検出"
-"されます。"
+msgid "If you run this import again with an updated file, the Unique Identifier allows WP All Import to correctly link the records in your updated file with the %s it will create right now. If multiple records in this file have the same Unique Identifier, only the first will be created. The others will be detected as duplicates."
+msgstr "あなたが更新されたファイルで再びこのインポートを実行する場合は、一意の識別子がWPすべてのインポートが正しく%sのあなたの更新されたファイル内のレコードをリンクすることができ、それは今作成されます。このファイルに複数のレコードが同じ一意の識別子を使用している場合は、最初に作成されます。他の人が重複として検出されます。"
 
 #: views/admin/import/options/_reimport_template.php:84
-#, php-format
 msgid "WP All Import will merge data into existing %s."
 msgstr "WP All Import は、既存の %sにデータをマージします。"
 
 #: views/admin/import/options/_reimport_template.php:94
-#, php-format
 msgid "Records in your file will be matched with %ss on your site based on..."
 msgstr "あなたのファイルのレコードは、あなたのサイトの%ssと一致します..."
 
@@ -868,12 +689,8 @@ msgid "Block email notifications during import"
 msgstr "インポート中に電子メール通知をブロック"
 
 #: views/admin/import/options/_reimport_template.php:142
-msgid ""
-"If enabled, WP All Import will prevent WordPress from sending notification "
-"emails to customers when their orders are imported or updated."
-msgstr ""
-"有効にすると、WP All Importは、注文がインポートまたは更新されたときに"
-"WordPressが通知メールを顧客に送信することを防止します。"
+msgid "If enabled, WP All Import will prevent WordPress from sending notification emails to customers when their orders are imported or updated."
+msgstr "有効にすると、WP All Importは、注文がインポートまたは更新されたときにWordPressが通知メールを顧客に送信することを防止します。"
 
 #: views/admin/import/product/_tabs/_advanced.php:5
 msgid "Purchase Note"
@@ -943,7 +760,7 @@ msgstr "いいえ"
 #: views/admin/import/product/_tabs/_variations.php:728
 #: views/admin/import/product/_tabs/_variations.php:753
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:47
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:93
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:92
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:60
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:108
 #: views/admin/import/shop_order/_tabs/_order_payment.php:19
@@ -978,10 +795,8 @@ msgstr "XPathで設定"
 #: views/admin/import/product/_tabs/_variations.php:529
 #: views/admin/import/product/_tabs/_variations.php:696
 #: views/admin/import/product/_tabs/_variations.php:758
-msgid ""
-"The value of presented XPath should be one of the following: ('yes', 'no')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('yes', 'no')."
+msgid "The value of presented XPath should be one of the following: ('yes', 'no')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('yes', 'no')."
 
 #: views/admin/import/product/_tabs/_advanced.php:70
 msgid "Catalog visibility"
@@ -1004,12 +819,8 @@ msgid "Hidden"
 msgstr "不明"
 
 #: views/admin/import/product/_tabs/_advanced.php:95
-msgid ""
-"The value of presented XPath should be one of the following: ('visible', "
-"'catalog', 'search', 'hidden')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('visible', "
-"'catalog', 'search', 'hidden')."
+msgid "The value of presented XPath should be one of the following: ('visible', 'catalog', 'search', 'hidden')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('visible', 'catalog', 'search', 'hidden')."
 
 #: views/admin/import/product/_tabs/_attributes.php:8
 #: views/admin/import/product/_tabs/_variations.php:547
@@ -1111,14 +922,8 @@ msgid "Link all variations"
 msgstr "すべてのバリエーションをリンク"
 
 #: views/admin/import/product/_tabs/_attributes.php:415
-msgid ""
-"This option will create all possible variations for the presented "
-"attributes. Works just like the Link All Variations option inside "
-"WooCommerce."
-msgstr ""
-"このオプションは、提示された属性のすべてのバリエーションを作成します。"
-"WooCommerce は内部のリンクのすべてのバリエーションのオプションと同じように動"
-"作します。"
+msgid "This option will create all possible variations for the presented attributes. Works just like the Link All Variations option inside WooCommerce."
+msgstr "このオプションは、提示された属性のすべてのバリエーションを作成します。WooCommerce は内部のリンクのすべてのバリエーションのオプションと同じように動作します。"
 
 #: views/admin/import/product/_tabs/_general.php:4
 #: views/admin/import/product/_tabs/_variations.php:119
@@ -1143,7 +948,6 @@ msgstr "このテキストは外部商品のリンクボタンに表示されま
 
 #: views/admin/import/product/_tabs/_general.php:23
 #: views/admin/import/product/_tabs/_general.php:46
-#, php-format
 msgid "Regular Price (%s)"
 msgstr "通常価格 (%s)"
 
@@ -1153,7 +957,6 @@ msgstr "必須"
 
 #: views/admin/import/product/_tabs/_general.php:27
 #: views/admin/import/product/_tabs/_general.php:58
-#, php-format
 msgid "Sale Price (%s)"
 msgstr "販売価格を入力 (%s)"
 
@@ -1186,12 +989,8 @@ msgstr "通貨変換価格上下マークの価格。"
 
 #: views/admin/import/product/_tabs/_general.php:52
 #: views/admin/import/product/_tabs/_general.php:64
-msgid ""
-"Leave blank or enter in 100% to keep the price as is. Enter in 110% to "
-"markup by 10%. Enter in 50% to cut prices in half."
-msgstr ""
-"空白のままか、価格を維持する 100% で入力します。10% 110% マークアップを入力し"
-"ます。価格は半分にカットして 50% を入力します。"
+msgid "Leave blank or enter in 100% to keep the price as is. Enter in 110% to markup by 10%. Enter in 50% to cut prices in half."
+msgstr "空白のままか、価格を維持する 100% で入力します。10% 110% マークアップを入力します。価格は半分にカットして 50% を入力します。"
 
 #: views/admin/import/product/_tabs/_general.php:53
 #: views/admin/import/product/_tabs/_general.php:65
@@ -1211,29 +1010,16 @@ msgid "Convert decimal separator to a period"
 msgstr "桁区切り記号をピリオドに変換します。"
 
 #: views/admin/import/product/_tabs/_general.php:83
-msgid ""
-"Prices must be imported using a period as the decimal separator. If you'd "
-"like to change the decimal separator you can do so by editing your "
-"WooCommerce settings."
-msgstr ""
-"価格は、小数点の記号としてピリオドを使用してインポートする必要があります。小"
-"数点の区切り文字を変更したい場合、WooCommerce の設定を編集すればよい。"
+msgid "Prices must be imported using a period as the decimal separator. If you'd like to change the decimal separator you can do so by editing your WooCommerce settings."
+msgstr "価格は、小数点の記号としてピリオドを使用してインポートする必要があります。小数点の区切り文字を変更したい場合、WooCommerce の設定を編集すればよい。"
 
 #: views/admin/import/product/_tabs/_general.php:89
 msgid "Attempt to convert incorrectly formatted prices to WooCommerce format"
 msgstr "正しく書式設定された価格を WooCommerce 形式に変換しようとしました。"
 
 #: views/admin/import/product/_tabs/_general.php:90
-msgid ""
-"WP All Import will attempt to correct the formatting of prices presented "
-"incorrectly, but this doesn't always work. Try unchecking this option if "
-"your prices are not appearing correctly, or enter your prices in your import "
-"file using the same format you would when entering them in WooCommerce."
-msgstr ""
-"WP すべてインポートが正しく表示されていない価格の書式を正しくしようが、これは"
-"常に動作しません。あなたの価格が正しく表示されないまたは WooCommerce でそれら"
-"を入力するときと同じ形式を使用して、インポート ファイルにあなたの価格を入力す"
-"る場合は、このオプションをオフにしてみてください。"
+msgid "WP All Import will attempt to correct the formatting of prices presented incorrectly, but this doesn't always work. Try unchecking this option if your prices are not appearing correctly, or enter your prices in your import file using the same format you would when entering them in WooCommerce."
+msgstr "WP すべてインポートが正しく表示されていない価格の書式を正しくしようが、これは常に動作しません。あなたの価格が正しく表示されないまたは WooCommerce でそれらを入力するときと同じ形式を使用して、インポート ファイルにあなたの価格を入力する場合は、このオプションをオフにしてみてください。"
 
 #: views/admin/import/product/_tabs/_general.php:94
 msgid "Preview Prices"
@@ -1252,12 +1038,8 @@ msgstr "バリエーション 対応"
 
 #: views/admin/import/product/_tabs/_general.php:108
 #: views/admin/import/product/_tabs/_variations.php:741
-msgid ""
-"This option is the same as the Enabled checkbox when editing an individual "
-"variation in WooCommerce."
-msgstr ""
-"WooCommerce で個人差を編集するとき、このオプションは有効] チェック ボックスと"
-"同じです。"
+msgid "This option is the same as the Enabled checkbox when editing an individual variation in WooCommerce."
+msgstr "WooCommerce で個人差を編集するとき、このオプションは有効] チェック ボックスと同じです。"
 
 #: views/admin/import/product/_tabs/_general.php:135
 #: views/admin/import/product/_tabs/_variations.php:108
@@ -1287,14 +1069,8 @@ msgid "File paths"
 msgstr "ファイルのパス"
 
 #: views/admin/import/product/_tabs/_general.php:182
-msgid ""
-"File paths/URLs, comma separated. The delimiter is used when an XML element "
-"contains multiple URLs/paths - i.e. <code>http://files.com/1.doc, http://"
-"files.com/2.doc</code>."
-msgstr ""
-"ファイルのパス/Url、カンマで区切られました。XML 要素が複数の Url/パス - すな"
-"わち含まれている区切り記号を使用 <code>http://files.com/1.doc, http://files."
-"com/2.doc</code> 。"
+msgid "File paths/URLs, comma separated. The delimiter is used when an XML element contains multiple URLs/paths - i.e. <code>http://files.com/1.doc, http://files.com/2.doc</code>."
+msgstr "ファイルのパス/Url、カンマで区切られました。XML 要素が複数の Url/パス - すなわち含まれている区切り記号を使用 <code>http://files.com/1.doc, http://files.com/2.doc</code> 。"
 
 #: views/admin/import/product/_tabs/_general.php:185
 #: views/admin/import/product/_tabs/_variations.php:483
@@ -1303,12 +1079,8 @@ msgstr "ファイル名"
 
 #: views/admin/import/product/_tabs/_general.php:188
 #: views/admin/import/product/_tabs/_variations.php:486
-msgid ""
-"File names, comma separated. The delimiter is used when an XML element "
-"contains multiple names - i.e. <code>1.doc, 2.doc</code>."
-msgstr ""
-"ファイル名、カンマで区切られました。区切り記号、すなわち XML 要素に複数の名前"
-"が含まれている場合に使用 <code>1.doc, 2.doc</code> 。"
+msgid "File names, comma separated. The delimiter is used when an XML element contains multiple names - i.e. <code>1.doc, 2.doc</code>."
+msgstr "ファイル名、カンマで区切られました。区切り記号、すなわち XML 要素に複数の名前が含まれている場合に使用 <code>1.doc, 2.doc</code> 。"
 
 #: views/admin/import/product/_tabs/_general.php:191
 #: views/admin/import/product/_tabs/_variations.php:489
@@ -1325,8 +1097,7 @@ msgid "Download Expiry"
 msgstr "ダウンロード有効期限"
 
 #: views/admin/import/product/_tabs/_general.php:198
-msgid ""
-"Enter the number of days before a download link expires, or leave blank."
+msgid "Enter the number of days before a download link expires, or leave blank."
 msgstr "ダウンロードリンクの有効期限日数を入力するか、空白のままにします。"
 
 #: views/admin/import/product/_tabs/_general.php:201
@@ -1334,12 +1105,8 @@ msgid "Download Type"
 msgstr "ダウンロードタイプ"
 
 #: views/admin/import/product/_tabs/_general.php:203
-msgid ""
-"The value of presented XPath should be one of the following: ('application', "
-"'music')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('アプリケーショ"
-"ン'、'音楽')。"
+msgid "The value of presented XPath should be one of the following: ('application', 'music')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('アプリケーション'、'音楽')。"
 
 #: views/admin/import/product/_tabs/_general.php:211
 msgid "Tax Status"
@@ -1362,12 +1129,8 @@ msgid "Set tax status with XPath"
 msgstr "XPath を使ってセット税ステータス"
 
 #: views/admin/import/product/_tabs/_general.php:231
-msgid ""
-"Value should be the slug for the tax status - 'taxable', 'shipping', and "
-"'none' are the default slugs."
-msgstr ""
-"値は、-'課税'、'配布'、税ステータス用の slug をする必要があります、'none' 既"
-"定ナメクジです。"
+msgid "Value should be the slug for the tax status - 'taxable', 'shipping', and 'none' are the default slugs."
+msgstr "値は、-'課税'、'配布'、税ステータス用の slug をする必要があります、'none' 既定ナメクジです。"
 
 #: views/admin/import/product/_tabs/_general.php:241
 #: views/admin/import/product/_tabs/_variations.php:406
@@ -1385,12 +1148,8 @@ msgid "Set tax class with XPath"
 msgstr "XPath を使用して set 税クラス"
 
 #: views/admin/import/product/_tabs/_general.php:271
-msgid ""
-"Value should be the slug for the tax class - 'reduced-rate' and 'zero-rate', "
-"are the default slugs."
-msgstr ""
-"値は、税クラス -「割引料金」と「ゼロ金利」がデフォルト ナメクジ スラッグをす"
-"る必要があります。"
+msgid "Value should be the slug for the tax class - 'reduced-rate' and 'zero-rate', are the default slugs."
+msgstr "値は、税クラス -「割引料金」と「ゼロ金利」がデフォルト ナメクジ スラッグをする必要があります。"
 
 #: views/admin/import/product/_tabs/_inventory.php:4
 #: views/admin/import/product/_tabs/_variations.php:151
@@ -1430,22 +1189,14 @@ msgstr "自動"
 
 #: views/admin/import/product/_tabs/_inventory.php:48
 #: views/admin/import/product/_tabs/_variations.php:724
-msgid ""
-"Set the stock status to In Stock for positive Stock Qty values, and Out Of "
-"Stock if Stock Qty is 0 or blank."
-msgstr ""
-"在庫の数量が 0 または空白の場合に在庫に肯定的な在庫の数量値および在庫のうちの"
-"在庫状況を設定します。"
+msgid "Set the stock status to In Stock for positive Stock Qty values, and Out Of Stock if Stock Qty is 0 or blank."
+msgstr "在庫の数量が 0 または空白の場合に在庫に肯定的な在庫の数量値および在庫のうちの在庫状況を設定します。"
 
 #: views/admin/import/product/_tabs/_inventory.php:57
 #: views/admin/import/product/_tabs/_variations.php:216
 #: views/admin/import/product/_tabs/_variations.php:733
-msgid ""
-"The value of presented XPath should be one of the following: ('instock', "
-"'outofstock')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('在庫あり'、' "
-"outofstock」)。"
+msgid "The value of presented XPath should be one of the following: ('instock', 'outofstock')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('在庫あり'、' outofstock」)。"
 
 #: views/admin/import/product/_tabs/_inventory.php:66
 #: views/admin/import/product/_tabs/_variations.php:224
@@ -1469,11 +1220,8 @@ msgstr "許可"
 
 #: views/admin/import/product/_tabs/_inventory.php:87
 #: views/admin/import/product/_tabs/_variations.php:245
-msgid ""
-"The value of presented XPath should be one of the following: ('no', "
-"'notify', 'yes')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('yes', 'no')."
+msgid "The value of presented XPath should be one of the following: ('no', 'notify', 'yes')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('yes', 'no')."
 
 #: views/admin/import/product/_tabs/_inventory.php:95
 msgid "Sold Individually?"
@@ -1485,10 +1233,8 @@ msgstr "アップセル"
 
 #: views/admin/import/product/_tabs/_linked_product.php:6
 #: views/admin/import/product/_tabs/_linked_product.php:11
-msgid ""
-"Products can be matched by SKU, ID, or Title, and must be comma separated."
-msgstr ""
-"製品 SKU、ID、または、タイトルが一致して、コンマを区切る必要があります。"
+msgid "Products can be matched by SKU, ID, or Title, and must be comma separated."
+msgstr "製品 SKU、ID、または、タイトルが一致して、コンマを区切る必要があります。"
 
 #: views/admin/import/product/_tabs/_linked_product.php:9
 msgid "Cross-Sells"
@@ -1511,11 +1257,8 @@ msgid "Manual Grouped Product Matching"
 msgstr "マニュアルは製品に一致するグループ化"
 
 #: views/admin/import/product/_tabs/_linked_product.php:68
-msgid ""
-"Product will be assigned as the child of an already created product matching "
-"the specified criteria."
-msgstr ""
-"製品が指定された条件に一致する既に作成された製品の子として割り当てられます。"
+msgid "Product will be assigned as the child of an already created product matching the specified criteria."
+msgstr "製品が指定された条件に一致する既に作成された製品の子として割り当てられます。"
 
 #: views/admin/import/product/_tabs/_linked_product.php:75
 msgid "Match by Post Title"
@@ -1534,49 +1277,30 @@ msgid "Set out of stock status for missing records"
 msgstr "不足しているレコードの在庫状況から設定します。"
 
 #: views/admin/import/product/_tabs/_options.php:11
-msgid ""
-"Option to set the stock status to out of stock instead of deleting the "
-"product entirely. This option doesn't work when 'Delete missing records' "
-"option is enabled."
-msgstr ""
-"製品を完全に削除する代わりに在庫切れ、在庫状況を設定するオプション。「行方不"
-"明記録を削除」オプションが有効な場合、このオプションは動作しません。"
+msgid "Option to set the stock status to out of stock instead of deleting the product entirely. This option doesn't work when 'Delete missing records' option is enabled."
+msgstr "製品を完全に削除する代わりに在庫切れ、在庫状況を設定するオプション。「行方不明記録を削除」オプションが有効な場合、このオプションは動作しません。"
 
 #: views/admin/import/product/_tabs/_options.php:17
 msgid "Disable auto SKU generation"
 msgstr "SKU の自動生成を無効にします。"
 
 #: views/admin/import/product/_tabs/_options.php:18
-msgid ""
-"Plugin will NOT automaticaly generate the SKU for each product based on md5 "
-"algorithm, if SKU option is empty."
-msgstr ""
-"SKU オプションが空の場合、プラグインは自動的にないは md5 アルゴリズムに基づく"
-"各製品の SKU を生成します。"
+msgid "Plugin will NOT automaticaly generate the SKU for each product based on md5 algorithm, if SKU option is empty."
+msgstr "SKU オプションが空の場合、プラグインは自動的にないは md5 アルゴリズムに基づく各製品の SKU を生成します。"
 
 #: views/admin/import/product/_tabs/_options.php:23
 msgid "Don't check for duplicate SKUs"
 msgstr "重複する Sku をチェックしないでください。"
 
 #: views/admin/import/product/_tabs/_options.php:24
-msgid ""
-"Each product should have a unique SKU. If this box is checked, WP All Import "
-"won't check for duplicate SKUs, which speeds up the import process. Make "
-"sure the SKU for each of your products is unique. If this box is unchecked, "
-"WP All Import will import products with duplicate SKUs with a blank SKU."
-msgstr ""
-"各製品固有の SKU が必要です。場合は、このチェック ボックスをオンすると、WP を"
-"すべてインポートはチェックされません重複 sku、インポート プロセスを高速化。各"
-"製品の SKU に一意ことを確認します。このボックスをオフにした場合は、WP をすべ"
-"てインポート空白 SKU と重複する Sku に製品がインポートされます。"
+msgid "Each product should have a unique SKU. If this box is checked, WP All Import won't check for duplicate SKUs, which speeds up the import process. Make sure the SKU for each of your products is unique. If this box is unchecked, WP All Import will import products with duplicate SKUs with a blank SKU."
+msgstr "各製品固有の SKU が必要です。場合は、このチェック ボックスをオンすると、WP をすべてインポートはチェックされません重複 sku、インポート プロセスを高速化。各製品の SKU に一意ことを確認します。このボックスをオフにした場合は、WP をすべてインポート空白 SKU と重複する Sku に製品がインポートされます。"
 
 #: views/admin/import/product/_tabs/_shipping.php:5
-#, php-format
 msgid "Weight (%s)"
 msgstr "重量 (%s)"
 
 #: views/admin/import/product/_tabs/_shipping.php:9
-#, php-format
 msgid "Dimensions (%s)"
 msgstr "サイズ: %s"
 
@@ -1608,22 +1332,12 @@ msgid "Set product shipping class with XPath"
 msgstr "製品出荷の XPath を使用してクラスを設定します。"
 
 #: views/admin/import/product/_tabs/_shipping.php:49
-msgid ""
-"Value should be the name, ID, or slug for the shipping class. Default slugs "
-"are 'taxable', 'shipping' and 'none'."
-msgstr ""
-"値は、名前、ID、または出荷クラスのスラグにする必要があります。既定のナメクジ"
-"は、'課税'、'配布'、'none' が。"
+msgid "Value should be the name, ID, or slug for the shipping class. Default slugs are 'taxable', 'shipping' and 'none'."
+msgstr "値は、名前、ID、または出荷クラスのスラグにする必要があります。既定のナメクジは、'課税'、'配布'、'none' が。"
 
 #: views/admin/import/product/_tabs/_variations.php:7
-msgid ""
-"All my variable products have SKUs or some other unique identifier. Each "
-"variation is linked to its parent with its parent's SKU or other unique "
-"identifier."
-msgstr ""
-"すべてのバリエーションのある製品は、SKUいくつかの他の個別の識別子を持っていま"
-"す。それぞれのバリエーションはその親SKUまたは他の個別の識別子とその親にリンク"
-"されています。"
+msgid "All my variable products have SKUs or some other unique identifier. Each variation is linked to its parent with its parent's SKU or other unique identifier."
+msgstr "すべてのバリエーションのある製品は、SKUいくつかの他の個別の識別子を持っています。それぞれのバリエーションはその親SKUまたは他の個別の識別子とその親にリンクされています。"
 
 #: views/admin/import/product/_tabs/_variations.php:11
 msgid "SKU element for parent"
@@ -1656,24 +1370,16 @@ msgid "download"
 msgstr "ダウンロード"
 
 #: views/admin/import/product/_tabs/_variations.php:31
-msgid ""
-"All products with variations are grouped with a unique identifier that is "
-"the same for each variation and unique for each product."
-msgstr ""
-"バリエーションを持つすべての製品は、各製品の各バリエーションとユニークで同じ"
-"である一意の識別子でグループ化されています。"
+msgid "All products with variations are grouped with a unique identifier that is the same for each variation and unique for each product."
+msgstr "バリエーションを持つすべての製品は、各製品の各バリエーションとユニークで同じである一意の識別子でグループ化されています。"
 
 #: views/admin/import/product/_tabs/_variations.php:38
 msgid "Group ID column in the below example."
 msgstr "以下の例では、グループID列。"
 
 #: views/admin/import/product/_tabs/_variations.php:51
-msgid ""
-"All variations for a particular product have the same title as the parent "
-"product."
-msgstr ""
-"特定の製品のすべてのバリエーションは、親製品として同じタイトルを持っていま"
-"す。"
+msgid "All variations for a particular product have the same title as the parent product."
+msgstr "特定の製品のすべてのバリエーションは、親製品として同じタイトルを持っています。"
 
 #: views/admin/import/product/_tabs/_variations.php:56
 #: views/admin/import/product/_tabs/_variations.php:74
@@ -1681,12 +1387,8 @@ msgid "Product Title"
 msgstr "プロダクトタイトル"
 
 #: views/admin/import/product/_tabs/_variations.php:70
-msgid ""
-"All variations for a particular product have the same title. There are no "
-"parent products."
-msgstr ""
-"特定の製品のすべてのバリエーションは、同じタイトルを持っています。親製品はあ"
-"りません。"
+msgid "All variations for a particular product have the same title. There are no parent products."
+msgstr "特定の製品のすべてのバリエーションは、同じタイトルを持っています。親製品はありません。"
 
 #: views/admin/import/product/_tabs/_variations.php:88
 msgid "I'm importing XML and my variations are child XML elements"
@@ -1710,9 +1412,7 @@ msgstr "親の SKU に値を追加します。"
 
 #: views/admin/import/product/_tabs/_variations.php:125
 msgid "Enable this checkbox to combine SKU from parent and variation products."
-msgstr ""
-"親やバリエーション製品 SKU を結合する場合このチェック ボックスを有効にしま"
-"す。"
+msgstr "親やバリエーション製品 SKU を結合する場合このチェック ボックスを有効にします。"
 
 #: views/admin/import/product/_tabs/_variations.php:129
 msgid "Image"
@@ -1738,26 +1438,16 @@ msgid "XPath Is From Parent"
 msgstr "親からのXPath"
 
 #: views/admin/import/product/_tabs/_variations.php:135
-msgid ""
-"Images are imported according to the options set in the Images section "
-"below. There you can import images to the parent products, and here you can "
-"import images to the product variations."
-msgstr ""
-"画像はイメージで設定したオプションに従ってインポートされます。親製品にイメー"
-"ジをインポートできますが、ここでは、製品のバリエーションにイメージをインポー"
-"トできます。"
+msgid "Images are imported according to the options set in the Images section below. There you can import images to the parent products, and here you can import images to the product variations."
+msgstr "画像はイメージで設定したオプションに従ってインポートされます。親製品にイメージをインポートできますが、ここでは、製品のバリエーションにイメージをインポートできます。"
 
 #: views/admin/import/product/_tabs/_variations.php:187
 msgid "Enable this checkbox to determine XPath from parent element."
 msgstr "親要素から XPath を決定するこのチェック ボックスを有効にします。"
 
 #: views/admin/import/product/_tabs/_variations.php:207
-msgid ""
-"Set the stock status to In Stock for positive or blank Stock Qty values, and "
-"Out Of Stock if Stock Qty is 0."
-msgstr ""
-"在庫の数量が 0 の場合、在庫状況を肯定的なまたは空白の在庫の数量値および在庫の"
-"うちの在庫に設定します。"
+msgid "Set the stock status to In Stock for positive or blank Stock Qty values, and Out Of Stock if Stock Qty is 0."
+msgstr "在庫の数量が 0 の場合、在庫状況を肯定的なまたは空白の在庫の数量値および在庫のうちの在庫に設定します。"
 
 #: views/admin/import/product/_tabs/_variations.php:253
 msgid "Regular Price"
@@ -1784,12 +1474,8 @@ msgid "Dimensions (L×W×H)"
 msgstr "寸法 (L × W × H)"
 
 #: views/admin/import/product/_tabs/_variations.php:391
-msgid ""
-"The value of presented XPath should be one of the following: ('taxable', "
-"'shipping', 'none')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: (''、'配"
-"布'、'none') 課税。"
+msgid "The value of presented XPath should be one of the following: ('taxable', 'shipping', 'none')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: (''、'配布'、'none') 課税。"
 
 #: views/admin/import/product/_tabs/_variations.php:419
 msgid "Same as parent"
@@ -1800,21 +1486,12 @@ msgid "Set product tax class with XPath"
 msgstr "XPath を使って製品税クラスを設定します。"
 
 #: views/admin/import/product/_tabs/_variations.php:435
-msgid ""
-"The value of presented XPath should be one of the following: ('reduced-"
-"rate', 'zero-rate')."
-msgstr ""
-"提示された XPath の値は、次のいずれかをする必要があります: ('reduced-rate', "
-"'zero-rate')."
+msgid "The value of presented XPath should be one of the following: ('reduced-rate', 'zero-rate')."
+msgstr "提示された XPath の値は、次のいずれかをする必要があります: ('reduced-rate', 'zero-rate')."
 
 #: views/admin/import/product/_tabs/_variations.php:480
-msgid ""
-"File paths/URLs, comma separated. The delimiter option uses when xml element "
-"contains few paths/URLs (http://files.com/1.doc, http://files.com/2.doc)."
-msgstr ""
-"ファイルのパス/Url、カンマで区切られました。区切り記号オプションを使用して、"
-"xml 要素にいくつかのパス/Url (http://files.com/1.doc、http://files.com/2."
-"doc) が含まれている場合。"
+msgid "File paths/URLs, comma separated. The delimiter option uses when xml element contains few paths/URLs (http://files.com/1.doc, http://files.com/2.doc)."
+msgstr "ファイルのパス/Url、カンマで区切られました。区切り記号オプションを使用して、xml 要素にいくつかのパス/Url (http://files.com/1.doc、http://files.com/2.doc) が含まれている場合。"
 
 #: views/admin/import/product/_tabs/_variations.php:538
 msgid "Variation Attributes"
@@ -1835,9 +1512,7 @@ msgid "Set the default selection in the attributes dropdowns."
 msgstr "属性ドロップダウン リストの既定の選択を設定します。"
 
 #: views/admin/import/product/_tabs/_variations.php:771
-msgid ""
-"The attributes for the first variation will be automatically selected on the "
-"frontend."
+msgid "The attributes for the first variation will be automatically selected on the frontend."
 msgstr "フロント エンドの最初のバリエーションの属性が自動的に選択されます。"
 
 #: views/admin/import/product/_tabs/_variations.php:776
@@ -1861,18 +1536,12 @@ msgid "Save variation image to the gallery."
 msgstr "変動画像をギャラリーに保存します。"
 
 #: views/admin/import/product/_tabs/_variations.php:801
-msgid ""
-"Set _stock value for parent product to the _stock value for the first "
-"variation."
+msgid "Set _stock value for parent product to the _stock value for the first variation."
 msgstr "最初のバリエーションの _stock 値を親製品の _stock 値を設定します。"
 
 #: views/admin/import/product/_tabs/_variations.php:802
-msgid ""
-"This option works when there are no parent products in your feed ( cases 2 "
-"and 4 on Variations tab)."
-msgstr ""
-"このオプションは、あなたのフィード (ケース 2、[バリエーション] タブ 4) 親製品"
-"がない場合を機能します。"
+msgid "This option works when there are no parent products in your feed ( cases 2 and 4 on Variations tab)."
+msgstr "このオプションは、あなたのフィード (ケース 2、[バリエーション] タブ 4) 親製品がない場合を機能します。"
 
 #: views/admin/import/product/index.php:4
 msgid "WooCommerce Add-On"
@@ -1899,12 +1568,8 @@ msgid "Set Product Type With XPath"
 msgstr "XPath を使って製品の種類を設定します。"
 
 #: views/admin/import/product/index.php:44
-msgid ""
-"The value of presented XPath should be one of the following: ('simple', "
-"'grouped', 'external', 'variable')."
-msgstr ""
-"XPath の値は、次のいずれかを設定する必要があります: ('simple', 'grouped', "
-"'external', 'variable')."
+msgid "The value of presented XPath should be one of the following: ('simple', 'grouped', 'external', 'variable')."
+msgstr "XPath の値は、次のいずれかを設定する必要があります: ('simple', 'grouped', 'external', 'variable')."
 
 #: views/admin/import/product/index.php:55
 msgid "General"
@@ -2064,7 +1729,7 @@ msgstr "ゲスト ユーザーとしてインポートします。"
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:6
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:559
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:6
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:126
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:125
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:6
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:141
 #: views/admin/import/shop_order/order_notes_section.php:14
@@ -2094,7 +1759,7 @@ msgstr "別のクーポンを追加します。"
 #: views/admin/import/shop_order/_tabs/_order_item_coupons.php:88
 #: views/admin/import/shop_order/_tabs/_order_item_fees.php:61
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:552
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:119
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:118
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:134
 #: views/admin/import/shop_order/order_notes_section.php:169
 msgid "Advanced Options"
@@ -2108,7 +1773,7 @@ msgstr "区切られた複数のクーポン"
 #: views/admin/import/shop_order/_tabs/_order_item_coupons.php:106
 #: views/admin/import/shop_order/_tabs/_order_item_fees.php:79
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:569
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:137
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:136
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:152
 #: views/admin/import/shop_order/order_notes_section.php:187
 msgid "Variable Repeater Mode"
@@ -2117,7 +1782,7 @@ msgstr "変数のリピータ モード"
 #: views/admin/import/shop_order/_tabs/_order_item_coupons.php:109
 #: views/admin/import/shop_order/_tabs/_order_item_fees.php:82
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:572
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:140
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:139
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:155
 #: views/admin/import/shop_order/order_notes_section.php:190
 msgid "For each"
@@ -2126,7 +1791,7 @@ msgstr "各アドオン"
 #: views/admin/import/shop_order/_tabs/_order_item_coupons.php:111
 #: views/admin/import/shop_order/_tabs/_order_item_fees.php:84
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:574
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:142
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:141
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:157
 #: views/admin/import/shop_order/order_notes_section.php:192
 msgid "do..."
@@ -2241,12 +1906,8 @@ msgid "Add Product"
 msgstr "商品を追加"
 
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:242
-msgid ""
-"Manually import product order data and do not try to match to existing "
-"products"
-msgstr ""
-"製品注文データを手動でインポート、既存の製品に合わせてしようとしないでくださ"
-"い。"
+msgid "Manually import product order data and do not try to match to existing products"
+msgstr "製品注文データを手動でインポート、既存の製品に合わせてしようとしないでください。"
 
 #: views/admin/import/shop_order/_tabs/_order_item_products.php:243
 msgid "The product in this order will not be linked to any existing products."
@@ -2322,29 +1983,20 @@ msgid "Shipping Method"
 msgstr "配送方法"
 
 #: views/admin/import/shop_order/_tabs/_order_item_shipping.php:53
-#, php-format
-msgid ""
-"Shipping method can be matched by Name or ID: %s. If shipping method is not "
-"found then no shipping information will be imported."
-msgstr ""
-"%sの：配送方法は、名前またはIDで一致させることができます。配送方法が、その後"
-"見つからない場合は何の出荷情報はインポートされません。"
+msgid "Shipping method can be matched by Name or ID: %s. If shipping method is not found then no shipping information will be imported."
+msgstr "%sの：配送方法は、名前またはIDで一致させることができます。配送方法が、その後見つからない場合は何の出荷情報はインポートされません。"
 
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:99
-msgid ""
-"Shipping method can be matched by Nmae or ID. If shipping method is not "
-"found then no shipping information will be imported."
-msgstr ""
-"配送方法は、名前またはIDで一致させることができます。配送方法が、その後見つか"
-"らない場合は何の出荷情報はインポートされません。"
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:98
+msgid "Shipping method can be matched by Nmae or ID. If shipping method is not found then no shipping information will be imported."
+msgstr "配送方法は、名前またはIDで一致させることができます。配送方法が、その後見つからない場合は何の出荷情報はインポートされません。"
 
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:111
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:110
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:126
 msgid "Add More"
 msgstr "追加詳細"
 
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:129
-#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:149
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:128
+#: views/admin/import/shop_order/_tabs/_order_item_shipping.php:148
 msgid "Multiple shipping costs separated by"
 msgstr "で区切られた複数の輸送費"
 
@@ -2364,25 +2016,16 @@ msgid "Tax Rate"
 msgstr "税率"
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:66
-#, php-format
-msgid ""
-"Tax rate method can be matched by ID: %s. If tax method is not found then no "
-"tax information will be imported."
-msgstr ""
-"ID が一致する税レート方式: %s。税方式が見つからない場合税務情報はインポートさ"
-"れません。"
+msgid "Tax rate method can be matched by ID: %s. If tax method is not found then no tax information will be imported."
+msgstr "ID が一致する税レート方式: %s。税方式が見つからない場合税務情報はインポートされません。"
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:100
 msgid "Select"
 msgstr "選択 "
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:114
-msgid ""
-"Tax rate method can be matched by ID. If tax method is not found then no tax "
-"information will be imported."
-msgstr ""
-"ID で一致することができます税金率メソッド税方式が見つからない場合税務情報はイ"
-"ンポートされません。"
+msgid "Tax rate method can be matched by ID. If tax method is not found then no tax information will be imported."
+msgstr "ID で一致することができます税金率メソッド税方式が見つからない場合税務情報はインポートされません。"
 
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:144
 #: views/admin/import/shop_order/_tabs/_order_item_taxes.php:164
@@ -2394,13 +2037,8 @@ msgid "Payment Method"
 msgstr "支払方法"
 
 #: views/admin/import/shop_order/_tabs/_order_payment.php:25
-#, php-format
-msgid ""
-"Payment method can be matched by title or slug: %s. If payment method is not "
-"found 'N/A' will be applied to order."
-msgstr ""
-"タイトルやスラッグがお支払方法に一致する: %s。お支払方法がない場合「N/A」順に"
-"適用されます。"
+msgid "Payment method can be matched by title or slug: %s. If payment method is not found 'N/A' will be applied to order."
+msgstr "タイトルやスラッグがお支払方法に一致する: %s。お支払方法がない場合「N/A」順に適用されます。"
 
 #: views/admin/import/shop_order/_tabs/_order_payment.php:36
 msgid "Transaction ID"
@@ -2451,23 +2089,14 @@ msgid "Order Status"
 msgstr "注文状況"
 
 #: views/admin/import/shop_order/order_details_section.php:29
-#, php-format
-msgid ""
-"Order status can be matched by title or slug: %s. If order status is not "
-"found 'Pending Payment' will be applied to order."
-msgstr ""
-"%sは：注文状況は、タイトルやスラグによって一致させることができます。注文のス"
-"テータスが「保留中のお支払い'が見つからない場合はご注文に適用されます。"
+msgid "Order status can be matched by title or slug: %s. If order status is not found 'Pending Payment' will be applied to order."
+msgstr "%sは：注文状況は、タイトルやスラグによって一致させることができます。注文のステータスが「保留中のお支払い'が見つからない場合はご注文に適用されます。"
 
 #: views/admin/import/shop_order/order_details_section.php:39
 #: views/admin/import/shop_order/order_notes_section.php:39
 #: views/admin/import/shop_order/order_notes_section.php:103
-msgid ""
-"Use any format supported by the PHP <b>strtotime</b> function. That means "
-"pretty much any human-readable date will work."
-msgstr ""
-"PHP<b>strtotime</ b>の関数でサポートされている任意のフォーマットを使用してく"
-"ださい。それはほとんどすべての人間が読める日が動作することを意味します。"
+msgid "Use any format supported by the PHP <b>strtotime</b> function. That means pretty much any human-readable date will work."
+msgstr "PHP<b>strtotime</ b>の関数でサポートされている任意のフォーマットを使用してください。それはほとんどすべての人間が読める日が動作することを意味します。"
 
 #: views/admin/import/shop_order/order_items_section.php:4
 msgid "Order Items"
@@ -2523,36 +2152,26 @@ msgid "Multiple notes separated by"
 msgstr "区切られた複数のノート"
 
 #: wpai-woocommerce-add-on.php:35
-msgid ""
-"Please de-activate and remove the free version of the WooCommere add-on "
-"before activating the paid version."
-msgstr ""
-"非アクティブにしてくださいとアドオン有料版をアクティブにする前にWooCommerceの"
-"無料版を削除します。"
+msgid "Please de-activate and remove the free version of the WooCommere add-on before activating the paid version."
+msgstr "非アクティブにしてくださいとアドオン有料版をアクティブにする前にWooCommerceの無料版を削除します。"
 
 #. Plugin Name of the plugin/theme
+#: 
 msgid "WP All Import - WooCommerce Add-On Pro"
 msgstr "WP All Import - WooCommerce アドオン プロ版"
 
 #. Plugin URI of the plugin/theme
+#: 
 msgid "http://www.wpallimport.com/"
 msgstr "http://www.wpallimport.com/"
 
 #. Description of the plugin/theme
-msgid ""
-"Import to WooCommerce. Adds a section to WP All Import that looks just like "
-"WooCommerce. Requires WP All Import."
-msgstr ""
-"WooCommerce をインポートします。WooCommerce のような WP すべてインポートする"
-"セクションを追加します。WP すべてインポートが必要です。"
+#: 
+msgid "Import to WooCommerce. Adds a section to WP All Import that looks just like WooCommerce. Requires WP All Import."
+msgstr "WooCommerce をインポートします。WooCommerce のような WP すべてインポートするセクションを追加します。WP すべてインポートが必要です。"
 
 #. Author of the plugin/theme
+#: 
 msgid "Soflyy"
 msgstr "Soflyy"
 
-#~ msgid ""
-#~ "- <b>WARNING</b>: Slug “%s” is not allowed because it is a reserved term. "
-#~ "Change it, please."
-#~ msgstr ""
-#~ "-<b>警告</b>: 予約された用語であるために、スラグ\"%s\"は使用できません。く"
-#~ "ださいそれを変更します。"

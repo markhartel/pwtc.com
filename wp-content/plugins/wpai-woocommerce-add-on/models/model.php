@@ -1,8 +1,8 @@
 <?php 
 /**
  * Base class for models
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 abstract class PMWI_Model extends ArrayObject {
 	/**

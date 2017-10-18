@@ -640,9 +640,6 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 			'post_excerpt'  => $this->data['pmwi_order']['customer_provided_note'][$index], 
 		);
 
-		$old_status = str_replace("wc-", "", $this->articleData['post_status']);
-		$new_status = str_replace("wc-", "", $this->order_data['post_status']);			
-
 		if ( ! empty($this->articleData['ID']))
 		{
 			if ( $this->import->options['update_all_data'] == 'no' ){
@@ -775,49 +772,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 					break;
 			}
 		}
-		// [\Importing shipping information ]	
-
-		// send notifications on order status changed
-		if ( ! empty($this->articleData['ID']) and $new_status !== $old_status && empty($this->import->options['do_not_send_order_notifications'])) 
-		{				
-			do_action( 'woocommerce_order_status_' . $old_status . '_to_' . $new_status, $order_id );			
-			do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status );
-
-			if ( $new_status == 'completed' )
-			{
-				do_action( 'woocommerce_order_status_completed', $this->articleData['ID']);
-			}
-
-		}	
-
-		// send new order notification
-		if ( empty($this->articleData['ID']) && empty($this->import->options['do_not_send_order_notifications']) ) 
-		{			
-			do_action( 'woocommerce_order_status_' . $new_status, $order_id );			
-			
-			do_action( 'woocommerce_order_status_pending_to_' . $new_status, $order_id );			
-
-			do_action( 'woocommerce_before_resend_order_emails', $order );			
-
-			// Load mailer
-			$mailer = WC()->mailer();
-
-			$email_to_send = 'new_order';
-
-			$mails = $mailer->get_emails();
-
-			if ( ! empty( $mails ) ) {
-				foreach ( $mails as $mail ) {
-					if ( $mail->id == $email_to_send ) {
-						$mail->trigger( $order_id );						
-						$this->logger and call_user_func($this->logger, sprintf(__('- %s email notification has beed sent. ...', 'wp_all_import_plugin'), $mail->title));
-					}
-				}
-			}
-
-			do_action( 'woocommerce_after_resend_order_email', $order, $email_to_send );
-		}
-
+		// [\Importing shipping information ]
 
 		// [ Importing payment information ]		
 		if ( empty($this->articleData['ID']) or $this->import->options['update_all_data'] == 'yes' or $this->import->options['is_update_payment'] )
@@ -1118,7 +1073,53 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 
 	public function after_save_post( $importData )
 	{
-		// Do something when shop order already imported	
+        $old_status = str_replace("wc-", "", $this->articleData['post_status']);
+        $new_status = str_replace("wc-", "", $this->order_data['post_status']);
+
+        // send notifications on order status changed
+        if ( ! empty($this->articleData['ID']) and $new_status !== $old_status && empty($this->import->options['do_not_send_order_notifications']))
+        {
+            do_action( 'woocommerce_order_status_' . $old_status . '_to_' . $new_status, $importData['pid'] );
+            do_action( 'woocommerce_order_status_changed', $importData['pid'], $old_status, $new_status );
+
+            if ( $new_status == 'completed' )
+            {
+                do_action( 'woocommerce_order_status_completed', $importData['pid']);
+            }
+
+        }
+
+        // send new order notification
+        if ( empty($this->articleData['ID']) && empty($this->import->options['do_not_send_order_notifications']) )
+        {
+            /** @var WC_Order $order */
+            $order = wc_get_order($importData['pid']);
+
+            do_action( 'woocommerce_order_status_' . $new_status, $importData['pid'] );
+
+            do_action( 'woocommerce_order_status_pending_to_' . $new_status, $importData['pid'] );
+
+            do_action( 'woocommerce_before_resend_order_emails', $order );
+
+            // Load mailer
+            $mailer = WC()->mailer();
+
+            $email_to_send = 'new_order';
+
+            $mails = $mailer->get_emails();
+
+            if ( ! empty( $mails ) ) {
+                foreach ( $mails as $mail ) {
+                    if ( $mail->id == $email_to_send ) {
+                        $mail->trigger( $importData['pid'] );
+                        $this->logger and call_user_func($this->logger, sprintf(__('- %s email notification has beed sent. ...', 'wp_all_import_plugin'), $mail->title));
+                    }
+                }
+            }
+
+            do_action( 'woocommerce_after_resend_order_email', $order, $email_to_send );
+        }
+
 		update_option('wp_all_import_previously_updated_order_' . $this->import->id, $importData['pid']);	
 	}
 
@@ -1386,7 +1387,9 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 				$is_product_founded = true;
 				
 				foreach ($this->data['pmwi_order']['manual_products'][$index] as $productIndex => $productItem) 
-				{									
+				{
+
+				    if (empty($productItem['sku']))	continue;
 
 					$item_price = $productItem['price_per_unit'];
 

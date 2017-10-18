@@ -1,7 +1,7 @@
 <?php 
 /** 
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 
 class PMWI_Admin_Import extends PMWI_Controller_Admin 
@@ -33,7 +33,7 @@ class PMWI_Admin_Import extends PMWI_Controller_Admin
 		$this->data['post'] =& $post;				
 
 		$this->data['existing_meta_keys'] = array();	
-		
+
 		if ( ! in_array($post['custom_type'], array('import_users'))){
 
 			global $wpdb;

@@ -1,8 +1,8 @@
 <?php
 /**
  * Introduce special type for controllers which render pages inside admin area
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 abstract class PMWI_Controller_Admin extends PMWI_Controller {
 	/**

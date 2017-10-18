@@ -2,8 +2,8 @@
 Contributors: automattic, akeda, allendav, royho, slash1andy, woosteve, spraveenitpro, mikedmoore, fernashes, shellbeezy, danieldudzic, dsmithweb, fullysupportedphil, corsonr, zandyring, skyverge
 Tags: ecommerce, e-commerce, commerce, woothemes, wordpress ecommerce, store, sales, sell, shop, shopping, cart, checkout, configurable, paypal, braintree
 Requires at least: 4.4
-Tested up to: 4.7.5
-Stable tag: 2.0.3
+Tested up to: 4.8
+Stable tag: 2.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -122,6 +122,10 @@ New feature requests and bugs reports can be made in the plugin forum.
 
 == Changelog ==
 
+= 2.0.4 =
+* Fix - Prevent a fatal error when completing pre-orders
+* Fix - Prevent JavaScript errors when applying a 100%-off coupon at checkout
+
 = 2.0.3 =
 * Fix - Add a missing namespace that could cause JavaScript issues with some configurations
 
@@ -221,6 +225,10 @@ New feature requests and bugs reports can be made in the plugin forum.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.4 =
+* Fix - Prevent a fatal error when completing pre-orders
+* Fix - Prevent JavaScript errors when applying a 100%-off coupon at checkout
 
 = 1.2.4 =
 * Fix - Free subscription trials not allowed.

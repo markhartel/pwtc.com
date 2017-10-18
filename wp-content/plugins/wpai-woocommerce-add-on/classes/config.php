@@ -1,8 +1,8 @@
 <?php
 /**
  * Class to load config files
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 class PMWI_Config implements IteratorAggregate {
 	/**

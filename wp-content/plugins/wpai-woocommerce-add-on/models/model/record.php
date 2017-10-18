@@ -1,8 +1,8 @@
 <?php 
 /**
  * Base class for models
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 class PMWI_Model_Record extends PMWI_Model {
 	/**

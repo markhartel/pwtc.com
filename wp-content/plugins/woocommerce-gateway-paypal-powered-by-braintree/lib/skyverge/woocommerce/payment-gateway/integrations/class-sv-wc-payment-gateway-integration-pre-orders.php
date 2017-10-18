@@ -274,7 +274,7 @@ class SV_WC_Payment_Gateway_Integration_Pre_Orders extends SV_WC_Payment_Gateway
 			}
 
 			// perform the transaction
-			if ( $this->get_gateway()->is_credit_card_gateway() ) {
+			if ( $this->get_gateway()->is_credit_card_gateway() || $this->get_gateway()->is_paypal_gateway() ) {
 
 				if ( $this->get_gateway()->perform_credit_card_charge( $order ) ) {
 					$response = $this->get_gateway()->get_api()->credit_card_charge( $order );
@@ -308,6 +308,9 @@ class SV_WC_Payment_Gateway_Integration_Pre_Orders extends SV_WC_Payment_Gateway
 					// account type (checking/savings) may or may not be available, which is fine
 					$message = sprintf( __( '%s eCheck Pre-Order Release Payment Approved: %s ending in %s', 'woocommerce-plugin-framework' ), $this->get_gateway()->get_method_title(), SV_WC_Payment_Gateway_Helper::payment_type_to_name( ( ! empty( $order->payment->account_type ) ? $order->payment->account_type : 'bank' ) ), $last_four );
 
+				} else {
+
+					$message = sprintf( __( '%s Pre-Order Release Payment Approved', 'woocommerce-plugin-framework' ), $this->get_gateway()->get_method_title() );
 				}
 
 				// adds the transaction id (if any) to the order note

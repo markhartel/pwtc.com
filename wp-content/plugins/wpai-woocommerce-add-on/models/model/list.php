@@ -1,8 +1,8 @@
 <?php
 /**
  * Incapsulates behavior for list of database records
- * 
- * @author Pavel Kulbakin <p.kulbakin@gmail.com>
+ *
+ * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
  */
 class PMWI_Model_List extends PMWI_Model {
 	
