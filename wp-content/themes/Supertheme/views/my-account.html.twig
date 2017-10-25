@@ -13,7 +13,7 @@
                             <li><span class="term">Plan:</span> <span class="value">{{ membership.membership_name }}</span></li>
                             <li><span class="term">Joined:</span> <span class="value">{{ membership.join_date | date("F jS Y")}}</span></li>
                             <li><span class="term">Expires:</span> <span class="value">{{ membership.end_date | date("F jS Y")}}</span></li>
-                            {% if is_head %}<li><a href="{{ renew }}">Renew</a></li>{% endif %}
+                            {% if is_head or not household_members %}<li><a href="{{ renew }}">Renew</a></li>{% endif %}
                         </ul>
                     {% else %}
                         <h2>No Membership</h2>
@@ -65,7 +65,7 @@
                     <br>
                     <h3>
                         Family Members
-                        {% if is_head %}
+                        {% if is_head or not household_members %}
                             <small><a href="#add-form" class="fancybox">Add New</a></small>
                             <div id="add-form">
                                 <div class="row column">
@@ -144,7 +144,7 @@
                                         </li>
                                     {% endfor %}
                                 </ul>
-                                {% if is_head %}
+                                {% if is_head or not household_members %}
                                     <ul class="horizontal menu">
                                         <li><a href="#household_delete_{{ loop.index }}" class="alert button fancybox">Delete</a></li>
                                     </ul>
