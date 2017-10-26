@@ -79,3 +79,5 @@ function supertheme_get_timezone_string() {
     // fallback to UTC
     return 'UTC';
 }
+
+add_filter('jpeg_quality', function() { return 100; });
