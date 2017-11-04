@@ -20,9 +20,13 @@ function pmwi_wp_all_import_is_post_to_delete( $to_delete, $pid, $import )
 
 			if ( count($children) ){	
 				$to_delete = false;
+                $maybe_to_delete = get_option('_wp_all_import_products_maybe_to_delete', array());
+                if ( ! in_array($pid, $maybe_to_delete) ){
+                    $maybe_to_delete[] = $pid;
+                    update_option('wp_all_import_products_maybe_to_delete_' . $import->id, $maybe_to_delete);
+                }
 			}
-					
 		}
-	}	
+	}
 	return $to_delete;
 }

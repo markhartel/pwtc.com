@@ -63,7 +63,6 @@ if(!class_exists('WPCACore')) {
 		 * Post Types that use the engine
 		 * @var WPCAPostTypeManager
 		 */
-		private static $post_type_manager;
 		private static $type_manager;
 
 		/**
@@ -120,20 +119,7 @@ if(!class_exists('WPCACore')) {
 		 * @return  WPCAPostTypeManager
 		 */
 		public static function post_types() {
-			if(!self::$post_type_manager) {
-				self::$post_type_manager = new WPCAPostTypeManager();
-			}
-			return self::$post_type_manager;
-		}
-
-		/**
-		 * Content Aware Sidebars 3.5.2 rely on this
-		 *
-		 * @deprecated  4.0
-		 * @return WPTypeManager
-		 */
-		public static function modules() {
-			return self::$type_manager->get('sidebar');
+			return self::$type_manager;
 		}
 
 		/**
@@ -294,12 +280,12 @@ if(!class_exists('WPCACore')) {
 
 			$modules = self::$type_manager->get($post_type)->get_all();
 
-			foreach (self::$type_manager->get_all() as $key => $type) {
-				if($key == $post_type) {
+			foreach (self::$type_manager as $other_type => $other_modules) {
+				if($other_type == $post_type) {
 					continue;
 				}
-				if($type->get_all() === $modules) {
-					$cache[] = $key;
+				if($other_modules->get_all() === $modules) {
+					$cache[] = $other_type;
 				}
 			}
 
@@ -332,6 +318,7 @@ if(!class_exists('WPCACore')) {
 			$where[] = "p.menu_order ".(is_archive() || is_home() ? '>=' : '<=')." 1";
 				
 			//Syntax changed in MySQL 5.5 and MariaDB 10.0 (reports as version 5.5)
+			//todo: this might not be needed anymore?
 			$wpdb->query('SET'.(version_compare($wpdb->db_version(), '5.5', '>=') ? ' SESSION' : ' OPTION').' SQL_BIG_SELECTS = 1');
 
 			$groups_in_context = $wpdb->get_results(
@@ -402,8 +389,9 @@ if(!class_exists('WPCACore')) {
 				return self::$post_cache[$post_type];
 			}
 
-			if(!self::$type_manager->has($post_type) || (!$wp_query->query && !$post) || is_admin())
+			if(!self::$type_manager->has($post_type) || (!$wp_query->query && !$post) || is_admin()) {
 				return false;
+			}
 
 			$valid = self::get_conditions($post_type);
 
@@ -429,40 +417,13 @@ if(!class_exists('WPCACore')) {
 					FROM $wpdb->posts p
 					INNER JOIN $wpdb->postmeta h ON h.post_id = p.ID AND h.meta_key = '".self::PREFIX."handle' 
 					WHERE
-					p.post_type = '".$post_type."' AND 
-					p.post_status = 'publish' AND 
-					p.ID IN(".implode(',',$valid).") 
-					
+						p.post_type = '".$post_type."' AND 
+						p.post_status = 'publish' AND 
+						p.ID IN(".implode(',',$valid).") 
 					ORDER BY p.menu_order ASC, h.meta_value DESC, p.post_date DESC
-				");
-				//".implode(' ',$joins)."
-				//AND ".implode(' AND ',$wheres)."
+				",OBJECT_K);
 
-				//diff orderby only works in WP4.0+
-				// $new_results = new WP_Query(array(
-				// 	'post_type'           => $post_type,
-				// 	'post_status'         => 'publish',
-				// 	'post__in'            => $valid,
-				// 	'ignore_sticky_posts' => true,
-				// 	'nopaging'            => true,
-				// 	'posts_per_page'      => -1,
-				// 	'orderby'  => array('menu_order' => 'ASC', 'meta_value_num' => 'DESC', 'post_date' => 'DESC' ),
-				// 	'meta_key' => self::PREFIX.'handle',
-				// 	'meta_query' => array(
-				// 		// array(
-				// 		// 	'key'     => self::PREFIX.'handle',
-				// 		// 	'value'   => 'blue',
-				// 		// 	'compare' => 'NOT LIKE',
-				// 		// )
-				// 	)
-				// ));
-
-				foreach($results as $result) {
-					self::$post_cache[$post_type][$result->ID] = $result;
-				}
-				foreach(self::$post_cache as $post_type => $cache) {
-					self::$post_cache[$post_type] = apply_filters("wpca/posts/{$post_type}",$cache);
-				}
+				self::$post_cache[$post_type] = apply_filters("wpca/posts/{$post_type}",$results);
 			}
 			return self::$post_cache[$post_type];
 		}
@@ -732,6 +693,7 @@ if(!class_exists('WPCACore')) {
 			//Make sure to use packaged version
 			if(wp_script_is('select2','registered')) {
 				wp_deregister_script('select2');
+				wp_deregister_style('select2');
 			}
 
 			//Add to head to take priority

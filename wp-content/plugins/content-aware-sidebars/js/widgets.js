@@ -20,11 +20,30 @@
 		 */
 		init: function() {
 
+			this.openSidebarByURL();
 			this.addSidebarToolbar();
 			this.addWidgetSearch();
 			this.toggleSidebarStatus();
 			this.enhancedWidgetManager();
 
+		},
+
+		/**
+		 * Open widget area based on URL hash
+		 *
+		 * @since  3.7
+		 * @return {void}
+		 */
+		openSidebarByURL: function() {
+			if(window.location.hash) {
+				var $sidebars = this.$sidebarContainer.find('.widgets-holder-wrap'),
+					$openSidebar = $sidebars.has(window.location.hash);
+
+				if($openSidebar.length) {
+					//.sidebar-name-arrow is used in older wp versions
+					$openSidebar.add($sidebars.first()).find('.handlediv,.sidebar-name-arrow').trigger('click');
+				}
+			}
 		},
 
 		/**

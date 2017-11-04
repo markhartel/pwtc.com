@@ -11,7 +11,7 @@
 			<a href="#help" class="wpallimport-help" title="<?php _e('Products can be matched by SKU, ID, or Title, and must be comma separated.', 'wpai_woocommerce_addon_plugin'); ?>">?</a>
 		</p>
 	</div> <!-- End options group -->
-	<div class="options_group grouping show_if_simple show_if_external">
+	<div class="options_group grouping show_if_simple show_if_external show_if_variable">
 		<?php
 		$post_parents = array();
 		$post_parents[''] = __( 'Choose a grouped product&hellip;', 'wpai_woocommerce_addon_plugin' );

@@ -185,16 +185,16 @@ if ($show_buttons) {
 <?php        
     }
 ?>
-    <p>
+    
 <?php if (false) { ?>
-        <div><strong>Synchronize rider list with master membership database.</strong></div>
+        <p>Synchronize rider list with master membership database.</p>
         <div><form class="sync-frm" method="POST">
             <?php wp_nonce_field('pwtc_mileage_member_sync'); ?>
             <input type="submit" name="member_sync" value="Synchronize" 
                 class="button button-primary button-large"/>
         </form></div><br>
 <?php } ?>
-        <div><strong>Synchronize rider list with contents of updmembs file.</strong></div>
+        <p>Synchronize the rider list with the contents of the UPDMEMBS.DBF file. This file is provided by the membership secretary.</p>
         <div>
             <button class="updmembs-btn button button-primary button-large">Synchronize</button>
             <span class="updmembs-blk popup-frm initially-hidden">
@@ -209,21 +209,21 @@ if ($show_buttons) {
 		    </span>
         </div><br>
  <?php if ($show_purge) { ?>
-       <div><strong>Purge all non-riders from rider list.</strong></div>
+       <p>Purge all non-riders from rider list.</p>
         <div><form class="purge-frm" method="POST">
             <?php wp_nonce_field('pwtc_mileage_purge_nonriders'); ?>
             <input type="submit" name="purge_nonriders" value="Purge" 
                 class="button button-primary button-large"/>
         </form></div><br>
  <?php } ?>
-       <div><strong>Consolidate all <?php echo(intval(date('Y'))-2); ?> club rides to single entry.</strong></div>
+       <p>Consolidate all <?php echo(intval(date('Y'))-2); ?> club rides to a single entry. This will remove all obsolete entries from the mileage database.</p>
         <div><form class="consol-frm" method="POST">
             <?php wp_nonce_field('pwtc_mileage_consolidate'); ?>
             <input type="submit" name="consolidate" value="Consolidate" 
                 class="button button-primary button-large" 
                 <?php if ($rides_to_consolidate <= 1) { echo 'disabled'; } ?>/>
         </form></div><br>
-        <div><strong>Export mileage database to CSV files.</strong></div>
+        <p>Export the mileage database to CSV files. Be certain to download all four files.</p>
         <div><form class="export-frm" method="POST">
             <?php wp_nonce_field('pwtc_mileage_export'); ?>
             <input type="submit" name="export_members" 
@@ -239,7 +239,7 @@ if ($show_buttons) {
                 value="Leaders (<?php echo $leader_count; ?>)" 
                 class="button button-primary button-large"/>
         </form></div><br>
-        <div><strong>Restore mileage database from exported CSV files.</strong></div>
+        <p>Restore the mileage database from the four exported CSV files.</p>
         <div>
             <button class="restore-btn button button-primary button-large">Restore</button>
             <span class="restore-blk popup-frm initially-hidden">
@@ -262,7 +262,7 @@ if ($show_buttons) {
 			</form>
 		    </span>
         </div><br>
-    </p>
+
 <?php
     include('admin-rider-lookup.php');
 }

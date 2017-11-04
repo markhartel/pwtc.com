@@ -98,7 +98,18 @@ table.pretty a {
   width: 200px;    
 }
 
+.stacked-form span {
+  font-weight: bold;  
+}
+
 .stacked-form input[type=text] {
+  width: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 4px 0;
+}
+
+.stacked-form select {
   width: 100%;
   display: inline-block;
   box-sizing: border-box;

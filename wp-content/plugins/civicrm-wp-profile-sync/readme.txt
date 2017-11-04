@@ -1,10 +1,10 @@
 === CiviCRM WordPress Profile Sync ===
 Contributors: needle, cuny-academic-commons
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PZSKM8T5ZP3SC
+Donate link: https://www.paypal.me/interactivist
 Tags: civicrm, buddypress, user, profile, xprofile, sync
 Requires at least: 3.9
-Tested up to: 4.6
-Stable tag: 0.2.5
+Tested up to: 4.9
+Stable tag: 0.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,16 @@ For versions of *CiviCRM* prior to 4.6-alpha1, this plugin requires the correspo
 
 
 == Changelog ==
+
+= 0.2.6 =
+
+* Allows plugin constants to be pre-defined
+* Allow plugins to provide a unique username
+* Provides new filters to customise bulk import process
+
+= 0.2.5 =
+
+* Makes synced usernames URL-friendly
 
 = 0.2.4 =
 

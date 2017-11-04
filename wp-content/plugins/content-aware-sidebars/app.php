@@ -17,7 +17,7 @@ final class CAS_App {
 	/**
 	 * Plugin version
 	 */
-	const PLUGIN_VERSION       = '3.6.2';
+	const PLUGIN_VERSION       = '3.7';
 
 	/**
 	 * Prefix for sidebar id
@@ -78,7 +78,7 @@ final class CAS_App {
 		if(is_admin()) {
 			new CAS_Sidebar_Overview();
 			new CAS_Sidebar_Edit();
-			new CAS_Post_Type_Sidebar();
+			new CAS_Quick_Select();
 			new CAS_Admin_Screen_Widgets();
 		}
 

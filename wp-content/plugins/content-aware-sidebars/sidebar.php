@@ -58,7 +58,6 @@ final class CAS_Sidebar_Manager {
 		add_shortcode( 'ca-sidebar',
 			array($this,'sidebar_shortcode'));
 
-
 	}
 
 	/**
@@ -73,6 +72,10 @@ final class CAS_Sidebar_Manager {
 		if(!is_admin()) {
 			add_filter('sidebars_widgets',
 				array($this,'replace_sidebar'));
+			add_filter('wpca/posts/sidebar',
+				array(__CLASS__,'filter_password_protection'));
+			add_filter('wpca/posts/sidebar',
+				array($this,'filter_visibility'));
 			add_action( 'dynamic_sidebar_before',
 				array($this,'render_sidebar_before'),9,2);
 			add_action( 'dynamic_sidebar_after',
@@ -120,7 +123,7 @@ final class CAS_Sidebar_Manager {
 				0 => __('Replace', 'content-aware-sidebars'),
 				1 => __('Merge', 'content-aware-sidebars'),
 				3 => __('Forced replace','content-aware-sidebars'),
-				2 => __('Shortcode / Template Tag', 'content-aware-sidebars')
+				2 => __('Shortcode')
 			),
 			__('Replace host sidebar, merge with it or add sidebar manually.', 'content-aware-sidebars')
 		),'handle')
@@ -234,7 +237,7 @@ final class CAS_Sidebar_Manager {
 			'delete_with_user'    => false
 		));
 
-		WPCACore::post_types()->add(CAS_App::TYPE_SIDEBAR);
+		WPCACore::types()->add(CAS_App::TYPE_SIDEBAR);
 	}
 
 	/**
@@ -285,8 +288,7 @@ final class CAS_Sidebar_Manager {
 		$has_host = array(0=>1,1=>1,3=>1);
 		$metadata = $this->metadata();
 
-		foreach($this->sidebars as $post) {
-			$id = CAS_App::SIDEBAR_PREFIX.$post->ID;
+		foreach($this->sidebars as $id => $post) {
 
 			$args = $default_styles;
 
@@ -327,33 +329,21 @@ final class CAS_Sidebar_Manager {
 			return $this->replaced_sidebars;
 		}
 
-		if(is_singular() && post_password_required()) {
-			return $sidebars_widgets;
-		}
-
 		$posts = WPCACore::get_posts(CAS_App::TYPE_SIDEBAR);
 
 		if ($posts) {
 			global $wp_registered_sidebars;
 
 			$metadata = $this->metadata();
+			$has_host = array(0=>1,1=>1,3=>1);
 
-			//temporary filter until WPCACore allows filtering
-			$user_visibility = is_user_logged_in() ? array(-1) : array();
-			$user_visibility = apply_filters('cas/user_visibility',$user_visibility);
 			foreach ($posts as $post) {
 
 				$id = CAS_App::SIDEBAR_PREFIX . $post->ID;
-				$visibility = $metadata->get('visibility')->get_data($post->ID,true,false);
 				$host = $metadata->get('host')->get_data($post->ID);
 
-				// Check visibility
-				if($visibility && !array_intersect($visibility,$user_visibility)) {
-					continue;
-				}
-
 				// Check for correct handling and if host exist
-				if ( $post->handle == 2 || !isset($sidebars_widgets[$host])) {
+				if (!isset($has_host[$post->handle]) || !isset($sidebars_widgets[$host])) {
 					continue;
 				}
 
@@ -461,10 +451,13 @@ final class CAS_Sidebar_Manager {
 		$id = CAS_App::SIDEBAR_PREFIX.esc_attr($a['id']);
 
 		//if sidebar is in replacement map, shortcode is called wrongly
+		//todo: check for handle instead?
 		if(!isset($this->replace_map[$id])) {
-			ob_start();
-			dynamic_sidebar($id);
-			$content = ob_get_clean();
+			if(is_active_sidebar($id)) {
+				ob_start();
+				dynamic_sidebar($id);
+				$content = ob_get_clean();
+			}
 		}
 		return $content;
 	}
@@ -472,35 +465,25 @@ final class CAS_Sidebar_Manager {
 	/**
 	 * Get styles from nested sidebars
 	 *
-	 * @since  3.6
+	 * @since  3.7
 	 * @param  string  $i
 	 * @param  array   $styles
 	 * @return array
 	 */
-	public function get_sidebar_styles($i,$styles) {
-		if(isset($this->replace_map[$i])) {
-			$styles = $this->get_sidebar_styles($this->replace_map[$i],$styles);
-		}
+	public function get_sidebar_styles($i) {
+		$styles = array();
 
-		if(isset($this->sidebars[$i])) {
-			$html = $this->metadata()->get('html')->get_data($this->sidebars[$i]->ID);
-			//Set user styles
-			foreach (array(
-				'widget',
-				'title',
-				'sidebar'
-			) as $pos) {
-				if(isset($html[$pos],$html[$pos.'_class'])) {
-					$e = esc_html($html[$pos]);
-					$class = esc_html($html[$pos.'_class']);
-					$id = '';
-					if($pos == 'widget') {
-						$id = ' id="%1$s"';
-					}
-					$styles['before_'.$pos] = '<'.$e.$id.' class="'.$class.'">';
-					$styles['after_'.$pos] = "</$e>";
+		$metadata = $this->metadata()->get('html');
+		while($i) {
+			if(isset($this->sidebars[$i])) {
+				$style = apply_filters('cas/sidebar/html',$metadata->get_data($this->sidebars[$i]->ID),$this->sidebars[$i]->ID);
+				if($style) {
+					$styles = array_merge($styles,$style);
+					$styles['widget_id'] = '%1$s';
+					$styles['sidebar_id'] = CAS_App::SIDEBAR_PREFIX.$this->sidebars[$i]->ID;
 				}
 			}
+			$i = isset($this->replace_map[$i]) ? $this->replace_map[$i] : false;
 		}
 
 		return $styles;
@@ -518,7 +501,28 @@ final class CAS_Sidebar_Manager {
 		global $wp_registered_sidebars;
 
 		//Get nested styles
-		$wp_registered_sidebars[$i] = $this->get_sidebar_styles($i,$wp_registered_sidebars[$i]);
+		$html = $this->get_sidebar_styles($i);
+		if($html) {
+			$styles = $wp_registered_sidebars[$i];
+			//Set user styles
+			foreach (array(
+				'widget',
+				'title',
+				'sidebar'
+			) as $pos) {
+				if(isset($html[$pos],$html[$pos.'_class'])) {
+					$e = esc_html($html[$pos]);
+					$class = esc_html($html[$pos.'_class']);
+					$id = '';
+					if(isset($html[$pos.'_id'])) {
+						$id = ' id="'.$html[$pos.'_id'].'"';
+					}
+					$styles['before_'.$pos] = '<'.$e.$id.' class="'.$class.'">';
+					$styles['after_'.$pos] = "</$e>";
+				}
+			}
+			$wp_registered_sidebars[$i] = $styles;
+		}
 
 		if($has_widgets && isset($wp_registered_sidebars[$i]['before_sidebar'])) {
 			echo $wp_registered_sidebars[$i]['before_sidebar'];
@@ -538,6 +542,47 @@ final class CAS_Sidebar_Manager {
 		if($has_widgets && isset($wp_registered_sidebars[$i]['after_sidebar'])) {
 			echo $wp_registered_sidebars[$i]['after_sidebar'];
 		}
+	}
+
+	/**
+	 * Filter out all sidebars if post is password protected
+	 *
+	 * @since  3.7
+	 * @param  array  $sidebars
+	 * @return array
+	 */
+	public static function filter_password_protection($sidebars) {
+		if(is_singular() && post_password_required()) {
+			return array();
+		}
+		return $sidebars;
+	}
+
+	/**
+	 * Filter out sidebars based on current user
+	 *
+	 * @since  3.7
+	 * @param  array  $sidebars
+	 * @return array
+	 */
+	public function filter_visibility($sidebars) {
+		if($sidebars) {
+			$metadata = $this->metadata()->get('visibility');
+
+			//temporary filter until WPCACore allows filtering
+			$user_visibility = is_user_logged_in() ? array(-1) : array();
+			$user_visibility = apply_filters('cas/user_visibility',$user_visibility);
+			foreach ($sidebars as $id => $sidebar) {
+
+				$visibility = $metadata->get_data($id,true,false);
+
+				// Check visibility
+				if($visibility && !array_intersect($visibility,$user_visibility)) {
+					unset($sidebars[$id]);
+				}
+			}
+		}
+		return $sidebars;
 	}
 
 	/**
