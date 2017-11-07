@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -666,6 +666,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return $importableFields;
   }
 
+  /**
+   * Get the fields relating to locations.
+   *
+   * @return array
+   */
   public static function getLocationFields() {
     static $locationFields = array(
       'street_address',
@@ -938,8 +943,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * Given a contact id and a field set, return the values from the db
-   * for this contact
+   * Given a contact id and a field set, return the values from the db.
    *
    * @param int $cid
    * @param array $fields
@@ -953,6 +957,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
+   *
+   * @return null|array
    */
   public static function getValues(
     $cid, &$fields, &$values,
@@ -1467,14 +1473,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $ufGroup->copyValues($params);
 
     $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids, CRM_Utils_Array::value('id', $params));
-    if (!$ufGroupID) {
+    if (!$ufGroupID && empty($params['name'])) {
       $ufGroup->name = CRM_Utils_String::munge($ufGroup->title, '_', 56);
     }
     $ufGroup->id = $ufGroupID;
 
     $ufGroup->save();
 
-    if (!$ufGroupID) {
+    if (!$ufGroupID && empty($params['name'])) {
       $ufGroup->name = $ufGroup->name . "_{$ufGroup->id}";
       $ufGroup->save();
     }
@@ -3301,7 +3307,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             );
             $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $subTree);
           }
-          $formattedGroupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
+          $formattedGroupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
           CRM_Core_BAO_CustomGroup::setDefaults($formattedGroupTree, $defaults);
         }
 

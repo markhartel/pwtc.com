@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class contains functions for managing Tag(tag) for a contact
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
@@ -458,11 +458,22 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
       // Output tag list as nested hierarchy
       // TODO: This will only work when api.entity is "entity_tag". What about others?
       if ($context == 'search' || $context == 'create') {
-        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), CRM_Core_DAO::$_nullArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+        $dummyArray = array();
+        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), $dummyArray, CRM_Utils_Array::value('parent_id', $params), '- ');
       }
     }
 
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+
+    // Special formatting for validate/match context
+    if ($fieldName == 'entity_table' && in_array($context, array('validate', 'match'))) {
+      $options = array();
+      foreach (self::buildOptions($fieldName) as $tableName => $label) {
+        $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
+        $apiName = CRM_Core_DAO_AllCoreTables::getBriefName($bao);
+        $options[$tableName] = $apiName;
+      }
+    }
 
     return $options;
   }

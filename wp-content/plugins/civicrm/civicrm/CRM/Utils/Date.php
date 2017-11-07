@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -184,7 +184,7 @@ class CRM_Utils_Date {
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
       CRM_Core_I18n::setLcTime();
-      for ($i = $firstDay; count($days) < 7; $i = $i > 6 ? 0 : $i + 1) {
+      for ($i = $firstDay; count($days) < 7; $i = $i > 5 ? 0 : $i + 1) {
         $days[$i] = strftime('%a', mktime(0, 0, 0, 6, $i, 1970));
       }
     }
@@ -213,7 +213,7 @@ class CRM_Utils_Date {
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
       CRM_Core_I18n::setLcTime();
-      for ($i = $firstDay; count($days) < 7; $i = $i > 6 ? 0 : $i + 1) {
+      for ($i = $firstDay; count($days) < 7; $i = $i > 5 ? 0 : $i + 1) {
         $days[$i] = strftime('%A', mktime(0, 0, 0, 6, $i, 1970));
       }
     }
@@ -1884,6 +1884,22 @@ class CRM_Utils_Date {
     }
 
     return $formattedDate;
+  }
+
+  /**
+   * Function to return days of the month.
+   *
+   * @return array
+   */
+  public static function getCalendarDayOfMonth() {
+    $month = array();
+    for ($i = 1; $i <= 31; $i++) {
+      $month[$i] = $i;
+      if ($i == 31) {
+        $month[$i] = $i . ' / Last day of month';
+      }
+    }
+    return $month;
   }
 
 }

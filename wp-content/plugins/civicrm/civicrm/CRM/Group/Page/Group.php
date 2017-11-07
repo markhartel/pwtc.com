@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
@@ -143,8 +143,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     if (!empty($_GET['update_smart_groups'])) {
       CRM_Contact_BAO_GroupContactCache::loadAll();
     }
-    else {
-      CRM_Contact_BAO_GroupContactCache::fillIfEmpty();
+    elseif (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_group_contact_cache LIMIT 1")) {
+      CRM_Core_Session::setStatus(ts('Count data for smart groups is not currently calculated. You may click Update Smart Groups to generate it. Be aware this can cause significant server load'));
     }
 
     $this->search();

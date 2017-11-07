@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
@@ -108,15 +108,16 @@ class CRM_Core_OptionGroup {
    *   ignore cache entries and go back to DB.
    * @param string $keyColumnName
    *   the column to use for 'key'.
+   * @param string $orderBy
    *
    * @return array
-   *   the values as specified by the above params
-   * @void
+   *   The values as specified by the params
    */
   public static function &values(
     $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
-    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value'
+    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value',
+    $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
@@ -152,7 +153,7 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.weight";
+    $query .= " ORDER BY v.{$orderBy}";
 
     $p = array(1 => array($name, 'String'));
     $dao = CRM_Core_DAO::executeQuery($query, $p);

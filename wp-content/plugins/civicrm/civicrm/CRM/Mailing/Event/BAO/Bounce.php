@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
@@ -75,7 +75,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     }
 
     // CRM-11989
-    $params['bounce_reason'] = substr($params['bounce_reason'], 0, 254);
+    $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
     $bounce->copyValues($params);
     $bounce->save();
@@ -238,7 +238,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $bounce.time_stamp, $bounce.bounce_reason, $bounceType.name ";
     }
 
     $orderBy = "sort_name ASC, {$bounce}.time_stamp DESC";

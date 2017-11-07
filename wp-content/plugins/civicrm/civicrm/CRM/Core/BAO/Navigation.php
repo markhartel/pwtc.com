@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
@@ -711,9 +711,6 @@ ORDER BY parent_id, weight";
         );
       }
     }
-    // also reset the dashlet cache in case permissions have changed etc
-    // FIXME: decouple this
-    CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
 
     return $newKey;
   }
@@ -929,6 +926,9 @@ ORDER BY parent_id, weight";
 
     // Create or update the All Reports link.
     self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
+    // Create or update the My Reports link.
+    self::createOrUpdateReportNavItem('My Reports', 'civicrm/report/list', 'myreports=1&reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
+
   }
 
   /**

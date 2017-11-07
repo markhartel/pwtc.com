@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -106,6 +106,9 @@
   }
   #api-join li.join-enabled > i {
     opacity: 1;
+  }
+  #api-join li.join-not-available {
+    font-style: italic;
   }
   #api-generated-wraper,
   #api-result {
@@ -389,10 +392,10 @@
   {literal}
   <ul class="fa-ul">
     <% _.forEach(joins, function(join, name) { %>
-      <li <% if(join.checked) { %>class="join-enabled"<% } %>>
+      <li <% if(join.checked) { %>class="join-enabled"<% } if(join.disabled) { %>class="join-not-available"<% }%>>
         <i class="fa-li crm-i fa-reply fa-rotate-180"></i>
         <label for="select-join-<%= name %>" class="api-checkbox-label">
-          <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } %>/>
+          <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } if(join.disabled) { %>disabled<% } %>/>
           <%- join.title %>
         </label>
       </li>
