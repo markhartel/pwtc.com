@@ -53,7 +53,7 @@
                     {% include 'partials/ride-calendarlink.html.twig' with {date: SP.ACF.get_field('date')} only %}
                     {% if user_can_cancel %}
                         {% if SP.ACF.get_field('is_canceled') %}
-                            <a href="{{ current_url }}?canceled=0" class="success button"><i class="fa fa-calendar-check-o"></i> Schedule Ride</a>
+                            <a href="{{ current_url }}?canceled=0" class="success button"><i class="fa fa-calendar-check-o"></i> Allow Ride</a>
                         {% else %}
                             <a href="{{ current_url }}?canceled=1" class="alert button"><i class="fa fa-calendar-times-o"></i> Cancel Ride</a>
                         {% endif %}

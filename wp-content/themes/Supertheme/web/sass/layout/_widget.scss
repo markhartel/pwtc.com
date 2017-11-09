@@ -29,3 +29,13 @@
     }
   }
 }
+
+.widget_rides {
+  .canceled {
+    color: $accent-color;
+    text-decoration: line-through;
+    &:hover {
+      color: scale_color($alert-color, $lightness: -15%);
+    }
+  }
+}

@@ -330,7 +330,7 @@ a.scroll-to-top {
       padding: 0 0 $global-margin/2 0;
     }
   }
-  .day.date, .day.current, .day.weekend {
+  .day, .day.current, .day.weekend {
     .canceled {
       text-decoration: line-through;
       text-decoration-color: $alert-color;
