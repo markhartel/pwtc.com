@@ -39,3 +39,21 @@ add_action('acf/save_post', function ($post_id) {
     update_field('from', false);
     update_field('to', false);
 }, 20);
+
+
+// can cancel ride
+function can_cancel_ride($post_id) {
+    $user = wp_get_current_user();
+    if(user_can($user,'edit_published_rides')) {
+        return true;
+    } elseif (in_array('ride_leader', (array) $user->roles)) {
+        $leaders = get_field('ride_leaders', $post_id);
+        foreach($leaders as $leader) {
+            if($leader->ID == $user->ID) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

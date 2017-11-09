@@ -196,6 +196,13 @@ a.scroll-to-top {
 
 // rides
 .ride {
+  .canceled {
+    text-decoration: line-through;
+    text-decoration-color: $alert-color;
+    &+h3 {
+      color: $alert-color;
+    }
+  }
   .description {
     margin-bottom: 1rem;
   }
@@ -323,6 +330,21 @@ a.scroll-to-top {
       padding: 0 0 $global-margin/2 0;
     }
   }
+  .day.date, .day.current, .day.weekend {
+    .canceled {
+      text-decoration: line-through;
+      text-decoration-color: $alert-color;
+      color: $alert-color;
+      &:hover {
+        color: scale_color($alert-color, $lightness: -15%);
+      }
+    }
+  }
+  .day.previous, .day.future {
+    .canceled {
+      text-decoration: line-through;
+    }
+  }
   @include breakpoint(medium) {
     display: table;
     .week {
@@ -371,6 +393,16 @@ a.scroll-to-top {
   padding: $global-margin * 2 0;
   color: $white;
   background-color: $primary-color;
+  .canceled {
+    text-decoration: line-through;
+    text-decoration-color: $alert-color;
+    a {
+      color: $alert-color;
+      &:hover {
+        color: scale_color($alert-color, $lightness: -15%);
+      }
+    }
+  }
   .date, .button {
     margin-top: $global-margin;
   }

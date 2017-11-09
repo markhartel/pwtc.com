@@ -15,7 +15,7 @@
                         <h4 class="time">{{ ride.time | date('g:i') }}<sup>{{ ride.time | date('a') }}</sup></h4>
                     </div>
                     <div class="small-8 medium-10 columns">
-                        <h4><a href="{{ ride.link }}">{{ ride.title }}</a></h4>
+                        <h4 class="{% if ride.is_canceled %}canceled{% endif %}"><a href="{{ ride.link }}">{{ ride.title }}</a></h4>
                     </div>
                 </div>
             </div>

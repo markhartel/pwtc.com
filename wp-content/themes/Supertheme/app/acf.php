@@ -1786,13 +1786,27 @@ if( function_exists('acf_add_local_field_group') ):
                 'required' => 1,
                 'conditional_logic' => 0,
                 'wrapper' => array (
-                    'width' => '',
+                    'width' => '75',
                     'class' => '',
                     'id' => '',
                 ),
                 'display_format' => 'D, F j Y, g:i a',
                 'return_format' => 'Y-m-d H:i:s',
                 'first_day' => 0,
+            ),
+            array (
+                'key' => 'field_canceled',
+                'label' => 'Ride Canceled?',
+                'name' => 'is_canceled',
+                'type' => 'true_false',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => '25',
+                    'class' => '',
+                    'id' => '',
+                ),
             ),
             array (
                 'key' => 'field_57bc9992f40cc',
