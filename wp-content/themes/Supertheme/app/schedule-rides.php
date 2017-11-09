@@ -49,7 +49,7 @@ function can_cancel_ride($post_id) {
     } elseif (in_array('ride_leader', (array) $user->roles)) {
         $leaders = get_field('ride_leaders', $post_id);
         foreach($leaders as $leader) {
-            if($leader->ID == $user->ID) {
+            if($leader['ID'] == $user->ID) {
                 return true;
             }
         }

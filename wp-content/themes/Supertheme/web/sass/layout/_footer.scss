@@ -38,6 +38,17 @@
   .gform_wrapper .field_sublabel_above div.ginput_container[class*="gfield_time_"] label {
     display: none !important;
   }
+
+  .top_label div.ginput_complex.ginput_container.gf_name_has_1,
+  .top_label div.ginput_complex.ginput_container.gf_name_has_2,
+  .top_label div.ginput_complex.ginput_container.gf_name_has_3 {
+    @media only screen and (min-width: 641px) {
+      width: calc(100% + 35px);
+    }
+    input {
+      margin-bottom: $global-margin;
+    }
+  }
   .menu {
     li:first-of-type a {
       padding-left: 0;
