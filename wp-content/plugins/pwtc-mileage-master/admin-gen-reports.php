@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
         }
         else {
             $('#report-results-section .results-div').append(
-                '<span class="empty-tbl">No records found!</span>');
+                '<span class="empty-tbl">No records found.</span>');
         }
     }
 
@@ -246,6 +246,7 @@ if ($running_jobs > 0) {
 } else {
 ?>
     <div id='report-main-section'>
+        <p>Use this page to view and download various mileage database reports.</p>
         <p>Download: 
             <select class='download-slt'>
                 <option value="no" selected>No</option> 

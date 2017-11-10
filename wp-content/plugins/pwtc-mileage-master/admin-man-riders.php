@@ -12,6 +12,8 @@ jQuery(document).ready(function($) {
             $('#rider-inspect-section .riders-div').append('<table class="rwd-table">' +
                 '<tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Expiration Date</th><th>Actions</th></tr>' +
                 '</table>');
+            editlink = '<a title="Edit this rider\'s information." class="modify-btn">Edit</a>';
+            deletelink = '<a title="Delete this rider." class="remove-btn">Delete</a>';
             members.forEach(function(item) {
                 var fmtdate = getPrettyDate(item.expir_date);
                 $('#rider-inspect-section .riders-div table').append(
@@ -20,8 +22,8 @@ jQuery(document).ready(function($) {
                     '<td data-th="First Name">' + item.first_name + 
                     '</td><td data-th="Last Name">' + item.last_name + '</td>' + 
                     '<td data-th="Expiration" date="' + item.expir_date + '">' + fmtdate + '</td>' + 
-                    '<td data-th="Actions"><a class="modify-btn">Edit</a>' + ' ' +
-                    '<a class="remove-btn">Delete</a></td></tr>');    
+                    '<td data-th="Actions">' + editlink + ' ' + deletelink +
+                    '</td></tr>');    
             });
             $('#rider-inspect-section .riders-div .modify-btn').on('click', function(evt) {
                 evt.preventDefault();
@@ -57,7 +59,7 @@ jQuery(document).ready(function($) {
         }
         else {
             $('#rider-inspect-section .riders-div').append(
-                '<span class="empty-tbl">No riders found!</span>');
+                '<span class="empty-tbl">No riders found.</span>');
         }
     }
 
@@ -166,15 +168,20 @@ jQuery(document).ready(function($) {
     });
 
     $("#rider-inspect-section .add-btn").on('click', function(evt) {
-        $("#rider-inspect-section .add-blk .add-frm input[type='submit']").val('Create');
-		$("#rider-inspect-section .add-blk .add-frm input[type='text']").val(''); 
-		$("#rider-inspect-section .add-blk .add-frm input[type='hidden']").val(''); 
-        $("#rider-inspect-section .add-blk .add-frm input[name='mode']").val('insert');
-        $("#rider-inspect-section .add-blk .add-frm input[name='memberid']").removeAttr("disabled");
-        $("#rider-inspect-section .add-btn").hide('fast', function() {
-		    $('#rider-inspect-section .add-blk').show('slow'); 
-            $("#rider-inspect-section .add-blk .add-frm input[name='memberid']").focus();          
-        });
+        open_confirm_dialog(
+			'WARNING: to add a new rider, you must have a valid ID which is assigned by the membership secretary. Do you want to continue?', 
+			function() {
+                $("#rider-inspect-section .add-blk .add-frm input[type='submit']").val('Create');
+		        $("#rider-inspect-section .add-blk .add-frm input[type='text']").val(''); 
+		        $("#rider-inspect-section .add-blk .add-frm input[type='hidden']").val(''); 
+                $("#rider-inspect-section .add-blk .add-frm input[name='mode']").val('insert');
+                $("#rider-inspect-section .add-blk .add-frm input[name='memberid']").removeAttr("disabled");
+                $("#rider-inspect-section .add-btn").hide('fast', function() {
+		            $('#rider-inspect-section .add-blk').show('slow'); 
+                    $("#rider-inspect-section .add-blk .add-frm input[name='memberid']").focus();          
+                });
+			}
+		);
     });
 
 	$("#rider-inspect-section .add-blk .cancel-btn").on('click', function(evt) {
@@ -225,8 +232,9 @@ if ($running_jobs > 0) {
 } else {
 ?>
     <div id='rider-inspect-section'>
+        <p>A rider that is a recent new member may not be in the rider list, use this page to add them. These changes will be updated when a new UPDMEMBS.DBF file from the membership secretary is uploaded.</p>
         <div class='search-sec'>
-        <p><strong>Enter search parameters to lookup riders.</strong>
+        <p><strong>Enter search parameters to find riders.</strong>
         	<form class="search-frm stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
                 <span>ID</span>
                 <input name="memberid" type="text"/>

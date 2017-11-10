@@ -132,8 +132,8 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 
 global $civicrm_root;
 
-$civicrm_root = 'C:\xampp5.6\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\\';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:\\xampp5.6\\htdocs\\pwtc.com\\wp-content\\plugins\\files\\civicrm\\templates_c\\' );
+$civicrm_root = 'C:\xampp\htdocs\pwtc.com\wp-content\plugins\civicrm\civicrm\\';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:\\xampp\\htdocs\\pwtc.com\\wp-content\\plugins\\files\\civicrm\\templates_c\\' );
 
 /**
  * Site URLs:
@@ -160,7 +160,7 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:\\xampp5.6\\htdocs\\pwtc.com\\wp-conte
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/' );
  *
  */
-define( 'CIVICRM_UF_BASEURL'      , 'http://localhost:8056/pwtc.com/' );
+define( 'CIVICRM_UF_BASEURL'      , 'http://localhost/pwtc.com/' );
 
 /*
  * If you are using any CiviCRM script in the bin directory that

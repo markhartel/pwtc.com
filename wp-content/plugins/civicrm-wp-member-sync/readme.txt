@@ -3,8 +3,8 @@ Contributors: needle, cuny-academic-commons
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PZSKM8T5ZP3SC
 Tags: civicrm, member, membership, sync
 Requires at least: 3.9
-Tested up to: 4.8
-Stable tag: 0.3.2
+Tested up to: 4.9
+Stable tag: 0.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,11 @@ It may sometimes be necessary to manually synchronize users. Click on the "Manua
 
 
 == Changelog ==
+
+= 0.3.3 =
+
+* Pass CiviCRM contact ID to "civi_wp_member_sync_auto_create_wp_user" filter
+* Allow limitless API queries where needed
 
 = 0.3.2 =
 

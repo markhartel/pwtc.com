@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -79,10 +79,6 @@ function civicrm_api3_contribution_create(&$params) {
     }
   }
   _civicrm_api3_contribution_create_legacy_support_45($params);
-
-  // Make sure tax calculation is handled via api.
-  // @todo this belongs in the BAO NOT the api.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
 
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
@@ -386,8 +382,8 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $input = $ids = $values = array();
-  $passThroughParams = array(
+  $ids = $values = array();
+  $allowedParams = array(
     'receipt_from_email',
     'receipt_from_name',
     'receipt_update',
@@ -396,11 +392,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'receipt_text',
     'payment_processor_id',
   );
-  foreach ($passThroughParams as $key) {
-    if (isset($params[$key])) {
-      $input[$key] = $params[$key];
-    }
-  }
+  $input = array_intersect_key($params, array_flip($allowedParams));
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 
@@ -552,8 +544,9 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
+ * @return array
  *   Api result array.
+ * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
@@ -572,6 +565,10 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
       'A valid original contribution ID is required', 'invalid_data');
   }
   $original_contribution = clone $contribution;
+  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', array(
+    'return' => 'payment_processor_id',
+    'id' => $contribution->contribution_recur_id,
+  ));
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
@@ -629,6 +626,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   }
   if (!empty($params['trxn_date'])) {
     $input['trxn_date'] = $params['trxn_date'];
+  }
+  if (!empty($params['receive_date'])) {
+    $input['receive_date'] = $params['receive_date'];
   }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;

@@ -919,7 +919,16 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 				);
 				
 				if ( ! $refund_item->isEmpty() ) $args['refund_id'] = str_replace('refund-item-', '', $refund_item->product_key);
-				
+
+                if ( ! empty($this->import->options['do_not_send_order_notifications']) ) {
+                    remove_all_actions('woocommerce_order_partially_refunded');
+                    remove_all_actions('woocommerce_order_fully_refunded');
+                    remove_all_actions( 'woocommerce_order_status_refunded_notification' );
+                    remove_all_actions( 'woocommerce_order_partially_refunded_notification' );
+                    remove_action( 'woocommerce_order_status_refunded', array( 'WC_Emails', 'send_transactional_email' ) );
+                    remove_action( 'woocommerce_order_partially_refunded', array( 'WC_Emails', 'send_transactional_email' ) );
+                }
+
 				$refund = wc_create_refund( $args );
 
 				if ( $refund instanceOf WC_Order_Refund )
@@ -1821,7 +1830,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 						foreach ($this->shipping_methods as $shipping_method_slug => $shipping_method) 
 						{
 
-							if ( $shipping_method_slug == strtolower(trim($shipping['class'])) || $shipping_method->method_title == $shipping['class'])
+							if ( $shipping_method_slug == str_replace(" ", "_", strtolower(trim($shipping['class']))) || $shipping_method->method_title == $shipping['class'])
 							{
 								$method = $shipping_method;
 								break;
@@ -1846,7 +1855,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 				{
 					foreach ($this->shipping_methods as $shipping_method_slug => $shipping_method) 
 					{						
-						if ( $shipping_method_slug == strtolower(trim($shipping['class'])) || $shipping_method->method_title == $shipping['class'])
+						if ( $shipping_method_slug == str_replace(" ", "_", strtolower(trim($shipping['class']))) || $shipping_method->method_title == $shipping['class'])
 						{
 							$method = $shipping_method;
 							break;

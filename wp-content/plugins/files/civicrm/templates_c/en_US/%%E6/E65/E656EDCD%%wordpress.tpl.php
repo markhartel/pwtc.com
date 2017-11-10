@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2017-01-19 19:22:41
+<?php /* Smarty version 2.6.27, created on 2017-11-08 12:12:21
          compiled from CRM/common/wordpress.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/common/wordpress.tpl', 1, false),array('block', 'ts', 'CRM/common/wordpress.tpl', 48, false),array('block', 'crmRegion', 'CRM/common/wordpress.tpl', 67, false),array('modifier', 'truncate', 'CRM/common/wordpress.tpl', 30, false),array('function', 'crmNavigationMenu', 'CRM/common/wordpress.tpl', 32, false),)), $this); ?>
@@ -73,8 +73,6 @@ $this->_tpl_vars = $_smarty_tpl_vars;
 unset($_smarty_tpl_vars);
  ?>
   <?php $this->_tag_stack[] = array('crmRegion', array('name' => 'page-body')); $_block_repeat=true;smarty_block_crmRegion($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>
-    <!-- .tpl file invoked: <?php echo $this->_tpl_vars['tplFile']; ?>
-. Call via form.tpl if we have a form in the page. -->
     <?php if (isset ( $this->_tpl_vars['isForm'] ) && $this->_tpl_vars['isForm'] && isset ( $this->_tpl_vars['formTpl'] )): ?>
       <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "CRM/Form/".($this->_tpl_vars['formTpl']).".tpl", 'smarty_include_vars' => array()));

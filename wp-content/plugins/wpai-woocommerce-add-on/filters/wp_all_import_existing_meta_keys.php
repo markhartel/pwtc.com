@@ -13,6 +13,7 @@ function pmwi_wp_all_import_existing_meta_keys( $existing_meta_keys, $custom_typ
         foreach ($existing_meta_keys as $key => $value) {
             if ( in_array($value, $hide_fields) || strpos($value, '_v_') === 0 ) unset($existing_meta_keys[$key]);
         }
+        $existing_meta_keys = array_values($existing_meta_keys);
 	}	
 	return $existing_meta_keys;
 }

@@ -6,7 +6,7 @@
 					<td><?php _e('Name', 'wpai_woocommerce_addon_plugin'); ?></td>
 					<td style="padding-bottom: 5px;">
 						<?php _e('Values', 'wpai_woocommerce_addon_plugin'); ?>
-						<a href="#help" class="wpallimport-help" title="<?php _e('Separate mutiple values with a |', 'wpai_woocommerce_addon_plugin') ?>" style="top:-1px;">?</a>
+						<a href="#help" class="wpallimport-help" title="<?php _e('Separate multiple values with a |', 'wpai_woocommerce_addon_plugin') ?>" style="top:-1px;">?</a>
 					</td>
 					<td></td>
 				</tr>
@@ -27,7 +27,7 @@
 									<input type="hidden" value="<?php echo (empty($post['is_advanced'][$i])) ? '0' : $post['is_advanced'][$i];?>" name="is_advanced[]">
 
 									<span class="default_attribute_settings">
-										<span class='in_variations'>													
+										<span class='in_variations'>
 											<input type="checkbox" name="in_variations[]" id="in_variations_<?php echo $i; ?>" <?php echo ($post['in_variations'][$i]) ? 'checked="checked"' : ''; ?> style="float: left;" value="1"/>
 											<label for="in_variations_<?php echo $i; ?>"><?php _e('In Variations','wpai_woocommerce_addon_plugin');?></label>															
 										</span>

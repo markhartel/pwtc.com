@@ -14,7 +14,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var array $settings_page The reference to the settings page
+	 * @var array $settings_page The reference to the settings page.
 	 */
 	public $settings_page;
 
@@ -23,7 +23,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var array $settings The plugin settings data
+	 * @var array $settings The plugin settings data.
 	 */
 	public $settings = array();
 
@@ -113,7 +113,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @return array $settings The default values for this plugin
+	 * @return array $settings The default values for this plugin.
 	 */
 	public function settings_get_defaults() {
 
@@ -128,6 +128,9 @@ class CiviCRM_Admin_Utilities_Admin {
 
 		// init post types as empty
 		$settings['post_types'] = array();
+
+		// do not add menu to admin bar
+		$settings['admin_bar'] = '0';
 
 		// --<
 		return $settings;
@@ -230,6 +233,9 @@ class CiviCRM_Admin_Utilities_Admin {
 		// styling
 		$this->admin_form_styling_options();
 
+		// admin bar
+		$this->admin_form_admin_bar_options();
+
 		// post types
 		$this->admin_form_post_type_options();
 
@@ -272,7 +278,7 @@ class CiviCRM_Admin_Utilities_Admin {
 
 		// init checkbox
 		$main_site_only = '';
-		if ( $this->setting_get( 'main_site_only' ) == '1' ) $main_site_only = ' checked="checked"';
+		if ( $this->setting_get( 'main_site_only', '0' ) == '1' ) $main_site_only = ' checked="checked"';
 
 		// show sync
 		echo '
@@ -307,13 +313,18 @@ class CiviCRM_Admin_Utilities_Admin {
 
 		// init checkbox
 		$prettify_menu = '';
-		if ( $this->setting_get( 'prettify_menu' ) == '1' ) $prettify_menu = ' checked="checked"';
+		if ( $this->setting_get( 'prettify_menu', '0' ) == '1' ) $prettify_menu = ' checked="checked"';
 
 		// show sync
 		echo '
 		<h3>' . __( 'Style Options', 'civicrm-admin-utilities' ) . '</h3>
 
-		<p>' . __( 'Personally, I find the CiviCRM menu rather cramped andthe second-level menus do not align properly. Also, it does not obscure the underlying WordPress menu entirely. Check this option to apply some styling tweaks that make the menu look a little better.', 'civicrm-admin-utilities' ) . '</p>
+		<p>' . __( 'Checking this option has two effects:', 'civicrm-admin-utilities' ) . '</p>
+
+		<ol>
+			<li>' . __( 'Applies some styling tweaks that make the CiviCRM menu look a little better.', 'civicrm-admin-utilities' ) . '</li>
+			<li>' . __( 'Fixes the appearance of the WordPress Access Control form.', 'civicrm-admin-utilities' ) . '</li>
+		</ol>
 
 		<table class="form-table">
 
@@ -321,7 +332,42 @@ class CiviCRM_Admin_Utilities_Admin {
 				<th scope="row">' . __( 'Prettify CiviCRM', 'civicrm-admin-utilities' ) . '</th>
 				<td>
 					<input type="checkbox" class="settings-checkbox" name="civicrm_admin_utilities_menu" id="civicrm_admin_utilities_menu" value="1"' . $prettify_menu . ' />
-					<label class="civicrm_admin_utilities_settings_label" for="civicrm_admin_utilities_menu">' . __( 'Check this to prettify the CiviCRM menu.', 'civicrm-admin-utilities' ) . '</label>
+					<label class="civicrm_admin_utilities_settings_label" for="civicrm_admin_utilities_menu">' . __( 'Check this to prettify the CiviCRM menu and WordPress Access Control form.', 'civicrm-admin-utilities' ) . '</label>
+				</td>
+			</tr>
+
+		</table>
+
+		<hr>' . "\n\n";
+
+	}
+
+
+
+	/**
+	 * Get admin bar options.
+	 *
+	 * @since 0.1
+	 */
+	public function admin_form_admin_bar_options() {
+
+		// init checkbox
+		$admin_bar = '';
+		if ( $this->setting_get( 'admin_bar', '0' ) == '1' ) $admin_bar = ' checked="checked"';
+
+		// show
+		echo '
+		<h3>' . __( 'Admin Bar Options', 'civicrm-admin-utilities' ) . '</h3>
+
+		<p>' . __( 'Some people find it helpful to have links directly to CiviCRM components available from the WordPress admin bar.', 'civicrm-admin-utilities' ) . '</p>
+
+		<table class="form-table">
+
+			<tr>
+				<th scope="row">' . __( 'Shortcuts Menu', 'civicrm-admin-utilities' ) . '</th>
+				<td>
+					<input type="checkbox" class="settings-checkbox" name="civicrm_admin_utilities_admin_bar" id="civicrm_admin_utilities_admin_bar" value="1"' . $admin_bar . ' />
+					<label class="civicrm_admin_utilities_settings_label" for="civicrm_admin_utilities_admin_bar">' . __( 'Check this to add a CiviCRM Shortcuts Menu to the WordPress admin bar.', 'civicrm-admin-utilities' ) . '</label>
 				</td>
 			</tr>
 
@@ -357,7 +403,7 @@ class CiviCRM_Admin_Utilities_Admin {
 		$options = '';
 
 		// get chosen post types
-		$selected_types = $this->setting_get( 'post_types' );
+		$selected_types = $this->setting_get( 'post_types', array() );
 
 		// sanity check
 		if ( count( $post_types ) > 0 ) {
@@ -407,7 +453,7 @@ class CiviCRM_Admin_Utilities_Admin {
 		echo '
 		<h3>' . __( 'Miscellaneous Utilities', 'civicrm-admin-utilities' ) . '</h3>
 
-		<p>' . __( 'Some useful functions.', 'civicrm-admin-utilities' ) . '</p>
+		<p>' . __( 'Some useful functions and shortcuts to various commonly used CiviCRM admin pages.', 'civicrm-admin-utilities' ) . '</p>
 
 		<table class="form-table">
 
@@ -453,7 +499,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @return string $target_url The URL for the admin form action
+	 * @return string $target_url The URL for the admin form action.
 	 */
 	public function admin_form_url_get() {
 
@@ -501,34 +547,23 @@ class CiviCRM_Admin_Utilities_Admin {
 			$civicrm_admin_utilities_menu = '';
 			$civicrm_admin_utilities_post_types = array();
 			$civicrm_admin_utilities_cache = '';
+			$civicrm_admin_utilities_admin_bar = '';
 
 			// get variables
 			extract( $_POST );
 
 			// did we ask to remove the menu on sub-sites?
 			if ( $civicrm_admin_utilities_main_site == '1' ) {
-
-				// set option
 				$this->setting_set( 'main_site_only', '1' );
-
 			} else {
-
-				// set option
 				$this->setting_set( 'main_site_only', '0' );
-
 			}
 
 			// did we ask to prettify the menu?
 			if ( $civicrm_admin_utilities_menu == '1' ) {
-
-				// set option
 				$this->setting_set( 'prettify_menu', '1' );
-
 			} else {
-
-				// set option
 				$this->setting_set( 'prettify_menu', '0' );
-
 			}
 
 			// which post types are we enabling the CiviCRM button on?
@@ -546,21 +581,22 @@ class CiviCRM_Admin_Utilities_Admin {
 				$this->setting_set( 'post_types', $civicrm_admin_utilities_post_types );
 
 			} else {
-
-				// set option
 				$this->setting_set( 'post_types', array() );
+			}
 
+			// did we ask to add the shortcuts menu to the admin bar?
+			if ( $civicrm_admin_utilities_admin_bar == '1' ) {
+				$this->setting_set( 'admin_bar', '1' );
+			} else {
+				$this->setting_set( 'admin_bar', '0' );
 			}
 
 			// save options
 			$this->settings_save();
 
-			// did we ask to clear cache?
+			// clear caches if asked to
 			if ( $civicrm_admin_utilities_cache == '1' ) {
-
-				// clear them
 				$this->clear_caches();
-
 			}
 
 		}
@@ -574,7 +610,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @return bool True if CiviCRM active, false otherwise
+	 * @return bool True if CiviCRM active, false otherwise.
 	 */
 	public function is_active() {
 
@@ -623,7 +659,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @return bool Success or failure
+	 * @return bool Success or failure.
 	 */
 	public function settings_save() {
 
@@ -639,8 +675,8 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $setting_name The name of the setting
-	 * @return bool Whether or not the setting exists
+	 * @param string $setting_name The name of the setting.
+	 * @return bool Whether or not the setting exists.
 	 */
 	public function setting_exists( $setting_name = '' ) {
 
@@ -661,9 +697,9 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $setting_name The name of the setting
-	 * @param mixed $default The default value if the setting does not exist
-	 * @return mixed The setting or the default
+	 * @param string $setting_name The name of the setting.
+	 * @param mixed $default The default value if the setting does not exist.
+	 * @return mixed The setting or the default.
 	 */
 	public function setting_get( $setting_name = '', $default = false ) {
 
@@ -684,8 +720,8 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $setting_name The name of the setting
-	 * @param mixed $value The value of the setting
+	 * @param string $setting_name The name of the setting.
+	 * @param mixed $value The value of the setting.
 	 */
 	public function setting_set( $setting_name = '', $value = '' ) {
 
@@ -711,7 +747,7 @@ class CiviCRM_Admin_Utilities_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $setting_name The name of the setting
+	 * @param string $setting_name The name of the setting.
 	 */
 	public function setting_delete( $setting_name = '' ) {
 
@@ -749,8 +785,8 @@ class CiviCRM_Admin_Utilities_Admin {
  *
  * @since 0.1
  *
- * @param str $option_name The name of the option
- * @return bool $exists Whether or not the option exists
+ * @param str $option_name The name of the option.
+ * @return bool $exists Whether or not the option exists.
  */
 function civicrm_admin_utilities_site_option_exists( $option_name = '' ) {
 
@@ -775,9 +811,9 @@ function civicrm_admin_utilities_site_option_exists( $option_name = '' ) {
  *
  * @since 0.1
  *
- * @param str $option_name The name of the option
- * @param str $default The default value of the option if it has no value
- * @return mixed $value the value of the option
+ * @param str $option_name The name of the option.
+ * @param str $default The default value of the option if it has no value.
+ * @return mixed $value the value of the option.
  */
 function civicrm_admin_utilities_site_option_get( $option_name = '', $default = false ) {
 
@@ -798,9 +834,9 @@ function civicrm_admin_utilities_site_option_get( $option_name = '', $default = 
  *
  * @since 0.1
  *
- * @param str $option_name The name of the option
- * @param mixed $value The value to set the option to
- * @return bool $success True if the value of the option was successfully saved
+ * @param str $option_name The name of the option.
+ * @param mixed $value The value to set the option to.
+ * @return bool $success True if the value of the option was successfully saved.
  */
 function civicrm_admin_utilities_site_option_set( $option_name = '', $value = '' ) {
 
@@ -821,8 +857,8 @@ function civicrm_admin_utilities_site_option_set( $option_name = '', $value = ''
  *
  * @since 0.1
  *
- * @param str $option_name The name of the option
- * @return bool $success True if the value of the option was successfully deleted
+ * @param str $option_name The name of the option.
+ * @return bool $success True if the value of the option was successfully deleted.
  */
 function civicrm_admin_utilities_site_option_delete( $option_name = '' ) {
 

@@ -1,9 +1,11 @@
 <?php
-/**
- * Template Name: Two Columns
- *
- */
 require_once __DIR__.'/app/bootstrap.php';
+
+// cancel/reschedule ride?
+if(isset($_GET['canceled']) && can_cancel_ride(get_the_ID())) {
+    update_field('is_canceled', (bool) $_GET['canceled']);
+}
+
 // get services
 /** @var \Symfony\Component\DependencyInjection\Container $container */
 /** @var Twig_Environment $twig */
@@ -81,6 +83,8 @@ while ($tok !== false) {
     $tok = strtok(" \n\t\r");
 }
 $data['description'] = $desc2;
+$data['user_can_cancel'] = can_cancel_ride(get_the_ID());
+$data['current_url'] = get_permalink();
 
 // render
 echo $twig->render('ride-details.html.twig', $data);

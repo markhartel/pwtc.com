@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.27, created on 2017-01-19 19:22:41
+<?php /* Smarty version 2.6.27, created on 2017-11-08 12:12:21
          compiled from CRM/Contact/Page/DashBoardDashlet.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/Contact/Page/DashBoardDashlet.tpl', 1, false),array('block', 'ts', 'CRM/Contact/Page/DashBoardDashlet.tpl', 32, false),array('function', 'crmURL', 'CRM/Contact/Page/DashBoardDashlet.tpl', 35, false),array('function', 'help', 'CRM/Contact/Page/DashBoardDashlet.tpl', 51, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/Contact/Page/DashBoardDashlet.tpl', 1, false),array('block', 'ts', 'CRM/Contact/Page/DashBoardDashlet.tpl', 32, false),array('function', 'help', 'CRM/Contact/Page/DashBoardDashlet.tpl', 47, false),)), $this); ?>
 <?php $this->_tag_stack[] = array('crmScope', array('extensionKey' => "")); $_block_repeat=true;smarty_block_crmScope($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?><?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "CRM/common/dashboard.tpl", 'smarty_include_vars' => array()));
 $this->_tpl_vars = $_smarty_tpl_vars;
@@ -14,18 +14,12 @@ unset($_smarty_tpl_vars);
  ?>
 <?php echo $this->_tpl_vars['communityMessages']; ?>
 
-<div class="crm-submit-buttons">
+<div class="crm-submit-buttons crm-dashboard-controls">
 <a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
   <i class="crm-i fa-wrench"></i> <?php $this->_tag_stack[] = array('ts', array()); $_block_repeat=true;smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Configure Your Dashboard<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?>
 </a>
 
-<a style="display:none;" href="<?php echo CRM_Utils_System::crmURL(array('p' => "civicrm/dashboard",'q' => "reset=1"), $this);?>
-" class="button show-done" style="margin-left: 6px;">
-  <span><i class="crm-i fa-check"></i> <?php $this->_tag_stack[] = array('ts', array()); $_block_repeat=true;smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Done<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
-</a>
-
-<a style="float:right;" href="<?php echo CRM_Utils_System::crmURL(array('p' => "civicrm/dashboard",'q' => "reset=1&resetCache=1"), $this);?>
-" class="crm-hover-button show-refresh" style="margin-left: 6px;">
+<a style="float:right;" href="#" class="crm-hover-button show-refresh" style="margin-left: 6px;">
   <i class="crm-i fa-refresh"></i> <?php $this->_tag_stack[] = array('ts', array()); $_block_repeat=true;smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Refresh Dashboard Data<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?>
 </a>
 
@@ -42,7 +36,7 @@ unset($_smarty_tpl_vars);
     </div>
 </div>
 
-<div id="configure-dashlet" class='hiddenElement'></div>
+<div id="configure-dashlet" class='hiddenElement' style="min-height: 20em;"></div>
 <div id="civicrm-dashboard">
     <noscript><?php $this->_tag_stack[] = array('ts', array()); $_block_repeat=true;smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Javascript must be enabled in your browser in order to use the dashboard features.<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo smarty_block_ts($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></noscript>
 </div>
@@ -50,16 +44,17 @@ unset($_smarty_tpl_vars);
 <?php echo '
 <script type="text/javascript">
   CRM.$(function($) {
-    $(\'#crm-dashboard-configure\').click(function() {
-      $.ajax({
-         url: CRM.url(\'civicrm/dashlet\', \'reset=1&snippet=1\'),
-         success: function( content ) {
-           $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
-           $(\'.show-done\').show();
-           $("#configure-dashlet").show().html(content).trigger(\'crmLoad\');
-         }
+    $(\'#crm-dashboard-configure\').click(function(e) {
+      e.preventDefault();
+      $(this).hide();
+      if ($("#empty-message").is(\':visible\')) {
+        $("#empty-message").fadeOut(400);
+      }
+      $("#civicrm-dashboard").fadeOut(400, function() {
+        $(".crm-dashboard-controls").hide();
+        $("#configure-dashlet").fadeIn(400);
       });
-      return false;
+      CRM.loadPage(CRM.url(\'civicrm/dashlet\', \'reset=1\'), {target: $("#configure-dashlet")});
     });
   });
 </script>

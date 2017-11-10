@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -56,7 +56,13 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     CRM_Utils_Hook::pre($hook, 'MembershipPayment', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->copyValues($params);
-    $dao->id = CRM_Utils_Array::value('id', $params);
+    // We check for membership_id in case we are being called too early in the process. This is
+    // cludgey but is part of the deprecation process (ie. we are trying to do everything
+    // from LineItem::create with a view to eventually removing this fn & the table.
+    if (!civicrm_api3('Membership', 'getcount', array('id' => $params['membership_id']))) {
+      return $dao;
+    }
+
     //Fixed for avoiding duplicate entry error when user goes
     //back and forward during payment mode is notify
     if (!$dao->find(TRUE)) {

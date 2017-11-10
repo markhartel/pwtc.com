@@ -101,7 +101,7 @@
                                     {% for event in day.events %}
                                         <li>
                                             <div class="time">{{ event.date | date('g:i') }}<sup>{{ event.date | date('a') }}</sup></div>
-                                            <a href="{{ event.link }}">{{ event.title }}</a>
+                                            <a href="{{ event.link }}" class="{% if event.is_canceled %}canceled{% endif %}">{{ event.title }}</a>
                                         </li>
                                     {% else %}
                                         <li></li>

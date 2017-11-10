@@ -59,6 +59,7 @@ foreach($memberships['values'] as $membership) {
 		}
 	}
 }
+
 // renew
 $data['renew'] = get_field('membership_renewal_link', 'option');
 // use the api to find the households
@@ -72,15 +73,12 @@ if($civi_contact->relationship["data"]) {
 	$result = civicrm_api3('Relationship', 'get', array(
 		'sequential' => 1,
 		'relationship_type_id' => array('IN' => array(6, 7)),
-		'contact_id_a' => array("!=" => $result['values'][0]['contact_id']),
+		'contact_id_a' => array("!=" => $contact_id),
 		'contact_id_b' => array("IN" => $relationships),
 	));
 	// get data on all users in the household
 	if($result['values']) {
 		foreach($result['values'] as $member) {
-		    if($member['relationship_type_id'] == 7) {
-		        $data['is_head'] = true;
-            }
 			$member_result = civicrm_api3('contact', 'get', array(
 				'sequential' => 1,
 				'contact_id' => $member['contact_id_a'],
@@ -93,6 +91,16 @@ if($civi_contact->relationship["data"]) {
 			}
 		}
 	}
+	// check if head of a house
+    $result = civicrm_api3('Relationship', 'get', array(
+        'sequential' => 1,
+        'relationship_type_id' => array('IN' => array(6)),
+        'contact_id_a' => array("==" => $contact_id),
+        'contact_id_b' => array("IN" => $relationships),
+    ));
+	if($result['values']) {
+        $data['is_head'] = true;
+    }
 }
 $data['contact_id'] = $contact_id;
 

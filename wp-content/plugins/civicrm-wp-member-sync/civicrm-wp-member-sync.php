@@ -4,7 +4,7 @@ Plugin Name: CiviCRM WordPress Member Sync
 Plugin URI: https://github.com/christianwach/civicrm-wp-member-sync
 Description: Synchronize CiviCRM memberships with WordPress user roles or capabilities.
 Author: Christian Wach
-Version: 0.3.2
+Version: 0.3.3
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-wp-member-sync
 Domain Path: /languages
@@ -29,7 +29,7 @@ if ( ! defined( 'CIVI_WP_MEMBER_SYNC_CAP_PREFIX' ) ) {
 }
 
 // define plugin version (bumping this will also refresh CSS and JS)
-define( 'CIVI_WP_MEMBER_SYNC_VERSION', '0.3.2' );
+define( 'CIVI_WP_MEMBER_SYNC_VERSION', '0.3.3' );
 
 // store reference to this file
 define( 'CIVI_WP_MEMBER_SYNC_PLUGIN_FILE', __FILE__ );
@@ -66,7 +66,7 @@ class Civi_WP_Member_Sync {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var object $user The users utilities object
+	 * @var object $user The users utilities object.
 	 */
 	public $users;
 
@@ -75,7 +75,7 @@ class Civi_WP_Member_Sync {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var object $schedule The scheduled events utilities object
+	 * @var object $schedule The scheduled events utilities object.
 	 */
 	public $schedule;
 
@@ -84,7 +84,7 @@ class Civi_WP_Member_Sync {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var object $admin The admin utilities object
+	 * @var object $admin The admin utilities object.
 	 */
 	public $admin;
 
@@ -93,7 +93,7 @@ class Civi_WP_Member_Sync {
 	 *
 	 * @since 0.1
 	 * @access public
-	 * @var object $members The membership utilities object
+	 * @var object $members The membership utilities object.
 	 */
 	public $members;
 
@@ -258,7 +258,7 @@ register_deactivation_hook( __FILE__, array( $civi_wp_member_sync, 'deactivate' 
  *
  * @since 0.2.7
  *
- * @return object $civi_wp_member_sync The plugin reference
+ * @return object $civi_wp_member_sync The plugin reference.
  */
 function civicrm_wpms() {
 
@@ -275,9 +275,9 @@ function civicrm_wpms() {
  *
  * @since 0.1
  *
- * @param array $links The existing list of plugin links
- * @param str $file The name of the plugin file
- * @return array $links The amended list of plugin links
+ * @param array $links The existing list of plugin links.
+ * @param str $file The name of the plugin file.
+ * @return array $links The amended list of plugin links.
  */
 function civi_wp_member_sync_plugin_add_settings_link( $links, $file ) {
 

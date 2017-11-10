@@ -25,7 +25,6 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 * 
 	 * @var array
 	 */
-	private $_post_types_obj;
 	private $_post_types;
 
 	/**
@@ -53,9 +52,11 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		add_action('transition_post_status',
 			array($this,'post_ancestry_check'),10,3);
 
-		foreach ($this->post_types() as $post_type) {
-			add_action('wp_ajax_wpca/module/'.$this->id.'-'.$post_type,
-				array($this,'ajax_print_content'));
+		if(is_admin()) {
+			foreach ($this->post_types() as $post_type) {
+				add_action('wp_ajax_wpca/module/'.$this->id.'-'.$post_type,
+					array($this,'ajax_print_content'));
+			}
 		}
 	}
 
@@ -134,25 +135,6 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		}
 
 		return $retval;
-	}
-
-	/**
-	 * Get registered public post types
-	 * Content Aware Sidebars 3.5.2 relies on this
-	 *
-	 * @deprecated 4.0
-	 * @since   1.0
-	 * @return  array
-	 */
-	public function _post_types() {
-		if(!$this->_post_types_obj) {
-			// List public post types
-			$this->_post_types_obj = new WPCAObjectManager();
-			foreach (get_post_types(array('public' => true), 'objects') as $post_type) {
-				$this->_post_types_obj->add($post_type,$post_type->name);
-			}
-		}
-		return $this->_post_types_obj;
 	}
 
 	/**
@@ -384,7 +366,7 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	 */
 	public function post_ancestry_check($new_status, $old_status, $post) {
 		
-		if(!WPCACore::post_types()->has($post->post_type) && $post->post_type != WPCACore::TYPE_CONDITION_GROUP && $post->post_parent) {
+		if(!WPCACore::types()->has($post->post_type) && $post->post_type != WPCACore::TYPE_CONDITION_GROUP && $post->post_parent) {
 
 			$status = array(
 				'publish' => 1,

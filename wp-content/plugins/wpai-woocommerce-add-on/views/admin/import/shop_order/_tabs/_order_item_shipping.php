@@ -96,7 +96,7 @@
 								<div class="switcher-target-order_shipping_class_ROWNUMBER" style="margin-top:10px; display: none;">
 									<span class="wpallimport-slide-content" style="padding-left:0;">
 										<input type="text" class="short rad4" name="pmwi_order[shipping][ROWNUMBER][class_xpath]" value=""/>
-										<a href="#help" class="wpallimport-help" title="<?php _e('Shipping method can be matched by Nmae or ID. If shipping method is not found then no shipping information will be imported.', 'wp_all_import_plugin') ?>" style="position:relative; top:0px;">?</a>	
+										<a href="#help" class="wpallimport-help" title="<?php _e('Shipping method can be matched by Name or ID. If shipping method is not found then no shipping information will be imported.', 'wp_all_import_plugin') ?>" style="position:relative; top:0px;">?</a>	
 									</span>
 								</div>
 							</td>

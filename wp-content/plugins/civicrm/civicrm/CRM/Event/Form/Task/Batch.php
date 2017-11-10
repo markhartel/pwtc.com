@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -95,7 +95,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
-
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
@@ -105,6 +104,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
+    if (array_key_exists('participant_status', $this->_fields)) {
+      $this->assign('statusProfile', 1);
+      $this->assignToTemplate();
+    }
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
@@ -504,12 +507,27 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     }
 
     //complete the contribution.
+    // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
+    // as this method is not preferred / supported.
     $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
 
     return $statusId;
+  }
+
+  /**
+   * Assign the minimal set of variables to the template.
+   */
+  public function assignToTemplate() {
+    $notifyingStatuses = array('Pending from waitlist', 'Pending from approval', 'Expired', 'Cancelled');
+    $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
+    $this->assign('status', TRUE);
+    if (!empty($notifyingStatuses)) {
+      $s = '<em>' . implode('</em>, <em>', $notifyingStatuses) . '</em>';
+      $this->assign('notifyingStatuses', $s);
+    }
   }
 
 }

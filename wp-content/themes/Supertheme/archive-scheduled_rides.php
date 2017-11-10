@@ -191,6 +191,7 @@ while($query->have_posts()) {
         'link' => get_the_permalink(),
         'date' => $datetime->getTimestamp(),
         'time' => $datetime->getTimestamp(),
+        'is_canceled' => get_field('is_canceled'),
     ];
 }
 wp_reset_postdata();

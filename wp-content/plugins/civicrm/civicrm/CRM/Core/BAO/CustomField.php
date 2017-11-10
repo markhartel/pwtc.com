@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -131,7 +131,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static function create(&$params) {
     $origParams = array_merge(array(), $params);
 
-    if (!isset($params['id'])) {
+    $op = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
+
+    if ($op == 'create') {
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
         $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
@@ -211,6 +215,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
         $optionGroup->title = $params['label'];
         $optionGroup->is_active = 1;
+        $optionGroup->data_type = $params['data_type'];
         $optionGroup->save();
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
@@ -290,7 +295,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
-    if (!empty($params['id'])) {
+    if ($op == 'edit') {
       self::createField($customField, 'modify', $indexExist, $triggerRebuild);
     }
     else {
@@ -309,6 +314,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // complete transaction
     $transaction->commit();
+
+    CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
 
@@ -864,6 +871,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
+          if ($field->text_length) {
+            $field->attributes .= ' maxlength=' . $field->text_length;
+            if ($field->text_length < 20) {
+              $field->attributes .= ' size=' . $field->text_length;
+            }
+          }
           $element = $qf->add('text', $elementName, $label,
             $field->attributes,
             $useRequired && !$search
@@ -908,7 +921,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           //CRM-18487 - max date should be the last date of the year.
           'maxDate' => isset($maxYear) ? $maxYear . '-12-31' : NULL,
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
-          'yearRange' => "{$minYear}:{$maxYear}",
         );
         if ($field->is_search_range && $search) {
           $qf->add('datepicker', $elementName . '_from', $label, $attr + array('placeholder' => ts('From')), FALSE, $params);
@@ -1024,6 +1036,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         if ($field->data_type == 'ContactReference') {
+          // break if contact does not have permission to access ContactReference
+          if (!CRM_Core_Permission::check('access contact reference fields')) {
+            break;
+          }
           $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . ' ' : '') . 'crm-form-contact-reference huge';
           $attributes['data-api-entity'] = 'Contact';
           $element = $qf->add('text', $elementName, $label, $attributes, $useRequired && !$search);
@@ -1118,6 +1134,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
+
+    CRM_Utils_Hook::post('delete', 'CustomField', $field->id, $field);
   }
 
   /**
@@ -1256,7 +1274,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field['data_type'] == 'Money' && isset($value)) {
           //$value can also be an array(while using IN operator from search builder or api).
           foreach ((array) $value as $val) {
-            $disp[] = CRM_Utils_Money::format($val);
+            $disp[] = CRM_Utils_Money::format($val, NULL, NULL, TRUE);
           }
           $display = implode(', ', $disp);
         }
@@ -1428,18 +1446,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             'id'
           );
           list($path) = CRM_Core_BAO_File::path($fileID, $entityId, NULL, NULL);
-          list($imageWidth, $imageHeight) = getimagesize($path);
-          list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
           $url = CRM_Utils_System::url('civicrm/file',
             "reset=1&id=$fileID&eid=$contactID",
             $absolute, NULL, TRUE, TRUE
           );
-          $result['file_url'] = "
-          <a href=\"$url\" class='crm-image-popup'>
-          <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
-          </a>";
-          // for non image files
+          $result['file_url'] = CRM_Utils_File::getFileURL($path, $fileType, $url);
         }
+        // for non image files
         else {
           $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
             $fileID,
@@ -1449,7 +1462,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             "reset=1&id=$fileID&eid=$contactID",
             $absolute, NULL, TRUE, TRUE
           );
-          $result['file_url'] = "<a href=\"$url\">{$uri}</a>";
+          $result['file_url'] = CRM_Utils_File::getFileURL($uri, $fileType, $url);
         }
       }
       return $result;

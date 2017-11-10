@@ -448,31 +448,38 @@ class PwtcMileage_DB {
 		return $results;
 	}
 
-	public static function fetch_posts_without_rides() {
+	public static function fetch_posts_without_rides($start="", $end="") {
 		global $wpdb;
-		$ride_table = $wpdb->prefix . self::RIDE_TABLE;
-		$plugin_options = PwtcMileage::get_plugin_options();
-		$thisyear = date('Y', current_time('timestamp'));
-		$lastyear = intval($thisyear) - 1;
-		$lookback_date = '' . $lastyear . '-01-01';
-		if ($plugin_options['ride_lookback_date'] != '') {
-			$option_date = $plugin_options['ride_lookback_date'];
-			if (strtotime($option_date) > strtotime($lookback_date)) {
-				$lookback_date = $option_date;
+		if ($start) {
+			if (!$end) {
+				$end = $start;
 			}
 		}
+		else {
+			$plugin_options = PwtcMileage::get_plugin_options();
+			$thisyear = date('Y', current_time('timestamp'));
+			$lastyear = intval($thisyear) - 1;
+			$start = '' . $lastyear . '-01-01';
+			if ($plugin_options['ride_lookback_date'] != '') {
+				$option_date = $plugin_options['ride_lookback_date'];
+				if (strtotime($option_date) > strtotime($start)) {
+					$start = $option_date;
+				}
+			}
+			$end = date('Y-m-d', current_time('timestamp'));
+		}
+		$ride_table = $wpdb->prefix . self::RIDE_TABLE;
 		$sql_stmt = $wpdb->prepare(
-			'select post_id from ' . $ride_table . ' where post_id <> 0 and date >= %s',
-			$lookback_date);
-
-		$rides = pwtc_mileage_fetch_posts($sql_stmt, $lookback_date);
+			'select post_id from ' . $ride_table . 
+			' where post_id <> 0 and date between %s and %s',
+			$start, $end);
+		$rides = pwtc_mileage_fetch_posted_rides($start, $end, $sql_stmt);
     	$results = array();
 		foreach ($rides as $ride) {
 			$postid = $ride[0];
 			$url = get_permalink(intval($postid));
 			array_push($results, array($ride[0], $ride[1], $ride[2], $url));
 		}
-
 		return $results;
 	}
 
@@ -536,13 +543,22 @@ class PwtcMileage_DB {
 		return $results;
 	}
 
-	public static function rename_ride($rideid, $title) {
-   		global $wpdb;
+	public static function update_ride($rideid, $title, $date, $postid=0) {
+		global $wpdb;
 		$ride_table = $wpdb->prefix . self::RIDE_TABLE;
-		$status = $wpdb->query($wpdb->prepare('update ' . $ride_table . 
-			' set title = %s where ID = %d', $title, $rideid));
-		return $status;
-	}
+	 	$status = $wpdb->query($wpdb->prepare('update ' . $ride_table . 
+			 ' set title = %s, date = %s, post_id = %d where ID = %d', 
+			 $title, $date, $postid, $rideid));
+	 	return $status;
+ 	}
+
+	public static function update_ride_post_id($rideid, $postid) {
+		global $wpdb;
+		$ride_table = $wpdb->prefix . self::RIDE_TABLE;
+	 	$status = $wpdb->query($wpdb->prepare('update ' . $ride_table . 
+			 ' set post_id = %d where ID = %d', $postid, $rideid));
+	 	return $status;
+ 	}
 
 	public static function fetch_ride_mileage($rideid) {
     	global $wpdb;
@@ -556,15 +572,33 @@ class PwtcMileage_DB {
 		return $results;
 	}
 
+	public static function fetch_ride_member_mileage($memberid, $rideid) {
+    	global $wpdb;
+		$mileage_table = $wpdb->prefix . self::MILEAGE_TABLE;
+    	$results = $wpdb->get_results($wpdb->prepare('select member_id, ride_id, mileage' . 
+			' from ' . $mileage_table . ' where ride_id = %d and member_id = %s', 
+			$rideid, $memberid), ARRAY_A);
+		return $results;
+	}		
+
 	public static function fetch_ride_leaders($rideid) {
     	global $wpdb;
 		$leader_table = $wpdb->prefix . self::LEADER_TABLE;
 		$member_table = $wpdb->prefix . self::MEMBER_TABLE;
-    	$results = $wpdb->get_results($wpdb->prepare('select' . 
+		$results = $wpdb->get_results($wpdb->prepare('select' . 
 			' c.member_id, c.first_name, c.last_name' . 
 			' from ' . $member_table . ' as c inner join ' . $leader_table . ' as l' . 
 			' on c.member_id = l.member_id where l.ride_id = %d order by c.last_name, c.first_name', 
 			$rideid), ARRAY_A);
+		return $results;
+	}
+
+	public static function fetch_ride_member_leaders($memberid, $rideid) {
+    	global $wpdb;
+		$leader_table = $wpdb->prefix . self::LEADER_TABLE;
+    	$results = $wpdb->get_results($wpdb->prepare('select member_id, ride_id, rides_led' . 
+			' from ' . $leader_table . ' where ride_id = %d and member_id = %s', 
+			$rideid, $memberid), ARRAY_A);
 		return $results;
 	}
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  */
 
@@ -48,7 +48,7 @@ if (empty($_GET)) {
 }
 else {
   $log->alert('payment_notification PayPal_Standard', $_REQUEST);
-  $paypalIPN = new CRM_Core_Payment_PayPalIPN();
+  $paypalIPN = new CRM_Core_Payment_PayPalIPN($_REQUEST);
   // @todo upgrade standard per Pro
 }
 try {

@@ -46,7 +46,11 @@ class UpcomingRides extends \WP_Widget {
             echo "<ul class='vertical menu'>";
             while ($rides_query->have_posts()) {
                 $rides_query->the_post();
-                echo "<li><a href='" . get_the_permalink() . "'>" . get_the_title() . "</a></li>";
+                $class = "";
+                if(get_field('is_canceled')) {
+                    $class .= 'class="canceled"';
+                }
+                echo "<li><a href='" . get_the_permalink() . "' $class>" . get_the_title() . "</a></li>";
             }
             echo "</ul>";
             echo "<a href='" . site_url('scheduled_rides') . "' class='dark button'>More Rides</a>";

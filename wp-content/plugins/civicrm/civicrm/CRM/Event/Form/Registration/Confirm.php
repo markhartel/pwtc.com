@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -99,9 +99,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $params['discountAmount'] = $this->_params[0]['discountAmount'];
           $params['discountMessage'] = $this->_params[0]['discountMessage'];
         }
-        if (!empty($this->_params[0]['amount_priceset_level_radio'])) {
-          $params['amount_priceset_level_radio'] = $this->_params[0]['amount_priceset_level_radio'];
-        }
+
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
 
@@ -432,6 +430,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = array();
+    $taxAmount = $totalTaxAmount = 0;
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -444,7 +443,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-
+      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      if (CRM_Utils_Array::value('is_primary', $record)) {
+        $taxAmount = &$params[$participantNum]['tax_amount'];
+      }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
         $additonalId = CRM_Utils_Array::value('participant_id', $record);
@@ -453,7 +455,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
-
+    $taxAmount = $totalTaxAmount;
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
@@ -610,7 +612,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution = self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount);
+          $contribution = self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount, $this->_paymentProcessor);
           $value['contributionID'] = $contribution->id;
           $value['contributionTypeID'] = $contribution->financial_type_id;
           $value['receive_date'] = $contribution->receive_date;
@@ -945,7 +947,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public static function processContribution(
     &$form, $params, $result, $contactID,
-    $pending = FALSE, $isAdditionalAmount = FALSE
+    $pending = FALSE, $isAdditionalAmount = FALSE,
+    $paymentProcessor = NULL
   ) {
     $transaction = new CRM_Core_Transaction();
 
@@ -974,8 +977,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
     );
 
-    if (empty($params['is_pay_later'])) {
-      $contribParams['payment_instrument_id'] = 1;
+    if ($paymentProcessor) {
+      $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
     }
 
     if (!$pending && $result) {
@@ -1013,6 +1016,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['id'] = $contribID;
     }
 
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $eventStartDate = CRM_Utils_Array::value(
+        'start_date',
+        CRM_Utils_Array::value(
+          'event',
+          $form->_values
+        )
+      );
+      if ($eventStartDate) {
+        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
+      }
+    }
     //create an contribution address
     // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
     // currently that is only inherited by back-office forms.
@@ -1025,7 +1040,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, CRM_Utils_Array::value('amount_priceset_level_radio', $params, NULL));
+    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     // process soft credit / pcp pages
     if (!empty($params['pcp_made_through_id'])) {
@@ -1265,6 +1280,30 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $form->set('addParticipantProfile', $formattedValues);
       }
     }
+  }
+
+  /**
+   * Submit in test mode.
+   *
+   * @param $params
+   */
+  public static function testSubmit($params) {
+    $form = new CRM_Event_Form_Registration_Confirm();
+    // This way the mocked up controller ignores the session stuff.
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_REQUEST['id'] = $form->_eventId = $params['id'];
+    $form->controller = new CRM_Event_Controller_Registration();
+    $form->_params = $params['params'];
+    $form->_amount = $form->_totalAmount = CRM_Utils_Array::value('totalAmount', $params);
+    $form->set('params', $params['params']);
+    $form->_values['custom_pre_id'] = array();
+    $form->_values['custom_post_id'] = array();
+    $form->_values['event'] = CRM_Utils_Array::value('event', $params);
+    $form->_contributeMode = $params['contributeMode'];
+    $eventParams = array('id' => $params['id']);
+    CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
+    $form->set('registerByID', $params['registerByID']);
+    $form->postProcess();
   }
 
 }

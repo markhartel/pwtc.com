@@ -140,24 +140,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		//process actions
 		$this->process_actions($post_id);
 
-		if ( is_multisite() ) {
-			add_action( 'admin_footer', '_admin_notice_post_locked' );
-		} else {
-			$check_users = get_users( array( 'fields' => 'ID', 'number' => 2 ) );
-			if ( count( $check_users ) > 1 )
-				add_action( 'admin_footer', '_admin_notice_post_locked' );
-			unset( $check_users );
-		}
-
-		wp_enqueue_script('post');
-
-		if ( wp_is_mobile() ) {
-			wp_enqueue_script( 'jquery-touch-punch' );
-		}
-
-		// Add the local autosave notice HTML
-		//add_action( 'admin_footer', '_local_storage_notice' );
-
 		/**
 		 * Edit mode
 		 */
@@ -246,8 +228,9 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function process_actions($post_id) {
 		$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
-		if ( isset( $_POST['deletepost'] ) )
+		if ( isset( $_POST['deletepost'] ) ) {
 			$action = 'delete';
+		}
 
 		if($action && $post_id) {
 			//wp_reset_vars( array( 'action' ) );
@@ -262,9 +245,10 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 				wp_die( __( 'The sidebar no longer exists.', 'content-aware-sidebars' ) );
 			}
 
+			check_admin_referer($action . '-post_' . $post_id);
+
 			switch($action) {
-				case 'editpost':
-					check_admin_referer('update-post_' . $post_id);
+				case 'update':
 
 					$post_id = $this->update_sidebar_type();
 
@@ -303,7 +287,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 					wp_safe_redirect($sendback);
 					exit();
 				case 'trash':
-					check_admin_referer('trash-post_' . $post_id);
 
 					if ( ! current_user_can( 'delete_post', $post_id ) )
 						wp_die( __( 'You are not allowed to move this sidebar to the Trash.', 'content-aware-sidebars' ) );
@@ -326,7 +309,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 						), $sendback ));
 					exit();
 				case 'untrash':
-					check_admin_referer('untrash-post_' . $post_id);
 
 					if ( ! current_user_can( 'delete_post', $post_id ) )
 						wp_die( __( 'You are not allowed to restore this sidebar from the Trash.', 'content-aware-sidebars' ) );
@@ -337,7 +319,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 					wp_safe_redirect( add_query_arg('untrashed', 1, $sendback) );
 					exit();
 				case 'delete':
-					check_admin_referer('delete-post_' . $post_id);
 
 					if ( ! current_user_can( 'delete_post', $post_id ) )
 						wp_die( __( 'You are not allowed to delete this sidebar.', 'content-aware-sidebars' ) );
@@ -369,14 +350,6 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		global $nav_tabs, $post, $title, $active_post_lock;
 
 		$post_type_object = get_post_type_object( $post->post_type );
-
-		$message = false;
-		if ( isset($_GET['message']) ) {
-			$messages = $this->sidebar_updated_messages($post);
-			$_GET['message'] = absint( $_GET['message'] );
-			if ( isset($messages[$_GET['message']]) )
-				$message = $messages[$_GET['message']];
-		}
 
 		$notice = false;
 		$form_extra = '';
@@ -416,18 +389,23 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		echo '<div class="wrap">';
 		echo '<'.$tag.'>';
 		echo esc_html( $title );
-		if ( isset($_REQUEST['sidebar_id']) && current_user_can( $post_type_object->cap->create_posts ) ) {
-			echo ' <a href="' . esc_url( admin_url( 'admin.php?page=wpcas-edit' ) ) . '" class="page-title-action add-new-h2">' . esc_html( $post_type_object->labels->add_new ) . '</a>';
+		if ( isset($_REQUEST['sidebar_id']) ) {
+			if(current_user_can( $post_type_object->cap->create_posts ) ) {
+				echo ' <a href="' . esc_url( admin_url( 'admin.php?page=wpcas-edit' ) ) . '" class="page-title-action add-new-h2">' . esc_html( $post_type_object->labels->add_new ) . '</a>';
+			}
+			if ( current_user_can( 'edit_theme_options' ) ) {
+				echo ' <a href="' . esc_url( admin_url( 'widgets.php#'.CAS_App::SIDEBAR_PREFIX.$post->ID ) ) . '" class="page-title-action add-new-h2">' . __('Manage Widgets','content-aware-sidebars') . '</a>';
+			}
 		}
 		echo '</'.$tag.'>';
-		if ( $message ) {
-			echo '<div id="message" class="updated notice notice-success is-dismissible"><p>'.$message.'</p></div>';
-		} 
+
+		$this->sidebar_updated_messages($post);
+
 		echo '<form name="post" action="admin.php?page=wpcas-edit" method="post" id="post">';
 		$referer = wp_get_referer();
 		wp_nonce_field('update-post_' . $post->ID);
 		echo '<input type="hidden" id="user-id" name="user_ID" value="'.(int)get_current_user_id().'" />';
-		echo '<input type="hidden" id="hiddenaction" name="action" value="editpost" />';
+		echo '<input type="hidden" id="hiddenaction" name="action" value="update" />';
 		echo '<input type="hidden" id="post_author" name="post_author" value="'.esc_attr($post->post_author).'" />';
 		echo '<input type="hidden" id="original_post_status" name="original_post_status" value="'.esc_attr( $post->post_status).'" />';
 		echo '<input type="hidden" id="referredby" name="referredby" value="'.($referer ? esc_url( $referer ) : '').'" />';
@@ -601,11 +579,11 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 * Create update messages
 	 * 
 	 * @param  array  $messages 
-	 * @return array           
+	 * @return array
 	 */
 	public function sidebar_updated_messages($post) {
-		$manage_widgets = sprintf(' <a href="%1$s">%2$s</a>','widgets.php',__('Manage widgets','content-aware-sidebars'));
-		return array(
+		$manage_widgets = sprintf(' <a href="%1$s">%2$s</a>',esc_url( admin_url( 'widgets.php#'.CAS_App::SIDEBAR_PREFIX.$post->ID ) ),__('Manage widgets','content-aware-sidebars'));
+		$messages = array(
 			1 => __('Sidebar updated.','content-aware-sidebars').$manage_widgets,
 			6 => __('Sidebar activated.','content-aware-sidebars').$manage_widgets,
 			9 => sprintf(__('Sidebar scheduled for: <strong>%1$s</strong>.','content-aware-sidebars'),
@@ -613,6 +591,15 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 				date_i18n(__('M j, Y @ G:i'),strtotime($post->post_date))).$manage_widgets,
 			10 => __('Sidebar deactivated.','content-aware-sidebars').$manage_widgets,
 		);
+		$messages = apply_filters('cas/admin/messages',$messages,$post);
+
+		if ( isset($_GET['message']) ) {
+			$_GET['message'] = absint( $_GET['message'] );
+			if ( isset($messages[$_GET['message']]) ) {
+				echo '<div id="message" class="updated notice notice-success is-dismissible"><p>'.$messages[$_GET['message']].'</p></div>';
+			}
+		}
+
 	}
 
 	/**
@@ -721,7 +708,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		);
 		$boxes[] = array(
 			'id'       => 'cas-widget-html',
-			'title'    => __('Layout', 'content-aware-sidebars'),
+			'title'    => __('Styles', 'content-aware-sidebars'),
 			'view'     => 'html',
 			'context'  => 'section-design',
 			'priority' => 'default'
@@ -748,9 +735,16 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			);
 			$boxes[] = array(
 				'id'       => 'cas-schedule',
-				'title'    => __('Time Schedule', 'content-aware-sidebars'),
+				'title'    => __('Time Schedule', 'content-aware-sidebars').' <span class="cas-pro-label">'.__('Pro','content-aware-sidebars').'</span>',
 				'view'     => 'schedule',
 				'context'  => 'section-schedule',
+				'priority' => 'default'
+			);
+			$boxes[] = array(
+				'id'       => 'cas-design',
+				'title'    => __('Design', 'content-aware-sidebars').' <span class="cas-pro-label">'.__('Pro','content-aware-sidebars').'</span>',
+				'view'     => 'design',
+				'context'  => 'section-design',
 				'priority' => 'default'
 			);
 		}
@@ -814,36 +808,19 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 * @return void
 	 */
 	public function meta_box_options($post) {
-
-		$columns = array(
-			'handle',
-			'host',
-			'merge_pos'
+		$this->_form_field('handle');
+		$this->_form_field('host',
+			'js-cas-action js-cas-action-0 js-cas-action-1 js-cas-action-3'
 		);
 
-		foreach ($columns as $key => $value) {
+		echo "<div class='js-cas-action js-cas-action-2'><strong>".__('Shortcode')."</strong><p><input type='text' readonly value='[ca-sidebar id=\"$post->ID\"]' /></p></div>";
 
-			$id = is_numeric($key) ? $value : $key;
+		do_action('cas/sidebar/options',$post);
 
-			echo '<span class="'.$id.'"><strong>' . CAS_App::instance()->manager()->metadata()->get($id)->get_title() . '</strong>';
-			echo '<p>';
-			$values = explode(',', $value);
-			foreach ($values as $val) {
-				$this->_form_field($val);
-			}
-			echo '</p></span>';
-		}
-
-		$visibility = CAS_App::instance()->manager()->metadata()->get('visibility');
-
-		echo '<span>';
-		echo '<strong>'.__('Visibility','content-aware-sidebars').'</strong>';
-		echo '<p><label for="visibility" class="screen-reader-text">'.__('Visibility','content-aware-sidebars').'</label>';
-
-		echo '<div><select style="width:250px;" class="js-cas-visibility" multiple="multiple"  name="visibility[]" data-value="'.implode(",", $visibility->get_data($post->ID,true,false)).'"></select></div>';
-		
-		echo '</p></span>';
-
+		$this->_form_field('merge_pos',
+			'js-cas-action js-cas-action-0 js-cas-action-1'
+		);
+		$this->_form_field('visibility');
 	}
 
 	/**
@@ -868,14 +845,16 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 * @param  array $setting 
 	 * @return void 
 	 */
-	private function _form_field($setting) {
+	private function _form_field($id,$class = '') {
 
-		$setting = CAS_App::instance()->manager()->metadata()->get($setting);
-		$current = $setting->get_data(get_the_ID(),true);
+		$setting = CAS_App::instance()->manager()->metadata()->get($id);
+		$current = $setting->get_data(get_the_ID(),true,$setting->get_input_type() != 'multi');
 
+		echo '<div class="'.$class.'"><strong>' . $setting->get_title() . '</strong>';
+		echo '<p>';
 		switch ($setting->get_input_type()) {
 			case 'select' :
-				echo '<select style="width:250px;" name="' . $setting->get_id() . '">' . "\n";
+				echo '<select style="width:250px;" name="' . $id . '" class="js-cas-'.$id.'">' . "\n";
 				foreach ($setting->get_input_list() as $key => $value) {
 					echo '<option value="' . $key . '"' . selected($current,$key,false) . '>' . $value . '</option>' . "\n";
 				}
@@ -884,15 +863,19 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 			case 'checkbox' :
 				echo '<ul>' . "\n";
 				foreach ($setting->get_input_list() as $key => $value) {
-					echo '<li><label><input type="checkbox" name="' . $setting->get_id() . '[]" value="' . $key . '"' . (in_array($key, $current) ? ' checked="checked"' : '') . ' /> ' . $value . '</label></li>' . "\n";
+					echo '<li><label><input type="checkbox" name="' . $id . '[]" class="js-cas-'.$id.'" value="' . $key . '"' . (in_array($key, $current) ? ' checked="checked"' : '') . ' /> ' . $value . '</label></li>' . "\n";
 				}
 				echo '</ul>' . "\n";
 				break;
+			case 'multi' :
+				echo '<div><select style="width:250px;" class="js-cas-'.$id.'" multiple="multiple"  name="' . $id . '[]" data-value="'.implode(",", $current).'"></select></div>';
+				break;
 			case 'text' :
 			default :
-				echo '<input style="width:200px;" type="text" name="' . $setting->get_id() . '" value="' . $current . '" />' . "\n";
+				echo '<input style="width:200px;" type="text" name="' . $id . '" value="' . $current . '" />' . "\n";
 				break;
 		}
+		echo '</p></div>';
 	}
 		
 	/**
@@ -916,35 +899,10 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
 			return;
 
-		// Update metadata
-		foreach (CAS_App::instance()->manager()->metadata()->get_all() as $field) {
-			$single = $field->get_input_type()!="multi";
-			//$new = isset($_POST[$field->get_id()]) ? $_POST[$field->get_id()] : '';
-			$old = $field->get_data($post_id,false,$single);
-
-			//TODO: package update/delete in meta class
-			if($single) {
-				$new = isset($_POST[$field->get_id()]) ? $_POST[$field->get_id()] : '';
-				if ($new != '' && $new != $old) {
-					$field->update($post_id,$new);
-				} elseif ($new == '' && $old != '') {
-					$field->delete($post_id,$old);
-				}
-			} else {
-				$new = isset($_POST[$field->get_id()]) ? $_POST[$field->get_id()] : array();
-				$old = array_flip($old);
-				foreach ($new as $meta) {
-					if(isset($old[$meta])) {
-						unset($old[$meta]);
-					} else {
-						add_post_meta($post_id, CAS_App::META_PREFIX.$field->get_id(), $meta);
-					}
-				}
-				foreach ($old as $meta => $v) {
-					$field->delete($post_id,$meta);
-				}
-			}
-
+		// Save metadata
+		// todo: wrap this in metadata manager?
+		foreach (CAS_App::instance()->manager()->metadata() as $field) {
+			$field->save($post_id);
 		}
 	}
 
@@ -1032,6 +990,11 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 				$sep = '&amp;';
 			}
 			$link = admin_url('admin.php?page=wpcas-edit'.$sep.'sidebar_id='.$post_id);
+
+			//load page in all languages for wpml
+			if(defined('ICL_SITEPRESS_VERSION') || defined('POLYLANG_VERSION')) {
+				$link .= $sep.'lang=all';
+			}
 		}
 		return $link;
 	}
@@ -1080,14 +1043,32 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function add_scripts_styles() {
 
+		if ( is_multisite() ) {
+			add_action( 'admin_footer', '_admin_notice_post_locked' );
+		} else {
+			$check_users = get_users( array( 'fields' => 'ID', 'number' => 2 ) );
+			if ( count( $check_users ) > 1 ) {
+				add_action( 'admin_footer', '_admin_notice_post_locked' );
+			}
+		}
+
+		wp_enqueue_script('post');
+
+		if ( wp_is_mobile() ) {
+			wp_enqueue_script( 'jquery-touch-punch' );
+		}
+
+		// Add the local autosave notice HTML
+		//add_action( 'admin_footer', '_local_storage_notice' );
+
 		WPCACore::enqueue_scripts_styles('');
 
 		wp_register_script('flatpickr', plugins_url('../js/flatpickr.min.js', __FILE__), array(), '3.0.6', false);
 
-		wp_register_script('cas/admin/edit', plugins_url('../js/cas_admin.min.js', __FILE__), array('jquery','flatpickr'), CAS_App::PLUGIN_VERSION, false);
+		wp_register_script('cas/admin/edit', plugins_url('../js/cas_admin.min.js', __FILE__), array('jquery','flatpickr','wp-color-picker'), CAS_App::PLUGIN_VERSION, false);
 		
-		wp_register_style('flatpickr', plugins_url('../css/flatpickr.dark.min.css', __FILE__), array(), '2.3.4');
-		wp_register_style('cas/admin/style', plugins_url('../css/style.css', __FILE__), array('flatpickr'), CAS_App::PLUGIN_VERSION);
+		wp_register_style('flatpickr', plugins_url('../css/flatpickr.dark.min.css', __FILE__), array(), '3.0.6');
+		wp_register_style('cas/admin/style', plugins_url('../css/style.css', __FILE__), array('flatpickr','wp-color-picker'), CAS_App::PLUGIN_VERSION);
 
 		$visibility = array();
 		foreach (CAS_App::instance()->_manager->metadata()->get('visibility')->get_input_list() as $k => $v) {

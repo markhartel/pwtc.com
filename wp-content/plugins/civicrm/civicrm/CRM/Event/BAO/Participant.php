@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
@@ -757,7 +757,7 @@ GROUP BY  participant.event_id
 
       $participantStatus = array(
         'participant_status' => array(
-          'title' => 'Participant Status',
+          'title' => 'Participant Status (label)',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -765,11 +765,14 @@ GROUP BY  participant.event_id
 
       $participantRole = array(
         'participant_role' => array(
-          'title' => 'Participant Role',
+          'title' => 'Participant Role (label)',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
         ),
       );
+
+      $participantFields['participant_status_id']['title'] .= ' (ID)';
+      $participantFields['participant_role_id']['title'] .= ' (ID)';
 
       $discountFields = CRM_Core_DAO_Discount::export();
 
@@ -800,7 +803,7 @@ FROM   civicrm_participant
    LEFT JOIN civicrm_contact ON (civicrm_participant.contact_id = civicrm_contact.id)
 WHERE  civicrm_participant.id = {$participantId}
 ";
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $details = array();
     while ($dao->fetch()) {
@@ -870,6 +873,11 @@ WHERE  civicrm_participant.id = {$participantId}
    * @return \CRM_Event_DAO_Participant
    */
   public static function deleteParticipant($id) {
+    $participant = new CRM_Event_DAO_Participant();
+    $participant->id = $id;
+    if (!$participant->find()) {
+      return FALSE;
+    }
     CRM_Utils_Hook::pre('delete', 'Participant', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -902,8 +910,6 @@ WHERE  civicrm_participant.id = {$participantId}
       CRM_Core_BAO_Note::del($noteId, FALSE);
     }
 
-    $participant = new CRM_Event_DAO_Participant();
-    $participant->id = $id;
     $participant->delete();
 
     $transaction->commit();
@@ -1037,6 +1043,38 @@ WHERE  civicrm_participant.id = {$participantId}
       $additionalParticipantIds[$dao->id] = $dao->id;
     }
     return $additionalParticipantIds;
+  }
+
+  /**
+   * Get the amount for the undiscounted version of the field.
+   *
+   * Note this function is part of the refactoring process rather than the best approach.
+   *
+   * @param int $eventID
+   * @param int $discountedPriceFieldOptionID
+   * @param string $feeLevel (deprecated)
+   *
+   * @return null|string
+   */
+  public static function getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel) {
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
+    $params = array(
+      1 => array($priceSetId, 'Integer'),
+    );
+    if ($discountedPriceFieldOptionID) {
+      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
+LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
+WHERE cpf.price_set_id = %1 AND cpfv.label = (SELECT label from civicrm_price_field_value WHERE id = %2)";
+      $params[2] = array($discountedPriceFieldOptionID, 'Integer');
+    }
+    else {
+      $feeLevel = current($feeLevel);
+      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
+LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
+WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
+      $params[2] = array($feeLevel, 'String');
+    }
+    return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
   /**
@@ -1789,36 +1827,29 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param array $contributionParams
    *   Contribution params.
    *
-   * @param $feeLevel
-   *
+   * @param string $feeLevel (deprecated)
+   * @param int $discountedPriceFieldOptionID
+   *   ID of the civicrm_price_field_value field for the discount id.
    */
-  public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel) {
-    // CRM-11124
+  public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID) {
+    $financialTypeID = $contributionParams['contribution']->financial_type_id;
+    $total_amount = $contributionParams['total_amount'];
+
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
-      $feeLevel = current($feeLevel);
-      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
-      $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
-LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
-WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
-      $params = array(
-        1 => array($priceSetId, 'Integer'),
-        2 => array($feeLevel, 'String'),
-      );
-      $mainAmount = CRM_Core_DAO::singleValueQuery($query, $params);
+      $mainAmount = self::getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel);
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
-      $contributionParams['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
-        $contributionParams['contribution']->financial_type_id, $relationTypeId);
-      if (!empty($contributionParams['trxnParams']['from_financial_account_id'])) {
-        $contributionParams['trxnParams']['total_amount'] = $mainAmount - $contributionParams['total_amount'];
-        $contributionParams['trxnParams']['payment_processor_id'] = NULL;
-        $contributionParams['trxnParams']['payment_instrument_id'] = NULL;
-        $contributionParams['trxnParams']['check_number'] = NULL;
-        $contributionParams['trxnParams']['trxn_id'] = NULL;
-        $contributionParams['trxnParams']['net_amount'] = NULL;
-        $contributionParams['trxnParams']['fee_amount'] = NULL;
-
-        CRM_Core_BAO_FinancialTrxn::create($contributionParams['trxnParams']);
+      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
+        $financialTypeID, $relationTypeId);
+      if (!empty($transactionParams['trxnParams']['from_financial_account_id'])) {
+        $transactionParams['trxnParams']['total_amount'] = $mainAmount - $total_amount;
+        $transactionParams['trxnParams']['payment_processor_id'] = NULL;
+        $transactionParams['trxnParams']['payment_instrument_id'] = NULL;
+        $transactionParams['trxnParams']['check_number'] = NULL;
+        $transactionParams['trxnParams']['trxn_id'] = NULL;
+        $transactionParams['trxnParams']['net_amount'] = NULL;
+        $transactionParams['trxnParams']['fee_amount'] = NULL;
+        CRM_Core_BAO_FinancialTrxn::create($transactionParams);
       }
     }
   }
@@ -1889,6 +1920,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       $submittedFields = implode(', ', $submittedFieldId);
       $submittedFieldValues = implode(', ', $submittedFieldValueIds);
     }
+    $financialItemsArray = array();
     if (!empty($submittedFields) && !empty($submittedFieldValues)) {
       $updateLineItem = "UPDATE civicrm_line_item li
 INNER JOIN civicrm_financial_item fi
@@ -1906,7 +1938,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
   SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
     FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})
-GROUP BY li.entity_table, li.entity_id, price_field_value_id
+GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
 ";
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'DESC', TRUE);
@@ -1914,7 +1946,6 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
-      $financialItemsArray = array();
       while ($updateFinancialItemInfoDAO->fetch()) {
         $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
         $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
@@ -2004,11 +2035,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // the recordAdjustedAmt code would execute over here
     $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
     if (count($ids) > 1) {
-      $total = 0;
-      foreach ($ids as $val) {
-        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
-      }
-      $updatedAmount = $total;
+      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
       $updatedAmount = $params['amount'];
@@ -2066,6 +2093,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 FROM civicrm_line_item
 WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
     $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    $line = array();
     while ($getUpdatedLineItemsDAO->fetch()) {
       $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }

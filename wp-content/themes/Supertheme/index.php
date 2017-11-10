@@ -67,6 +67,7 @@ while(have_rows('content_rows')) {
                 'link' => get_the_permalink(),
                 'date' => get_field('date'),
                 'time' => get_field('date'),
+                'is_canceled' => get_field('is_canceled'),
             ];
         }
         $data['rides'] = $rides_data;

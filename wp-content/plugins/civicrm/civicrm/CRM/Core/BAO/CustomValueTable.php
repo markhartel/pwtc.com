@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -241,7 +241,7 @@ class CRM_Core_BAO_CustomValueTable {
             $params[$count] = array($entityID, 'Integer');
             $count++;
 
-            $fieldNames = implode(',', array_keys($set));
+            $fieldNames = implode(',', CRM_Utils_Type::escapeAll(array_keys($set), 'MysqlColumnNameOrAlias'));
             $fieldValues = implode(',', array_values($set));
             $query = "$sqlOP ( $fieldNames ) VALUES ( $fieldValues )";
             // for multiple values we dont do on duplicate key update
@@ -468,8 +468,17 @@ AND    $cond
       $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
-    $result = array();
+    $result = $sortedResult = array();
     foreach ($select as $tableName => $clauses) {
+      if (!empty($DTparams['sort'])) {
+        $query = CRM_Core_DAO::executeQuery("SELECT id FROM {$tableName} WHERE entity_id = {$entityID}");
+        $count = 1;
+        while ($query->fetch()) {
+          $sortedResult["{$query->id}"] = $count;
+          $count++;
+        }
+      }
+
       $query = "SELECT SQL_CALC_FOUND_ROWS id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
       if (!empty($DTparams)) {
@@ -491,6 +500,9 @@ AND    $cond
           }
         }
       }
+    }
+    if (!empty($sortedResult)) {
+      $result['sortedResult'] = $sortedResult;
     }
     return $result;
   }

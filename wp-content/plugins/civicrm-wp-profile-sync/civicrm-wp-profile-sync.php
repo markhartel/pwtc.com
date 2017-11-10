@@ -4,7 +4,7 @@ Plugin Name: CiviCRM WordPress Profile Sync
 Plugin URI: https://github.com/christianwach/civicrm-wp-profile-sync
 Description: Keeps a WordPress User profile in sync with CiviCRM Contact info
 Author: Christian Wach
-Version: 0.2.5
+Version: 0.2.6
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-wp-profile-sync
 Domain Path: /languages
@@ -14,14 +14,18 @@ Depends: CiviCRM
 
 
 
+// set plugin version here
+define( 'CIVICRM_WP_PROFILE_SYNC_VERSION', '0.2.6' );
+
 // set our debug flag here
-define( 'CIVICRM_WP_PROFILE_SYNC_DEBUG', false );
+if ( ! defined( 'CIVICRM_WP_PROFILE_SYNC_DEBUG' ) ) {
+	define( 'CIVICRM_WP_PROFILE_SYNC_DEBUG', false );
+}
 
 // set our bulk operations flag here
-define( 'CIVICRM_WP_PROFILE_SYNC_BULK', false );
-
-// set our version here
-define( 'CIVICRM_WP_PROFILE_SYNC_VERSION', '0.2.5' );
+if ( ! defined( 'CIVICRM_WP_PROFILE_SYNC_BULK' ) ) {
+	define( 'CIVICRM_WP_PROFILE_SYNC_BULK', false );
+}
 
 // store reference to this file
 if ( ! defined( 'CIVICRM_WP_PROFILE_SYNC_FILE' ) ) {
@@ -102,30 +106,18 @@ class CiviCRM_WP_Profile_Sync {
 
 
 	/**
-	 * Load translation if present.
+	 * Enable translation.
 	 *
 	 * @since 0.1
 	 */
 	public function translation() {
 
-		// only use, if we have it...
-		if ( function_exists( 'load_plugin_textdomain' ) ) {
-
-			// there are no translations as yet, but they can now be added
-			load_plugin_textdomain(
-
-				// unique name
-				'civicrm-wp-profile-sync',
-
-				// deprecated argument
-				false,
-
-				// relative path to directory containing translation files
-				dirname( plugin_basename( CIVICRM_WP_PROFILE_SYNC_FILE ) ) . '/languages/'
-
-			);
-
-		}
+		// load translations
+		load_plugin_textdomain(
+			'civicrm-wp-profile-sync', // unique name
+			false, // deprecated argument
+			dirname( plugin_basename( CIVICRM_WP_PROFILE_SYNC_FILE ) ) . '/languages/' // relative path to files
+		);
 
 	}
 
@@ -140,7 +132,7 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param object $config The CiviCRM config object
+	 * @param object $config The CiviCRM config object.
 	 */
 	public function register_php_directory( &$config ) {
 
@@ -163,7 +155,7 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param object $config The CiviCRM config object
+	 * @param object $config The CiviCRM config object.
 	 */
 	public function register_template_directory( &$config ) {
 
@@ -192,24 +184,13 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param str $object_name The CiviCRM object type
-	 * @param array $tasks The CiviCRM tasks array to add our option to
+	 * @param str $object_name The CiviCRM object type.
+	 * @param array $tasks The CiviCRM tasks array to add our option to.
 	 */
 	public function civi_bulk_operations( $object_name, &$tasks ) {
 
 		// only handle contacts
 		if ( $object_name != 'contact' ) return;
-
-		/*
-		// sort by key for clarity
-		ksort( $tasks );
-
-		// debug
-		print_r( array(
-			'object_name' => $object_name,
-			'tasks' => $tasks,
-		) ); die();
-		*/
 
 		// add our item to the tasks array
 		$tasks[] = array(
@@ -230,9 +211,9 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param integer $user_id The numeric ID of the WordPress user
-	 * @param array $posted_field_ids The array of numeric IDs of the BuddyPress fields
-	 * @param boolean $errors True if there are errors, false otherwise
+	 * @param integer $user_id The numeric ID of the WordPress user.
+	 * @param array $posted_field_ids The array of numeric IDs of the BuddyPress fields.
+	 * @param boolean $errors True if there are errors, false otherwise.
 	 */
 	public function buddypress_contact_updated( $user_id = 0, $posted_field_ids, $errors ) {
 
@@ -268,7 +249,7 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param integer $user_id The numeric ID of the WordPress user
+	 * @param integer $user_id The numeric ID of the WordPress user.
 	 */
 	public function wordpress_contact_updated( $user_id ) {
 
@@ -303,6 +284,13 @@ class CiviCRM_WP_Profile_Sync {
 				'Individual' // contact type
 			);
 
+			// bail if we don't get one for some reason
+			if ( ! isset( $civi_contact->contact_id ) ) {
+				$this->_add_hooks_bp();
+				$this->_add_hooks_civi();
+				return;
+			}
+
 			// update first name and last name
 			$this->_update_civi_name( $user, $civi_contact );
 
@@ -319,8 +307,8 @@ class CiviCRM_WP_Profile_Sync {
 			 *
 			 * @since 0.2.4
 			 *
-			 * @param WP_User $user The WordPress user object
-			 * @param array $civi_contact The array of CiviCRM contact data
+			 * @param WP_User $user The WordPress user object.
+			 * @param array $civi_contact The array of CiviCRM contact data.
 			 */
 			 do_action( 'civicrm_wp_profile_sync_wp_user_sync', $user, $civi_contact );
 
@@ -333,8 +321,8 @@ class CiviCRM_WP_Profile_Sync {
 			 *
 			 * @since 0.2.4
 			 *
-			 * @param WP_User $user The WordPress user object
-			 * @param array $civi_contact The array of CiviCRM contact data
+			 * @param WP_User $user The WordPress user object.
+			 * @param array $civi_contact The array of CiviCRM contact data.
 			 */
 			 do_action( 'civicrm_wp_profile_sync_wp_user_synced', $user, $civi_contact );
 
@@ -357,10 +345,10 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $op The type of database operation
-	 * @param string $objectName The type of object
-	 * @param integer $objectId The ID of the object
-	 * @param object $objectRef The object
+	 * @param string $op The type of database operation.
+	 * @param string $objectName The type of object.
+	 * @param integer $objectId The ID of the object.
+	 * @param object $objectRef The object.
 	 */
 	public function civi_contact_pre_update( $op, $objectName, $objectId, $objectRef ) {
 
@@ -391,10 +379,10 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $op The type of database operation
-	 * @param string $objectName The type of object
-	 * @param integer $objectId The ID of the object
-	 * @param object $objectRef The object
+	 * @param string $op The type of database operation.
+	 * @param string $objectName The type of object.
+	 * @param integer $objectId The ID of the object.
+	 * @param object $objectRef The object.
 	 */
 	public function civi_primary_email_pre_update( $op, $objectName, $objectId, $objectRef ) {
 
@@ -428,10 +416,10 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $op The type of database operation
-	 * @param string $objectName The type of object
-	 * @param integer $objectId The ID of the object
-	 * @param object $objectRef The object
+	 * @param string $op The type of database operation.
+	 * @param string $objectName The type of object.
+	 * @param integer $objectId The ID of the object.
+	 * @param object $objectRef The object.
 	 */
 	public function civi_website_pre_update( $op, $objectName, $objectId, $objectRef ) {
 
@@ -488,9 +476,9 @@ class CiviCRM_WP_Profile_Sync {
 		 *
 		 * @since 0.2.4
 		 *
-		 * @param integer $user_id The ID of the WordPress user
-		 * @param integer $objectId The ID of the CiviCRM contact
-		 * @param object $objectRef The CiviCRM contact object
+		 * @param integer $user_id The ID of the WordPress user.
+		 * @param integer $objectId The ID of the CiviCRM contact.
+		 * @param object $objectRef The CiviCRM contact object.
 		 */
 		 do_action( 'civicrm_wp_profile_sync_website_synced', $user_id, $objectId, $objectRef );
 
@@ -507,10 +495,10 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $op The type of database operation
-	 * @param string $objectName The type of object
-	 * @param integer $objectId The ID of the object
-	 * @param object $objectRef The object
+	 * @param string $op The type of database operation.
+	 * @param string $objectName The type of object.
+	 * @param integer $objectId The ID of the object.
+	 * @param object $objectRef The object.
 	 */
 	public function civi_contact_updated( $op, $objectName, $objectId, $objectRef ) {
 
@@ -592,9 +580,9 @@ class CiviCRM_WP_Profile_Sync {
 		 *
 		 * @since 0.2.4
 		 *
-		 * @param integer $objectId The ID of the CiviCRM contact
-		 * @param object $objectRef The CiviCRM contact object
-		 * @param integer $user_id The ID of the WordPress user
+		 * @param integer $objectId The ID of the CiviCRM contact.
+		 * @param object $objectRef The CiviCRM contact object.
+		 * @param integer $user_id The ID of the WordPress user.
 		 */
 		 do_action( 'civicrm_wp_profile_sync_civi_contact_synced', $objectId, $objectRef, $user_id );
 
@@ -745,8 +733,8 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param object $user The WP user object
-	 * @param object $civi_contact The Civi Contact object
+	 * @param object $user The WP user object.
+	 * @param object $civi_contact The Civi Contact object.
 	 */
 	private function _update_civi_name( $user, $civi_contact ) {
 
@@ -770,8 +758,8 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param object $user The WP user object
-	 * @param object $civi_contact The Civi Contact object
+	 * @param object $user The WP user object.
+	 * @param object $civi_contact The Civi Contact object.
 	 */
 	private function _update_civi_primary_email( $user, $civi_contact ) {
 
@@ -816,8 +804,8 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param object $user The WP user object
-	 * @param object $civi_contact The Civi Contact object
+	 * @param object $user The WP user object.
+	 * @param object $civi_contact The Civi Contact object.
 	 */
 	private function _update_civi_website( $user, $civi_contact ) {
 
@@ -894,8 +882,7 @@ class CiviCRM_WP_Profile_Sync {
 	 *
 	 * @since 0.1
 	 *
-	 * @param array $msg
-	 * @return string
+	 * @param array $msg The message to log.
 	 */
 	private function _debug( $msg ) {
 
