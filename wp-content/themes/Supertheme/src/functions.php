@@ -10,7 +10,7 @@ add_action('wp_enqueue_scripts', function() use($container) {
     // styles
     if($container->hasParameter('wordpress.styles')) {
         foreach ($container->getParameter('wordpress.styles') as $args) {
-            wp_register_style($args['id'], $container->getParameterBag()->resolveValue($args['source']), $args['deps'], false, 'all');
+            wp_register_style($args['id'], $container->getParameterBag()->resolveValue($args['source']), $args['deps'], $args['version'], 'all');
             wp_enqueue_style($args['id']);
         }
     }
@@ -18,7 +18,7 @@ add_action('wp_enqueue_scripts', function() use($container) {
     // config
     if($container->hasParameter('wordpress.scripts')) {
         foreach ($container->getParameter('wordpress.scripts') as $args) {
-            wp_register_script($args['id'], $container->getParameterBag()->resolveValue($args['source']), $args['deps'], false, $args['header']);
+            wp_register_script($args['id'], $container->getParameterBag()->resolveValue($args['source']), $args['deps'], $args['version'], $args['header']);
             wp_enqueue_script($args['id']);
         }
     }
