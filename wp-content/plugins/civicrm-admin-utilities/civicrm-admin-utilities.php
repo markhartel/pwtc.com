@@ -4,7 +4,7 @@ Plugin Name: CiviCRM Admin Utilities
 Plugin URI: https://github.com/christianwach/civicrm-admin-utilities
 Description: Custom code to modify CiviCRM's behaviour.
 Author: Christian Wach
-Version: 0.3
+Version: 0.3.2
 Author URI: http://haystack.co.uk
 Text Domain: civicrm-admin-utilities
 Domain Path: /languages
@@ -15,7 +15,7 @@ Depends: CiviCRM
 
 
 // set our version here
-define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.3' );
+define( 'CIVICRM_ADMIN_UTILITIES_VERSION', '0.3.2' );
 
 // trigger logging of 'civicrm_pre' and 'civicrm_post'
 if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_DEBUG' ) ) {
@@ -23,16 +23,16 @@ if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_DEBUG' ) ) {
 }
 
 // store reference to this file
-if ( !defined( 'CIVICRM_ADMIN_UTILITIES_FILE' ) ) {
+if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_FILE' ) ) {
 	define( 'CIVICRM_ADMIN_UTILITIES_FILE', __FILE__ );
 }
 
 // store URL to this plugin's directory
-if ( !defined( 'CIVICRM_ADMIN_UTILITIES_URL' ) ) {
+if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_URL' ) ) {
 	define( 'CIVICRM_ADMIN_UTILITIES_URL', plugin_dir_url( CIVICRM_ADMIN_UTILITIES_FILE ) );
 }
 // store PATH to this plugin's directory
-if ( !defined( 'CIVICRM_ADMIN_UTILITIES_PATH' ) ) {
+if ( ! defined( 'CIVICRM_ADMIN_UTILITIES_PATH' ) ) {
 	define( 'CIVICRM_ADMIN_UTILITIES_PATH', plugin_dir_path( CIVICRM_ADMIN_UTILITIES_FILE ) );
 }
 
@@ -116,18 +116,11 @@ class CiviCRM_Admin_Utilities {
 	 */
 	public function enable_translation() {
 
-		// there are no translations as yet, here for completeness
+		// enable translation
 		load_plugin_textdomain(
-
-			// unique name
-			'civicrm-admin-utilities',
-
-			// deprecated argument
-			false,
-
-			// relative path to directory containing translation files
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-
+			'civicrm-admin-utilities', // unique name
+			false, // deprecated argument
+			dirname( plugin_basename( __FILE__ ) ) . '/languages/' // relative path to files
 		);
 
 	}
@@ -151,8 +144,8 @@ class CiviCRM_Admin_Utilities {
 		// kill CiviCRM shortcode button
 		add_action( 'admin_head', array( $this, 'kill_civi_button' ) );
 
-		// allow plugins to register php and template directories
-		add_action( 'civicrm_config', array( $this, 'register_directories' ), 10, 1 );
+		// register template directory for menu amends
+		add_action( 'civicrm_config', array( $this, 'register_menu_directory' ), 10, 1 );
 
 		// run after the CiviCRM menu hook has been registered
 		add_action( 'init', array( $this, 'civicrm_only_on_main_site_please' ) );
@@ -164,6 +157,7 @@ class CiviCRM_Admin_Utilities {
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_add' ), 2000 );
 
 		// filter the WordPress Permissions Form
+		add_action( 'civicrm_config', array( $this, 'register_access_directory' ), 10, 1 );
 		add_action( 'civicrm_buildForm', array( $this, 'fix_permissions_form' ), 10, 2 );
 
 		// if the debugging flag is set
@@ -181,25 +175,60 @@ class CiviCRM_Admin_Utilities {
 
 
 	/**
-	 * Register directories that CiviCRM searches for php and template files.
+	 * Register directory that CiviCRM searches for the menu template file.
 	 *
-	 * @since 0.1
+	 * @since 0.3.2
 	 *
 	 * @param object $config The CiviCRM config object.
 	 */
-	public function register_directories( &$config ) {
+	public function register_menu_directory( &$config ) {
 
 		// bail if disabled
 		if ( $this->admin->setting_get( 'prettify_menu', '0' ) == '0' ) return;
-
-		// define our custom path
-		$custom_path = CIVICRM_ADMIN_UTILITIES_PATH . 'civicrm_custom_templates';
 
 		// kick out if no CiviCRM
 		if ( ! $this->admin->is_active() ) return;
 
 		// get template instance
 		$template = CRM_Core_Smarty::singleton();
+
+		// define our custom path
+		$custom_path = CIVICRM_ADMIN_UTILITIES_PATH . 'civicrm_custom_templates';
+
+		// add our custom template directory
+		$template->addTemplateDir( $custom_path );
+
+		// register template directories
+		$template_include_path = $custom_path . PATH_SEPARATOR . get_include_path();
+		set_include_path( $template_include_path );
+
+	}
+
+
+
+	/**
+	 * Register directory that CiviCRM searches for the WordPress Access Control template file.
+	 *
+	 * @since 0.3.2
+	 *
+	 * @param object $config The CiviCRM config object.
+	 */
+	public function register_access_directory( &$config ) {
+
+		// bail if disabled
+		if ( $this->admin->setting_get( 'prettify_access', '0' ) == '0' ) return;
+
+		// kick out if no CiviCRM
+		if ( ! $this->admin->is_active() ) return;
+
+		// TODO: bail if CiviCRM has been fixed
+		//if ( $this->admin->access_form_fixed() ) return;
+
+		// get template instance
+		$template = CRM_Core_Smarty::singleton();
+
+		// define our custom path
+		$custom_path = CIVICRM_ADMIN_UTILITIES_PATH . 'civicrm_access_templates';
 
 		// add our custom template directory
 		$template->addTemplateDir( $custom_path );
@@ -307,7 +336,7 @@ class CiviCRM_Admin_Utilities {
 			remove_action( 'admin_footer', array( $civi->modal, 'add_form_button_html' ) );
 
 			// also remove core resources
-		    remove_action( 'admin_head', array( $civi, 'wp_head' ), 50 );
+			remove_action( 'admin_head', array( $civi, 'wp_head' ), 50 );
 			remove_action( 'load-post.php', array( $civi->modal, 'add_core_resources' ) );
 			remove_action( 'load-post-new.php', array( $civi->modal, 'add_core_resources' ) );
 			remove_action( 'load-page.php', array( $civi->modal, 'add_core_resources' ) );
@@ -451,11 +480,19 @@ class CiviCRM_Admin_Utilities {
 			'href' => $this->get_link( 'civicrm/contact/search/advanced', 'reset=1' ),
 		) );
 
+		// groups
+		$wp_admin_bar->add_menu( array(
+			'id' => 'cau-3',
+			'parent' => $id,
+			'title' => __( 'Manage Groups', 'civicrm-admin-utilities' ),
+			'href' => $this->get_link( 'civicrm/group', 'reset=1' ),
+		) );
+
 		// contributions
 		if ( array_key_exists( 'CiviContribute', $components ) ) {
 			if ( $this->check_permission( 'access CiviContribute' ) ) {
 				$wp_admin_bar->add_menu( array(
-					'id' => 'cau-3',
+					'id' => 'cau-4',
 					'parent' => $id,
 					'title' => __( 'Contribution Dashboard', 'civicrm-admin-utilities' ),
 					'href' => $this->get_link( 'civicrm/contribute', 'reset=1' ),
@@ -467,7 +504,7 @@ class CiviCRM_Admin_Utilities {
 		if ( array_key_exists( 'CiviMember', $components ) ) {
 			if ( $this->check_permission( 'access CiviMember' ) ) {
 				$wp_admin_bar->add_menu( array(
-					'id' => 'cau-4',
+					'id' => 'cau-5',
 					'parent' => $id,
 					'title' => __( 'Membership Dashboard', 'civicrm-admin-utilities' ),
 					'href' => $this->get_link( 'civicrm/member', 'reset=1' ),
@@ -479,7 +516,7 @@ class CiviCRM_Admin_Utilities {
 		if ( array_key_exists( 'CiviEvent', $components ) ) {
 			if ( $this->check_permission( 'access CiviEvent' ) ) {
 				$wp_admin_bar->add_menu( array(
-					'id' => 'cau-5',
+					'id' => 'cau-6',
 					'parent' => $id,
 					'title' => __( 'Events Dashboard', 'civicrm-admin-utilities' ),
 					'href' => $this->get_link( 'civicrm/event', 'reset=1' ),
@@ -491,10 +528,22 @@ class CiviCRM_Admin_Utilities {
 		if ( array_key_exists( 'CiviMail', $components ) ) {
 			if ( $this->check_permission( 'access CiviMail' ) ) {
 				$wp_admin_bar->add_menu( array(
-					'id' => 'cau-6',
+					'id' => 'cau-7',
 					'parent' => $id,
 					'title' => __( 'Mailings Sent and Scheduled', 'civicrm-admin-utilities' ),
 					'href' => $this->get_link( 'civicrm/mailing/browse/scheduled', 'reset=1&scheduled=true' ),
+				) );
+			}
+		}
+
+		// reports
+		if ( array_key_exists( 'CiviReport', $components ) ) {
+			if ( $this->check_permission( 'access CiviReport' ) ) {
+				$wp_admin_bar->add_menu( array(
+					'id'     => 'cau-8',
+					'parent' => $id,
+					'title'  => __( 'Report Listing', 'civicrm-admin-utilities' ),
+					'href'   => $this->get_link( 'civicrm/report/list', '&reset=1' ),
 				) );
 			}
 		}
@@ -503,7 +552,7 @@ class CiviCRM_Admin_Utilities {
 		if ( array_key_exists( 'CiviCase', $components ) ) {
 			if ( CRM_Case_BAO_Case::accessCiviCase() ) {
 				$wp_admin_bar->add_menu( array(
-					'id' => 'cau-7',
+					'id' => 'cau-9',
 					'parent' => $id,
 					'title' => __( 'Cases Dashboard', 'civicrm-admin-utilities' ),
 					'href' => $this->get_link( 'civicrm/case', 'reset=1' ),
@@ -514,7 +563,7 @@ class CiviCRM_Admin_Utilities {
 		// admin console
 		if ( $this->check_permission( 'administer CiviCRM' ) ) {
 			$wp_admin_bar->add_menu( array(
-				'id' => 'cau-8',
+				'id' => 'cau-10',
 				'parent' => $id,
 				'title' => __( 'Admin Console', 'civicrm-admin-utilities' ),
 				'href' => $this->get_link( 'civicrm/admin', 'reset=1' ),
@@ -620,26 +669,39 @@ class CiviCRM_Admin_Utilities {
 	 */
 	public function fix_permissions_form( $formName, &$form ) {
 
+		// bail if disabled
+		if ( $this->admin->setting_get( 'prettify_access', '0' ) == '0' ) return;
+
 		// bail if not the form we want
 		if ( $formName != 'CRM_ACL_Form_WordPress_Permissions' ) return;
 
 		// get vars
 		$vars = $form->get_template_vars();
 
+		// bail if $permDesc does not exist
+		if ( ! isset( $vars['permDesc'] ) ) return;
+
+		// build replacement for permDesc array
+		foreach( $vars['rolePerms'] AS $role => $perms ) {
+			foreach( $perms AS $name => $title ) {
+				$permissions[$name] = $title;
+			}
+		}
+
 		// build array keyed by permission
 		$table = array();
-		foreach( $vars['permDesc'] AS $perm => $desc ) {
+		foreach( $permissions AS $perm => $label ) {
 
 			// init row with permission description
 			$table[$perm] = array(
-				'desc' => $desc,
+				'label' => $label,
 				'roles' => array(),
 			);
 
 			// add permission label and role names
 			foreach( $vars['roles'] AS $key => $label ) {
-				if ( isset( $vars['rolePerms'][$key][$perm] ) ) {
-					$table[$perm]['label'] = $vars['rolePerms'][$key][$perm];
+				if ( isset( $vars['permDesc'][$perm] ) ) {
+					$table[$perm]['desc'] = $vars['permDesc'][$perm];
 				}
 				$table[$perm]['roles'][] = $key;
 			}
@@ -650,7 +712,7 @@ class CiviCRM_Admin_Utilities {
 		$form->assign( 'table', $table );
 
 		// camelcase dammit
-		CRM_Utils_System::setTitle(  __( 'WordPress Access Control', 'civicrm-admin-utilities' )  );
+		CRM_Utils_System::setTitle( __( 'WordPress Access Control', 'civicrm-admin-utilities' ) );
 
 	}
 

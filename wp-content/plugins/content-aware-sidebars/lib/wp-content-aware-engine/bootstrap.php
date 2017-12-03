@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
  * Version of this WPCA
  * @var string
  */
-$this_wpca_version = '4.2';
+$this_wpca_version = '4.2.1';
 
 /**
  * Class to make sure the latest
@@ -84,7 +84,8 @@ if(!class_exists('WPCALoader')) {
 		}
 
 	}
-	add_action('plugins_loaded',array('WPCALoader','load'),-1);
+	//Hook as early as possible after plugins are loaded
+	add_action('plugins_loaded',array('WPCALoader','load'),-999999);
 }
 WPCALoader::add(plugin_dir_path( __FILE__ ),$this_wpca_version);
 

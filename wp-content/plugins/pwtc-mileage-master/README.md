@@ -43,6 +43,8 @@ Available operations are:
 - Consolidate all club rides older than two years to single entry
 - Export mileage database to CSV files
 - Restore mileage database from exported CSV files
+### User Guide
+This menu page allows a user to view the user guide for the mileage database.
 ### Settings
 This menu page allows a user to adjust the settings of this plugin. It is only
 available to users with the **administrator** role and is located under the **Settings** 
@@ -112,33 +114,6 @@ Argument|Description|Values|Default
 caption|show the table caption|on, off|on
 
 `[pwtc_riderid_download]` *enables download of logged-in user's rider ID card*
-
-## How do I...
-
-### enter mileage from a rider signup sheet into the mileage database?
-
-1. The statistician logs in to the _pwtc.com_ website.
-1. Navigates to the administrator menus page. 
-1. Selects the _Create Ride Sheets_ option under the _Rider Mileage_ submenu.
-1. A page displays that shows a table of all the posted rides that are without ride sheets.
-1. Finds the appropriate ride based on the rider signup sheet's name and date.
-1. Selects the _Create_ link in the _Action_ column of the ride's table row.
-1. Selects _OK_ when the confirmation dialog pops up.
-1. A page displays that is the ride sheet leader and mileage entry form.
-1. more...
-
-### amended a rider's mileage for a ride in the mileage database?
-
-1. The statistician logs in to the _pwtc.com_ website.
-1. Navigates to the administrator menus page. 
-1. Selects the _Manage Ride Sheets_ option under the _Rider Mileage_ submenu.
-1. A page displays that shows a search form for existing ride sheets.
-1. Selects the _From Date_ field and choose the ride's date from the popup calendar.
-1. A table displays that shows all the existing ride sheets for that day.
-1. Finds the appropriate ride sheet based on the information given by the rider.
-1. Selects the _Edit_ link in the _Action_ column of the ride sheet's table row.
-1. A page displays that is the ride sheet leader and mileage entry form.
-1. more...
 
 ## Rider Mileage Database Schema
 The following MySQL database tables and views are created by this plugin.
@@ -215,6 +190,7 @@ The following views are used to generate rider mileage and leader reports:
 - `admin-man-riders.php` *client-side logic for Manage Riders admin page*
 - `admin-man-ridesheets.php` *client-side logic for Manage Ride Sheets admin page*
 - `admin-man-yearend.php` *client-side logic for Database Ops admin page*
+- `admin-user-guide.php` *client-side logic for User Guide admin page*
 - `admin-man-settings.php` *client-side logic for Settings admin page*
 - `admin-rider-lookup.php` *client-side logic for rider lookup dialog*
 - `admin-scripts.js` *javascript utility functions for admin pages*

@@ -7,7 +7,7 @@
  * @copyright 2017 by Joachim Jensen
  */
 if ( !defined( 'ABSPATH' ) ) {
-    die;
+    exit;
 }
 //<wp4.5 compatibility
 if ( !function_exists( 'wp_get_raw_referer' ) ) {
@@ -105,3 +105,5 @@ if ( $cas_fs->is_on() ) {
     //after_uninstall is only run for new users
     register_uninstall_hook( plugin_dir_path( __FILE__ ) . 'content-aware-sidebars.php', 'cas_fs_uninstall' );
 }
+
+//eol
