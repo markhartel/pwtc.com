@@ -66,18 +66,20 @@ class PwtcMileage_Admin {
 		if (!strpos($hook, "pwtc_mileage")) {
             return;
         }
-        wp_enqueue_style('pwtc_mileage_admin_css', 
-			PWTC_MILEAGE__PLUGIN_URL . 'admin-style.css');
-        wp_enqueue_style('pwtc_mileage_datepicker_css', 
-			PWTC_MILEAGE__PLUGIN_URL . 'datepicker.css');
+		wp_enqueue_style('pwtc_mileage_admin_css', 
+			PWTC_MILEAGE__PLUGIN_URL . 'admin-style.css', array(),
+			filemtime(PWTC_MILEAGE__PLUGIN_DIR . 'admin-style.css'));
+		wp_enqueue_style('pwtc_mileage_datepicker_css', 
+			PWTC_MILEAGE__PLUGIN_URL . 'datepicker.css', array(),
+			filemtime(PWTC_MILEAGE__PLUGIN_DIR . 'datepicker.css'));
 		wp_enqueue_style('wp-jquery-ui-dialog');
 		wp_enqueue_script('jquery-ui-datepicker');   
 		wp_enqueue_script('pwtc_mileage_admin_js', 
-			PWTC_MILEAGE__PLUGIN_URL . 'admin-scripts.js',
-			array('jquery-ui-dialog'), 1.1, true);
+			PWTC_MILEAGE__PLUGIN_URL . 'admin-scripts.js', array('jquery-ui-dialog'), 
+			filemtime(PWTC_MILEAGE__PLUGIN_DIR . 'admin-scripts.js'), true);
 		wp_enqueue_script('pwtc_mileage_dateformatter_js', 
-			PWTC_MILEAGE__PLUGIN_URL . 'php-date-formatter.min.js', 
-			array('jquery'), 1.1, true);
+			PWTC_MILEAGE__PLUGIN_URL . 'php-date-formatter.min.js', array('jquery'), 
+			filemtime(PWTC_MILEAGE__PLUGIN_DIR . 'php-date-formatter.min.js'), true);
 	}
 
 	/*************************************************************/
@@ -1919,6 +1921,12 @@ class PwtcMileage_Admin {
 			}
     	} 
 		if ($form_submitted) {
+			if (isset($_POST['admin_maint_mode'])) {
+				$plugin_options['admin_maint_mode'] = true;
+			}
+			else {
+				$plugin_options['admin_maint_mode'] = false;
+			}
 			if (isset($_POST['drop_db_on_delete'])) {
 				$plugin_options['drop_db_on_delete'] = true;
 			}
