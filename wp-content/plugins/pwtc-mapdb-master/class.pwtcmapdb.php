@@ -264,9 +264,9 @@ class PwtcMapdb {
 				var numpages = Math.ceil(count/limit);
 				$('.pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
-                    '<input class="prev-btn dark button" type="button" value="Prev"/>' +
-					'<span>&nbsp;Page ' + pagenum + ' of ' + numpages + '&nbsp;</span>' +
-                    '<input class="next-btn dark button" type="button" value="Next"/>' +
+                    '<input class="prev-btn dark button" style="margin: 0" type="button" value="< Prev"/>' +
+					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
+                    '<input class="next-btn dark button" style="margin: 0" type="button" value="Next >"/>' +
 					'<input name="offset" type="hidden" value="' + offset + '"/>' +
 					'<input name="count" type="hidden" value="' + count + '"/>' +
 					'</form>'
@@ -361,7 +361,7 @@ class PwtcMapdb {
 	</script>
 	<div class='pwtc-mapdb-search-sec'>
 	<p>To search the route map database, press the <strong>Search</strong> button. 
-	To narrow your search, first enter a string into the <strong>Title</strong> field before searching.
+	To narrow your search, first enter a string into the <strong>Title</strong> field before searching.</p>
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 		<span>Title</span>
 		<input type="text" name="title"/>
@@ -371,7 +371,7 @@ class PwtcMapdb {
 		</span>
 		<input class="dark button" type="submit" value="Search"/>
 		<input class="reset-btn dark button" type="button" value="Reset"/>
-	</form></p>	
+	</form>
 	</div>
 	<div class="pwtc-mapdb-maps-div"></div>
 	<?php

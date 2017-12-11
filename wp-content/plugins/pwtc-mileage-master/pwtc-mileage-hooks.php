@@ -34,7 +34,7 @@ function pwtc_mileage_fetch_civi_member_id($email) {
     if (function_exists('civicrm_api3')) {
         $result = civicrm_api3('contact', 'get', array(
             'sequential' => 1,
-			'contact_type' => 'Individual',
+            'contact_type' => 'Individual',
             'email' => $email
         ));
         if ($result['values']) {

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.me/interactivist
 Tags: civicrm, admin, utility, styling, menu
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 0.3
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,16 @@ This plugin requires a minimum of *WordPress 3.9* and *CiviCRM 4.6-alpha1*. For 
 
 
 == Changelog ==
+
+= 0.3.2 =
+
+* Reinstates missing permissions rows
+
+= 0.3.1 =
+
+* Add link to Reports Listing to CiviCRM shortcuts menu
+* Add link to Manage Groups to CiviCRM shortcuts menu
+* Set sensible plugin defaults
 
 = 0.3 =
 

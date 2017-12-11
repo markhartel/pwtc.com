@@ -48,9 +48,9 @@ parameters:
   wordpress.styles:
     - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: [], version: "1.0" }
   wordpress.scripts:
-    - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false }
-    - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false }
-    - { id: "app", source: "%template_uri%/web/scripts-min/app.min.js", deps: ["jquery", "sharethis", "gmaps"], header: false }
+    - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
+    - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false, version: "1.0" }
+    - { id: "app", source: "%template_uri%/web/scripts-min/app.min.js", deps: ["jquery", "sharethis", "gmaps"], header: false, version: "1.0" }
 
 services:
   # just the basics
