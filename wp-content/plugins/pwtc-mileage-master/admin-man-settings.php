@@ -69,6 +69,11 @@ if (count($error_msgs) > 0) {
 			<input type="checkbox" id="drop_db_on_delete" name="drop_db_on_delete" 
 			<?php if ($plugin_options['drop_db_on_delete']) { echo 'checked'; } ?>/>
 		</span>
+		<span>Administrator Maintenance Mode</span>
+		<span class="checkbox-wrap">
+			<input type="checkbox" id="admin_maint_mode" name="admin_maint_mode" 
+			<?php if ($plugin_options['admin_maint_mode']) { echo 'checked'; } ?>/>
+		</span>
 		<input type="submit" value="Save" class="button button-primary button-large"/>
 	</form>
 </div>
