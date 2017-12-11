@@ -50,7 +50,8 @@ class PwtcMapdb {
 
 	public static function load_report_scripts() {
         wp_enqueue_style('pwtc_mapdb_report_css', 
-			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css' );
+			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css', array(),
+			filemtime(PWTC_MAPDB__PLUGIN_DIR . 'reports-style.css'));
 	}
 
 	/*************************************************************/
@@ -111,7 +112,7 @@ class PwtcMapdb {
 				$url = '<a target="_blank" href="' . $link . '">Link</a>';
 			}
 		endwhile;
-		
+	
 		return $url;
 	}
 
@@ -315,7 +316,7 @@ class PwtcMapdb {
 						$('.pwtc-mapdb-maps-div').append('<div>No route maps found.</div>');					
 					}
 				}
-                $('body').removeClass('pwtc-mapdb-waiting');
+				$('body').removeClass('pwtc-mapdb-waiting');
 			}   
 
 			function load_maps_table(mode) {
@@ -343,7 +344,7 @@ class PwtcMapdb {
 						data.next = 1;						
 					}
 				}
-                $('body').addClass('pwtc-mapdb-waiting');
+				$('body').addClass('pwtc-mapdb-waiting');
 				$.post(action, data, lookup_maps_cb); 
 			}
 
