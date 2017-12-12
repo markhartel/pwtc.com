@@ -1,7 +1,17 @@
+<div class="wrap">
+	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 if (!current_user_can($capability)) {
-    return;
+?> 
+	<p><strong>Access Denied</strong> - you do not have the rights to view this page.</p>
+<?php   
 }
+else if ($plugin_options['admin_maint_mode'] and !current_user_can('manage_options')) {
+?> 
+	<p><strong>Access Denied</strong> - the mileage database is maintenance mode.</p>
+<?php       
+}
+else {
 ?>
 <script type="text/javascript" >
 jQuery(document).ready(function($) {  
@@ -885,8 +895,6 @@ if ($create_mode) {
 
 });
 </script>
-<div class="wrap">
-	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 if ($running_jobs > 0) {
 ?>
@@ -942,7 +950,7 @@ if ($running_jobs > 0) {
 	</div>
 	<div id="ridesheet-sheet-page" class="initially-hidden">
 		<p>Use this page to record the ride leader and rider mileages entered on the ride sign in sheet.</p>
-		<p><button class="back-btn button button-primary button-large"><i class="fa fa-chevron-left"></i> Back</button></p>
+		<p><button class="back-btn button button-primary button-large">&lt; Back</button></p>
 		<div class='report-sec'>
 		<h3>Ride Sheet</h3>
 		<h3>
@@ -1019,6 +1027,7 @@ if ($running_jobs > 0) {
 	</div>
 <?php
 	include('admin-rider-lookup.php');
+}
 }
 ?>
 </div>

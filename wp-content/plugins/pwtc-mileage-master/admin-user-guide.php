@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
         <h1>How do I...</h1>
         <p>Click on your topic of interest to expand.</p>
         <h3><a href="#">prepare the mileage database for the upcoming year's activities?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>After the start of the new year, a set of housekeeping actions must be performed 
         on the mileage database before it can handle upcoming club activities. These actions 
         should be executed in the specified order.</p>
@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="ridesheet">enter a ride sign-in sheet into the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>After a ride is complete, the ride leader sends the ride sign-in sheet to the
         club statistician who enters the information into the club mileage database.</p>
         <ol>
@@ -65,7 +65,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="amendmiles">amend a rider's mileage for a ride in the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>Occasionally, a rider wishes to amend their recorded mileage for a ride.
         To do so, they contact the club statistician who then makes the modification.</p>
         <ol>
@@ -87,7 +87,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="lookup">use the Lookup Rider dialog box?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>The club statistician needs to lookup riders in order to assign ride leaders
         and set rider mileages.</p>
         <p>If you know the rider ID, enter it into the <em>ID</em> text field and press 
@@ -97,10 +97,12 @@ jQuery(document).ready(function($) {
         <em>Last Name</em> text fields. Enter text into those fields and press the 
         <em>Lookup</em> button. If only one match is found, the dialog will close and return 
         that rider. If multiple matches are found, they will be listed below and one can be 
-        choosen which will close the dialog and return that rider.</p>
+        selected which will close the dialog and return that rider.</p>
+        <p>You can also restrict the search results to riders who have current active 
+        membership by checking the <em>Active Members Only</em> checkbox.</p>
         </div>
         <h3><a href="#">add a new rider to the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>Occasionally, a rider who has just joined the club will not be in the mileage
         datebase. The club statistician will need to add them so that their mileage can
         be recorded. (That rider must have an assigned rider ID from the membership 
@@ -122,7 +124,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="awards">generate the year-end banquet award reports?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>In January, the club holds an awards banquet. The club statistician generates
         reports that are used by the banquet organizers to identify the award receipents.
         These reports are based on rider activities for the previous year and should
@@ -141,7 +143,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="updmembs">upload an UPDMEMBS.DBF file from the membership secretary?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>Every month, the club membership secretary updates their membership database
         with new club members. A new UPDMEMBS.DBF file is then emailed to the club statistician
         who uploads it into the mileage database to keep it synchronized with the
@@ -160,7 +162,7 @@ jQuery(document).ready(function($) {
        </ol>
         </div>
         <h3><a href="#" topic="consolidate">consolidate obsolete rides in the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p><strong>WARNING: this operation has the potential to corrupt the mileage database, 
         so you should first backup the mileage database before proceeding.</strong> Mileage data 
         for only the current and last years are required, all older data is obsolete 
@@ -178,7 +180,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#" topic="backup">backup the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p>Occasionally, the club statistician should backup the mileage database.
         This involves exporting four CSV files to the local file system.</p>
         <ol>
@@ -192,7 +194,7 @@ jQuery(document).ready(function($) {
         </ol>
         </div>
         <h3><a href="#">restore the mileage database?</a></h3>
-        <div class="initially-hidden">
+        <div class="initially-hidden report-sec">
         <p><strong>WARNING: this operation will overwrite the current mileage database, 
         therefore it should only be performed by the administrator.</strong> The 
         administrator may need to restore the mileage database from a saved backup. 

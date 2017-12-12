@@ -1,7 +1,17 @@
+<div class="wrap">
+	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 if (!current_user_can($capability)) {
-    return;
+?> 
+    <p><strong>Access Denied</strong> - you do not have the rights to view this page.</p>
+<?php   
 }
+else if ($plugin_options['admin_maint_mode'] and !current_user_can('manage_options')) {
+?> 
+    <p><strong>Access Denied</strong> - the mileage database is maintenance mode.</p>
+<?php       
+}
+else {
 ?>
 <script type="text/javascript">
 jQuery(document).ready(function($) { 
@@ -220,8 +230,6 @@ jQuery(document).ready(function($) {
 
 });
 </script>
-<div class="wrap">
-	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 if ($running_jobs > 0) {
 ?>
@@ -274,6 +282,7 @@ if ($running_jobs > 0) {
     </div>
 <?php
     include('admin-rider-lookup.php');
+}
 }
 ?>
 </div>

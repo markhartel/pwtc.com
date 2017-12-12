@@ -1,7 +1,17 @@
+<div class="wrap">
+	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 if (!current_user_can($capability)) {
-    return;
+?> 
+    <p><strong>Access Denied</strong> - you do not have the rights to view this page.</p>
+<?php   
 }
+else if ($plugin_options['admin_maint_mode'] and !current_user_can('manage_options')) {
+?> 
+    <p><strong>Access Denied</strong> - the mileage database is maintenance mode.</p>
+<?php       
+}
+else {
 $message = '';
 $notice_type = '';
 $show_buttons = true;
@@ -149,8 +159,6 @@ jQuery(document).ready(function($) {
 
  });
 </script>
-<div class="wrap">
-	<h1><?= esc_html(get_admin_page_title()); ?></h1>
 <?php
 foreach ( $job_status as $status ) {
     if ($status['status'] == PwtcMileage_DB::TRIGGERED_STATUS) {
@@ -293,6 +301,7 @@ else {
         </form>
     </div>
 <?php
+}
 }
 ?>
 </div>
