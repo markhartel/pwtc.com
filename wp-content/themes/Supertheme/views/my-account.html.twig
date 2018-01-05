@@ -55,7 +55,10 @@
                                             {{ address.street_address }} <br />
                                             {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
                                             {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
-                                            <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(address.state_province_id) }} {{ address.postal_code }}
+                                            <i class="fa fa-fw"></i>
+                                            {% if address.city is defined %}{{ address.city }}{% endif %},
+                                            {% if address.state_province_id is defined and address.state_province_id %}{{ SP.Civicrm.convert_county_id(address.state_province_id) }}{% endif %}
+                                            {% if address.postal_code is defined %}{{ address.postal_code }}{% endif %}
                                         </li>
                                     {% endfor %}
                                 </ul>
