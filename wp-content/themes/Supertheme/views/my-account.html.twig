@@ -24,12 +24,14 @@
                 <div data-equalizer-watch>
                     <h2>Basic Info <small><a href="#basic-form" class="fancybox">Edit</a></small></h2>
                     <div class="row">
-                        <div class="large-6 columns">
-                            <div class="account-overview profile">
-                                {{ SP.WordPress.processShortcode("[basic-user-avatars]") }}
+                        {% if is_head or not household_members %}
+                            <div class="small-12 large-6 columns">
+                                <div class="account-overview profile">
+                                    {{ SP.WordPress.processShortcode("[basic-user-avatars]") }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="large-6 columns">
+                        {% endif %}
+                        <div class="small-12 {% if is_head or not household_members %}large-6{% endif %} columns">
                             <div class="account-overview">
                                 <ul class="contact vertical menu">
                                     <li><h3 class="name">{{ user.first_name }} {{ user.last_name }}</h3></li>

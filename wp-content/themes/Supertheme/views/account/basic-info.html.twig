@@ -2,146 +2,61 @@
     <div class="row column"><h3>Basic Info</h3></div>
     <form action="" id="basicInfo" data-abide novalidate>
         <div class="row">
-            <div class="small-12 medium-6 large-4 columns">
-                <label for="">Profile</label>
-                {{ SP.WordPress.getAvatar(200) }}
-            </div>
-            <div class="small-12 medium-6 large-8 columns">
+            <div class="small-6 columns">
                 <label for="">
                     First Name
                     <input name="first" type="text" value="{{ user.first_name }}" required pattern="alpha">
                     <span class="form-error">A valid first name is required. Only a-z characters are allowed</span>
                 </label>
+            </div>
+            <div class="small-6 columns">
                 <label for="">
                     Last Name
                     <input name="last" type="text" value="{{ user.last_name }}" required pattern="alpha">
                     <span class="form-error">A valid last name is required. Only a-z characters are allowed</span>
                 </label>
-                {% for email in user.email %}
-                    {% if loop.first %}
-                        <div class="row">
-                            <div class="small-6 columns">
-                                <label for="">
-                                    Email
-                                    <input name="email" type="text" value="{{ email.email }}" required pattern="email">
-                                    <span class="form-error">A valid email is required.</span>
-                                </label>
-                            </div>
-                            <div class="small-6 columns">
-                                <label for="">Location
-                                    <select name="email_location" id="" required>
-                                        <option value="5" {% if email.location_type_id == 5 %}selected="selected"{% endif %}>Billing</option>
-                                        <option value="1" {% if email.location_type_id == 1 %}selected="selected"{% endif %}>Home</option>
-                                        <option value="3" {% if email.location_type_id == 3 %}selected="selected"{% endif %}>Main</option>
-                                        <option value="4" {% if email.location_type_id == 4 %}selected="selected"{% endif %}>Other</option>
-                                        <option value="2" {% if email.location_type_id == 2 %}selected="selected"{% endif %}>Work</option>
-                                    </select>
-                                </label>
-                                <input name="email_id" type="hidden" value="{{ email.id }}">
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
             </div>
-        </div>
-        <div class="row column"><h3>Phone Numbers</h3></div>
-        {% for phone in user.phone %}
-            <div class="row">
-                <div class="small-12 medium-4 columns">
-                    <label for="">Phone <input type="text" name="phone[]" value="{{ phone.phone }}"></label>
-                </div>
-                <div class="small-6 medium-3 columns">
-                    <label for="">Location
-                        <select name="phone_location[]" id="">
-                            <option value="5" {% if phone.location_type_id == 5 %}selected="selected"{% endif %}>Billing</option>
-                            <option value="1" {% if phone.location_type_id == 1 %}selected="selected"{% endif %}>Home</option>
-                            <option value="3" {% if phone.location_type_id == 3 %}selected="selected"{% endif %}>Main</option>
-                            <option value="4" {% if phone.location_type_id == 4 %}selected="selected"{% endif %}>Other</option>
-                            <option value="2" {% if phone.location_type_id == 2 %}selected="selected"{% endif %}>Work</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="small-6 medium-3 columns">
-                    <label for="">Type
-                        <select name="phone_type[]" id="">
-                            <option value="1" {% if phone.phone_type_id == 1 %}selected="selected"{% endif %}>Phone</option>
-                            <option value="2" {% if phone.phone_type_id == 2 %}selected="selected"{% endif %}>Mobile</option>
-                            <option value="3" {% if phone.phone_type_id == 3 %}selected="selected"{% endif %}>Fax</option>
-                            <option value="4" {% if phone.phone_type_id == 4 %}selected="selected"{% endif %}>Pager</option>
-                            <option value="5" {% if phone.phone_type_id == 5 %}selected="selected"{% endif %}>Voicemail</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="small-12 medium-2 columns">
-                    <label for="">
-                        Primary
-                    </label>
-                    <div class="switch large">
+            {% for email in user.email %}
+                {% if loop.first %}
+                    <input type="hidden" name="email_location" id="" value="1"/>
+                    <input name="email_id" type="hidden" value="{{ email.id }}" />
+                    <div class="small-12 medium-6 columns">
+                        <label for="">
+                            Email
+                            <input name="email" type="text" value="{{ email.email }}" required pattern="email">
+                            <span class="form-error">A valid email is required.</span>
+                        </label>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for phone in user.phone %}
+                <div class="small-12 medium-6 columns">
+                    <input type="hidden" name="phone_id[]" value="{{ phone.id }}">
+                    <input type="hidden" name="phone_location[]" value="1">
+                    <input type="hidden" name="phone_type[]" value="1">
+                    {% if phone.is_primary is defined and phone.is_primary %}
                         <input
-                                class="switch-input"
-                                id="phome_primary_{{ loop.index }}"
-                                type="radio"
+                                type="hidden"
                                 name="phone_primary"
                                 value="{{ phone.id }}"
-                                {% if phone.is_primary is defined and phone.is_primary %}checked="checked"{% endif %}
                         />
-                        <label class="switch-paddle" for="phome_primary_{{ loop.index }}">
-                            <span class="show-for-sr">primary</span>
-                        </label>
-                    </div>
+                    {% endif %}
+                    <label for="">Phone <input type="text" name="phone[]" value="{{ phone.phone }}"></label>
                 </div>
-                <div class="small-12 columns">
-                    <input type="hidden" name="phone_id[]" value="{{ phone.id }}">
-                    <!--<a href="" class="tiny alert button"><i class="fa fa-minus"></i> Remove</a>-->
-                </div>
-            </div>
-        {% endfor %}
-        <!--
-        <div class="row">
-            <div class="small-12 columns">
-                <a href="" class="tiny success button"><i class="fa fa-plus"></i> Add Another</a>
-            </div>
+            {% endfor %}
         </div>
-        --->
-        <div class="row column"><h3>Addresses</h3></div>
-        {% for address in user.address %}
+        {% if is_head or not household_members %}
+            <div class="row column"><h3>Address</h3></div>
+            {% for address in user.address %}
+            <input type="hidden" name="address_id[]" value="{{ address.id }}">
+            <input type="hidden" name="address_type[]" value="1">
+                <input type="hidden"  name="address_2[]" value="{% if address.supplemental_address_1 is defined %}{{ address.supplemental_address_1 }}{% endif %}">
+            {% if address.is_primary is defined and address.is_primary %}
+                <input type="hidden" name="address_primary" value="{{ address.id }}" />
+            {% endif %}
             <div class="row">
-                <div class="small-6 columns">
-                    <label for="">Type
-                        <select name="address_type[]" id="">
-                            <option value="5" {% if address.location_type_id == 5 %}selected="selected"{% endif %}>Billing</option>
-                            <option value="1" {% if address.location_type_id == 1 %}selected="selected"{% endif %}>Home</option>
-                            <option value="3" {% if address.location_type_id == 3 %}selected="selected"{% endif %}>Main</option>
-                            <option value="4" {% if address.location_type_id == 4 %}selected="selected"{% endif %}>Other</option>
-                            <option value="2" {% if address.location_type_id == 2 %}selected="selected"{% endif %}>Work</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="small-6 columns">
-                    <label for="">
-                        Primary
-                    </label>
-                    <div class="switch large">
-                        <input
-                                class="switch-input"
-                                id="address_primary_{{ loop.index }}"
-                                type="radio"
-                                name="address_primary"
-                                value="{{ address.id }}"
-                                {% if address.is_primary is defined and address.is_primary %}checked="checked"{% endif %}
-                        />
-                        <label class="switch-paddle" for="address_primary_{{ loop.index }}">
-                            <span class="show-for-sr">primary</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12 medium-6 columns">
+                <div class="small-12 medium-12 columns">
                     <label for="">Address <input type="text" name="address_1[]" value="{{ address.street_address }}"></label>
-                </div>
-                <div class="small-12 medium-6 columns">
-                    <label for="">Unit <input type="text"  name="address_2[]" value="{% if address.supplemental_address_1 is defined %}{{ address.supplemental_address_1 }}{% endif %}"></label>
                 </div>
             </div>
             <div class="row">
@@ -210,16 +125,11 @@
                     <label for="">Zip <input type="text" name="address_zip[]" value="{{ address.postal_code }}"></label>
                 </div>
             </div>
-            <div class="row">
-                <div class="small-12 columns">
-                    <input type="hidden" name="address_id[]" value="{{ address.id }}">
-                    <!--<a href="" class="tiny alert button"><i class="fa fa-minus"></i> Remove</a>-->
-                </div>
-            </div>
             {% if not loop.last %}
                 <hr>
             {% endif %}
         {% endfor %}
+        {% endif %}
         <div class="row column">
             <input type="hidden" name="action" value="basic_info"/>
             <input type="hidden" name="contact_id" value="{{ contact_id }}"/>
