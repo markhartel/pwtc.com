@@ -214,6 +214,7 @@ HTML
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
         $email = $_POST['email'];
+        $phone = $_POST['phone'];
 
         // check if user already has a contact by looking for the email
         $result = civicrm_api3('contact', 'get', array(
@@ -236,6 +237,13 @@ HTML
                 'contact_id' => $household_member_id,
                 'email' => $email,
             ));
+            // add phone number to contact
+            if($phone) {
+                $result = civicrm_api3('Phone', 'create', array(
+                    'contact_id' => $household_member_id,
+                    'phone' => $phone,
+                ));
+            }
         } else {
             $household_member_id = $result['values'][0]['contact_id'];
 
