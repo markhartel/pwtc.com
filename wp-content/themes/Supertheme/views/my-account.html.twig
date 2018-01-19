@@ -24,12 +24,14 @@
                 <div data-equalizer-watch>
                     <h2>Basic Info <small><a href="#basic-form" class="fancybox">Edit</a></small></h2>
                     <div class="row">
-                        <div class="large-6 columns">
-                            <div class="account-overview profile">
-                                {{ SP.WordPress.processShortcode("[basic-user-avatars]") }}
+                        {% if is_head or not household_members %}
+                            <div class="small-12 large-6 columns">
+                                <div class="account-overview profile">
+                                    {{ SP.WordPress.processShortcode("[basic-user-avatars]") }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="large-6 columns">
+                        {% endif %}
+                        <div class="small-12 {% if is_head or not household_members %}large-6{% endif %} columns">
                             <div class="account-overview">
                                 <ul class="contact vertical menu">
                                     <li><h3 class="name">{{ user.first_name }} {{ user.last_name }}</h3></li>
@@ -55,7 +57,10 @@
                                             {{ address.street_address }} <br />
                                             {% if address.supplemental_address_1 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_1 }} <br> {% endif %}
                                             {% if address.supplemental_address_2 is defined %}<i class="fa fa-fw"></i> {{ address.supplemental_address_2 }} <br>{% endif %}
-                                            <i class="fa fa-fw"></i> {{ address.city }}, {{ SP.Civicrm.convert_county_id(address.state_province_id) }} {{ address.postal_code }}
+                                            <i class="fa fa-fw"></i>
+                                            {% if address.city is defined %}{{ address.city }}{% endif %},
+                                            {% if address.state_province_id is defined and address.state_province_id %}{{ SP.Civicrm.convert_county_id(address.state_province_id) }}{% endif %}
+                                            {% if address.postal_code is defined %}{{ address.postal_code }}{% endif %}
                                         </li>
                                     {% endfor %}
                                 </ul>
@@ -73,12 +78,20 @@
                                         <div class="row column">
                                             <p>Enter in the email and name of the person you want to add to your family membership</p>
                                         </div>
-                                        <div class="row column">
-                                            <label for="">
-                                                Email:
-                                                <input type="email" name="email" required pattern="email">
-                                                <span class="form-error">A valid email is required</span>
-                                            </label>
+                                        <div class="row">
+                                            <div class="small-12 medium-6 columns">
+                                                <label for="">
+                                                    Email:
+                                                    <input type="email" name="email" required pattern="email">
+                                                    <span class="form-error">A valid email is required</span>
+                                                </label>
+                                            </div>
+                                            <div class="small-12 medium-6 columns">
+                                                <label for="">
+                                                    Phone:
+                                                    <input type="text" name="phone">
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="small-6 columns">

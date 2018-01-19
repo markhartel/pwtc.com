@@ -46,6 +46,11 @@
 #basic-form, .household-delete, .fancybox-message, #add-form {
   display: none;
 }
+#basic-form {
+  .column:last-child:not(:first-child), .columns:last-child:not(:first-child) {
+    float: left;
+  }
+}
 .account-overview.profile {
   margin-bottom: $global-margin;
   font-size: 0;

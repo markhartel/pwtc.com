@@ -82,3 +82,10 @@ function supertheme_get_timezone_string() {
 
 // image quality
 add_filter('jpeg_quality', function() { return 100; });
+
+// remove password meter
+add_action('wp_print_scripts', function(){
+    if (wp_script_is('wc-password-strength-meter', 'enqueued') ) {
+        wp_dequeue_script('wc-password-strength-meter');
+    }
+}, 100);
