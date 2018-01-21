@@ -60,4 +60,13 @@ add_action('init', function() {
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-calendar-alt',
     ]);
+    add_filter('wp_insert_post_data', function($data) {
+        $types = array('ride_maps', 'ride_template', 'scheduled_rides');
+        if (in_array($data['post_type'], $types)) {
+            if (empty(trim($data['post_title']))) {
+                $data['post_title'] = 'Untitled';
+            }
+        }
+        return $data;
+    });
 });
