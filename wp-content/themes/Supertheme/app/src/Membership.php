@@ -83,6 +83,13 @@ class Membership
         ));
 
         // update phones
+        if(!is_array($_POST['phone']) && $_POST['phone']) {
+            $phone = $_POST['phone'];
+            $result = civicrm_api3('Phone', 'create', array(
+                'contact_id' => $contact_id,
+                'phone' => $phone,
+            ));
+        }
         for($i = 0; $i < count($_POST['phone']); $i++) {
             $phone_id = $_POST['phone_id'][$i];
             $phone_number = $_POST['phone'][$i];

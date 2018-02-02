@@ -43,6 +43,13 @@
                     {% endif %}
                     <label for="">Phone <input type="text" name="phone[]" value="{{ phone.phone }}"></label>
                 </div>
+            {% else %}
+                <div class="small-12 medium-6 columns">
+                    <label for="">
+                        Phone:
+                        <input type="text" name="phone[]">
+                    </label>
+                </div>
             {% endfor %}
         </div>
         {% if is_head or not household_members %}
