@@ -10,6 +10,7 @@ require_once __DIR__.'/app/post-types.php';
 require_once __DIR__.'/app/schedule-rides.php';
 require_once __DIR__.'/app/schedule-column.php';
 require_once __DIR__.'/app/woocommerce.php';
+require_once __DIR__.'/app/rides-ical-feed.php';
 
 // add civicrm membership functionality to account page
 $membership = new \App\Membership();
