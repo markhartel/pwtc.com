@@ -71,3 +71,9 @@ add_action('after_setup_theme', function() use($container) {
         register_nav_menus($container->getParameter('wordpress.menus'));
     }
 });
+
+// remove duplicate page link
+add_filter('wp_before_admin_bar_render', function(){
+    global $wp_admin_bar;
+    $wp_admin_bar->remove_menu('duplicate_this');
+});
