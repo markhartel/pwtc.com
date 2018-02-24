@@ -899,8 +899,53 @@ if( function_exists('acf_add_local_field_group') ):
         'title' => 'Leader Details',
         'fields' => array (
             array (
+                'key' => 'field_5a8b7617b5c2d',
+                'label' => 'Use Contact Email',
+                'name' => 'use_contact_email',
+                'type' => 'true_false',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+                'message' => '',
+                'default_value' => 0,
+            ),
+            array (
+                'key' => 'field_5a89bcada7247',
+                'label' => 'Contact Email',
+                'name' => 'contact_email',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => array (
+                    array (
+                        array (
+                            'field' => 'field_5a8b7617b5c2d',
+                            'operator' => '==',
+                            'value' => '1',
+                        ),
+                    ),
+                ),
+                'wrapper' => array (
+                    'width' => 50,
+                    'class' => '',
+                    'id' => '',
+                ),
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'maxlength' => '',
+                'readonly' => 0,
+                'disabled' => 0,
+            ),
+            array (
                 'key' => 'field_579b77e328013',
-                'label' => 'Home Phone',
+                'label' => 'Text Phone',
                 'name' => 'home_phone',
                 'type' => 'text',
                 'instructions' => '',
@@ -921,7 +966,7 @@ if( function_exists('acf_add_local_field_group') ):
             ),
             array (
                 'key' => 'field_579b77f128014',
-                'label' => 'Cell Phone',
+                'label' => 'Voice Phone',
                 'name' => 'cell_phone',
                 'type' => 'text',
                 'instructions' => '',
