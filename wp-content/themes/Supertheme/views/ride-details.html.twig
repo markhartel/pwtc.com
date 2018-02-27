@@ -51,6 +51,7 @@
                 </div>
                 <div>
                     {% include 'partials/ride-calendarlink.html.twig' with {date: SP.ACF.get_field('date')} only %}
+                    <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Export Ride</a>
                     {% if user_can_cancel %}
                         {% if SP.ACF.get_field('is_canceled') %}
                             <a href="{{ current_url }}?canceled=0" class="success button"><i class="fa fa-calendar-check-o"></i> Allow Ride</a>
