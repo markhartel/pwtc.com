@@ -45,8 +45,10 @@ function echo_ical_rideevent() {
 
     echo_ical_longline('SUMMARY', html_entity_decode(get_the_title()));
 
-    $desc = 'Portland Wheelmen Touring Club\n\n';
-    $desc .= 'Please join us for a bike ride, for details see:\n';
+    $desc = 'Portland Wheelmen Touring Club\n';
+    $desc .= date('l, F j \a\t g:i A', strtotime(get_field('date'))) . '\n\n';
+    $desc .= 'Please join us for a bike ride, all are welcome!\n';
+    $desc .= 'For details see:\n';
     $desc .= get_the_permalink();
     echo_ical_longline('DESCRIPTION', $desc);
         
@@ -106,19 +108,33 @@ add_action('init', function() {
         echo_ical_shortline('PRODID', '-//PWTC//PWTC Ride Calendar//EN');
         echo_ical_shortline('CALSCALE', 'GREGORIAN');
 
+        $query_args = false;
         if(isset($_GET['month']) && $_GET['month']) {
-            $query_args = query_ical_monthly_rides($_GET['month']);
+            $month = $_GET['month'];
+            if (preg_match('/^\d{4}-\d{2}$/', $month) === 1) {
+                $query_args = query_ical_monthly_rides($month);
+            }
         }
         else {
-            $query_args = query_ical_upcoming_rides(7);
+            if(isset($_GET['days']) && $_GET['days']) {
+                $days = $_GET['days'];
+                if (is_numeric($days) and intval($days) > 0) {
+                    $query_args = query_ical_upcoming_rides($days);
+                }
+            }
+            else {
+                $query_args = query_ical_upcoming_rides('7');
+            }
         }
 
-        $rides_query = new WP_Query($query_args);
-        while($rides_query->have_posts()) {
-            $rides_query->the_post();
-            echo_ical_rideevent();       
+        if ($query_args) {
+            $rides_query = new WP_Query($query_args);
+            while($rides_query->have_posts()) {
+                $rides_query->the_post();
+                echo_ical_rideevent();       
+            }
+            wp_reset_query();
         }
-        wp_reset_query();
 
         echo_ical_shortline('END', 'VCALENDAR');
 
