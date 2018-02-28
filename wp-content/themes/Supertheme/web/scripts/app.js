@@ -12,7 +12,14 @@ if(typeof(stLight) != "undefined") {
 jQuery(function() {
     // load foundation
     jQuery(document).foundation();
-    jQuery('img.avatar').load(function(){
+
+    // rerun equlizer after form changes in case they change the hiehgtt of the page
+    jQuery('.gform_wrapper form').on('change', function(){
+        Foundation.reInit('equalizer');
+    });
+
+    // rerun on page load
+    jQuery(window).on('load', function ($) {
         Foundation.reInit('equalizer');
     });
 
