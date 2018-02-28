@@ -3,7 +3,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -72,11 +72,18 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function add_to_module_list($list) {
 		if(get_post_type() == CAS_App::TYPE_SIDEBAR) {
-			$list[''] = array(
+			$list[] = array(
 				'name' =>__('URLs (Pro Feature)','content-aware-sidebars'),
 				'placeholder' => '',
 				'default_value' => ''
 			);
+			if(function_exists('bp_is_active')) {
+				$list[] = array(
+					'name' =>__('BuddyPress Groups (Pro Feature)','content-aware-sidebars'),
+					'placeholder' => '',
+					'default_value' => ''
+				);
+			}
 		}
 		return $list;
 	}
@@ -90,7 +97,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 */
 	public function show_description($post_type) {
 		if($post_type == CAS_App::TYPE_SIDEBAR) {
-			_e('Display this sidebar only on content that meets the following conditions:','content-aware-sidebars');
+			_e('Where do you want to show it?','content-aware-sidebars');
 			echo '<p></p>';
 		}
 	}
@@ -239,6 +246,9 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 				array('action','trashed', 'untrashed', 'deleted', 'ids'), 
 				$sendback
 			);
+			if(isset($_REQUEST['_cas_section']) && $_REQUEST['_cas_section']) {
+				$sendback .= $_REQUEST['_cas_section'];
+			}
 
 			$post = get_post( $post_id );
 			if ( ! $post ) {
@@ -405,6 +415,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 		$referer = wp_get_referer();
 		wp_nonce_field('update-post_' . $post->ID);
 		echo '<input type="hidden" id="user-id" name="user_ID" value="'.(int)get_current_user_id().'" />';
+		echo '<input type="hidden" id="_cas_section" name="_cas_section" value="" />';
 		echo '<input type="hidden" id="hiddenaction" name="action" value="update" />';
 		echo '<input type="hidden" id="post_author" name="post_author" value="'.esc_attr($post->post_author).'" />';
 		echo '<input type="hidden" id="original_post_status" name="original_post_status" value="'.esc_attr( $post->post_status).'" />';
@@ -1031,7 +1042,7 @@ final class CAS_Sidebar_Edit extends CAS_Admin {
 	 * @since 3.4.1
 	 */
 	public function add_general_scripts_styles() {
-		wp_register_script('cas/admin/general', plugins_url('../js/general.js', __FILE__), array('jquery'), CAS_App::PLUGIN_VERSION, true);
+		wp_register_script('cas/admin/general', plugins_url('../js/general.min.js', __FILE__), array('jquery'), CAS_App::PLUGIN_VERSION, true);
 		wp_enqueue_script('cas/admin/general');
 	}
 

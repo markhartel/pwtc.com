@@ -1142,18 +1142,25 @@ class PwtcMileage_Admin {
 			switch ($reportid) {
 				case "ytd_miles":
 				case "ly_miles":
-				case "pre_ly_miles":
 				case "lt_miles":
-				case "ly_lt_achvmnt":
 					if (!isset($_POST['sort'])) {
 						$error = 'Input parameters needed to generate a mileage report are missing.';
 					}
 					else {
+						$showid = 'false';
+						if (isset($_POST['showid'])) {
+							$showid = trim($_POST['showid']);
+						}
+						$hide_id = true;
+						if ($showid == 'true') {
+							$hide_id = false;
+						}					
 						$sort = $_POST['sort'];
 						$state = array(
 							'action' => 'pwtc_mileage_generate_report',
 							'report_id' => $reportid,
-							'sort' => $sort
+							'sort' => $sort,
+							'showid' => $showid
 						);						
 						$sortby = 'mileage desc';
 						if ($sort == 'name') {
@@ -1161,24 +1168,16 @@ class PwtcMileage_Admin {
 						}
 						switch ($reportid) {			
 							case "ytd_miles":
-								$meta = PwtcMileage_DB::meta_ytd_miles();
-								$data = PwtcMileage_DB::fetch_ytd_miles(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_ytd_miles($hide_id);
+								$data = PwtcMileage_DB::fetch_ytd_miles(ARRAY_N, $sortby, 0, $hide_id);
 								break;
 							case "ly_miles":
-								$meta = PwtcMileage_DB::meta_ly_miles();
-								$data = PwtcMileage_DB::fetch_ly_miles(ARRAY_N, $sortby);
-								break;
-							case "pre_ly_miles":
-								$meta = PwtcMileage_DB::meta_pre_ly_miles();
-								$data = PwtcMileage_DB::fetch_pre_ly_miles(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_ly_miles($hide_id);
+								$data = PwtcMileage_DB::fetch_ly_miles(ARRAY_N, $sortby, 0, $hide_id);
 								break;
 							case "lt_miles":
-								$meta = PwtcMileage_DB::meta_lt_miles();
-								$data = PwtcMileage_DB::fetch_lt_miles(ARRAY_N, $sortby);
-								break;
-							case "ly_lt_achvmnt":
-								$meta = PwtcMileage_DB::meta_ly_lt_achvmnt();
-								$data = PwtcMileage_DB::fetch_ly_lt_achvmnt(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_lt_miles($hide_id);
+								$data = PwtcMileage_DB::fetch_lt_miles(ARRAY_N, $sortby, 0, $hide_id);
 								break;
 						}
 					}
@@ -1190,11 +1189,20 @@ class PwtcMileage_Admin {
 						$error = 'Input parameters needed to generate a mileage report are missing.';
 					}
 					else {
+						$showid = 'false';
+						if (isset($_POST['showid'])) {
+							$showid = trim($_POST['showid']);
+						}
+						$hide_id = true;
+						if ($showid == 'true') {
+							$hide_id = false;
+						}					
 						$sort = $_POST['sort'];
 						$state = array(
 							'action' => 'pwtc_mileage_generate_report',
 							'report_id' => $reportid,
-							'sort' => $sort
+							'sort' => $sort,
+							'showid' => $showid							
 						);						
 						$sortby = 'rides_led desc';
 						if ($sort == 'name') {
@@ -1202,16 +1210,16 @@ class PwtcMileage_Admin {
 						}
 						switch ($reportid) {			
 							case "ytd_led":
-								$meta = PwtcMileage_DB::meta_ytd_led();
-								$data = PwtcMileage_DB::fetch_ytd_led(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_ytd_led($hide_id);
+								$data = PwtcMileage_DB::fetch_ytd_led(ARRAY_N, $sortby, 0, $hide_id);
 								break;
 							case "ly_led":
-								$meta = PwtcMileage_DB::meta_ly_led();
-								$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_ly_led(0, $hide_id);
+								$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, $sortby, 0, false, $hide_id);
 								break;
 							case "pre_ly_led":
-								$meta = PwtcMileage_DB::meta_pre_ly_led();
-								$data = PwtcMileage_DB::fetch_pre_ly_led(ARRAY_N, $sortby);
+								$meta = PwtcMileage_DB::meta_pre_ly_led($hide_id);
+								$data = PwtcMileage_DB::fetch_pre_ly_led(ARRAY_N, $sortby, 0, $hide_id);
 								break;
 						}
 					}
@@ -1256,26 +1264,45 @@ class PwtcMileage_Admin {
 				case "award_top_miles":
 				case "award_members":
 				case "award_leaders":
+				case "award_members_500":
+				case "award_leaders_12":
+					$showid = 'false';
+					if (isset($_POST['showid'])) {
+						$showid = trim($_POST['showid']);
+					}
+					$hide_id = true;
+					if ($showid == 'true') {
+						$hide_id = false;
+					}					
 					$state = array(
 						'action' => 'pwtc_mileage_generate_report',
-						'report_id' => $reportid
+						'report_id' => $reportid,
+						'showid' => $showid							
 					);						
 					switch ($reportid) {
 						case "award_achvmnt":
-							$meta = PwtcMileage_DB::meta_ly_lt_achvmnt();
-							$data = PwtcMileage_DB::fetch_ly_lt_achvmnt(ARRAY_N, 'nachievement, last_name, first_name');
+							$meta = PwtcMileage_DB::meta_ly_lt_achvmnt($hide_id);
+							$data = PwtcMileage_DB::fetch_ly_lt_achvmnt(ARRAY_N, 'nachievement, last_name, first_name', $hide_id);
 							break;
 						case "award_top_miles":
-							$meta = PwtcMileage_DB::meta_ly_miles();
-							$data = PwtcMileage_DB::fetch_ly_miles(ARRAY_N, 'mileage desc');
+							$meta = PwtcMileage_DB::meta_ly_miles($hide_id);
+							$data = PwtcMileage_DB::fetch_ly_miles(ARRAY_N, 'mileage desc', 1, $hide_id);
 							break;
 						case "award_leaders":
-							$meta = PwtcMileage_DB::meta_ly_led();
-							$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, 'last_name, first_name', 0, true);
+							$meta = PwtcMileage_DB::meta_ly_led(0, $hide_id);
+							$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, 'last_name, first_name', 0, true, $hide_id);
 							break;
 						case "award_members":
-							$meta = PwtcMileage_DB::meta_annual_accum_miles();
-							$data = PwtcMileage_DB::fetch_annual_accum_miles(ARRAY_N);
+							$meta = PwtcMileage_DB::meta_annual_accum_miles(0, $hide_id);
+							$data = PwtcMileage_DB::fetch_annual_accum_miles(ARRAY_N, 0, $hide_id);
+							break;
+						case "award_leaders_12":
+							$meta = PwtcMileage_DB::meta_ly_led(12, $hide_id);
+							$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, 'last_name, first_name', 12, true, $hide_id);
+							break;
+						case "award_members_500":
+							$meta = PwtcMileage_DB::meta_annual_accum_miles(500, $hide_id);
+							$data = PwtcMileage_DB::fetch_annual_accum_miles(ARRAY_N, 500, $hide_id);
 							break;
 					}			
 					break;

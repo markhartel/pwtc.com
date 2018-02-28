@@ -1,8 +1,9 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @copyright Joachim Jensen <jv@intox.dk>
+ * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -259,10 +260,14 @@ abstract class WPCAModule_Base {
 		//todo: fix in each module
 		$fix_response = array();
 		foreach ($response as $id => $title) {
-			$fix_response[] = array(
-				'id' => $id,
-				'text' => $title
-			);
+			if(!is_array($title)) {
+				$fix_response[] = array(
+					'id'   => $id,
+					'text' => $title
+				);
+			} else {
+				$fix_response[] = $title;
+			}
 		}
 
 		wp_send_json($fix_response);

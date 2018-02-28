@@ -1729,7 +1729,7 @@ class Civi_WP_Member_Sync_Admin {
 		 * civi_wp_member_sync_rule_delete_roles
 		 * civi_wp_member_sync_rule_delete_capabilities
 		 *
-		 * @param array The association rule we're going to delete
+		 * @param array The association rule we're going to delete.
 		 */
 		do_action( 'civi_wp_member_sync_rule_delete_' . $method, $subset[$type_id] );
 
@@ -1768,7 +1768,7 @@ class Civi_WP_Member_Sync_Admin {
 	 *
 	 * The current logic may remove the expired role because other rules may be
 	 * applied after the rule which assigns the expired role. If they are - and
-	 * they are not expired memberships - the exipred rule will therefore be
+	 * they are not expired memberships - the expired rule will therefore be
 	 * removed from the user.
 	 *
 	 * It seems that what's needed is to parse the rules prior to applying them
@@ -1972,8 +1972,8 @@ class Civi_WP_Member_Sync_Admin {
 	 *
 	 * @since 0.1
 	 *
-	 * @param WP_User $user WP_User object of the user in question
-	 * @param object $membership The membership details of the WordPress user in question
+	 * @param WP_User $user WP_User object of the user in question.
+	 * @param object $membership The membership details of the WordPress user in question.
 	 */
 	public function rule_undo( $user, $membership = false ) {
 
@@ -2315,7 +2315,7 @@ class Civi_WP_Member_Sync_Admin {
 		$memberships = civicrm_api( 'Membership', 'getcount', array(
 			'version' => '3',
 			'options' => array(
-				'limit' => '99999999',
+				'limit' => '0',
 			),
 		));
 

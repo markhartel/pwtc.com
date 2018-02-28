@@ -856,7 +856,7 @@ class PwtcMileage {
 		$a = self::normalize_atts($atts);
 		$sort = self::build_rides_led_sort($a);
 		$min = self::get_minimum_val($a);
-		$meta = PwtcMileage_DB::meta_ly_led();
+		$meta = PwtcMileage_DB::meta_ly_led($min);
 		$data = PwtcMileage_DB::fetch_ly_led(ARRAY_N, $sort, $min);
 		$out = self::shortcode_build_table($meta, $data, $a, $content);
 		return $out;
@@ -989,8 +989,10 @@ class PwtcMileage {
 			return "<div>Please log in to see the posted rides that are missing ridesheets report.</div>";
 		}	
 		$a = self::normalize_atts($atts);
-		$meta = PwtcMileage_DB::meta_posts_without_rides2();
-		$data = PwtcMileage_DB::fetch_posts_without_rides2();
+		//$meta = PwtcMileage_DB::meta_posts_without_rides2();
+		//$data = PwtcMileage_DB::fetch_posts_without_rides2();
+		$meta = PwtcMileage_DB::meta_posts_without_rides();
+		$data = PwtcMileage_DB::fetch_posts_without_rides();
 		$out = self::shortcode_build_table($meta, $data, $a, $content);
 		return $out;
 	}

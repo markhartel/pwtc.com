@@ -1,8 +1,9 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @copyright Joachim Jensen <jv@intox.dk>
+ * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -439,6 +440,7 @@ if(!class_exists('WPCACore')) {
 				foreach (self::$type_manager->get($post->post_type)->get_all() as $module) {
 					$options = $module->list_module($options);
 				}
+				$options = apply_filters('wpca/modules/list',$options);
 				$post_type_obj = get_post_type_object($post->post_type);
 
 				$template = WPCAView::make('condition_options');
@@ -446,7 +448,7 @@ if(!class_exists('WPCACore')) {
 
 				$template = WPCAView::make('group_template',array(
 					'post_type'=> $post->post_type,
-					'options'  => apply_filters('wpca/modules/list',$options)
+					'options'  => $options
 				));
 				add_action('admin_footer',array($template,'render'));
 
@@ -726,7 +728,7 @@ if(!class_exists('WPCACore')) {
 			wp_localize_script(self::PREFIX.'condition-groups', 'WPCA', array(
 				'searching'     => __('Searching',WPCA_DOMAIN),
 				'noResults'     => __('No results found.',WPCA_DOMAIN),
-				'targetNegate'  => __('Target all but this context',WPCA_DOMAIN),
+				'loadingMore'   => __('Loading more results',WPCA_DOMAIN),
 				'unsaved'       => __('Conditions have unsaved changes. Do you want to continue and discard these changes?',WPCA_DOMAIN),
 				'groups'        => $data,
 				'meta_default'  => $group_meta,

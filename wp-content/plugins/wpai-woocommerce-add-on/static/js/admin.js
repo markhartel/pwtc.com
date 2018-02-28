@@ -101,7 +101,13 @@
 			$('.variations_are_not_child_elements').show();
 		}
 
-		if ($('input[name=is_variation_product_manage_stock]:checked').val() == 'no') $('.variation_stock_fields').hide(); else $('.variation_stock_fields').fadeIn(); 
+		var $variations_matching = $('input[name=matching_parent]').val();
+
+		if ($('input[name=is_variation_product_manage_stock]:checked').val() == 'no' || $variations_matching == "xml" || $variations_matching == "first_is_parent_title" || $variations_matching == "auto"){
+			$('.variation_stock_fields').hide();
+		} else {
+			$('.variation_stock_fields').fadeIn();
+		}
 	}
 
 	$('input[name=matching_parent]').click(function(){

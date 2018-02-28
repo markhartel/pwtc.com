@@ -1,8 +1,8 @@
 <?php 
 /**
  * Admin License page
- *
- * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
+ * 
+ * @author Max Tsiplyakov <makstsiplyakov@gmail.com>
  */
 class PMXI_Admin_License extends PMXI_Controller_Admin {
 	

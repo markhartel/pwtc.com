@@ -3,7 +3,7 @@
 Plugin Name: WP All Import - User Import Add-On
 Plugin URI: http://www.wpallimport.com/
 Description: Import Users & User's metadata to WordPress. Requires WP All Import.
-Version: 1.0.9
+Version: 1.1.0
 Author: Soflyy
 */
 /**
@@ -24,7 +24,7 @@ define('PMUI_ROOT_URL', rtrim(plugin_dir_url(__FILE__), '/'));
  */
 define('PMUI_PREFIX', 'pmui_');
 
-define('PMUI_VERSION', '1.0.9');
+define('PMUI_VERSION', '1.1.0');
 
 if ( class_exists('PMUI_Plugin') and PMUI_EDITION == "free"){
 
@@ -52,7 +52,7 @@ else {
 	 * Main plugin file, Introduces MVC pattern
 	 *
 	 * @singletone
-	 * @author Max Tsiplyakov <makstsiplyakov@gmail.com>
+	 * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
 	 */
 
 	final class PMUI_Plugin {
@@ -474,7 +474,8 @@ else {
 				'is_update_registered' => 1,
 				'is_update_display_name' => 1,
 				'is_update_url' => 1,
-				'do_not_send_password_notification' => 1				
+				'do_not_send_password_notification' => 1,
+				'is_hashed_wordpress_password' => 0
 			);
 		}
 	}

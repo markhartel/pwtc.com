@@ -35,7 +35,13 @@
 							</div>
 							<div class="input">
 								<p style="margin-bottom:5px;"><?php _e('<b>Password</b>', 'wp_all_import_user_add_on');?><a class="wpallimport-help" href="#help" original-title="<?php _e('A string that contains the plain text password for the user.', 'wp_all_import_user_add_on'); ?>">?</a></p>
-								<input name="pmui[pass]" type="text" class="widefat" style="width:100%;margin-bottom:5px;" value="<?php echo esc_attr($post['pmui']['pass']); ?>"/>				
+								<input name="pmui[pass]" type="text" class="widefat" style="width:100%;margin-bottom:5px;" value="<?php echo esc_attr($post['pmui']['pass']); ?>"/>
+								<div class="input" style="margin:3px;">
+									<input type="hidden" name="is_hashed_wordpress_password" value="0" />
+									<input type="checkbox" id="is_hashed_wordpress_password" name="is_hashed_wordpress_password" value="1" <?php echo $post['is_hashed_wordpress_password'] ? 'checked="checked"' : '' ?> class="fix_checkbox"/>
+									<label for="is_hashed_wordpress_password"><?php _e('This is a hashed password from another WordPress site','wp_all_import_plugin');?> </label>						
+									<a href="#help" class="wpallimport-help" title="<?php _e('If the value being imported is a hashed password from another WordPress site, enable this option.', 'wp_all_import_plugin') ?>" style="position: relative; top: -2px;">?</a>
+								</div>
 							</div>
 							<div class="input">
 								<p style="margin-bottom:5px;"><?php _e('<b>Nicename</b>', 'wp_all_import_user_add_on');?><a class="wpallimport-help" href="#help" original-title="<?php _e('A string that contains a URL-friendly name for the user. The default is the user\'s username.', 'wp_all_import_user_add_on'); ?>">?</a></p>

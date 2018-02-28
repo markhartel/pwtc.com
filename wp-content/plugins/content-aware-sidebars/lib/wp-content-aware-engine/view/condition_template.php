@@ -1,8 +1,9 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @copyright Joachim Jensen <jv@intox.dk>
+ * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
+ * @copyright 2018 by Joachim Jensen
  */
 ?>
 <script type="text/template" id="wpca-template-condition">
@@ -13,5 +14,5 @@
 	<div class="cas-group-input">
 		<select class="js-wpca-suggest" multiple="multiple"></select>
 	</div>
-	<div class="cas-group-sep"><?php _e('And',WPCA_DOMAIN); ?></div>
+	<div class="cas-group-sep"><span><?php _e('And',WPCA_DOMAIN); ?></span></div>
 </script>

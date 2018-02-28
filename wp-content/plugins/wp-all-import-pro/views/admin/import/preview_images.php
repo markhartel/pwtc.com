@@ -27,7 +27,7 @@
 					
 			<?php			
 
-			switch ($post[$get['slug'] . 'download_images']) {
+			switch ($post[$option_slug . 'download_images']) {
 				case 'no':
 					$featured_delim = $post[$get['slug'] . 'featured_delim'];
 					break;

@@ -3,18 +3,16 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
-// if(!defined('WP_UNINSTALL_PLUGIN')) {
-// 	exit();
-// }
+if(!(defined('WP_UNINSTALL_PLUGIN') || defined('WP_FS__UNINSTALL_MODE'))) {
+	exit();
+}
 
 global $wpdb;
 
@@ -40,4 +38,4 @@ foreach ($sidebars as $sidebar) {
 }
 
 // Remove user meta
-$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key IN('metaboxhidden_sidebar','closedpostboxes_sidebar','managesidebarcolumnshidden','".$wpdb->prefix."_ca_cas_tour')");
+$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key IN('metaboxhidden_sidebar','closedpostboxes_sidebar','managesidebarcolumnshidden','{$wpdb->prefix}_ca_cas_tour')");

@@ -146,6 +146,7 @@ Table Column|Description|Data Type|Comment
 member_id|rider membership ID|varchar(5)|key
 ride_id|club ride ID|bigint(20)|key, unsigned
 mileage|rider's mileage for this ride|int(10)|unsigned
+line_no|mileage line number|bigint(20)|key, auto increment, unsigned
 
 Table `pwtc_ride_leaders` contains ride leaders.
 

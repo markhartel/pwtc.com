@@ -2,7 +2,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 (function($) {
@@ -37,7 +37,7 @@
 					url: ajaxurl,
 					data:{
 						'action': 'cas_dismiss_review_notice',
-						'dismiss': $this.attr("href") ? 1 : 0
+						'dismiss': $this.data("cas-rating") ? 1 : 0
 					},
 					dataType: 'JSON',
 					type: 'POST',

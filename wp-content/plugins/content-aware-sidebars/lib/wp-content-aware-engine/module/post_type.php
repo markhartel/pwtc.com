@@ -1,8 +1,9 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @copyright Joachim Jensen <jv@intox.dk>
+ * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -77,7 +78,6 @@ class WPCAModule_post_type extends WPCAModule_Base {
 			'posts_per_page' => 20,
 			'search'         => ''
 		));
-		extract($args);
 
 		$exclude = array();
 		if ($args['post_type'] == 'page' && 'page' == get_option('show_on_front')) {
@@ -89,6 +89,10 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		if($args['post_type'] == 'attachment') {
 			$post_status = 'inherit';
 		}
+
+		$walk_tree = false;
+		$start = ( $args['paged'] - 1 ) * $args['posts_per_page'];
+		$end = $start + $args['posts_per_page'];
 
 		//WordPress searches in title and content by default
 		//We want to search in title and slug
@@ -111,9 +115,18 @@ class WPCAModule_post_type extends WPCAModule_Base {
 				$args['post_type'],
 				"%".$args['search']."%",
 				"%".$args['search']."%",
-				($args['paged']-1)*$args['posts_per_page']
+				$start
 			));
 		} else {
+			if(is_post_type_hierarchical($args['post_type']) && !$args['include']) {
+
+				$args['posts_per_page'] = -1;
+				$args['paged'] = 0;
+				$args['orderby'] = 'menu_order title';
+
+				$walk_tree = true;
+
+			}
 			$query = new WP_Query(array(
 				'posts_per_page'         => $args['posts_per_page'],
 				'post_type'              => $args['post_type'],
@@ -130,11 +143,56 @@ class WPCAModule_post_type extends WPCAModule_Base {
 		}
 
 		$retval = array();
-		foreach ($posts as $post) {
-			$retval[$post->ID] = $this->post_title($post);
+
+		if($walk_tree) {
+			$pages_sorted = array();
+			foreach ($posts as $post) {
+				$pages_sorted[$post->post_parent][] = $post;
+			}
+			$this->_walk_tree($pages_sorted,$pages_sorted[0],0,$start,$end,0,$retval);
+		} else {
+			foreach ($posts as $post) {
+				$retval[$post->ID] = $this->post_title($post);
+			}
 		}
 
 		return $retval;
+	}
+
+	/**
+	 * Get hierarchical content with level param
+	 *
+	 * @since  3.7.2
+	 * @param  array  $all_pages
+	 * @param  array  $pages
+	 * @param  int    $i
+	 * @param  int    $start
+	 * @param  int    $end
+	 * @param  int    $level
+	 * @param  array  &$retval
+	 * @return void
+	 */
+	protected function _walk_tree($all_pages,$pages,$i,$start,$end,$level,&$retval) {
+		foreach ($pages as $page) {
+			if ( $i >= $end ) {
+				break;
+			}
+
+			if ( $i >= $start ) {
+				$retval[] = array(
+					'id' => $page->ID,
+					'text' => $this->post_title($page),
+					'level' => $level
+				);
+			}
+
+			$i++;
+
+			if ( isset( $all_pages[$page->ID] ) ) {
+				$this->_walk_tree( $all_pages, $all_pages[$page->ID], $i, $start, $end, $level + 1, $retval );
+			}
+		
+		}
 	}
 
 	/**
@@ -175,9 +233,20 @@ class WPCAModule_post_type extends WPCAModule_Base {
 
 				if($data || isset($lookup[$post_type])) {
 
-					$placeholder = $post_type_obj->has_archive ? '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name) : '';
-					$placeholder = $post_type == 'post' ? '/'.__('Blog Page',WPCA_DOMAIN) : $placeholder;
-					$placeholder = $post_type_obj->labels->all_items.$placeholder;
+					$placeholder = $post_type_obj->labels->all_items;
+					switch($post_type) {
+						case 'post':
+							$placeholder .= ' / '.__('Blog Page',WPCA_DOMAIN);
+							break;
+						case 'product':
+							$placeholder .= ' / '.__('Shop Page',WPCA_DOMAIN);
+							break;
+						default:
+							if($post_type_obj->has_archive) {
+								$placeholder .= ' / '.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name);
+							}
+							break;
+					}
 
 					$group_data[$this->id.'-'.$post_type] = array(
 						'label' => $post_type_obj->label,
@@ -264,9 +333,22 @@ class WPCAModule_post_type extends WPCAModule_Base {
 	public function list_module($list) {
 		foreach($this->post_types() as $post_type) {
 			$post_type_obj = get_post_type_object($post_type);
-			$placeholder = $post_type_obj->has_archive ? '/'.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name) : '';
-			$placeholder = $post_type == 'post' ? '/'.__('Blog Page',WPCA_DOMAIN) : $placeholder;
-			$placeholder = $post_type_obj->labels->all_items.$placeholder;
+
+			$placeholder = $post_type_obj->labels->all_items;
+			switch($post_type) {
+				case 'post':
+					$placeholder .= ' / '.__('Blog Page',WPCA_DOMAIN);
+					break;
+				case 'product':
+					$placeholder .= ' / '.__('Shop Page',WPCA_DOMAIN);
+					break;
+				default:
+					if($post_type_obj->has_archive) {
+						$placeholder .= ' / '.sprintf(__('%s Archives',WPCA_DOMAIN),$post_type_obj->labels->singular_name);
+					}
+					break;
+			}
+
 			$list[$this->id.'-'.$post_type] = array(
 				'name' => $post_type_obj->label,
 				'placeholder' => $placeholder,

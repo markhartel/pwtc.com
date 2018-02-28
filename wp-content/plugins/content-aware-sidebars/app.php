@@ -3,12 +3,10 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
 	exit;
 }
 
@@ -17,7 +15,7 @@ final class CAS_App {
 	/**
 	 * Plugin version
 	 */
-	const PLUGIN_VERSION       = '3.7.1';
+	const PLUGIN_VERSION       = '3.7.4';
 
 	/**
 	 * Prefix for sidebar id
@@ -157,6 +155,7 @@ final class CAS_App {
 
 	/**
 	 * Add actions to plugin in Plugins screen
+	 * 
 	 * @version 2.4
 	 * @param   array     $actions
 	 * @param   string    $plugin_file
@@ -166,15 +165,18 @@ final class CAS_App {
 	 */
 	public function plugin_action_links($actions, $plugin_file, $plugin_data, $context) {
 
-		$new_actions = array(
-			'<a href="https://wordpress.org/support/plugin/content-aware-sidebars" target="_blank">'.__('Get Support','content-aware-sidebars').'</a>'
-		);
-
 		global $cas_fs;
 
+		$new_actions = array();
+
+		$new_actions['docs'] = '<a href="https://dev.institute/docs/content-aware-sidebars/?utm_source=plugin&utm_medium=referral&utm_content=plugin-list&utm_campaign=cas" target="_blank">'.__('Documentation & FAQ','content-aware-sidebars').'</a>';
+		$new_actions['support'] = '<a href="'.esc_url($cas_fs->contact_url()).'">'.__('Support','content-aware-sidebars').'</a>';
+
 		if ( $cas_fs->is_not_paying() )  {
-			$new_actions[] = '<a href="'.$cas_fs->get_upgrade_url().'">'.__('Upgrade','content-aware-sidebars').'</a>';
+			$new_actions['support'] = '<a href="https://wordpress.org/support/plugin/content-aware-sidebars" target="_blank">'.__('Support','content-aware-sidebars').'</a>';
+			$new_actions['upgrade'] = '<a href="'.esc_url($cas_fs->get_upgrade_url()).'">'.__('Upgrade','content-aware-sidebars').'</a>';
 		}
+		unset($actions['addons']);
 
 		return array_merge($new_actions,$actions);
 	}

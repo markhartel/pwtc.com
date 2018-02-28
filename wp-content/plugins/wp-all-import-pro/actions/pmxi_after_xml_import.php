@@ -25,7 +25,7 @@ function pmxi_pmxi_after_xml_import( $import_id, $import )
                     if (!empty($parent_post) && !is_wp_error($parent_post)){
                         wp_update_post(array(
                             'ID' => $pid,
-                            'post_parent' => $parent_post
+                            'parent' => $parent_post->ID
                         ));
                     }
                 }

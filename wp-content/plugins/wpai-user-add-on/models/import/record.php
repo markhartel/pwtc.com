@@ -55,7 +55,14 @@ class PMUI_Import_Record extends PMUI_Model_Record {
 		else {
 			$parsing_data['count'] and $this->data['pmui_pass'] = array_fill(0, $parsing_data['count'], '');
 		}
-
+		
+		if ( ! empty($parsing_data['import']->options['is_hashed_wordpress_password']) ) {
+			$this->data['is_hashed_wordpress_password'] = XmlImportParser::factory($xml, $cxpath, (string)$parsing_data['import']->options['is_hashed_wordpress_password'], $file)->parse($records); $tmp_files[] = $file;				
+		}
+		else {
+			$parsing_data['count'] and $this->data['is_hashed_wordpress_password'] = array_fill(0, $parsing_data['count'], '');
+		}
+		
 		if ( ! empty($parsing_data['import']->options['pmui']['nicename']) ) {
 			$this->data['pmui_nicename'] = XmlImportParser::factory($xml, $cxpath, $parsing_data['import']->options['pmui']['nicename'], $file)->parse($records); $tmp_files[] = $file;				
 		}
@@ -163,7 +170,40 @@ class PMUI_Import_Record extends PMUI_Model_Record {
 			{
 				wp_new_user_notification( $importData['pid'], null, 'both' );
 			}
-		}		
+		}
+		
+		if (
+			// This is a new user
+	    	(empty($importData['articleData']['ID'])
+			// The 'is_hashed_wordpress_password' variable is present
+	    	and isset($importData['import']->options['is_hashed_wordpress_password'])
+			// The 'is_hashed_wordpress_password' option is enabled
+			and $importData['import']->options['is_hashed_wordpress_password'] == '1')
+			or
+			// This is an existing user, and we can update the password
+			($importData['import']->options['is_update_password'] == '1'
+			// The 'is_hashed_wordpress_password' variable is present
+			and isset($importData['import']->options['is_hashed_wordpress_password'])
+			// The 'is_hashed_wordpress_password' option is enabled
+			and $importData['import']->options['is_hashed_wordpress_password'] == '1')
+    	){
+
+			$user_pass_hash = $importData['articleData']['user_pass'];
+		
+			global $wpdb;
+
+			$table = $wpdb->base_prefix . 'users';
+			$wpdb->query( $wpdb->prepare(
+				"
+				UPDATE `" . $table . "`
+				SET `user_pass` = %s
+				WHERE `ID` = %d
+				",
+				$user_pass_hash,
+				$importData['pid']
+			) );
+		
+		}
 
 	}
 
