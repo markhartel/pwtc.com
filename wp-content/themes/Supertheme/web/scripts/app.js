@@ -15,7 +15,10 @@ jQuery(function() {
 
     // rerun equlizer after form changes in case they change the hiehgtt of the page
     jQuery('.gform_wrapper form').on('change', function(){
-        Foundation.reInit('equalizer');
+        console.log("reinit");
+        setTimeout(function(){
+            Foundation.reInit('equalizer');
+        }, 100);
     });
 
     // rerun on page load
