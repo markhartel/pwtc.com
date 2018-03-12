@@ -1,0 +1,57 @@
+<header data-sticky-container>
+    <div data-sticky data-options="marginTop:0;" style="width:100%">
+        <!-- desktop menu -->
+        <div class="row column hide-for-small-only">
+            <!-- top row -->
+            <div class="top clearfix">
+                {% if isLoggedIn is defined and isLoggedIn %}
+                    <ul class="dropdown menu hide-for-small-only float-right" data-dropdown-menu data-close-on-click-inside="false">
+                        <li>
+                            <a href="#">
+                                {{ avatar }}
+                            </a>
+                            {{ memberMenu }}
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="login-menu menu float-right">
+                        <li><a href="{{ loginLink }}" class="tiny primary hollow button">Login</a></li>
+                    </ul>
+                {% endif %}
+            </div>
+            <!-- bottom row -->
+            <div class="bottom clearfix">
+
+                <ul class="vertical menu">
+                    <li><a href="{{ url }}" class="title float-left">PWTC</a></li>
+                </ul>
+                {{ desktopMenu }}
+            </div>
+        </div>
+        <!-- mobile menu title bar -->
+        <div class="title-bar hide-for-medium" data-hide-for="medium">
+            <div class="title-bar-left">
+                <div class="title-bar-title"><a href="{{ url }}">PWTC</a></div>
+            </div>
+            <div class="title-bar-right">
+                {% if isLoggedIn is defined and isLoggedIn %}
+                    <ul class="dropdown menu float-left" data-dropdown-menu data-close-on-click-inside="false">
+                        <li>
+                            <a class="mobile-account-menu">
+                                {{ avatar }}
+                            </a>
+                            {{ memberMenu }}
+                        </li>
+                    </ul>
+                {% else %}
+                    <a href="{{ loginLink }}" class="tiny hollow button">Login</a>
+                {% endif %}
+                <span data-responsive-toggle="mobile-menu"><button class="menu-icon" type="button" data-toggle></button></span>
+            </div>
+        </div>
+        <!-- mobile menu -->
+        <div id="mobile-menu" class="hide-for-medium">
+            {{ mobileMenu }}
+        </div>
+    </div>
+</header>

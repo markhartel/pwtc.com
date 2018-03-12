@@ -1,0 +1,30 @@
+.alternating-content {
+  @extend .clearfix;
+  background-color: $dark-gray;
+  color: #FFF;
+  padding-top: $global-margin * 2;
+  .row {
+    margin-bottom: $global-margin * 2;
+    transform-style: preserve-3d;
+  }
+
+  .content {
+    position: relative;
+    @include breakpoint(large) {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    a.fancybox-media {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: $white;
+      &:hover {
+        color: $anchor-color-hover;
+      }
+    }
+  }
+}

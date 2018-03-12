@@ -1,0 +1,7 @@
+assets/libs
+assets/scripts-min
+assets/styles
+node_modules
+var/cache/*
+var/twig/*
+vendor

@@ -1,0 +1,29 @@
+#basic-form, .household-delete, .fancybox-message, #add-form {
+  display: none;
+}
+#basic-form {
+  .column:last-child:not(:first-child), .columns:last-child:not(:first-child) {
+    float: left;
+  }
+}
+.account-overview.profile {
+  margin-bottom: $global-margin;
+  font-size: 0;
+  img {
+    width: 200px;
+    margin-bottom: $global-margin;
+  }
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  input[type=submit] {
+    @include button(false);
+  }
+  input[type=checkbox], .description {
+    display: none;
+  }
+}
+.contact.menu {
+  margin-bottom: $global-margin;
+}

@@ -1,0 +1,161 @@
+//dont overwrite link style in header
+.login-menu .button.hollow.primary {
+  border: 1px solid #53D9E6;
+  color: #53D9E6;
+  background-color: transparent;
+  font-size: 0.6rem;
+  padding: 0.7rem 1rem;
+  margin: 0.7rem 0 0.7rem 0.5rem ;
+}
+
+// product link
+.woocommerce-LoopProduct-link {
+  color: $body-font-color;
+  &:hover {
+    color: $body-font-color;
+  }
+}
+
+// rating
+.woocommerce .star-rating span::before {
+  color: $body-font-color;
+}
+
+// price
+.woocommerce div.product p.price, .woocommerce div.product span.price, .woocommerce-Price-amount {
+  color: $body-font-color;
+  font-size: 2rem;
+}
+// stock text
+.woocommerce div.product .stock {
+  color: $alert-color;
+  &.in-stock {
+    color: $body-font-color;
+  }
+}
+
+// button
+.woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt,
+.woocommerce #respond input#submit, .woocommerce a.button, .woocommerce button.button, .woocommerce input.button {
+  background-color: $button-background;
+  color: $white;
+  font-weight: normal;
+  &:hover {
+    background-color: $button-background-hover;
+    color: $white;
+    font-weight: normal;
+  }
+}
+.woocommerce #respond input#submit, .woocommerce a.button, .woocommerce button.button, .woocommerce input.button {
+  border-radius: 0;
+  padding: 0.75em 1em;
+}
+.woocommerce ul.products li.product .button {
+  margin: 0;
+}
+
+// tabs for reviews/details
+.woocommerce div.product .woocommerce-tabs ul.tabs {
+  border: none;
+  padding: 0 0 0 5px;
+}
+.woocommerce div.product .woocommerce-tabs ul.tabs li {
+  border-radius: 0;
+}
+.woocommerce div.product .woocommerce-tabs ul.tabs li::after, .woocommerce div.product .woocommerce-tabs ul.tabs li::before {
+  display: none ;
+  content: "";
+}
+
+// avatar
+.woocommerce #reviews #comments ol.commentlist li img.avatar {
+  padding: 0;
+  border-radius: 100%;
+}
+
+// woocommerce textarea
+.woocommerce #reviews #comment {
+  height: rem-calc(200px);
+}
+
+// lightbox gallery
+.pp_gallery, div.ppt, div.pp_woocommerce .pp_details, .pp_expand {
+  display: none !important;
+}
+.pp_content {
+  height: auto !important;
+}
+a.pp_next::before {
+  background-image: none !important;
+  background-color: transparent !important;
+  content: "\f061" !important;
+  font-family: "FontAwesome" !important;
+  font-size: 2rem !important;
+  color: $white !important;
+  &:hover {
+    color: $anchor-color-hover !important;
+  }
+}
+a.pp_previous::before {
+  background-image: none !important;
+  background-color: transparent !important;
+  content: "\f060" !important;
+  font-family: "FontAwesome" !important;
+  font-size: 2rem !important;
+  color: $white !important;
+  &:hover {
+    color: $anchor-color-hover !important;
+  }
+}
+
+// view cart
+.woocommerce a.added_to_cart {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  color: $white;
+  line-height:1;
+  position: relative;
+  top: 1px;
+  background-color: map-get($foundation-palette, dark);
+  &:hover {
+    background-color: scale_color(map-get($foundation-palette, dark), $lightness: -15%);
+  }
+}
+
+// table buttons
+.woocommerce .cart .button, .woocommerce .cart input.button {
+  background-color: map-get($foundation-palette, dark);
+  &:hover {
+    background-color: scale_color(map-get($foundation-palette, dark), $lightness: -15%);
+  }
+}
+.woocommerce .cart .coupon .button, .woocommerce .cart .coupon input.button {
+  background-color: $success-color;
+  &:hover {
+    background-color: scale_color($success-color, $lightness: -15%);
+  }
+}
+.woocommerce input.button:disabled, .woocommerce input.button[disabled]:disabled {
+  background-color: map-get($foundation-palette, dark);
+  &:hover {
+    background-color: scale_color(map-get($foundation-palette, dark), $lightness: -15%);
+  }
+}
+
+// variation data
+.variations {
+  border: none;
+  tbody {
+    border: none;
+  }
+  .label {
+    background: none;
+    label {
+      padding: 8px 0;
+      font-size: 1rem;
+    }
+  }
+}
+.product.has-default-attributes.has-children > .images {
+  opacity: 1;
+}

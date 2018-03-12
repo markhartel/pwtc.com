@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.27, created on 2017-11-08 12:12:21
+<?php /* Smarty version 2.6.27, created on 2018-03-11 23:10:51
          compiled from CRM/common/wordpress.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 'crmScope', 'CRM/common/wordpress.tpl', 1, false),array('block', 'ts', 'CRM/common/wordpress.tpl', 48, false),array('block', 'crmRegion', 'CRM/common/wordpress.tpl', 67, false),array('modifier', 'truncate', 'CRM/common/wordpress.tpl', 30, false),array('function', 'crmNavigationMenu', 'CRM/common/wordpress.tpl', 32, false),)), $this); ?>

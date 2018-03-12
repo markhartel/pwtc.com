@@ -1,0 +1,15 @@
+<section class="news">
+    <div class="row column">
+        <h2>{% if title is defined %}{{ title }}{% else %}News{% endif %}</h2>
+    </div>
+    <div class="row small-up-1 medium-up-2 large-up-4">
+        {% for teaser in teasers %}
+            <div class="column{% if loop.index > 4 %} hide-for-small-only{% endif %}">
+                {{ teaser }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row column text-center">
+        <a href="{{ blog_url }}" class="large primary button">Read More</a>
+    </div>
+</section>

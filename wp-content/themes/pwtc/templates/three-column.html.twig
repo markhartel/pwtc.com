@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="three-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <div class="medium-12 large-3 columns sidebar hide-for-small-only">
+                {{ left_sidebar }}
+            </div>
+            <article class="medium-8 large-6 columns content" data-equalizer-watch="">
+                <h1>{{ SP.WordPress.title() }}</h1>
+                {{ SP.WordPress.content() }}
+            </article>
+            <div class="medium-4 large-3 columns sidebar" data-equalizer-watch="">
+                {{ right_sidebar }}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}

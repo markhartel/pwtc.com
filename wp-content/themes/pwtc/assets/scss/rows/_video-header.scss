@@ -1,0 +1,33 @@
+.video {
+  position: relative;
+  .content {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  h1 {
+    text-transform: uppercase;
+    font-weight: bolder;
+    color: #FFF;
+    width: 100%;
+    font-size: 2rem;
+    line-height: 1.2;
+    @include breakpoint(medium) {
+      font-size: 3rem;
+      line-height: 1.4;
+    }
+    @include breakpoint(large) {
+      font-size: 4rem;
+    }
+  }
+  a {
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+  i.fa {
+    font-size: 3rem;
+  }
+}

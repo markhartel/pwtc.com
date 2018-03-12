@@ -1,0 +1,13 @@
+<span class="term">Maps:</span>
+<span class="value">
+    {% for map in maps %}
+        {% if map.type == "link" %}
+            <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.title }}</a>
+        {% elseif map.type == "file"%}
+            <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.title }}</a>
+        {% endif %}
+        {% if not loop.last %}, {% endif %}
+    {% else%}
+        <i class="missing">No maps available</i>
+    {% endfor %}
+</span>

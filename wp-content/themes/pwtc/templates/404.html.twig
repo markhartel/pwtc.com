@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div class="row">
+        <article class="small-12 columns content" data-equalizer-watch="">
+            <h1>404 Page Not Found</h1>
+            <h4>Check out some of our other content below</h4>
+            {{ rows }}
+        </article>
+    </div>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}
