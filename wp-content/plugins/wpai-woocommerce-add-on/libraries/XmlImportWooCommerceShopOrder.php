@@ -63,8 +63,12 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 			}
 		}
 
-		add_filter('wp_all_import_is_post_to_skip', array( &$this, 'wp_all_import_is_post_to_skip'), 10, 5);
-		add_filter('wp_all_import_combine_article_data', array( &$this, 'wp_all_import_combine_article_data'), 10, 4);
+        if ( ! has_filter('wp_all_import_is_post_to_skip')){
+            add_filter('wp_all_import_is_post_to_skip', array( &$this, 'wp_all_import_is_post_to_skip'), 10, 5);
+        }
+        if ( ! has_filter('wp_all_import_combine_article_data')){
+            add_filter('wp_all_import_combine_article_data', array( &$this, 'wp_all_import_combine_article_data'), 10, 4);
+        }
 		
 	}
 
@@ -293,7 +297,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 											{
 												foreach ($row_data['meta_name'] as $meta_name) 
 												{
-													$products[$j]['meta_name'][] = $meta_name[$j];
+													if (isset($meta_name[$k])) $products[$j]['meta_name'][] = $meta_name[$k];
 												}
 											}											
 
@@ -301,7 +305,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 											{
 												foreach ($row_data['meta_value'] as $meta_value) 
 												{
-													$products[$j]['meta_value'][] = $meta_value[$j];
+													if (isset($meta_value[$k])) $products[$j]['meta_value'][] = $meta_value[$k];
 												}
 											}											
 										}	
@@ -358,7 +362,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 											{
 												foreach ($row_data['meta_name'] as $meta_name) 
 												{
-													$products[$j]['meta_name'][] = $meta_name[$j];
+													if (isset($meta_name[$k])) $products[$j]['meta_name'][] = $meta_name[$k];
 												}
 											}
 											
@@ -366,7 +370,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 											{
 												foreach ($row_data['meta_value'] as $meta_value) 
 												{
-													$products[$j]['meta_value'][] = $meta_value[$j];
+													if (isset($meta_value[$k])) $products[$j]['meta_value'][] = $meta_value[$k];
 												}
 											}											
 										}																					
@@ -418,7 +422,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 									{
 										foreach ($product['meta_name'] as $meta_name) 
 										{
-											$products[$k]['meta_name'][] = $meta_name[$j];
+											if (isset($meta_name[$j])) $products[$k]['meta_name'][] = $meta_name[$j];
 										}
 									}									
 
@@ -426,7 +430,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 									{
 										foreach ($product['meta_value'] as $meta_value) 
 										{
-											$products[$k]['meta_value'][] = $meta_value[$j];
+											if (isset($meta_value[$j])) $products[$k]['meta_value'][] = $meta_value[$j];
 										}
 									}									
 								}
@@ -1200,7 +1204,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 					{
 						$is_product_founded = true;
 
-						$item_price = $product->get_price();
+						$item_price = empty($productItem['price_per_unit']) ? $product->get_price() : $productItem['price_per_unit'];
 
 						$item_qty = empty($productItem['qty']) ? 1 : $productItem['qty']; 
 
@@ -1811,6 +1815,11 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 		update_post_meta($order_id, '_cart_discount_tax', $total_discount_amount_tax);
 	}
 
+    /**
+     * @param WC_Order $order
+     * @param $order_id
+     * @param $index
+     */
 	protected function _import_shipping_items( & $order, $order_id, $index )
 	{
 		if ( ! empty($this->data['pmwi_order']['shipping'][$index]))
@@ -1896,7 +1905,22 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 
 						if ( ! $item_id )
 						{
-							$item_id = $order->add_shipping( $shipping_method );
+
+                            $item = new WC_Order_Item_Shipping();
+                            $item->set_props( array(
+                                'method_title' => $shipping_method->label,
+                                'method_id'    => $shipping_method->id,
+                                'total'        => wc_format_decimal( $shipping_method->cost ),
+                                'taxes'        => $shipping_method->taxes,
+                                'order_id'     => $order_id,
+                            ) );
+                            foreach ( $shipping_method->get_meta_data() as $key => $value ) {
+                                $item->add_meta_data( $key, $value, true );
+                            }
+                            $item->save();
+                            $order->add_item( $item );
+                            $item_id =  $item->get_id();
+
 						}
 
 						if ( ! $item_id ) {						
@@ -1916,11 +1940,21 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 					else
 					{
 						$item_id = str_replace('shipping-item-', '', $shipping_item->product_key);
-						$is_updated = $order->update_shipping($item_id, array(
-							'method_title' => $shipping_method->label,
-							'method_id' => $shipping_method->id,
-							'cost' => $shipping_method->cost
-						));
+                        $item = $order->get_item( $item_id );
+                        if ( is_object( $item ) && $item->is_type( 'shipping' ) ) {
+                            $args = array(
+                                'method_title' => $shipping_method->label,
+                                'method_id' => $shipping_method->id,
+                                'cost' => $shipping_method->cost
+                            );
+                            $item->set_order_id( $order_id );
+                            $item->set_props( $args );
+                            $item->save();
+                            $order->calculate_shipping();
+
+                            $is_updated = $item->get_id();
+                        }
+
 						if ( $is_updated )
 						{
 							$shipping_item->set(array(								
@@ -1965,14 +1999,14 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 					else
 					{
 						$tax_rate = $this->tax_rates[$tax['tax_code']];
-						$tax['tax_amount'] = 0;
+//						$tax['tax_amount'] = 0;
 						$tax['shipping_tax_amount'] = 0;
 					}
 				}
                 else{
                     if ( ! empty($this->tax_rates[$tax['tax_code']])) {
                         $tax_rate = $this->tax_rates[$tax['tax_code']];
-                        $tax['tax_amount'] = 0;
+//                        $tax['tax_amount'] = 0;
                         $tax['shipping_tax_amount'] = 0;
                     }
                     else{
@@ -2039,6 +2073,7 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 								'product_key' => 'tax-item-' . $item_id,
 								'iteration'   => $this->import->iteration
 							))->save();
+
 						}
 					}
 					else{
@@ -2047,25 +2082,30 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 
                         if ( version_compare(WOOCOMMERCE_VERSION, '3.0') >= 0 ) {
 
-                            $item = new WC_Order_Item_Tax( $item_id );
+                            try{
+                                $item = new WC_Order_Item_Tax( $item_id );
 
-                            if ( isset( $tax_rate->tax_rate_name ) ) {
-                                $item->set_name( wc_clean( $tax_rate->tax_rate_name ) );
-                            }
-                            if ( isset( $tax_rate->tax_rate_id ) ) {
-                                $item->set_rate( $tax_rate->tax_rate_id );
-                            }
-                            if ( isset( $tax['tax_amount'] ) ) {
-                                $item->set_tax_total( floatval( $tax['tax_amount'] ) );
-                            }
+                                if ( isset( $tax_rate->tax_rate_name ) ) {
+                                    $item->set_name( wc_clean( $tax_rate->tax_rate_name ) );
+                                }
+                                if ( isset( $tax_rate->tax_rate_id ) ) {
+                                    $item->set_rate( $tax_rate->tax_rate_id );
+                                }
+                                if ( isset( $tax['tax_amount'] ) ) {
+                                    $item->set_tax_total( floatval( $tax['tax_amount'] ) );
+                                }
 
-                            $is_updated = $item->save();
+                                $is_updated = $item->save();
 
-                            if ( $is_updated )
-                            {
-                                $tax_item->set(array(
-                                    'iteration'   => $this->import->iteration
-                                ))->save();
+                                if ( $is_updated )
+                                {
+                                    $tax_item->set(array(
+                                        'iteration'   => $this->import->iteration
+                                    ))->save();
+                                }
+                            }
+                            catch (Exception $e){
+                                $tax_item->delete();
                             }
                         }
 
@@ -2272,7 +2312,11 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 		return $customer;
 	}
 
-	protected function _calculate_shipping_taxes( & $order ){
+    /**
+     * @param WC_Order $order
+     * @return bool
+     */
+    protected function _calculate_shipping_taxes(& $order ){
 
         $tax_total          = 0;
         $shipping_tax_total = 0;
@@ -2286,15 +2330,15 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
         }
 
         if ( 'billing' === $tax_based_on ) {
-            $country  = $order->billing_country;
-            $state    = $order->billing_state;
-            $postcode = $order->billing_postcode;
-            $city     = $order->billing_city;
+            $country  = $order->get_billing_country();
+            $state    = $order->get_billing_state();
+            $postcode = $order->get_billing_postcode();
+            $city     = $order->get_billing_city();
         } elseif ( 'shipping' === $tax_based_on ) {
-            $country  = $order->shipping_country;
-            $state    = $order->shipping_state;
-            $postcode = $order->shipping_postcode;
-            $city     = $order->shipping_city;
+            $country  = $order->get_shipping_country();
+            $state    = $order->get_shipping_state();
+            $postcode = $order->get_shipping_postcode();
+            $city     = $order->get_shipping_city();
         }
 
 	    // Calc taxes for shipping
@@ -2348,7 +2392,11 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
 //        $order->set_total( $tax_total, 'tax' );
     }
 
-    protected function _calculate_fee_taxes( &$order ){
+    /**
+     * @param WC_Order $order
+     * @return bool
+     */
+    protected function _calculate_fee_taxes(&$order ){
 
         $tax_total          = 0;
         $shipping_tax_total = 0;
@@ -2362,15 +2410,15 @@ class XmlImportWooCommerceShopOrder extends XmlImportWooCommerce{
         }
 
         if ( 'billing' === $tax_based_on ) {
-            $country  = $order->billing_country;
-            $state    = $order->billing_state;
-            $postcode = $order->billing_postcode;
-            $city     = $order->billing_city;
+            $country  = $order->get_billing_country();
+            $state    = $order->get_billing_state();
+            $postcode = $order->get_billing_postcode();
+            $city     = $order->get_billing_city();
         } elseif ( 'shipping' === $tax_based_on ) {
-            $country  = $order->shipping_country;
-            $state    = $order->shipping_state;
-            $postcode = $order->shipping_postcode;
-            $city     = $order->shipping_city;
+            $country  = $order->get_shipping_country();
+            $state    = $order->get_shipping_state();
+            $postcode = $order->get_shipping_postcode();
+            $city     = $order->get_shipping_city();
         }
 
         // Default to base

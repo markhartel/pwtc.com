@@ -53,7 +53,11 @@ if ( ! class_exists( 'WpSmushResize' ) ) {
 			}
 
 			global $wpsmush_settings, $wpsmushit_admin;
-			$current_screen = get_current_screen();
+
+			$settings = $wpsmush_settings->settings;
+
+			// Make sure the screen function exists.
+			$current_screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
 
 			if ( ! empty( $current_screen ) && ! $skip_check ) {
 				//Do not Proceed if not on one of the required screens
@@ -64,7 +68,7 @@ if ( ! class_exists( 'WpSmushResize' ) ) {
 			}
 
 			//If resizing is enabled
-			$this->resize_enabled = $wpsmush_settings->get_setting( WP_SMUSH_PREFIX . 'resize' );
+			$this->resize_enabled = $settings['resize'];
 
 			$resize_sizes = $wpsmush_settings->get_setting( WP_SMUSH_PREFIX . 'resize_sizes', array() );
 
@@ -99,8 +103,11 @@ if ( ! class_exists( 'WpSmushResize' ) ) {
 					return false;
 				}
 
+				$file_exists = $wpsmush_helper->file_exists( $id, $file_path );
+
 				//If file doesn't exists, return
-				if ( ! file_exists( $file_path ) ) {
+				if ( ! $file_exists ) {
+
 					return false;
 				}
 

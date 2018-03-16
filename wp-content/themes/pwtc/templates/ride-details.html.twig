@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="two-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <article class="medium-8 large-9 columns content ride" data-equalizer-watch>
+                <h1 class="{% if SP.ACF.get_field('is_canceled') %}canceled{% endif %}">{{ SP.WordPress.title() }}</h1>
+                {% if SP.ACF.get_field('is_canceled') %}
+                    <h3>This ride has been canceled!</h3>
+                {% endif %}
+                <div class="row column description">
+                    {% include 'partials/ride-description.html.twig' with {description:
+                    description} only %}
+                </div>
+                <div class="row column details">
+                    <h4>Details</h4>
+                    <div class="row small-up-1 medium-up-2 large-up-3 details">
+                        <div class="column">
+                            {% include 'partials/ride-date.html.twig' with {date: SP.ACF.get_field('date')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-time.html.twig' with {date: SP.ACF.get_field('date')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-type.html.twig' with {type: SP.ACF.get_field('type')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-pace.html.twig' with {pace: SP.ACF.get_field('pace')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-length.html.twig' with {length: length, max_length: max_length} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-terrain.html.twig' with {terrains: terrain} only %}
+                        </div>
+                    </div>
+                </div>
+                <div class="maps">
+                    {% include 'partials/ride-maps.html.twig' with {maps: maps} only %}
+                </div>
+                <div class="row column location">
+                    <h4>Start Location </h4>
+                    <div>
+                        <p>{{ SP.ACF.get_field('start_location').address }}</p>
+                    </div>
+                    <div class="google-maps">
+                        <div class="acf-map">
+                            <div class="marker" data-lat="{{ SP.ACF.get_field('start_location').lat }}" data-lng="{{ SP.ACF.get_field('start_location').lng }}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {% include 'partials/ride-calendarlink.html.twig' with {date: SP.ACF.get_field('date')} only %}
+                    <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Export Ride</a>
+                    {% if user_can_cancel %}
+                        {% if SP.ACF.get_field('is_canceled') %}
+                            <a href="{{ current_url }}?canceled=0" class="success button"><i class="fa fa-calendar-check-o"></i> Allow Ride</a>
+                        {% else %}
+                            <a href="{{ current_url }}?canceled=1" class="alert button"><i class="fa fa-calendar-times-o"></i> Cancel Ride</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </article>
+            <div class="medium-4 large-3 columns sidebar" data-equalizer-watch="">
+                <h3 class="text-center">Ride Leaders</h3>
+                {% include 'partials/ride-leaders.html.twig' with {leaders: SP.ACF.Get_field('ride_leaders')} only %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}

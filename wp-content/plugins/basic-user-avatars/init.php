@@ -321,7 +321,7 @@ class basic_user_avatars {
 		?>
 		<form id="basic-user-avatar-form" action="<?php the_permalink(); ?>" method="post" enctype="multipart/form-data">
 			<?php
-			echo get_avatar( $profileuser->ID );
+			echo get_avatar( $profileuser->ID, 200 );
 
 			$options = get_option( 'basic_user_avatars_caps' );
 			if ( empty( $options['basic_user_avatars_caps'] ) || current_user_can( 'upload_files' ) ) {

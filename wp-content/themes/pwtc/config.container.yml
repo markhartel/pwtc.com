@@ -1,0 +1,83 @@
+parameters:
+  twig.paths:
+    - "%template_dir%/templates"
+  twig.options:
+    debug:            false
+    charset:          "utf-8"
+    cache:            "%template_dir%/var/twig"
+    auto_reload:      "%WP_DEBUG%"
+    strict_variables: false
+    autoescape:       false
+    optimizations:    -1
+  wordpress.theme_support:
+    - "html5"
+    - "post-thumbnails"
+    - "custom-logo"
+    - "woocommerce"
+  wordpress.translations: "%template_dir%/languages"
+  wordpress.image_sizes:
+    fullscreen: [1920, 1080, true]
+    teaser: [600, 600, true]
+    desktop_slider: [1900, 630, true]
+    mobile_slider: [600, 300, true]
+  wordpress.menus:
+    member_menu: "Member Menu"
+    primary_menu: "Primary Menu"
+    footer_menu: "Footer Menu"
+  wordpress.sidebars:
+    -
+      id: "left_sidebar"
+      name: "Left Sidebar"
+      description: "Left Sidebar"
+      before_widget: '<section id="%1$s" class="widget %2$s">'
+      after_widget: '</section>'
+      before_title: '<h4 class="widgettitle">'
+      after_title: '</h4>'
+    -
+      id: "right_sidebar"
+      name: "Right Sidebar"
+      description: "Right Sidebar"
+      before_widget: '<section id="%1$s" class="widget %2$s">'
+      after_widget: '</section>'
+      before_title: '<h4 class="widgettitle">'
+      after_title: '</h4>'
+  wordpress.styles:
+    - { id: "app", source: "%template_uri%/assets/styles/app.css", deps: [], version: "1.1" }
+  wordpress.scripts:
+    - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
+    - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false, version: "1.0" }
+    - { id: "app", source: "%template_uri%/assets/scripts-min/app.min.js", deps: ["jquery", "sharethis", "gmaps"], header: false, version: "1.4" }
+
+services:
+  # just the basics
+  http:
+    class: "Symfony\\Component\\Form\\Extension\\HttpFoundation\\HttpFoundationExtension"
+  session:
+    class: "Symfony\\Component\\HttpFoundation\\Session\\Session"
+    arguments: ["@session.bridge"]
+  session.bridge:
+    class: "Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage"
+  translater:
+    class: "Symfony\\Component\\Translation\\Translator"
+    arguments: ["en"]
+  # get twiggy with it
+  twig.loader:
+    class: "Twig_Loader_Filesystem"
+    arguments: ["%twig.paths%"]
+  twig.debug:
+    class: "Twig_Extension_Debug"
+  twig.acf:
+    class: "PWTC\\WordPress\\Twig\\ACF"
+  twig.wordpress:
+    class: "PWTC\\WordPress\\Twig\\WordPress"
+  twig.civicrm:
+    class: "PWTC\\WordPress\\Twig\\CiviCRM"
+  twig.PWTC:
+    class: "PWTC\\WordPress\\Twig\\Theme"
+    arguments: ["@twig.acf", "@twig.wordpress", "@twig.civicrm"]
+  twig.environment:
+    class: "Twig_Environment"
+    arguments: ["@twig.loader", "%twig.options%"]
+    calls:
+      - ["addExtension", ["@twig.debug"]]
+      - ["addGlobal", ["SP", "@twig.PWTC"]]

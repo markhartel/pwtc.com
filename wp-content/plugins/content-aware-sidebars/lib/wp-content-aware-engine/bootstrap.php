@@ -1,8 +1,9 @@
 <?php
 /**
  * @package WP Content Aware Engine
- * @copyright Joachim Jensen <jv@intox.dk>
+ * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -13,7 +14,7 @@ if (!defined('ABSPATH')) {
  * Version of this WPCA
  * @var string
  */
-$this_wpca_version = '4.2.1';
+$this_wpca_version = '4.3';
 
 /**
  * Class to make sure the latest

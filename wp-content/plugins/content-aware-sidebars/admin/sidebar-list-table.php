@@ -3,7 +3,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 if (!defined('ABSPATH')) {
@@ -447,7 +447,7 @@ class CAS_Sidebar_List_Table extends WP_List_Table {
 					$return = $action->get_list_data($post->ID);
 					$host = $metadata->get('host')->get_list_data($post->ID);
 					$return .= ": " . ($host ? $host : '<span style="color:red;">' . __('Please update Host Sidebar', "content-aware-sidebars") . '</span>');
-					if($action->get_data($post->ID) != 3) {
+					if($action->get_data($post->ID) == 1) {
 						$pos = $metadata->get("merge_pos")->get_data($post->ID,true);
 						$pos_icon = $pos ? "up" : "down";
 						$pos_title = array(

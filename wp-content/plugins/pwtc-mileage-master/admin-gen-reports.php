@@ -84,6 +84,10 @@ jQuery(document).ready(function($) {
 
     $('#report-main-section .ride-mileage a').on('click', function(evt) {
         evt.preventDefault();
+        var showid = false;
+        if ($('#report-main-section .mileage-showid-chk').is(':checked')) {
+            showid = true;
+        }
         if ($('#report-main-section .download-slt').val() != 'no') {
             $('#report-main-section .download').html(
                 '<form method="post">' + 
@@ -91,6 +95,7 @@ jQuery(document).ready(function($) {
                 '<input type="hidden" name="report_id" value="' + $(this).attr('report-id') + '"/>' +
                 '<input type="hidden" name="sort" value="' + 
                     $('#report-main-section .mileage-sort-slt').val() + '"/>' +
+                '<input type="hidden" name="showid" value="' + showid + '"/>' +                  
                 '</form>');
             $('#report-main-section .download form').submit();
         }
@@ -99,7 +104,8 @@ jQuery(document).ready(function($) {
             var data = {
                 'action': 'pwtc_mileage_generate_report',
                 'report_id': $(this).attr('report-id'),
-                'sort': $('#report-main-section .mileage-sort-slt').val()
+                'sort': $('#report-main-section .mileage-sort-slt').val(),
+                'showid': showid
             };
             $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
@@ -108,6 +114,10 @@ jQuery(document).ready(function($) {
 
     $('#report-main-section .ride-leader a').on('click', function(evt) {
         evt.preventDefault();
+        var showid = false;
+        if ($('#report-main-section .leader-showid-chk').is(':checked')) {
+            showid = true;
+        }
         if ($('#report-main-section .download-slt').val() != 'no') {
             $('#report-main-section .download').html(
                 '<form method="post">' + 
@@ -115,6 +125,7 @@ jQuery(document).ready(function($) {
                 '<input type="hidden" name="report_id" value="' + $(this).attr('report-id') + '"/>' +
                 '<input type="hidden" name="sort" value="' + 
                     $('#report-main-section .leader-sort-slt').val() + '"/>' +
+                '<input type="hidden" name="showid" value="' + showid + '"/>' +                  
                 '</form>');
             $('#report-main-section .download form').submit();
         }
@@ -123,7 +134,8 @@ jQuery(document).ready(function($) {
             var data = {
                 'action': 'pwtc_mileage_generate_report',
                 'report_id': $(this).attr('report-id'),
-                'sort': $('#report-main-section .leader-sort-slt').val()
+                'sort': $('#report-main-section .leader-sort-slt').val(),
+                'showid': showid
             };
             $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
@@ -164,11 +176,16 @@ jQuery(document).ready(function($) {
 
     $('#report-main-section .awards a').on('click', function(evt) {
         evt.preventDefault();
+        var showid = false;
+        if ($('#report-main-section .award-showid-chk').is(':checked')) {
+            showid = true;
+        }
         if ($('#report-main-section .download-slt').val() != 'no') {
             $('#report-main-section .download').html(
                 '<form method="post">' + 
                 '<input type="hidden" name="' + $('#report-main-section .download-slt').val() + '"/>' +
                 '<input type="hidden" name="report_id" value="' + $(this).attr('report-id') + '"/>' +
+                '<input type="hidden" name="showid" value="' + showid + '"/>' +                  
                 '</form>');
             $('#report-main-section .download form').submit();
         }
@@ -176,7 +193,8 @@ jQuery(document).ready(function($) {
             var action = '<?php echo admin_url('admin-ajax.php'); ?>';
             var data = {
                 'action': 'pwtc_mileage_generate_report',
-                'report_id': $(this).attr('report-id')
+                'report_id': $(this).attr('report-id'),
+                'showid': showid
             };
             $('body').addClass('waiting');
             $.post(action, data, generate_report_cb);
@@ -264,11 +282,16 @@ if ($running_jobs > 0) {
         </p>
         <div class='report-sec'>
         <h3><?php echo(intval(date('Y'))-1); ?> Award Reports</h3>
+        <p>Show ID:
+            <input class="award-showid-chk" type="checkbox" name="showid">
+        </p>
         <div class='awards'>
             <div><a href='#' report-id='award_achvmnt'>Accumulative mileage achievement</a></div>
             <div><a href='#' report-id='award_top_miles'>Top annual mileage</a></div>
             <div><a href='#' report-id='award_members'>Member annual and accumulative mileage</a></div>
+            <div><a href='#' report-id='award_members_500'>Member annual and accumulative mileage (500 miles or more)</a></div>
             <div><a href='#' report-id='award_leaders'>Ride leaders</a></div>
+            <div><a href='#' report-id='award_leaders_12'>Ride leaders (12 rides or more)</a></div>
         </div>
         </div>
         <div class='report-sec'>
@@ -278,6 +301,9 @@ if ($running_jobs > 0) {
                 <option value="name">Name</option> 
                 <option value="mileage" selected>Mileage</option>
             </select>
+        </p>
+        <p>Show ID:
+            <input class="mileage-showid-chk" type="checkbox" name="showid">
         </p>
         <div class='ride-mileage'>
             <div><a href='#' report-id='ytd_miles'>Year-to-date mileage</a></div>
@@ -292,6 +318,9 @@ if ($running_jobs > 0) {
                 <option value="name">Name</option> 
                 <option value="rides_led" selected>Rides Led</option>
             </select>
+        </p>
+        <p>Show ID:
+            <input class="leader-showid-chk" type="checkbox" name="showid">
         </p>
         <div class='ride-leader'>
             <div><a href='#' report-id='ytd_led'>Year-to-date ride leaders</a></div>

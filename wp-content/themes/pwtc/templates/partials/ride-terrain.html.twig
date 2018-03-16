@@ -1,0 +1,57 @@
+<span class="term">Terrain:</span>
+<span class="value">
+    {% if attached is not defined or not attached %}
+        {% for terrain in terrains %}
+            {% if terrain == "a" %}
+                <span
+                        class="has-tip"
+                        data-tooltip
+                        aria-haspopup="true"
+                        data-disable-hover="false"
+                        tabindex="1"
+                        title="Basically flat, no steep hills"
+                >A{% if not loop.last %}, {% endif %}</span>
+            {% elseif terrain == "b" %}
+                <span
+                        class="has-tip"
+                        data-tooltip
+                        aria-haspopup="true"
+                        data-disable-hover="false"
+                        tabindex="1"
+                        title="Gently rolling terrain with one or two short hills"
+                >B{% if not loop.last %}, {% endif %}</span>
+            {% elseif terrain == "c" %}
+                <span
+                        class="has-tip"
+                        data-tooltip
+                        aria-haspopup="true"
+                        data-disable-hover="false"
+                        tabindex="1"
+                        title="Moderate terrain with rolling short steep hills or moderate, sustained climbs"
+                >C{% if not loop.last %}, {% endif %}</span>
+            {% elseif terrain == "d" %}
+                <span
+                        class="has-tip"
+                        data-tooltip
+                        aria-haspopup="true"
+                        data-disable-hover="false"
+                        tabindex="1"
+                        title="Difficult terrain with longer, steeper hills"
+                >D{% if not loop.last %}, {% endif %}</span>
+            {% elseif terrain == "e" %}
+                <span
+                        class="has-tip"
+                        data-tooltip
+                        aria-haspopup="true"
+                        data-disable-hover="false"
+                        tabindex="1"
+                        title="Extreme terrain with frequent steep hills and long sustained climbs"
+                >E{% if not loop.last %}, {% endif %}</span>
+            {% endif %}
+        {% else %}
+            <i class="missing">A terrain has not been specified</i>
+        {% endfor %}
+    {% else %}
+        <i class="missing">Will include all terrains found in the attached maps</i>
+    {% endif %}
+</span>

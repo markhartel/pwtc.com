@@ -3,7 +3,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 $url = 'https://dev.institute/wordpress-sidebars/pricing/?utm_source=plugin&utm_medium=popup&utm_content=design&utm_campaign=cas';
@@ -43,7 +43,7 @@ $url = 'https://dev.institute/wordpress-sidebars/pricing/?utm_source=plugin&utm_
 	<tr>
 		<td scope="row"><?php _e('Background Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 	<tr>
@@ -64,7 +64,7 @@ $url = 'https://dev.institute/wordpress-sidebars/pricing/?utm_source=plugin&utm_
 	<tr>
 		<td scope="row"><?php _e('Border Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 	<tr>
@@ -74,25 +74,25 @@ $url = 'https://dev.institute/wordpress-sidebars/pricing/?utm_source=plugin&utm_
 	<tr>
 		<td scope="row"><?php _e('Text Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 	<tr>
 		<td scope="row"><?php _e('Title Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 	<tr>
 		<td scope="row"><?php _e('Link Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 	<tr>
 		<td scope="row"><?php _e('Link Hover Color','content-aware-sidebars'); ?></td>
 		<td>
-			<input type="text" class="js-color-field" value="" readonly />
+			<input type="text" class="js-cas-color-field" value="" readonly />
 		</td>
 	</tr>
 </tbody></table>

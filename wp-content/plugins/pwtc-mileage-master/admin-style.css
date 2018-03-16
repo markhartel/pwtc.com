@@ -107,6 +107,7 @@ table.pretty a {
   display: inline-block;
   box-sizing: border-box;
   margin: 4px 0;
+  font-weight: bold;
 }
 
 .stacked-form select {
@@ -114,6 +115,7 @@ table.pretty a {
   display: inline-block;
   box-sizing: border-box;
   margin: 4px 0;
+  font-weight: bold;
 }
 
 .stacked-form .checkbox-wrap {

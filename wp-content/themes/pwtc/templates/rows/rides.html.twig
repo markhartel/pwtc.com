@@ -1,0 +1,35 @@
+<section class="rides">
+    <div class="row column">
+        <h2>Rides</h2>
+    </div>
+    {% for date,rides in rides %}
+        <div class="date">
+            <div class="row column">
+                <h4>{{ date | date("l, M j") }}<sup>{{ date | date("S") }}</sup></h4>
+            </div>
+        </div>
+        {% for ride in rides %}
+            <div class="row column card">
+                <div class="row callout">
+                    <div class="small-4 medium-2 columns">
+                        <h4 class="time">{{ ride.time | date('g:i') }}<sup>{{ ride.time | date('a') }}</sup></h4>
+                    </div>
+                    <div class="small-8 medium-10 columns">
+                        <h4 class="{% if ride.is_canceled %}canceled{% endif %}"><a href="{{ ride.link }}">{{ ride.title }}</a></h4>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="date">
+            <div class="row column">
+                <h4>There are no rides scheduled. Please check again later</h4>
+            </div>
+        </div>
+    {% endfor %}
+    {% if rides %}
+        <div class="row column text-center">
+            <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}" class="large dark button">More Rides</a>
+        </div>
+    {% endif %}
+</section>

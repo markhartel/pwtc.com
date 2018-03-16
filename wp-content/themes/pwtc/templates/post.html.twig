@@ -1,0 +1,23 @@
+<section class="news">
+    <div class="row column">
+        <h2>{% if title is defined %}{{ title }}{% else %}News{% endif %}</h2>
+    </div>
+    <div class="row small-up-1 medium-up-2 large-up-4">
+        {% for teaser in teasers %}
+            <div class="column{% if loop.index > 4 %} hide-for-small-only{% endif %}">
+                {{ teaser }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row column text-center">
+        <ul class="pagination text-center" role="navigation" aria-label="Pagination">
+            {% for i in 1..pages %}
+                {% if i == page %}
+                    <li class="current"><span class="show-for-sr">You're on page</span>{{ i }}</li>
+                {% else %}
+                    <li><a href="{{ SP.WordPress.get_pagenum_link(i) }}" aria-label="Page {{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</section>

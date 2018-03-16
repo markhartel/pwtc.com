@@ -45,6 +45,12 @@ class PMWI_Import_Record extends PMWI_Model_Record {
 			add_action('pmxi_gallery_image', array($this, 'wpai_gallery_image'), 10, 3);
 		}
 
+		if ( ! empty($this->options['import_additional_variation_images']) ) {
+
+			add_action( 'pmxi_saved_post', array( $this, 'wpai_additional_variation_images' ), 10, 3 );
+
+		}
+
 		return $this->data;
 	}				
 
@@ -83,7 +89,18 @@ class PMWI_Import_Record extends PMWI_Model_Record {
 
 			update_post_meta($p->post_parent, '_product_image_gallery_tmp', implode(',', $gallery));		
 		}
-	}		
+	}
+	
+	public function wpai_additional_variation_images( $pid, $xml, $update ) {
+
+        $product = wc_get_product( $pid );
+        if ( $product->is_type( 'variation' ) ) {
+            if ( $gallery = get_post_meta( $pid, '_product_image_gallery', true ) ) {
+                update_post_meta( $pid, '_wc_additional_variation_images', $gallery );
+            }
+        }
+    }
+
 
 	public function _filter_has_cap_unfiltered_html($caps)
 	{

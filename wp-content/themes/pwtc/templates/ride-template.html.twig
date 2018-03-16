@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="two-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <article class="medium-8 large-9 columns content ride" data-equalizer-watch>
+                <h1>{{ SP.WordPress.title() }}</h1>
+                {% include 'partials/ride-callout.html.twig' %}
+                {% if SP.ACF.get_field('attach_map') %}
+                    <div class="primary callout">
+                        This template is using predefined maps to determine some fields such as the terrain.
+                        See the maps this template uses below.
+                    </div>
+                {% endif %}
+                {% if SP.ACF.get_field('attach_map') %}
+                    <div class="row column">
+                        <h4>Linked Maps</h4>
+                        <p>
+                            {% for map in SP.ACF.get_field('maps') %}
+                                <a href="{{ SP.WordPress.URL(map.ID) }}">{{ map.post_title }}</a>{% if not loop.last %}, {% endif %}
+                            {% else %}
+                                <div class="alert callout">Uh Oh! Looks like this is supposed to link to maps but the maps don't exist. Perhaps they were deleted.</div>
+                            {% endfor %}
+                        </p>
+                    </div>
+                {% endif %}
+                <div class="row column description">
+                    {% include 'partials/ride-description.html.twig' with {description: SP.ACF.get_field('description', false, false) | e('html')} only %}
+                </div>
+                <div class="row column details">
+                    <h4>Details</h4>
+                    <div class="row small-up-1 medium-up-2 large-up-4 details">
+                        <div class="column">
+                            {% include 'partials/ride-type.html.twig' with {type: SP.ACF.get_field('type')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-pace.html.twig' with {pace: SP.ACF.get_field('pace')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-length.html.twig' with {length: SP.ACF.get_field('length'), max_length: SP.ACF.get_field('max_length'), attached: SP.ACF.get_field('attach_map')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-terrain.html.twig' with {terrains: SP.ACF.get_field('terrain'), attached: SP.ACF.get_field('attach_map')} only %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row column location">
+                    <h4>Start Location</h4>
+                    <div>
+                        <p>{{ SP.ACF.get_field('start_location').address }} <a href="https://www.google.com/maps/place/{{ SP.ACF.get_field('start_location').address }}" target="_blank"><i class="fa fa-location-arrow"></i> Directions</a></p>
+                    </div>
+                    <div class="google-maps">
+                        <div class="acf-map">
+                            <div class="marker" data-lat="{{ SP.ACF.get_field('start_location').lat }}" data-lng="{{ SP.ACF.get_field('start_location').lng }}"></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <div class="medium-4 large-3 columns sidebar" data-equalizer-watch="">
+                <h3 class="text-center">Ride Leaders</h3>
+                {% include 'partials/ride-leaders.html.twig' with {leaders: SP.ACF.Get_field('ride_leaders')} only %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}

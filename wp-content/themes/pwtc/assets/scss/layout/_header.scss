@@ -1,0 +1,66 @@
+.sticky-container {
+  z-index: 2;
+  background-color: $dark-gray;
+  a {
+    color: $white;
+    &:hover {
+      color: $anchor-color;
+    }
+    &.fa {
+      padding: 0.7rem 0.5rem;
+    }
+  }
+  .title-bar-title {
+    margin-top: rem-calc(2px);
+  }
+  .title {
+    @include breakpoint(medium) {
+      font-size: 2rem;
+      position: relative;
+      top: -0.8rem;
+      margin-bottom: -1rem;
+      padding-left: 0;
+    }
+  }
+  .button {
+    color: $white;
+    border-color: $white;
+    margin: 0;
+    margin-right: 1rem;
+    &:hover {
+      color: $anchor-color;
+      border-color: $anchor-color;
+    }
+    @include breakpoint(medium) {
+      margin: 0.7rem 0 0.7rem 0.5rem;
+    }
+  }
+  .my-profile-pic {
+    border-radius: 100%;
+    width: 32px;
+  }
+  .mobile-account-menu {
+    padding: 0 1.5rem 0 1rem;
+    margin-right: 0.5rem;
+    .my-profile-pic {
+      height: 28px;
+      width: 28px;
+    }
+  }
+  .is-dropdown-submenu {
+    background-color: $dark-gray;
+  }
+  .is-dropdown-submenu-parent > a::after {
+    border-color: $white transparent transparent !important;
+  }
+  .avatar {
+    border-radius:100%;
+  }
+}
+.sticky {
+  background-color: $dark-gray;
+}
+
+.login-menu {
+  padding-top: 0.7rem;
+}

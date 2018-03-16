@@ -1,0 +1,206 @@
+$fa-font-path: "../libs/font-awesome/fonts/";
+@import "slick.scss";
+@import "slick-theme.scss";
+@import "font-awesome";
+@import "settings";
+@import "foundation";
+@include foundation-everything(true);
+@include foundation-flex-classes;
+@include foundation-flex-grid;
+@import "woocommerce";
+@import "layout/header";
+@import "layout/footer";
+@import "layout/two-col";
+@import "layout/widget";
+@import "rows/alternating-content";
+@import "rows/slick-slider";
+@import "rows/tagline";
+@import "rows/news";
+@import "rows/video-header";
+@import "rows/account";
+@import "rows/civicrm";
+@import "rows/rides";
+@import "print";
+
+.alignright {
+  float: right;
+  padding: 0 0 $global-padding $global-padding;
+}
+.aligncenter {
+  margin: 0 auto;
+}
+.alignleft {
+  float: left;
+  padding: 0 $global-padding $global-padding 0;
+}
+
+.vertical-centered {
+  &-wrapper {
+    position: relative;
+  }
+  &-content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.margin-bottom-free {
+  margin-bottom: 0 !important;
+}
+
+@each $name, $value in $foundation-palette {
+  #{$name}-color: $value;
+  .text-#{$name} {
+    color: $value;
+  }
+  .bg-#{$name} {
+    background: $value;
+  }
+}
+
+section.content {
+  padding: 4rem 0;
+}
+
+.screen-reader-text {
+  display: none;
+}
+
+.no-js .top-bar {
+  display: none;
+}
+
+@media screen and (min-width: 40em) {
+  .no-js .top-bar {
+    display: block;
+  }
+
+  .no-js .title-bar {
+    display: none;
+  }
+}
+
+// gravity forms
+.gfield {
+  list-style-type: none;
+}
+.gform_validation_container {
+  display: none;
+}
+.ginput_complex {
+  margin-left: -0.9375rem;
+  margin-right: -0.9375rem;
+  max-width: 75rem;
+  span {
+    width: 50%;
+    padding-left: 0.9375rem;
+    padding-right: 0.9375rem;
+    float: left;
+  }
+}
+#gform_1 > div.validation_error {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-bottom: $global-padding;
+}
+
+// fancybox
+.fancybox-overlay {
+  background-color: rgba(0,0,0,0.9);
+}
+.fancybox-close {
+  background-image: none;
+  top: rem-calc(-48px);
+  right: rem-calc(-12px);
+  display: none;
+  &::before {
+    content: "\f00d";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+}
+.fancybox-prev span {
+  background-image: none;
+  &::before {
+    content: "\f060";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+}
+.fancybox-next span {
+  background-image: none;
+  &::before {
+    content: "\f061";
+    font-family: "FontAwesome";
+    font-size: 2rem;
+    color: $white;
+    &:hover {
+      color: $anchor-color-hover;
+    }
+  }
+}
+
+// general
+a.scroll-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  background-color: $primary-color;
+  color: $white;
+  text-align: center;
+  font-size: 2rem;
+  padding: 0 1rem;
+  z-index: 2;
+  border: 1px solid $white;
+  display: none;
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+.has-tip {
+  font-weight: normal;
+}
+
+.tabs {
+  border: none;
+  background-color: #F6F6F6;
+}
+.tabs-title > a:focus, .tabs-title > a[aria-selected="true"] {
+  background-color: $dark-color;
+  color: $white;
+}
+.tabs-content {
+  border-color: #F6F6F6;
+}
+
+.main-section {
+  padding-top: $global-margin * 4;
+  padding-bottom: $global-margin;
+}
+
+.term {
+  font-weight: bold;
+}
+
+// maps
+.acf-map {
+  width: 100%;
+  height: 400px;
+  border: #ccc solid 1px;
+  margin: 20px 0;
+}
+
+/* fixes potential theme css conflict */
+.acf-map img {
+  max-width: inherit !important;
+}

@@ -2,7 +2,7 @@
  * @package Content Aware Sidebars
  * @author Joachim Jensen <jv@intox.dk>
  * @license GPLv3
- * @copyright 2017 by Joachim Jensen
+ * @copyright 2018 by Joachim Jensen
  */
 
 (function($) {
@@ -18,7 +18,7 @@
 			this.suggestVisibility();
 			this.initSidebarActivation();
 
-			$('.js-color-field').wpColorPicker();
+			$('.js-cas-color-field').wpColorPicker();
 
 			$('.js-cas-html').on('change',function(e) {
 				var $this = $(this);
@@ -135,16 +135,13 @@
 			var section = this.findSectionByURL(url) || 0,
 				$tabs = $(".js-cas-tabs").find(".nav-tab");
 			if($tabs.eq(section).is(":visible")) {
-				$(this.sections[this.current_section])
-				.hide();
-				//.find("input, select").attr("disabled",true);
+				$(this.sections[this.current_section]).hide();
+				$tabs.eq(this.current_section).removeClass("nav-tab-active");
 				this.current_section = section;
-				$(this.sections[this.current_section])
-				.show();
-				//.find("input, select").attr("disabled",false);
-
-				$tabs.removeClass("nav-tab-active");
+				$(this.sections[this.current_section]).show();
 				$tabs.eq(this.current_section).addClass("nav-tab-active");
+
+				$('#_cas_section').val('#top'+this.sections[this.current_section]);
 			}
 		},
 

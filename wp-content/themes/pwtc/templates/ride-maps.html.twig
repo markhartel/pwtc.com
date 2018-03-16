@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="two-col-section">
+        <div class="background"></div>
+        <div class="row" data-equalizer data-equalize-on="medium">
+            <article class="medium-8 large-9 columns content ride" data-equalizer-watch>
+                <h1>{{ SP.WordPress.title() }}</h1>
+                {% include 'partials/ride-callout.html.twig' %}
+                <div class="row column description">
+                    {% include 'partials/ride-description.html.twig' with {description: SP.ACF.get_field('description', false, false) | e('html')} only %}
+                </div>
+                <div class="row column details">
+                    <h4>Details</h4>
+                    <div class="row small-up-1 medium-up-2 large-up-3 details">
+                        <div class="column">
+                            {% include 'partials/ride-length.html.twig' with {length: SP.ACF.get_field('length'), max_length: SP.ACF.get_field('max_length')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-terrain.html.twig' with {terrains: SP.ACF.get_field('terrain')} only %}
+                        </div>
+                        <div class="column">
+                            {% include 'partials/ride-maps.html.twig' with {maps: SP.ACF.get_field('maps')} only %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}

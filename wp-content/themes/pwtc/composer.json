@@ -1,0 +1,27 @@
+{
+    "name": "sayenkodesign/theme",
+    "description": "Base theme for future projects.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Robert M. Parker",
+            "email": "robert@sayenkodesign.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PWTC\\": "classes"
+        }
+    },
+    "require": {
+        "twig/twig": "^1.0",
+        "symfony/yaml": "^2.0",
+        "symfony/config": "^2.0",
+        "symfony/filesystem": "^2.0",
+        "swiftmailer/swiftmailer": "^5.0",
+        "symfony/cache": "^3.0",
+        "symfony/dependency-injection": "^2.0"
+    },
+    "require-dev": {
+    }
+}

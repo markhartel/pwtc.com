@@ -1,8 +1,8 @@
 <h4>
 	<?php if ($import->friendly_name): ?>
-		<em><?php printf(__('%s - ID: %s Import History', 'wp_all_import_plugin'), $import->friendly_name, $import->id); ?></em>
+		<em><?php printf(__('%s - Import History', 'wp_all_import_plugin'), $import->friendly_name); ?></em>
 		<?php else: ?>
-		<em><?php printf(__('%s - ID: %s Import History', 'wp_all_import_plugin'), $import->name, $import->id); ?></em>
+		<em><?php printf(__('%s - Import History', 'wp_all_import_plugin'), $import->name); ?></em>
 	<?php endif ?>	
 </h4>
 

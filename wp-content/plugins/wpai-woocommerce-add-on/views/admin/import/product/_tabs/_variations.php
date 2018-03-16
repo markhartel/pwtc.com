@@ -805,6 +805,19 @@
 			<input type="checkbox" id="put_variation_image_to_gallery" name="put_variation_image_to_gallery" value="1" <?php echo $post['put_variation_image_to_gallery'] ? 'checked="checked"' : '' ?> />
 			<label for="put_variation_image_to_gallery" style="width:340px;"><?php _e('Save variation image to the gallery.', 'wpai_woocommerce_addon_plugin') ?></label>								
 		</p>
+		<?php
+			if ( function_exists( 'is_plugin_active' ) ) {
+				if ( is_plugin_active( "woocommerce-additional-variation-images/woocommerce-additional-variation-images.php" ) ) {
+				?>
+					<p class="form-field wpallimport-radio-field">
+						<input type="hidden" name="import_additional_variation_images" value="0" />
+						<input type="checkbox" id="import_additional_variation_images" name="import_additional_variation_images" value="1" <?php echo $post['import_additional_variation_images'] ? 'checked="checked"' : '' ?> />
+						<label for="import_additional_variation_images" style="width:340px;"><?php _e('Import additional variation images.', 'wpai_woocommerce_addon_plugin') ?></label>								
+					</p>	
+				<?php
+				}
+			}
+		?>
 		<p class="form-field wpallimport-radio-field set_parent_stock_option" style="display:none;">
 			<input type="hidden" name="set_parent_stock" value="0" />
 			<input type="checkbox" id="set_parent_stock" name="set_parent_stock" value="1" <?php echo $post['set_parent_stock'] ? 'checked="checked"' : '' ?> />

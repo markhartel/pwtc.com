@@ -1,8 +1,8 @@
 <?php 
 /**
- * Admin Settings page
- *
- * @author Maksym Tsypliakov <maksym.tsypliakov@gmail.com>
+ * Admin Statistics page
+ * 
+ * @author Pavel Kulbakin <p.kulbakin@gmail.com>
  */
 class PMXI_Admin_Settings extends PMXI_Controller_Admin {
 
@@ -35,10 +35,9 @@ class PMXI_Admin_Settings extends PMXI_Controller_Admin {
 				self::$path = wp_all_import_secure_file($uploads['basedir'] . DIRECTORY_SEPARATOR . PMXI_Plugin::UPLOADS_DIRECTORY );
 				set_transient( self::$upload_transient, self::$path);
 			}
+
 		}
 
-		$sleep = apply_filters( 'wp_all_import_shard_delay', 0 );
-		usleep($sleep);
 	}
 	
 	public function index() {
@@ -240,9 +239,8 @@ class PMXI_Admin_Settings extends PMXI_Controller_Admin {
 						// data to send in our API request
 						$api_params = array( 
 							'edd_action'=> 'activate_license', 
-							'license' 	=> PMXI_Plugin::decode($options['licenses'][$class]),
-							'item_name' => urlencode( $product_name ), // the name of our product in EDD
-							'url' => home_url()
+							'license' 	=> $options['licenses'][$class], 
+							'item_name' => urlencode( $product_name ) // the name of our product in EDD
 						);								
 						
 						// Call the custom API.
@@ -294,7 +292,7 @@ class PMXI_Admin_Settings extends PMXI_Controller_Admin {
 
 				$api_params = array( 
 					'edd_action' => 'check_license', 
-					'license' => PMXI_Plugin::decode($options['licenses'][$class]),
+					'license' => $options['licenses'][$class], 
 					'item_name' => urlencode( $product_name ) 
 				);
 
@@ -656,6 +654,7 @@ class PMXI_Admin_Settings extends PMXI_Controller_Admin {
 
 					switch ( $post_type ) {
 
+						case 'product':
 						case 'shop_order':
 							
 							if ( ! class_exists('WooCommerce') ) {

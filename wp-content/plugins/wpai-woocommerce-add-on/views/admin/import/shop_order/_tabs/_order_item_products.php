@@ -18,7 +18,7 @@
 					<?php
 					foreach ($post['pmwi_order']['products'] as $i => $product): 
 
-						$product += array('sku' => '', 'qty' => '', 'tax_rates' => array());
+						$product += array('sku' => '', 'qty' => '', 'price_per_unit' => '', 'tax_rates' => array());
 						
 						if (empty($product['sku'])) continue;
 						?>
@@ -34,7 +34,11 @@
 									<input type="text" class="short rad4" name="pmwi_order[products][<?php echo $i; ?>][qty]" value="<?php echo esc_attr($product['qty']) ?>" style="width:95%;"/>	
 								</div>
 								<div class="wpallimport-clear"></div>
-
+								<div style="float:right; width:50%;">
+									<label><?php _e('Price', 'wp_all_import_plugin'); ?></label>
+									<input type="text" class="short rad4" name="pmwi_order[products][<?php echo $i; ?>][price_per_unit]" value="<?php echo esc_attr($product['price_per_unit']) ?>" style="width:95%;"/>
+								</div>
+								<div class="wpallimport-clear"></div>
 								<!-- Product Taxes -->
 								<!--a class="switcher" id="taxes_existing_products_<?php echo $i; ?>" href="javascript:void(0);" style="display: block;margin: 10px 0 15px;width: 50px;"><span>-</span> <?php _e("Taxes", "wp_all_import_plugin"); ?></a-->
 								<div class="wpallimport-clear"></div>
@@ -162,7 +166,11 @@
 								<input type="text" class="short rad4" name="pmwi_order[products][ROWNUMBER][qty]" value="" style="width:95%;"/>	
 							</div>
 							<div class="wpallimport-clear"></div>
-
+							<div style="float:right; width:50%;">
+								<label><?php _e('Price', 'wp_all_import_plugin'); ?></label>
+								<input type="text" class="short rad4" name="pmwi_order[products][ROWNUMBER][price_per_unit]" value="" style="width:95%;"/>
+							</div>
+							<div class="wpallimport-clear"></div>
 							<!-- Product Taxes -->
 							<!--a class="switcher" id="taxes_existing_products_ROWNUMBER" href="javascript:void(0);" style="display: block;margin: 10px 0 15px;width: 50px;"><span>-</span> <?php _e("Taxes", "wp_all_import_plugin"); ?></a-->
 							<div class="wpallimport-clear"></div>
