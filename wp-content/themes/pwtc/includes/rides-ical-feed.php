@@ -58,7 +58,7 @@ function echo_ical_rideevent() {
 }
 
 function query_ical_upcoming_rides($days) {
-    $today = new DateTime(null, new DateTimeZone(supertheme_get_timezone_string()));
+    $today = new DateTime(null, new DateTimeZone(pwtc_get_timezone_string()));
     $later = clone $today;
     $later->add(new DateInterval('P'.$days.'D'));
     $query = [
@@ -78,7 +78,7 @@ function query_ical_upcoming_rides($days) {
 }
 
 function query_ical_monthly_rides($month) {
-    $timezone = new DateTimeZone(supertheme_get_timezone_string());
+    $timezone = new DateTimeZone(pwtc_get_timezone_string());
     $first_day = new DateTime($month.'-01', $timezone);
     $last_day = new DateTime($first_day->format('Y-m-t'), $timezone);
     $query = [
