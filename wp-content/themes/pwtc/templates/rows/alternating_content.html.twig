@@ -7,7 +7,7 @@
 
     {% for row in SP.ACF.get_sub_field('rows') %}
         <div class="row" data-equalizer data-equalize-on="large">
-            <div class="medium-6 large-4 {% if loop.index is even %}medium-push-6 large-push-8{% endif %} columns" data-equalizer-watch>
+            <div class="small-12 medium-6 large-4 {% if loop.index is even %}medium-order-2{% endif %} columns" data-equalizer-watch>
                 <div class="content">
                     <img src="{{ row.image.sizes.teaser }}"/>
                     {% if row.video %}
@@ -15,7 +15,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="medium-6 large-8 {% if loop.index is even %}medium-pull-6 large-pull-4{% endif %} columns" data-equalizer-watch>
+            <div class="small-12 medium-6 large-8 {% if loop.index is even %}medium-order-1{% endif %} columns" data-equalizer-watch>
                 <div class="content">
                     <h3>{{ row.heading }}</h3>
                     {{ row.content }}

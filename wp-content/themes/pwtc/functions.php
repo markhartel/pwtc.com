@@ -17,7 +17,7 @@ $membership = new \PWTC\Membership();
 
 // add admin styles and scripts
 add_action('admin_enqueue_scripts', function () {
-    wp_register_script('custom_wp_admin_css', get_template_directory_uri() . '/web/scripts/admin.js', ['jquery']);
+    wp_register_script('custom_wp_admin_css', get_template_directory_uri() . '/assets/scripts/admin.js', ['jquery']);
     wp_enqueue_script('custom_wp_admin_css');
 });
 
@@ -105,6 +105,9 @@ add_action( 'login_enqueue_scripts', function () { ?>
         body.login {
             background-color: #BA383B;
             color: #fefefe;
+        }
+        body.login .message {
+            color: #353535;
         }
         body.login form {
             background-color: #353535;
