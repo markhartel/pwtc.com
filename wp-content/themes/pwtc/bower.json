@@ -21,6 +21,6 @@
     "foundation-sites": "~6.4.0",
     "jQuery": "~3.0.0",
     "slick-carousel": "^1.8.1",
-    "fancybox": "~2.0.0"
+    "fancybox": "2.*"
   }
 }
