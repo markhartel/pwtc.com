@@ -2,6 +2,7 @@ $fa-font-path: "../libs/font-awesome/fonts/";
 @import "slick.scss";
 @import "slick-theme.scss";
 @import "font-awesome";
+@import "jquery.fancybox";
 @import "settings";
 @import "foundation";
 @include foundation-everything(true);

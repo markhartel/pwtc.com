@@ -1,18 +1,3 @@
-(function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r;
-    i[r] = i[r] || function () {
-        (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date();
-    a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-    a.async = 1;
-    a.src = g;
-    m.parentNode.insertBefore(a, m)
-})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-ga('create', SP.Settings.AnalyticsID, 'auto');
-ga('send', 'pageview');
-
 jQuery(function() {
     if(!jQuery('#acf-field_57c498d11ff63').length) {
         return;
@@ -31,32 +16,25 @@ jQuery(function() {
     // update values on change
     jQuery('#acf-field_57c498d11ff63').on('change', function () {
         every = jQuery(this).val();
-        //console.log("every now is: " + every);
         validate();
     });
     jQuery('#acf-field_57c4982a0c2a5+input').datepicker().on('input change', function(){
         from = new Date(jQuery(this).val());
-        //console.log("from now is: " + from);
         validate();
     });
     jQuery('#acf-field_57c498370c2a6+input').datepicker().on('input change', function(){
         until = new Date(jQuery(this).val());
-        //console.log("until now is: " + until);
         validate();
     });
     validate();
 
     // validate all three fields and enable the preview button
     function validate(){
-        console.log("validating");
         if(!every || isNaN(from.getTime()) || !from || isNaN(until.getTime()) || !until) {
-            console.log("missing values");
             jQuery('#schedule-rides-preview').attr('disabled','disabled');
             return;
         } else {
-            console.log("validating dates");
             if(from > until) {
-                console.log("from is later than until");
                 jQuery('#schedule-rides-preview').attr('disabled','disabled');
             }
         }
@@ -124,7 +102,6 @@ jQuery(function() {
             new_event.setDate(from.getDate()+i*every_days);
             events.push(new_event);
         }
-        console.log(events);
         buildPreviewTable();
     }
 

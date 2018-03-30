@@ -38,6 +38,7 @@ var options = {
         style: 'compressed',
         includePaths: [
             'assets/libs/slick-carousel/slick',
+            'assets/libs/fancybox/source',
             'assets/libs/font-awesome/scss',
             'assets/libs/foundation-sites/scss'
         ],

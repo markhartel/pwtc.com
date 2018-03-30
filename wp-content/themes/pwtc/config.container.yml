@@ -42,11 +42,11 @@ parameters:
       before_title: '<h4 class="widgettitle">'
       after_title: '</h4>'
   wordpress.styles:
-    - { id: "app", source: "%template_uri%/assets/styles/app.css", deps: [], version: "1.1" }
+    - { id: "app", source: "%template_uri%/assets/styles/app.css", deps: [], version: "1.2" }
   wordpress.scripts:
     - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
     - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k", deps: [], header: false, version: "1.0" }
-    - { id: "app", source: "%template_uri%/assets/scripts-min/app.min.js", deps: ["jquery", "sharethis", "gmaps"], header: false, version: "1.4" }
+    - { id: "app", source: "%template_uri%/assets/scripts-min/app.min.js", deps: ["jquery", "sharethis", "gmaps"], header: false, version: "1.5" }
 
 services:
   # just the basics
