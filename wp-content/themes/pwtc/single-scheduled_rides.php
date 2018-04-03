@@ -43,11 +43,17 @@ if(get_field('attach_map')) {
     if($length == $maxLength) {
         $maxLength = null;
     }
+    $data['terrain'] = array_unique($terrain);
+    $data['length'] = $length;
+    $data['max_length'] = $maxLength;
+    $data['maps'] = $maps;    
 }
-$data['terrain'] = isset($terrain) ? array_unique($terrain) : get_field('terrain');
-$data['length'] = isset($length) ? $length : get_field('length');
-$data['max_length'] = isset($maxLength) ? $maxLength : get_field('max_length');
-$data['maps'] = isset($maps) ? $maps : false;
+else {
+    $data['terrain'] = get_field('terrain');
+    $data['length'] = get_field('length');
+    $data['max_length'] = get_field('max_length');
+    $data['maps'] = false;     
+}
 
 // Fetch the ride's description, break it into tokens delemited by whitespace
 // and look for strings that start with "http://" or "https://". Convert those
