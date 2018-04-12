@@ -109,6 +109,9 @@ add_action( 'login_enqueue_scripts', function () { ?>
         body.login .message {
             color: #353535;
         }
+        body.login #login_error {
+            color: #353535;
+        }
         body.login form {
             background-color: #353535;
         }

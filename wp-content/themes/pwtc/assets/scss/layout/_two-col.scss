@@ -1,3 +1,14 @@
+.one-col-section {
+  .content {
+    position: relative;
+    padding-top: $global-margin;
+    padding-bottom: $global-margin;
+    @include breakpoint(medium) {
+      padding-top: $global-margin * 4;
+      padding-bottom: $global-margin;
+    }
+  }
+}
 .two-col-section {
   position: relative;
   overflow: hidden;

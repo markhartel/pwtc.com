@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: One Columns
+ * Template Name: Two Columns
  *
  */
 require_once __DIR__.'/includes/bootstrap.php';
@@ -14,4 +14,4 @@ $twig = $container->get("twig.environment");
 $data = require_once __DIR__ . '/includes/bootstrap-theme.php';
 
 // render
-echo $twig->render('one-column.html.twig', $data);
+echo $twig->render('two-column.html.twig', $data);
