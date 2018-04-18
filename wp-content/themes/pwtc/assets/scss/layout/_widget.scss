@@ -39,3 +39,10 @@
     }
   }
 }
+
+.widget_nav_menu {
+  ul.menu {
+    flex-wrap: nowrap;
+    flex-direction: column;
+  }
+}
