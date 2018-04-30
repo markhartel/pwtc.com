@@ -141,5 +141,12 @@ add_action( 'login_enqueue_scripts', function () { ?>
         body.login #backtoblog a:active, body.login #nav a:active {
             color: #cecece;
         }
+
+        body.login #nav {
+            font-size: 0;
+        }
+        body.login #nav a:last-of-type {
+            font-size: 13px;
+        }
     </style>
 <?php });
