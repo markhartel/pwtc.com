@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="one-col-section">
+        <div class="background"></div>
+        <div class="row">
+            <article class="small-12 columns content">
+                <h1>{{ SP.WordPress.title() }}</h1>
+                {{ SP.WordPress.content() }}
+            </article>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    {% include 'layout/footer.html.twig' %}
+    {% include 'layout/copyright.html.twig' %}
+{% endblock %}
