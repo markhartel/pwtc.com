@@ -19,6 +19,95 @@ $data = require_once __DIR__ . '/includes/bootstrap-theme.php';
 // get timezone
 $timezone = new \DateTimeZone(pwtc_get_timezone_string());
 
+$daily_view = false;
+if (isset($_GET['view']) && $_GET['view']) {
+    if ($_GET['view'] == 'daily') {
+        $daily_view = true;
+    }
+}
+
+if ($daily_view) {
+
+// get current date (use WP 'current_time' function to return local time instead of UTC time)
+$current_datetime = new DateTime(date('Y-m-d', current_time('timestamp')), $timezone);
+if (isset($_GET['date']) && $_GET['date']) {
+    $valid_date = DateTime::createFromFormat('Y-m-d', $_GET['date']);
+    if ($valid_date) {
+        $current_datetime = $valid_date;
+    }
+}
+
+// clone the current date and subtract one day to get the previous day
+$previous_day_datetime = clone $current_datetime;
+$previous_day_datetime->sub(new DateInterval('P1D'));
+
+// clone the current date and add one day to get the next day
+$next_day_datetime = clone $current_datetime;
+$next_day_datetime->add(new DateInterval('P1D'));
+
+$data['day_pretty'] = $current_datetime->format('l M j Y');
+$data['month_val'] = $current_datetime->format('Y-m');
+$data['month_name'] = $current_datetime->format('F');
+$data['day_previous_val'] = $previous_day_datetime->format('Y-m-d');
+$data['day_previous'] = $previous_day_datetime->format('l');
+$data['day_next_val'] = $next_day_datetime->format('Y-m-d');
+$data['day_next'] = $next_day_datetime->format('l');
+
+$query_args = [
+    'posts_per_page' => -1,
+    'post_type' => 'scheduled_rides',
+    'meta_query' => [
+        [
+            'key' => 'date',
+            'value' =>  [$current_datetime->format('Y-m-d 00:00:00'), $current_datetime->format('Y-m-d 23:59:59')],
+            'compare' => 'BETWEEN',
+            'type' => 'DATETIME'
+        ],
+    ],
+    'orderby' => ['date' => 'ASC'],
+];
+
+$query = new WP_Query($query_args);
+$locations = [];
+$num_rides = 0;
+while ($query->have_posts()) {
+    $query->the_post();
+    $num_rides++;
+    $start_location = get_field('start_location');
+    $address = $start_location['address'];
+    $lat = $start_location['lat'];
+    $lng = $start_location['lng'];
+    $location = $lat . '|' . $lng;
+    if (!isset($locations[$location])) {
+        $locations[$location] = [
+            'address' => $address,
+            'lat' => $lat,
+            'lng' => $lng,
+            'events' => []
+        ];
+    }
+    $locations[$location]['events'][] = [
+        'title' => get_the_title(),
+        'link' => get_the_permalink(),
+        'time' => DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'))->getTimestamp(),
+        'is_canceled' => get_field('is_canceled')
+    ];
+}
+wp_reset_postdata();
+
+if ($num_rides == 1) {
+    $data['ride_msg'] = 'is one ride';
+}
+else if ($num_rides > 1) {
+    $data['ride_msg'] = 'are ' . $num_rides . ' rides';
+}
+$data['locations'] = $locations;
+
+echo $twig->render('ride-locations.html.twig', $data);
+
+}
+else {
+
 // get current month (use WP 'current_time' function to return local time instead of UTC time)
 $current_datetime = new DateTime(date('Y-m-01', current_time('timestamp')), $timezone);
 $data['invalid_date'] = false;
@@ -218,3 +307,5 @@ $data['calendar'] = $calendar;
 
 // render
 echo $twig->render('ride-calendar.html.twig', $data);
+
+}
