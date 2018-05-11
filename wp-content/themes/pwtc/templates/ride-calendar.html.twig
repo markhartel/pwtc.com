@@ -96,7 +96,7 @@
                                     weekend
                                 {% endif %}"
                             >
-                                <div class="date">{{ day.date|date('j') }} <span class="day-of-week">{{ day.date|date('D') }}</span></div>
+                                <div class="date">{{ day.date|date('j') }} <span class="day-of-week">{{ day.date|date('D') }}{% if day.events %} <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day.date|date('Y-m-d') }}" title="Show ride start locations"><i class="fa fa-map-o"></i></a>{% endif %}</span></div>
                                 <ul class="vertical menu">
                                     {% for event in day.events %}
                                         <li>
