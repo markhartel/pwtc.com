@@ -1,0 +1,21 @@
+{% if is_logged_in %}
+    <a href="/membership/?page=CiviCRM&q=civicrm/contribute/transact&reset=1&id=8">CLICK HERE TO RENEW</a>
+{% else %}
+    <a href="#renew" class="fancybox">CLICK HERE TO RENEW</a>
+    <div id="renew">
+        <h4>You must be signed in</h4>
+        <p>
+            To renew your membership, you must be signed into your account.
+            If you are not presently signed in, go to Login and enter your username (or your email address) and password.
+            Then click on Join/Renew at the top of the page.
+        </p>
+
+        <p>
+            If you have forgotten your password, click the “Request New Password” tab right above the “Username or email address:” box.
+            If you have forgotten the email you have used for this account, please send a request to webmaster@pwtc.com for help.  Thanks!
+        </p>
+        <p>
+            For more information see <a href="/webtips/">Webtips</a>.
+        </p>
+    </div>
+{% endif %}
