@@ -151,3 +151,11 @@ add_action( 'login_enqueue_scripts', function () { ?>
         }
     </style>
 <?php });
+
+add_filter('wp_handle_upload_prefilter', function ( $file ) {
+    if(!current_user_can('edit_themes') && $file['size'] > 2050000) {
+        $file['error'] = "Image size must be less than 2MB";
+    }
+
+    return $file;
+});
