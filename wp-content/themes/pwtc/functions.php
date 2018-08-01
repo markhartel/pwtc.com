@@ -4,6 +4,7 @@ require_once __DIR__.'/includes/bootstrap.php';
 require_once __DIR__.'/includes/options-page.php';
 require_once __DIR__.'/includes/widgets.php';
 require_once __DIR__.'/includes/roles.php';
+require_once __DIR__.'/includes/shortcodes.php';
 require_once __DIR__.'/includes/excerpts.php';
 require_once __DIR__.'/includes/post-types.php';
 require_once __DIR__.'/includes/schedule-rides.php';

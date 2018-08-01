@@ -1,4 +1,4 @@
-/* global gapi, FB, twttr */
+/* global wp, gapi, FB, twttr */
 
 /**
  * Utilities to work with widgets in Customizer.
@@ -56,6 +56,14 @@ wp.isJetpackWidgetPlaced = function( placement, widgetName ) {
 					// Refresh Twitter
 					else if ( wp.isJetpackWidgetPlaced( placement, 'twitter_timeline' ) && 'object' === typeof twttr && 'object' === typeof twttr.widgets && 'function' === typeof twttr.widgets.load ) {
 						twttr.widgets.load( placement.container[0] );
+					} else if ( wp.isJetpackWidgetPlaced( placement, 'eu_cookie_law_widget' ) ) {
+						// Refresh EU Cookie Law
+						if ( $( '#eu-cookie-law' ).hasClass( 'top' ) ) {
+							$( '.widget_eu_cookie_law_widget' ).addClass( 'top' );
+						} else {
+							$( '.widget_eu_cookie_law_widget' ).removeClass( 'top' );
+						}
+						placement.container.fadeIn();
 					}
 				}
 			} );
@@ -63,7 +71,6 @@ wp.isJetpackWidgetPlaced = function( placement, widgetName ) {
 			// Refresh widgets when they're moved.
 			wp.customize.selectiveRefresh.bind( 'partial-content-moved', function( placement ) {
 				if ( placement.container ) {
-
 					// Refresh Twitter timeline iframe, since it has to be re-built.
 					if ( wp.isJetpackWidgetPlaced( placement, 'twitter_timeline' ) && placement.container.find( 'iframe.twitter-timeline:not([src]):first' ).length ) {
 						placement.partial.refresh();
@@ -71,6 +78,5 @@ wp.isJetpackWidgetPlaced = function( placement, widgetName ) {
 				}
 			} );
 		}
-	});
-
-})(jQuery);
+	} );
+} )( jQuery );

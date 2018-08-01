@@ -7,8 +7,8 @@ if(function_exists('acf_add_options_page')) {
         'capability' 	=> 'edit_posts',
         'redirect' 	=> false
     ));
-
-    add_action('acf/init', function () {
-        acf_update_setting('google_api_key', 'AIzaSyCBrImntaffCdMu_Gq6tgeGkxkHSVgnu6k');
-    });
 }
+
+add_action('acf/init', function () {
+    acf_update_setting('google_api_key', 'AIzaSyB869ZHXQOQYCYEDxpDkMcD7BkTUpCRVeQ');
+});

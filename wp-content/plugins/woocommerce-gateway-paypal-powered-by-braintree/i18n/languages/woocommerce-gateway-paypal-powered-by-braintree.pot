@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WooCommerce PayPal Powered by Braintree Gateway package.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce PayPal Powered by Braintree Gateway 2.1.1\n"
+"Project-Id-Version: WooCommerce PayPal Powered by Braintree Gateway 2.1.2\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/woocommerce-gateway-paypal-powered-by-"
 "braintree/\n"
@@ -629,11 +629,14 @@ msgid "Default"
 msgstr ""
 
 #: lib/skyverge/woocommerce/payment-gateway/admin/class-sv-wc-payment-gateway-admin-payment-token-editor.php:484
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:291
 msgid "Card Type"
 msgstr ""
 
 #: lib/skyverge/woocommerce/payment-gateway/admin/class-sv-wc-payment-gateway-admin-payment-token-editor.php:489
 #: lib/skyverge/woocommerce/payment-gateway/admin/class-sv-wc-payment-gateway-admin-payment-token-editor.php:525
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:191
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:289
 msgid "Last Four"
 msgstr ""
 
@@ -644,6 +647,7 @@ msgstr ""
 
 #: lib/skyverge/woocommerce/payment-gateway/admin/class-sv-wc-payment-gateway-admin-payment-token-editor.php:517
 #: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-payment-form.php:419
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:290
 #. translators: e-check account type, HTML form field label
 msgid "Account Type"
 msgstr ""
@@ -673,6 +677,7 @@ msgid "Remove"
 msgstr ""
 
 #: lib/skyverge/woocommerce/payment-gateway/admin/class-sv-wc-payment-gateway-admin-user-handler.php:211
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:200
 msgid "%s Payment Tokens"
 msgstr ""
 
@@ -1173,14 +1178,14 @@ msgstr ""
 msgid "Securely Save to Account"
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:423
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:432
 #. translators: Placeholders: %s - plugin name
 msgid ""
 "%s: WooCommerce is not being forced over SSL; your customer's payment data "
 "may be at risk."
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:480
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:489
 #. translators: Placeholders: %1$s - plugin name, %2$s - a
 #. currency/comma-separated list of currencies, %3$s - <a> tag, %4$s - </a> tag
 msgid ""
@@ -1192,7 +1197,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:524
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:533
 #. translators: Placeholders: %1$s - payment gateway title (such as
 #. Authorize.net, Braintree, etc), %2$s - <a> tag, %3$s - </a> tag
 msgid ""
@@ -1200,7 +1205,7 @@ msgid ""
 "tokenization%3$s to activate %1$s for Subscriptions."
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:542
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:551
 #. translators: Placeholders: %1$s - payment gateway title (such as
 #. Authorize.net, Braintree, etc), %2$s - <a> tag, %3$s - </a> tag
 msgid ""
@@ -1208,23 +1213,43 @@ msgid ""
 "tokenization%3$s to activate %1$s for Pre-Orders."
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:578
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:587
 msgid ""
 "You must enable tokenization for this gateway in order to support automatic "
 "renewal payments with the WooCommerce Subscriptions extension."
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:579
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:588
 msgid "Inactive"
 msgstr ""
 
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:723
-#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:792
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:732
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-plugin.php:801
 #. translators: verb, as in "Capture credit card charge". 		 Used when an
 #. amount has been pre-authorized before, but funds have not yet been captured
 #. (taken) from the card. 		 Capturing the charge will take the money from the
 #. credit card and put it in the merchant's pockets.
 msgid "Capture Charge"
+msgstr ""
+
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:114
+msgid "%s Customer ID"
+msgstr ""
+
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:183
+msgid "Type"
+msgstr ""
+
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:245
+msgid "Removed payment token \"%d\""
+msgstr ""
+
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:292
+msgid "Expiry Date"
+msgstr ""
+
+#: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway-privacy.php:293
+msgid "Payer Email"
 msgstr ""
 
 #: lib/skyverge/woocommerce/payment-gateway/class-sv-wc-payment-gateway.php:414

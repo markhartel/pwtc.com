@@ -6,6 +6,7 @@
  */
 
 (function($) {
+	"use strict";
 
 	var cas_general = {
 
@@ -30,9 +31,9 @@
 		 * @return {void}
 		 */
 		reviewNoticeHandler: function() {
-			$notice = $(".js-cas-notice-review");
+			var $notice = $(".js-cas-notice-review");
 			$notice.on("click","a, button", function(e) {
-				$this = $(this);
+				var $this = $(this);
 				$.ajax({
 					url: ajaxurl,
 					data:{
