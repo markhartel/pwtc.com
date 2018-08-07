@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="maps">
-                    {% include 'partials/ride-maps.html.twig' with {maps: maps} only %}
+                    {% include 'partials/ride-maps.html.twig' with {maps: maps, type: SP.ACF.get_field('type')} only %}
                 </div>
                 <div class="row column location">
                     <h4>Start Location </h4>
