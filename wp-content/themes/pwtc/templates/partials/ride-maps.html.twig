@@ -8,20 +8,20 @@
         {% endif %}
         {% if not loop.last %}, {% else %}
             {% if type == "nongroup" %}
-                <i class="missing">(paper maps will also be available at the ride start)</i>
+                <!-- <i class="missing">(paper maps will also be available at the ride start)</i> -->
             {% elseif type == "regroup" %}
-                <i class="missing">(paper maps will also be available at the ride start)</i>
+                <!-- <i class="missing">(paper maps will also be available at the ride start)</i> -->
             {% elseif type == "group" %}
-                <i class="missing">(riders will follow the ride leader)</i>
+                <!-- <i class="missing">(riders will follow the ride leader)</i> -->
             {% endif %}
         {% endif %}
     {% else%}
         {% if type == "nongroup" %}
-            <i class="missing">Paper maps will be available at the ride start</i>
+            <!-- <i class="missing">Paper maps will be available at the ride start</i> -->
         {% elseif type == "regroup" %}
-            <i class="missing">Paper maps will be available at the ride start</i>
+            <!-- <i class="missing">Paper maps will be available at the ride start</i> -->
         {% elseif type == "group" %}
-            <i class="missing">No map necessary, riders will follow the ride leader</i>
+            <!-- <i class="missing">No map necessary, riders will follow the ride leader</i> -->
         {% endif %}
     {% endfor %}
 </span>
