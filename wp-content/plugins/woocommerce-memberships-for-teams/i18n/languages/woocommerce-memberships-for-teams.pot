@@ -1,0 +1,1819 @@
+# Copyright (C) 2018 SkyVerge
+# This file is distributed under the GNU General Public License v3.0.
+msgid ""
+msgstr ""
+"Project-Id-Version: Teams for WooCommerce Memberships 1.0.5\n"
+"Report-Msgid-Bugs-To: "
+"https://woocommerce.com/my-account/marketplace-ticket-form/\n"
+"POT-Creation-Date: 2018-09-06 08:06:36+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: src/AJAX.php:126 src/Admin/User_Memberships.php:211
+#. translators: %1$s - team name, %2$s - team id
+msgid "%1$s (#%2$s)"
+msgstr ""
+
+#: src/Admin/Invitations.php:106
+msgid "%d invitation was re-sent."
+msgid_plural "%d invitations were re-sent."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Invitations.php:122
+msgid "%d invitation was cancelled."
+msgid_plural "%d invitations were cancelled."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Invitations.php:138
+msgid "%d user was set to be a member of the team."
+msgid_plural "%d users were set to be members of the team."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Invitations.php:154
+msgid "%d user was set to be a manager of the team."
+msgid_plural "%d users were set to be managers of the team."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Invitations.php:206 src/Frontend/Teams_Area.php:1431
+#. translators: %s - email address
+msgid "Invitation to %s re-sent."
+msgstr ""
+
+#: src/Admin/Invitations.php:210 src/Frontend/Teams_Area.php:1433
+#. translators: %s - error message
+msgid "Cannot send invitation: %s"
+msgstr ""
+
+#: src/Admin/Invitations.php:220 src/Admin/Team_Members.php:196
+#: src/Admin/Teams.php:726 src/Frontend/Teams_Area.php:1461
+#. translators: %s - email address
+msgid "Invitation for %s was cancelled."
+msgstr ""
+
+#: src/Admin/Invitations.php:224 src/Frontend/Teams_Area.php:1463
+#. translators: %s - error message
+msgid "Cannot cancel invitation: %s"
+msgstr ""
+
+#: src/Admin/Invitations.php:234 src/Frontend/Teams_Area.php:1441
+#. translators: %s - email address
+msgid "%s was set to be a member of the team."
+msgstr ""
+
+#: src/Admin/Invitations.php:238 src/Admin/Invitations.php:252
+#: src/Admin/Team_Members.php:213 src/Admin/Team_Members.php:222
+#: src/Admin/Teams.php:749 src/Admin/Teams.php:763
+#: src/Frontend/Teams_Area.php:1342 src/Frontend/Teams_Area.php:1352
+#: src/Frontend/Teams_Area.php:1443 src/Frontend/Teams_Area.php:1453
+#. translators: %s - error message
+msgid "Cannot set role in team: %s"
+msgstr ""
+
+#: src/Admin/Invitations.php:248 src/Frontend/Teams_Area.php:1451
+#. translators: %s - email address
+msgid "%s was set to be a manager of the team."
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:80
+#: src/Admin/List_Tables/Team_Members.php:80 src/Admin/Teams.php:90
+#: templates/myaccount/my-team-invitations-table.php:59
+#: templates/myaccount/my-team-members-table.php:60
+msgid "Name"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:81
+#: src/Admin/List_Tables/Team_Members.php:81 src/Frontend.php:804
+#: templates/myaccount/my-team-invitations-table.php:60
+#: templates/myaccount/my-team-members-table.php:61
+msgid "Email"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:82
+#: src/Admin/List_Tables/Team_Members.php:82
+msgid "Team Role"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:83
+msgid "Invited On"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:116
+#: src/Admin/List_Tables/Team_Members.php:116
+#: src/Admin/User_Memberships.php:109 src/Frontend/Teams_Area.php:902
+#: src/Integrations/Subscriptions.php:225
+#: src/Integrations/Subscriptions.php:980 templates/myaccount/my-teams.php:101
+msgid "N/A"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:145
+msgid "Select invitation"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:205
+#: src/Admin/List_Tables/Team_Members.php:219
+#. translators: %s: user's name
+msgid "Set &#8220;%s&#8221; as a manager of this team"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:206
+#: src/Admin/List_Tables/Invitations.php:490
+#: src/Admin/List_Tables/Team_Members.php:220
+#: src/Admin/List_Tables/Team_Members.php:486 src/Frontend/Teams_Area.php:1021
+#: src/Frontend/Teams_Area.php:1069
+msgid "Set as manager"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:218
+#: src/Admin/List_Tables/Team_Members.php:232
+#. translators: %s: user's name
+msgid "Set &#8220;%s&#8221; as a member of this team"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:219
+#: src/Admin/List_Tables/Invitations.php:489
+#: src/Admin/List_Tables/Team_Members.php:233
+#: src/Admin/List_Tables/Team_Members.php:485 src/Frontend/Teams_Area.php:1030
+#: src/Frontend/Teams_Area.php:1078
+msgid "Set as member"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:231
+#. translators: %s: user's name
+msgid "Resend invitation to &#8220;%s&#8221;"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:232
+#: src/Admin/List_Tables/Invitations.php:488 src/Frontend/Teams_Area.php:1055
+msgid "Resend"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:243
+#. translators: %s: user's name
+msgid "Cancel invitation for &#8220;%s&#8221; to join this team"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:244
+#: src/Admin/List_Tables/Invitations.php:491 src/Frontend/Teams_Area.php:1088
+msgid "Cancel"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:324
+#: src/Admin/List_Tables/Team_Members.php:324
+msgid "Filter"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:353
+#: src/Admin/List_Tables/Team_Members.php:353
+msgid "Filter by team member role"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:355
+#: src/Admin/List_Tables/Team_Members.php:355
+msgid "All team roles"
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:438
+#: src/Admin/List_Tables/Team_Members.php:435
+msgid "Please save the team first to add members."
+msgstr ""
+
+#: src/Admin/List_Tables/Invitations.php:438
+msgid "No invitations found."
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:83
+msgid "Added On"
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:145
+msgid "Select member"
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:206 src/Frontend/Teams_Area.php:967
+msgid "View"
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:245
+#. translators: %s: user's name
+msgid "Remove &#8220;%s&#8221; from this team"
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:246
+#: src/Admin/List_Tables/Team_Members.php:487 src/Frontend/Teams_Area.php:982
+msgid "Remove"
+msgstr ""
+
+#: src/Admin/List_Tables/Team_Members.php:435
+msgid "No members found."
+msgstr ""
+
+#: src/Admin/Membership_Plans.php:97 src/Integrations/Subscriptions.php:496
+msgid "and"
+msgstr ""
+
+#: src/Admin/Membership_Plans.php:100
+msgid "Team products"
+msgstr ""
+
+#: src/Admin/Membership_Plans.php:115
+msgid ""
+"Default access method options are disabled because this plan has at least "
+"one team product associated."
+msgstr ""
+
+#: src/Admin/Membership_Plans.php:173
+msgid ""
+"It looks like that this plan has at least one product that is both a team "
+"product and a product that can grant access to individual customers that "
+"complete a purchase. They will become team owners and plan members at the "
+"same time. Please make sure that this is intentional."
+msgstr ""
+
+#: src/Admin/Membership_Plans.php:212 src/Frontend.php:1106
+#: src/Integrations/Subscriptions.php:427 src/Post_Types.php:100
+#: src/Teams_Handler.php:101
+msgid "Team"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:58
+msgid "Billing Details"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:86
+#. translators: Placeholder: %s - order number
+msgid "Order %s"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:88
+msgid "Purchased in:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:89
+msgid "Order Date:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:90
+msgid "Order Total:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:96
+msgid "No billing details:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:96
+msgid "This team was created manually."
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:100
+msgid "Product:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:155
+msgid "Team not linked to a product"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:159
+#: src/Integrations/Subscriptions.php:272
+#. translators: Placeholders: %1$s - link to a product, %2$s - opening <a> HTML
+#. tag, %3%s - closing </a> HTML tag
+#. translators: Placeholders: %1$s - link to a Subscription, %2$s - opening <a>
+#. HTML tag, %3%s - closing </a> HTML tag
+msgid "%1$s - %2$sEdit Link%3$s"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:177
+#: src/Admin/Meta_Boxes/Team_Billing_Details.php:191
+msgid "Select product&hellip;"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:58
+#: templates/myaccount/my-team-settings.php:74
+msgid "Team Details"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:97
+msgid "Owner:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:102
+msgid "View user &rarr;"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:113
+#. translators: 1: user display name 2: user ID 3: user email
+msgid "%1$s (#%2$s &ndash; %3$s)"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:122
+msgid "No-one"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:129
+msgid "Created:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:134
+msgid "Team memberships begin to expire:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:139
+msgid "Seat count:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:140
+msgid "Leave blank for unlimited"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:144
+msgid "Members can access:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:145
+msgid "Plan cannot be changed because this team has active members."
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:173
+msgid "Delete Permanently"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:175
+msgid "Move to Trash"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:181
+msgid "Update"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:217
+#. translators: date placeholder for input, javascript format
+msgid "YYYY-MM-DD"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:222
+#. translators: hour placeholder for time input, javascript format
+msgid "HH"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:225
+#. translators: minute placeholder for time input, javascript format
+msgid "MM"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:308
+#. translators: %1$d - a number, %2$d - a number
+msgid ""
+"Could not update seat count - the value provided (%1$d) is lower than the "
+"number of seats used (%2$d)."
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Details.php:323
+#. translators: %s - error message
+msgid "Could not update team plan: %s"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Members.php:55
+msgid "Team Members"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Members.php:73
+msgid "Search Invitations"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Members.php:73
+msgid "Search Members"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Members.php:80
+msgid "Team management is disabled:"
+msgstr ""
+
+#: src/Admin/Meta_Boxes/Team_Members.php:86
+#: src/Admin/Modals/Add_Team_Member.php:47
+#: src/Admin/Modals/Add_Team_Member.php:48
+msgid "Add Team Member"
+msgstr ""
+
+#: src/Admin/Modals/Add_Team_Member.php:60
+msgid ""
+"Search for an existing user or create a new one to add as a member to the "
+"team."
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Delete_Team.php:47
+#: src/Admin/Modals/Confirm_Delete_Team.php:48
+msgid "Delete Team"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Delete_Team.php:69
+msgid "Are you sure you want to delete this team?"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Delete_Team.php:70
+#: src/Admin/Modals/Confirm_Remove_Member.php:104
+msgid ""
+"This will also delete any associated user memberships. You can opt to keep "
+"the user memberships by unlinking them from the team."
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Delete_Team.php:75
+#: src/Admin/Modals/Confirm_Remove_Member.php:109
+msgid "Delete user memberships"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Delete_Team.php:80
+#: src/Admin/Modals/Confirm_Remove_Member.php:114
+msgid "Keep user memberships and make them standalone"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Remove_Member.php:67
+#: src/Admin/Modals/Confirm_Remove_Member.php:145
+msgid "Remove Members"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Remove_Member.php:69
+#: src/Admin/Modals/Confirm_Remove_Member.php:147
+msgid "Remove Member"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Remove_Member.php:73
+msgid "Close modal panel"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Remove_Member.php:100
+msgid "Are you sure you want to remove these members?"
+msgstr ""
+
+#: src/Admin/Modals/Confirm_Remove_Member.php:102
+msgid "Are you sure you want to remove this member?"
+msgstr ""
+
+#: src/Admin/Products.php:77
+msgid "Team Membership"
+msgstr ""
+
+#: src/Admin/Products.php:78
+msgid "Team membership products give access to a team membership upon purchase."
+msgstr ""
+
+#: src/Admin/Products.php:97
+msgid "Team Pricing"
+msgstr ""
+
+#: src/Admin/Products.php:102
+msgid "Per Member"
+msgstr ""
+
+#: src/Admin/Products.php:103
+msgid "Per Team"
+msgstr ""
+
+#: src/Admin/Products.php:109 src/Admin/Products.php:178
+msgid "Minimum member count"
+msgstr ""
+
+#: src/Admin/Products.php:122 src/Admin/Products.php:193
+msgid "Maximum member count"
+msgstr ""
+
+#: src/Admin/Products.php:124 src/Admin/Products.php:196
+msgid "Leave this blank to allow an unlimited number of seats"
+msgstr ""
+
+#: src/Admin/Products.php:149 src/Admin/Products.php:229
+msgid "Team members will have access to"
+msgstr ""
+
+#: src/Admin/Products.php:156 src/Admin/Products.php:243
+msgid "Need to add or edit a plan?"
+msgstr ""
+
+#: src/Admin/Products.php:156 src/Admin/Products.php:243
+msgid "Manage Membership Plans"
+msgstr ""
+
+#: src/Admin/Products.php:224
+msgid "Same plan as parent"
+msgstr ""
+
+#: src/Admin/Settings.php:60 src/Admin/Settings.php:90 src/Admin.php:230
+#: src/Frontend/Teams_Area.php:347 src/Post_Types.php:99
+msgid "Teams"
+msgstr ""
+
+#: src/Admin/Settings.php:97
+msgid "Allow removing members"
+msgstr ""
+
+#: src/Admin/Settings.php:98
+msgid "If enabled, team owners and managers can remove members from their team."
+msgstr ""
+
+#: src/Admin/Settings.php:105
+msgid "Owners must be members"
+msgstr ""
+
+#: src/Admin/Settings.php:106
+msgid "If enabled, team owners must take up a seat in their team."
+msgstr ""
+
+#: src/Admin/Team_Members.php:103 src/Admin/Teams.php:626
+#. translators: %d - a number
+msgid "%d member was removed from the team."
+msgid_plural "%d members were removed from the team."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Team_Members.php:119 src/Admin/Teams.php:643
+#. translators: %d - a number
+msgid "%d user was set as a member of the team."
+msgid_plural "%d users were set as members of the team."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Team_Members.php:135 src/Admin/Teams.php:660
+#. translators: %d - a number
+msgid "%d user was set as a manager of the team."
+msgid_plural "%d users were set as managers of the team."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Team_Members.php:185 src/Admin/Teams.php:712
+#. translators: %s - user's name
+msgid "%s was added to team as a member."
+msgstr ""
+
+#: src/Admin/Team_Members.php:187 src/Admin/Teams.php:716
+#. translators: %s - error message
+msgid "Cannot add member: %s"
+msgstr ""
+
+#: src/Admin/Team_Members.php:196 src/Admin/Teams.php:726
+#: src/Frontend/Teams_Area.php:1360
+#. translators: %s - user's name
+msgid "%s was removed from the team."
+msgstr ""
+
+#: src/Admin/Team_Members.php:202 src/Frontend/Teams_Area.php:1362
+msgid "Cannot remove member: %s"
+msgstr ""
+
+#: src/Admin/Team_Members.php:202
+msgid "Cannot cancel invittation for %s."
+msgstr ""
+
+#: src/Admin/Team_Members.php:211 src/Admin/Teams.php:745
+#: src/Frontend/Teams_Area.php:1340
+#. translators: %s - user's name
+msgid "%s was set as a member of the team."
+msgstr ""
+
+#: src/Admin/Team_Members.php:220 src/Admin/Teams.php:759
+#: src/Frontend/Teams_Area.php:1350
+#. translators: %s - user's name
+msgid "%s was set as a manager of the team."
+msgstr ""
+
+#: src/Admin/Teams.php:91 src/Team_Member.php:196
+msgid "Owner"
+msgstr ""
+
+#: src/Admin/Teams.php:92
+msgid "Plan"
+msgstr ""
+
+#: src/Admin/Teams.php:93 src/Frontend/Teams_Area.php:901
+#: templates/myaccount/my-teams.php:70
+msgid "Created On"
+msgstr ""
+
+#: src/Admin/Teams.php:94 src/Frontend/Teams_Area.php:264
+msgid "Members"
+msgstr ""
+
+#: src/Admin/Teams.php:144
+msgid "This team cannot be restored because it has active members."
+msgstr ""
+
+#: src/Admin/Teams.php:146
+msgid "This team cannot be moved to trash because it has active members."
+msgstr ""
+
+#: src/Admin/Teams.php:150
+msgid "This team cannot be permanently deleted because it has active members."
+msgstr ""
+
+#: src/Admin/Teams.php:237 templates/myaccount/my-teams.php:113
+#. translators: %1$d - a number, %2$d - a number
+msgid "%1$d of %2$s seats"
+msgstr ""
+
+#: src/Admin/Teams.php:240 templates/myaccount/my-teams.php:115
+#. translators: %d - a number
+msgid "%d of unlimited seats"
+msgstr ""
+
+#: src/Admin/Teams.php:528
+msgid ""
+"Cannot add team: no membership plans available. %1$sClick here%2$s to add a "
+"membership plan."
+msgstr ""
+
+#: src/Admin/Teams.php:733
+#. translators: %1$s - user name, %2$s - error message
+msgid "Cannot remove %1$s: %2$s"
+msgstr ""
+
+#: src/Admin/Teams.php:733
+msgid "Cannot cancel invitation for %s: %2$s"
+msgstr ""
+
+#: src/Admin/User_Memberships.php:73
+msgid ""
+"Editing has been disabled because this membership belongs to a team. "
+"%1$sEdit team details%2$s instead."
+msgstr ""
+
+#: src/Admin/User_Memberships.php:81
+msgid "This will remove the member from the team."
+msgstr ""
+
+#: src/Admin/User_Memberships.php:122
+msgid "Granted from team:"
+msgstr ""
+
+#: src/Admin/User_Memberships.php:123
+msgid "Member added:"
+msgstr ""
+
+#: src/Admin/User_Memberships.php:124
+msgid "Team role:"
+msgstr ""
+
+#: src/Admin/User_Memberships.php:228 src/Admin/User_Memberships.php:245
+msgid "Search for a team&hellip;"
+msgstr ""
+
+#: src/Admin.php:157
+msgid ""
+"This user is already a member of the team's plan, either individually or "
+"having access from another team. Adding this user will move their existing "
+"user membership under this team's management. Do you want to continue?"
+msgstr ""
+
+#: src/Admin.php:158
+msgid ""
+"You are changing the team owner. Note that this does not affect team owner "
+"user membership, billing or subscriptions - these changes need to be made "
+"manually. Do you want to continue?"
+msgstr ""
+
+#: src/Admin.php:159
+msgid "Per-member price"
+msgstr ""
+
+#: src/Admin.php:160
+msgid "Per-member sale price"
+msgstr ""
+
+#: src/Admin.php:161
+msgid "Per-team price"
+msgstr ""
+
+#: src/Admin.php:162
+msgid "Per-team sale price"
+msgstr ""
+
+#: src/Admin.php:163
+msgid "Per-member subscription price"
+msgstr ""
+
+#: src/Admin.php:164
+msgid "Per-member sign-up fee"
+msgstr ""
+
+#: src/Admin.php:165
+msgid "Per-team subscription price"
+msgstr ""
+
+#: src/Admin.php:166
+msgid "Per-team sign-up fee"
+msgstr ""
+
+#: src/Admin.php:377
+msgid "My Teams"
+msgstr ""
+
+#: src/Admin.php:378
+msgid "Endpoint for the \"My Account &rarr; My Teams\" page"
+msgstr ""
+
+#: src/Admin.php:386 src/Frontend.php:755 src/Frontend.php:784
+#: templates/myaccount/join-team.php:158
+msgid "Join Team"
+msgstr ""
+
+#: src/Admin.php:387
+msgid "Endpoint for the \"My Account &rarr; Join Team\" page"
+msgstr ""
+
+#: src/Cart.php:88
+msgid "Select options"
+msgstr ""
+
+#: src/Cart.php:137
+#. translators: %s - field label
+msgid "Field '%s' is required."
+msgstr ""
+
+#: src/Cart.php:207
+msgid "At least %1$d member must be added to %2$s."
+msgid_plural "A minimum of %1$d members must be added to %2$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Cart.php:211
+msgid "Only %1$d member can be added to %1$s."
+msgid_plural "A maximum of %1$d members can be added to %2$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Emails/Invitation.php:45
+msgid "Team invitation"
+msgstr ""
+
+#: src/Emails/Invitation.php:46
+msgid "Invitation emails are sent when a new member is invited to a team."
+msgstr ""
+
+#: src/Emails/Invitation.php:48
+msgid "You've been invited to join {team_name}"
+msgstr ""
+
+#: src/Emails/Invitation.php:49
+msgid "{sender_name} has invited you to join the {team_name} team on {site_title}."
+msgstr ""
+
+#: src/Emails/Invitation.php:213 src/Emails/Membership_Email.php:151
+msgid "%s inserts your site name."
+msgstr ""
+
+#: src/Emails/Invitation.php:220
+msgid "%s inserts the membership plan name."
+msgstr ""
+
+#: src/Emails/Membership_Email.php:158
+msgid "%1$s inserts the team name, %2$s inserts the membership plan name."
+msgstr ""
+
+#: src/Emails/Membership_Ended.php:45
+msgid "Team membership ended"
+msgstr ""
+
+#: src/Emails/Membership_Ended.php:46
+msgid ""
+"Team membership ended emails are sent to team owners in the moment their "
+"membership expires."
+msgstr ""
+
+#: src/Emails/Membership_Ended.php:48
+msgid "Your {team_name} membership on {site_title} has expired"
+msgstr ""
+
+#: src/Emails/Membership_Ended.php:49
+msgid "Renew your {membership_plan} for {team_name}"
+msgstr ""
+
+#: src/Emails/Membership_Ending_Soon.php:45
+msgid "Team membership ending soon"
+msgstr ""
+
+#: src/Emails/Membership_Ending_Soon.php:46
+msgid ""
+"Team membership ending soon emails are sent to team owners when their "
+"membership is about to expire."
+msgstr ""
+
+#: src/Emails/Membership_Ending_Soon.php:48
+msgid "Your {team_name} membership on {site_title} end soon!"
+msgstr ""
+
+#: src/Emails/Membership_Ending_Soon.php:49
+msgid "An update about your {membership_plan} for {team_name}"
+msgstr ""
+
+#: src/Emails/Membership_Renewal_Reminder.php:45
+msgid "Team membership renewal reminder"
+msgstr ""
+
+#: src/Emails/Membership_Renewal_Reminder.php:48
+#. translators: Placeholders: %1$s - <strong> tag, %2$s - </strong> tag
+msgid ""
+"Team membership renewal reminder emails are sent to team owners inviting "
+"them to renew their membership. %1$sRenewal reminders are not sent for "
+"non-renewable team memberships, such as registration-based or admin-assign "
+"only memberships%2$s."
+msgstr ""
+
+#: src/Emails/Membership_Renewal_Reminder.php:51
+msgid "Renew {team_name} membership on {site_title}!"
+msgstr ""
+
+#: src/Emails/Membership_Renewal_Reminder.php:52
+msgid "You can renew your {membership_plan} for {team_name}"
+msgstr ""
+
+#: src/Frontend/Products.php:70
+msgid "per member"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:265
+#: templates/myaccount/my-team-add-member.php:99
+msgid "Add Member"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:266
+msgid "Team Settings"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:547
+#. translators: Placeholder: %s - "Back to Teams" or "Back to Dashboard" label
+#. to return back to the teams list or the My Account dashboard
+msgid "Back to %s"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:547
+msgid "Dashboard"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:892 templates/myaccount/my-teams.php:128
+msgid "Unlimited"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:897
+msgid "(including %d pending invitations)"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:906
+msgid "Actions"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:959
+msgid "Renew"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:992
+msgid ""
+"Can't remove this member because their membership is expired or has been "
+"cancelled."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1180
+msgid "First"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1182
+msgid "Previous"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1185
+msgid "Next"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1187
+msgid "Last"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1277
+msgid "You cannot manage this team."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1284
+msgid "You cannot manage settings for this team."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1291
+msgid "No such team."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1323 src/Frontend/Teams_Area.php:1411
+#: src/Frontend.php:137 src/Frontend.php:194 src/Frontend.php:245
+#: src/Frontend.php:324 src/Frontend.php:526 src/Frontend.php:993
+msgid "Invalid team."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1329
+msgid "Invalid member."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1372 src/Frontend/Teams_Area.php:1473
+#. translators: %s - team name
+msgid "Cannot perform action. Please try again."
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:1417
+msgid "Invalid invitation."
+msgstr ""
+
+#: src/Frontend.php:142
+msgid "Please provide a name for this team."
+msgstr ""
+
+#: src/Frontend.php:156
+msgid "Team name was updated."
+msgstr ""
+
+#: src/Frontend.php:161
+msgid "Cannot update name for this team."
+msgstr ""
+
+#: src/Frontend.php:205
+msgid "Team registration link was regenerated."
+msgstr ""
+
+#: src/Frontend.php:210
+msgid "Cannot regenerate registration link for this team."
+msgstr ""
+
+#: src/Frontend.php:260
+#. translators: %s - email
+msgid "%s was invited to join the team."
+msgstr ""
+
+#: src/Frontend.php:274
+msgid "%1$s is already invited. Do you want to %2$sre-send the invitation%3$s?"
+msgstr ""
+
+#: src/Frontend.php:280
+#. translators: %1$s - email, %2$s - error message
+msgid "Cannot invite %1$s to this team: %2$s"
+msgstr ""
+
+#: src/Frontend.php:289
+#. translators: %s - email
+msgid "Cannot invite %s to this team."
+msgstr ""
+
+#: src/Frontend.php:337
+msgid "You are now a member of the team."
+msgstr ""
+
+#: src/Frontend.php:343
+#. translators: %s - error message
+msgid "Cannot add yourself as a member: %s"
+msgstr ""
+
+#: src/Frontend.php:349
+msgid "Cannot add yourself as a member."
+msgstr ""
+
+#: src/Frontend.php:385
+msgid "Invalid token."
+msgstr ""
+
+#: src/Frontend.php:417
+#. translators: %s - team name
+msgid "Success! You are now a member of %s."
+msgstr ""
+
+#: src/Frontend.php:423
+#. translators: %1$s - team name %2$s - error message
+msgid "Cannot join %1$s: %2$s"
+msgstr ""
+
+#: src/Frontend.php:430
+#. translators: %s - team name
+msgid "Cannot join %s."
+msgstr ""
+
+#: src/Frontend.php:539
+#. translators: %s - team name
+msgid "You have left the %s team."
+msgstr ""
+
+#: src/Frontend.php:545
+#. translators: %1$s - team name %2$s - error message
+msgid "Cannot leave %1$s: %2$s"
+msgstr ""
+
+#: src/Frontend.php:552
+#. translators: %s - team name
+msgid "Cannot leave %s."
+msgstr ""
+
+#: src/Frontend.php:755 src/Frontend.php:784
+msgid "Join %s"
+msgstr ""
+
+#: src/Frontend.php:810 templates/myaccount/my-team-invitations-table.php:61
+#: templates/myaccount/my-team-members-table.php:62
+msgid "Role"
+msgstr ""
+
+#: src/Frontend.php:919
+msgid ""
+"Cannot automatically log in. Please log into your account and renew this "
+"membership manually."
+msgstr ""
+
+#: src/Frontend.php:949
+msgid "Invalid renewal URL. Please log in to your account to renew."
+msgstr ""
+
+#: src/Frontend.php:1002
+msgid "Invalid renewal token. Please log in to renew this team membership."
+msgstr ""
+
+#: src/Frontend.php:1010
+msgid ""
+"Cannot log in as your renewal token has expired. Please log in to renew "
+"this team membership from your account."
+msgstr ""
+
+#: src/Frontend.php:1065
+#. translators: Placeholder: %s - a product to purchase to renew a membership
+msgid "Renew your team membership by purchasing %s."
+msgstr ""
+
+#: src/Frontend.php:1066
+msgid "You must be logged to renew your team membership."
+msgstr ""
+
+#: src/Frontend.php:1070
+msgid "Cannot renew this team membership. Please contact us if you need assistance."
+msgstr ""
+
+#: src/Frontend.php:1075
+msgid ""
+"This team membership cannot be renewed. Please contact us if you need "
+"assistance."
+msgstr ""
+
+#: src/Frontend.php:1151
+msgid "Leave Team"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:114
+#. translators: Placeholders: %1$s - opening <a> tag, %2$s - closing </a> tag
+msgid ""
+"Heads up! The owner of this team switched their subscription and it's now "
+"linked to a new team. %1$sClick here to edit the new team &raquo;%2$s"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:224
+msgid "Subscription:"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:225
+msgid "Next Bill On:"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:268
+msgid "Team not linked to a Subscription"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:291
+#: src/Integrations/Subscriptions.php:307
+msgid "Link to a Subscription or keep empty to leave unlinked"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:426
+msgid "Subscription"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:499
+msgid "Team subscriptions"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:539
+msgid "Team subscription has been cancelled or expired."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:540
+msgid ""
+"Can't add more members because your team subscription has been cancelled or "
+"expired."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:541
+msgid ""
+"Can't remove members because your team subscription has been cancelled or "
+"expired."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:542 src/Team.php:1616
+msgid ""
+"Can't join team at the moment - please contact your team owner for more "
+"details."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:730
+#. translators: Placeholders: %1$s - subscription product name, %2%s - order
+#. number
+msgid "Membership re-activated due to subscription re-purchase (%1$s, Order %2$s)."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:804
+msgid "Membership activated because WooCommerce Subscriptions was activated."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:807
+msgid ""
+"Membership free trial activated because WooCommerce Subscriptions was "
+"activated."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:892
+msgid "Billing"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:913
+#: src/Integrations/Subscriptions.php:936
+msgid "Next Bill On"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:1004
+msgid ""
+"You have an active subscription (%s) tied to your current membership. Would "
+"you like this subscription to be cancelled when joining the team?."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:1007
+msgid "Cancel my existing subscription"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:1067
+#. translators: Placeholders: %s - team name
+msgid "Subscription cancelled because user joined team (%s)."
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:1069
+msgid "Your existing subscription (%s) has been cancelled."
+msgstr ""
+
+#: src/Invitation.php:88 src/Team.php:112
+msgid "Invalid id or post"
+msgstr ""
+
+#: src/Invitation.php:285 src/Team.php:812 src/Team.php:1068
+#: src/Team_Member.php:226
+msgid "Invalid role"
+msgstr ""
+
+#: src/Invitation.php:426
+msgid ""
+"Cannot accept this invitation - it may have been revoked or already "
+"accepted."
+msgstr ""
+
+#: src/Invitation.php:432 src/Team_Member.php:87
+msgid "Invalid user"
+msgstr ""
+
+#: src/Invitation.php:458
+msgid "Cannot cancel non-pending invitation"
+msgstr ""
+
+#: src/Invitations.php:69 src/Team_Member.php:74 src/Teams_Handler.php:144
+msgid "Invalid team"
+msgstr ""
+
+#: src/Invitations.php:73 src/Team.php:1059
+msgid "Invalid email"
+msgstr ""
+
+#: src/Invitations.php:334
+#. translators: Pending Invitation(s)
+msgid "Pending <span class=\"count\">(%s)</span>"
+msgid_plural "Pending <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Invitations.php:340
+#. translators: Accepted Invitation(s)
+msgid "Accepted <span class=\"count\">(%s)</span>"
+msgid_plural "Accepted <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Invitations.php:346
+#. translators: Cancelled Invitation(s)
+msgid "Cancelled <span class=\"count\">(%s)</span>"
+msgid_plural "Cancelled <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Orders.php:183
+#. translators: %1$s - order number, %2$s - order item id, %3$s - error message
+msgid "Could not create team from order %1$s item %2$s: %3$s"
+msgstr ""
+
+#: src/Orders.php:291
+msgid "(view team)"
+msgstr ""
+
+#: src/Orders.php:343
+msgid ""
+"Only full refunds and refunds of unoccupied seats are allowed for team "
+"membership purchases."
+msgstr ""
+
+#: src/Orders.php:346
+msgid "Team %1$s has currently %2$d unoccupied seat."
+msgid_plural "Team %1$s has currently %2$d unoccupied seats."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Orders.php:354
+msgid ""
+"Because this team product has per-team pricing with a maximum number of "
+"members configured, a quantity of 1 will refund %d seats for this team."
+msgstr ""
+
+#: src/Plugin.php:462
+#. translators: the %s placeholders are meant for pairs of opening <a> and
+#. closing </a> link tags
+msgid ""
+"Thanks for installing Memberships for Teams! To get started, take a minute "
+"to %1$sread the documentation%2$s and then %3$ssetup a membership plan%4$s "
+":)"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Teams for WooCommerce Memberships"
+msgstr ""
+
+#: src/Post_Types.php:102
+msgid "Add Team"
+msgstr ""
+
+#: src/Post_Types.php:103
+msgid "Add New Team"
+msgstr ""
+
+#: src/Post_Types.php:104
+msgid "Edit"
+msgstr ""
+
+#: src/Post_Types.php:105
+msgid "Edit Team"
+msgstr ""
+
+#: src/Post_Types.php:106
+msgid "New Team"
+msgstr ""
+
+#: src/Post_Types.php:107
+msgid "View Teams"
+msgstr ""
+
+#: src/Post_Types.php:108
+msgid "View Team"
+msgstr ""
+
+#: src/Post_Types.php:109
+msgid "Search Teams"
+msgstr ""
+
+#: src/Post_Types.php:110
+msgid "No Teams found"
+msgstr ""
+
+#: src/Post_Types.php:111
+msgid "No Teams found in trash"
+msgstr ""
+
+#: src/Post_Types.php:113
+msgid "This is where you can add new Teams."
+msgstr ""
+
+#: src/Post_Types.php:144 src/Post_Types.php:147 src/Post_Types.php:149
+#: src/Post_Types.php:150
+msgid "Team saved."
+msgstr ""
+
+#: src/Post_Types.php:145
+msgid "Custom field updated."
+msgstr ""
+
+#: src/Post_Types.php:146
+msgid "Custom field deleted."
+msgstr ""
+
+#: src/Post_Types.php:153
+msgid "Team draft updated."
+msgstr ""
+
+#: src/Post_Types.php:173
+msgid "%s team updated."
+msgid_plural "%s teams updated."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Post_Types.php:174
+msgid "%s team not updated, somebody is editing it."
+msgid_plural "%s teams not updated, somebody is editing them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Post_Types.php:175
+msgid "%s team permanently deleted."
+msgid_plural "%s teams permanently deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Post_Types.php:176
+msgid "%s team moved to the Trash."
+msgid_plural "%s teams moved to the Trash."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Post_Types.php:177
+msgid "%s team restored from the Trash."
+msgid_plural "%s teams restored from the Trash."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Product.php:144 templates/myaccount/my-team-settings.php:54
+msgid "Team Name"
+msgstr ""
+
+#: src/Product.php:152
+msgid "Take up a seat"
+msgstr ""
+
+#: src/Product.php:153
+msgid "Use a seat to add me as a team member"
+msgstr ""
+
+#: src/Team.php:178
+msgid "Invalid membership plan"
+msgstr ""
+
+#: src/Team.php:182
+msgid "Cannot change plan while team has active members"
+msgstr ""
+
+#: src/Team.php:590
+msgid "Invalid order"
+msgstr ""
+
+#: src/Team.php:698
+msgid "Invalid product"
+msgstr ""
+
+#: src/Team.php:803 src/Team.php:1082
+msgid "User is already a member of the team"
+msgstr ""
+
+#: src/Team.php:833 src/Team.php:1089
+msgid "No more seats left"
+msgstr ""
+
+#: src/Team.php:885
+#. translators: %1$s - previous team name, %2$s - new team name
+msgid "Team membership moved from %1$s to %2$s."
+msgstr ""
+
+#: src/Team.php:888
+#. translators: %s team name
+msgid "Individual membership converted to %s team membership."
+msgstr ""
+
+#: src/Team.php:909
+msgid "Membership access granted from %s team."
+msgstr ""
+
+#: src/Team.php:953
+msgid "User is not a member of the team"
+msgstr ""
+
+#: src/Team.php:994
+#. translators: %s - team name
+msgid "Member removed from %s team."
+msgstr ""
+
+#: src/Team.php:1075
+msgid "Already invited"
+msgstr ""
+
+#: src/Team.php:1145
+msgid "No invitation found"
+msgstr ""
+
+#: src/Team.php:1613
+msgid "Team order has been refunded."
+msgstr ""
+
+#: src/Team.php:1614
+msgid "Can't add more members because your team order has been refunded."
+msgstr ""
+
+#: src/Team.php:1615
+msgid "Can't remove members because your team order has been refunded."
+msgstr ""
+
+#: src/Team.php:1670
+msgid "Team management is not permitted"
+msgstr ""
+
+#: src/Team_Member.php:92
+msgid "User is not a member of this team"
+msgstr ""
+
+#: src/Team_Member.php:231
+msgid "Changing owner's role is not allowed"
+msgstr ""
+
+#: src/Team_Members.php:198
+msgid "Member"
+msgstr ""
+
+#: src/Team_Members.php:199
+msgid "Manager"
+msgstr ""
+
+#: src/Team_Members.php:263
+msgid "Members <span class=\"count\">(%s)</span>"
+msgstr ""
+
+#: src/Team_Members.php:278
+msgid "Pending invitations <span class=\"count\">(%s)</span>"
+msgstr ""
+
+#: src/Teams_Handler.php:134
+msgid "Owner is required"
+msgstr ""
+
+#: src/Teams_Handler.php:139
+msgid "Invalid plan"
+msgstr ""
+
+#: templates/emails/plain/team-invitation.php:42
+#: templates/emails/team-invitation.php:42 templates/myaccount/join-team.php:93
+#. translators: %s - membership plan name
+msgid "This will give you %s access."
+msgstr ""
+
+#: templates/emails/plain/team-invitation.php:48
+msgid "Please use the link below to sign in and accept your invite."
+msgstr ""
+
+#: templates/emails/plain/team-invitation.php:55
+#: templates/emails/team-invitation.php:52
+#: templates/myaccount/join-team.php:118
+#. translators: %1$s - current team name, %2$s - membership plan name, %3$s -
+#. new team name
+msgid ""
+"You are a member of %1$s, which already gives you access to %2$s. Joining "
+"%3$s means you will leave your current team and your existing membership "
+"will be moved under new team management."
+msgstr ""
+
+#: templates/emails/plain/team-invitation.php:57
+#: templates/emails/team-invitation.php:54
+#: templates/myaccount/join-team.php:121
+#. translators: %s - membership plan name
+msgid "Your existing %s membership will be moved under team management."
+msgstr ""
+
+#: templates/emails/plain/team-invitation.php:63
+msgid ""
+"Please use the confirmation link below to sign up for an account and accept "
+"your invite."
+msgstr ""
+
+#: templates/emails/plain/team-membership-ended.php:45
+#: templates/emails/plain/team-membership-ending-soon.php:45
+#: templates/emails/plain/team-membership-renewal-reminder.php:45
+#: templates/emails/team-membership-ended.php:45
+#: templates/emails/team-membership-ending-soon.php:45
+#: templates/emails/team-membership-renewal-reminder.php:45
+#. translators: %s - email recipient's name
+msgid "Hey %s"
+msgstr ""
+
+#: templates/emails/plain/team-membership-ended.php:49
+#: templates/emails/team-membership-ended.php:47
+msgid "Oh no, your team membership access at %s has now ended!"
+msgstr ""
+
+#: templates/emails/plain/team-membership-ended.php:51
+#: templates/emails/plain/team-membership-ending-soon.php:51
+#: templates/emails/plain/team-membership-renewal-reminder.php:51
+#: templates/emails/team-membership-ended.php:49
+#: templates/emails/team-membership-ending-soon.php:49
+#: templates/emails/team-membership-renewal-reminder.php:49
+#. translators: %s - membership plan name
+msgid ""
+"If you would like to continue having access to %s, please renew your "
+"membership."
+msgstr ""
+
+#: templates/emails/plain/team-membership-ended.php:55
+#: templates/emails/plain/team-membership-ending-soon.php:55
+#: templates/emails/plain/team-membership-renewal-reminder.php:55
+msgid "Use the link below to log in and renew your team membership now."
+msgstr ""
+
+#: templates/emails/plain/team-membership-ending-soon.php:49
+#: templates/emails/team-membership-ending-soon.php:47
+#. translators: %1$s - site title, %2$s - a date
+msgid ""
+"Heads up: your team membership access at %1$s is ending soon! Your "
+"membership access will stop on %2$s."
+msgstr ""
+
+#: templates/emails/plain/team-membership-renewal-reminder.php:49
+#: templates/emails/team-membership-renewal-reminder.php:47
+#. translators: %1$s - site title, %2$s - a date
+msgid "Your team membership access at %1$s expired on %2$s!"
+msgstr ""
+
+#: templates/emails/team-invitation.php:46
+msgid "Please click the confirmation link below to sign in and accept your invite."
+msgstr ""
+
+#: templates/emails/team-invitation.php:61
+msgid ""
+"Please click the confirmation link below to sign up for an account and "
+"accept your invite."
+msgstr ""
+
+#: templates/emails/team-invitation.php:67
+#. translators: %s - team name
+msgid "Click here to join %s"
+msgstr ""
+
+#: templates/emails/team-membership-ended.php:51
+#: templates/emails/team-membership-ending-soon.php:51
+#: templates/emails/team-membership-renewal-reminder.php:51
+msgid "Click here to log in and renew your team membership now"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:56
+#: templates/myaccount/form-join-team-register.php:103
+msgid "Register"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:65
+msgid "Username"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:72
+msgid "Email address"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:79
+#: templates/myaccount/form-join-team-register.php:125
+msgid "Password"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:86
+msgid "First Name"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:91
+msgid "Last Name"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:96
+msgid "Anti-spam"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:114
+#: templates/myaccount/form-join-team-register.php:133
+msgid "Login"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:121
+msgid "Username or email address"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:135
+msgid "Remember me"
+msgstr ""
+
+#: templates/myaccount/form-join-team-register.php:139
+msgid "Lost your password?"
+msgstr ""
+
+#: templates/myaccount/join-team.php:48
+msgid ""
+"Looks like the link you followed is no longer valid. If you were invited to "
+"join a team contact the team owner and ask them for a new invitation."
+msgstr ""
+
+#: templates/myaccount/join-team.php:57
+#. translators: 1: user display name 2: logout url
+msgid "Hello %1$s (not %1$s? <a href=\"%2$s\">Log out</a>)"
+msgstr ""
+
+#: templates/myaccount/join-team.php:65
+msgid "Hey there!"
+msgstr ""
+
+#: templates/myaccount/join-team.php:72
+#. translators: %1$s - inviter name, %2$s - team name
+msgid "You've been invited by %1$s to join %2$s."
+msgstr ""
+
+#: templates/myaccount/join-team.php:75
+#. translators: %s - team name
+msgid "You've been invited to join %s."
+msgstr ""
+
+#: templates/myaccount/join-team.php:90
+#. translators: %1$s - membership plan name, %2$s - date
+msgid "This will give you %1$s access until %2$s."
+msgstr ""
+
+#: templates/myaccount/join-team.php:98
+msgid "Click the button below to join this team."
+msgstr ""
+
+#: templates/myaccount/join-team.php:100
+msgid "Please log in with your account to join this team."
+msgstr ""
+
+#: templates/myaccount/join-team.php:107
+msgid "We sent this invitation to %1$s, but it looks like you are logged in as %2$s"
+msgstr ""
+
+#: templates/myaccount/join-team.php:108
+msgid ""
+"If you want to accept this invitation with your current account, click the "
+"button below, otherwise log out and sign up or log in as %s"
+msgstr ""
+
+#: templates/myaccount/join-team.php:111
+msgid ""
+"Please create an account or log in with an existing account to join this "
+"team."
+msgstr ""
+
+#: templates/myaccount/join-team.php:130
+#. translators: %1$s - opening <a> tag, %2$s - closing </a> tag
+msgid ""
+"You are already a member of this team. %1$sClick here to view your "
+"account%2$s."
+msgstr ""
+
+#: templates/myaccount/join-team.php:155
+#. translators: %s - email
+msgid "Join Team as %s"
+msgstr ""
+
+#: templates/myaccount/join-team.php:156
+#. translators: %1$s - opening <a> tag, %2$s - closing </a> tag
+msgid "Or %1$sLog Out%2$s to create a new account"
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:59
+#: templates/myaccount/my-team-members.php:61
+msgid "This team has <strong>%d seat remaining</strong>."
+msgid_plural "This team has <strong>%d seats remaining</strong>."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/myaccount/my-team-add-member.php:61
+#: templates/myaccount/my-team-members.php:63
+msgid "This team has <strong>unlimited seats</strong>."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:71
+msgid ""
+"You can %1$sadd yourself as a member%2$s, share your team registration "
+"link, or manually add new members below."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:73
+msgid "You can share your team registration link or manually add new members below."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:77
+msgid "Registration Link"
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:79
+msgid ""
+"This registration link will allow members to register themselves for your "
+"team. Please use caution when sharing this, as it allows any visitor to add "
+"themselves to your team."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:92
+msgid "Regenerate link"
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:103
+msgid "You can't add more members because your team has no more seats left."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:111
+msgid ""
+"Enter member details - your team member will receive an invitation via "
+"email."
+msgstr ""
+
+#: templates/myaccount/my-team-add-member.php:134
+msgid "Add member"
+msgstr ""
+
+#: templates/myaccount/my-team-invitations-table.php:151
+msgid "Looks like there are no pending invitations."
+msgstr ""
+
+#: templates/myaccount/my-team-members-table.php:157
+msgid "Looks like you your team has no members!"
+msgstr ""
+
+#: templates/myaccount/my-team-settings.php:67
+msgid "Update name"
+msgstr ""
+
+#: templates/myaccount/my-teams.php:178
+msgid "Looks like you don't have any teams yet!"
+msgstr ""
+
+#: templates/single-product/product-team.php:56
+msgid "Number of Seats:"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://woocommerce.com/products/teams-woocommerce-memberships/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Expands WooCommerce Memberships to sell memberships to teams, families, "
+"companies, or other groups!"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "SkyVerge"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://www.woocommerce.com/"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:886
+msgctxt "Membership plan"
+msgid "Plan"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:891
+msgctxt "Partitive (how many seats?)"
+msgid "Seats"
+msgstr ""
+
+#: src/Frontend/Teams_Area.php:896 templates/myaccount/my-teams.php:71
+msgctxt "Partitive (how many members?)"
+msgid "Members"
+msgstr ""
+
+#: src/Frontend.php:503
+#. translators: Placeholders: %1$s - first or given name, %2$s - surname or
+#. last name
+msgctxt "User full name"
+msgid "%1$s %2$s"
+msgstr ""
+
+#: src/Integrations/Subscriptions.php:1004
+#: src/Integrations/Subscriptions.php:1069
+msgctxt "hash before order number"
+msgid "#%s"
+msgstr ""
+
+#: src/Invitations.php:332
+msgctxt "Invitation Status"
+msgid "Pending"
+msgstr ""
+
+#: src/Invitations.php:338
+msgctxt "Invitation Status"
+msgid "Accepted"
+msgstr ""
+
+#: src/Invitations.php:344
+msgctxt "Invitation Status"
+msgid "Cancelled"
+msgstr ""
+
+#: src/Post_Types.php:101
+msgctxt "Admin menu name"
+msgid "Memberships"
+msgstr ""
+
+#: templates/myaccount/my-teams.php:69
+msgctxt "Team name"
+msgid "Name"
+msgstr ""

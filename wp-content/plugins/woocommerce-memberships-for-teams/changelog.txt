@@ -1,0 +1,45 @@
+*** Teams for WooCommerce Memberships Changelog ***
+
+2018.09.06 - version 1.0.5
+ * Tweak - Display product variations that grant team access on the Plan screens
+ * Tweak - Display a notice to users when a team owner switches their subscription
+ * Fix - When teams are unlinked from a subscription, ensure the team's user memberships are unlinked as well
+
+2018.07.03 - version 1.0.4
+ * Tweak - Allow searching teams by user membership, plan, customer, related order or linked subscription in the teams admin edit screen
+ * Fix - When some WooCommerce settings or product types cause the General tab to disappear in the product panel, ensure it is persisted if the product is also a team membership product
+ * Fix - If the team owner cancels a subscription linked to the team plan, and then resubscribes, make sure that every user membership within the team is reactivated
+ * Fix - When a non-paying member is invited to a different team which grants access to the same membership plan, make sure they are not asked to cancel their existing subscription, if they don't own one and is not tied to their current membership
+ * Dev - Add a filter to change the URL a user is redirected to when joining a team by invitation or registering via link
+
+2018.05.23 - version 1.0.3
+ * Fix - Ensure endpoint settings display in WooCommerce 3.4
+
+2018.05.23 - version 1.0.2
+ * Tweak - Add admin option to control whether team owners must take up a seat in their team or not
+ * Tweak - Make it simpler for owners to join their team by adding a pre-purchase checkbox to become a member
+ * Tweak - Provide an option for users to cancel their existing subscription for the team's plan when joining a team
+ * Fix - Ensure product variations are included in product search results when linking a team to a product in admin
+ * Fix - Ensure cart handler is loaded at all times, so plugins like One Page Checkout can be used to purchase teams
+ * Fix - Prevent subscription renewals from creating duplicate teams
+ * Fix - Ensure a consistent text domain for translatable texts is used throughout
+ * Fix - Avoid fatal error and conflicts with certain extensions
+ * Fix - Redeem existing invites if a member joins a team via the public link
+ * Fix - Adjust the "view team" link in customer emails to link to the team area
+ * Fix - Really direct team members to the account dashboard upon joining if there are no members area sections to display :)
+ * Fix - Ensure registration or login errors while joining teams appear in all themes
+ * Fix - Prevent a PHP warning when querying all team members with no paging
+ * Fix - If the My Account page is set as the Home Page, ensure that visiting the Teams Area does not redirect users to the Blog page (WooCommerce 3.3+)
+ * Dev - Ensure all falsy role values are replaced with the default role (member) when adding/inviting a member
+ * Dev - Allow passing team details via add to cart URL
+ * Misc - Add support for WooCommerce 3.4
+
+2018.03.28 - version 1.0.1
+ * Tweak - Allow manually changing team owners
+ * Fix - Direct team members to the account dashboard upon joining if there are no members area sections to display
+ * Fix - Remove the Teams filter from non-membership post lists
+ * Fix - Remove unsaved changes alert when updating a team
+ * Dev - Ensure getting teams for a user accepts custom arguments, which were previously ignored
+
+2018.03.13 - version 1.0.0
+ * Hello world! Initial Release :)
