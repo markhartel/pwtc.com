@@ -515,11 +515,58 @@ class wfUtils {
 	public static function truthyToInt($value) {
 		return self::truthyToBoolean($value) ? 1 : 0;
 	}
+	
+	/**
+	 * Returns the whitelist presets, which first grabs the bundled list and then merges the dynamic list into it.
+	 * 
+	 * @return array
+	 */
+	public static function whitelistPresets() {
+		static $_cachedPresets = null;
+		if ($_cachedPresets === null) {
+			include('wfIPWhitelist.php'); /** @var array $wfIPWhitelist */
+			$currentPresets = wfConfig::getJSON('whitelistPresets', array());
+			if (is_array($currentPresets)) {
+				$_cachedPresets = array_merge($wfIPWhitelist, $currentPresets);
+			}
+			else {
+				$_cachedPresets = $wfIPWhitelist;
+			}
+		}
+		return $_cachedPresets;
+	}
+	
+	/**
+	 * Returns an array containing all whitelisted service IPs/ranges. The returned array is grouped by service
+	 * tag: array('service1' => array('range1', 'range2', range3', ...), ...)
+	 * 
+	 * @return array
+	 */
+	public static function whitelistedServiceIPs() {
+		$result = array();
+		$whitelistPresets = self::whitelistPresets();
+		$whitelistedServices = wfConfig::getJSON('whitelistedServices', array());
+		foreach ($whitelistPresets as $tag => $preset) {
+			if (!isset($preset['n'])) { //Just an array of IPs/ranges
+				$result[$tag] = $preset;
+				continue;
+			}
+			
+			if ((isset($preset['h']) && $preset['h']) || (isset($preset['f']) && $preset['f'])) { //Forced
+				$result[$tag] = $preset['r'];
+				continue;
+			}
+			
+			if ((!isset($whitelistedServices[$tag]) && isset($preset['d']) && $preset['d']) || (isset($whitelistedServices[$tag]) && $whitelistedServices[$tag])) {
+				$result[$tag] = $preset['r'];
+			}
+		}
+		return $result;
+	}
 
 	/**
-	 * Get the list of whitelisted IPs and networks
-	 *
-	 * Results may include wfUserIPRange objects for now. Ideally everything would be in CIDR notation.
+	 * Get the list of whitelisted IPs and networks, which is a combination of preset IPs/ranges and user-entered
+	 * IPs/ranges.
 	 *
 	 * @param string	$filter	Group name to filter whitelist by
 	 * @return array
@@ -528,19 +575,16 @@ class wfUtils {
 		static $wfIPWhitelist;
 
 		if (!isset($wfIPWhitelist)) {
-			include('wfIPWhitelist.php');
-
-			// Memoize user defined whitelist IPs and ranges
-			// TODO: Convert everything to CIDR
+			$wfIPWhitelist = self::whitelistedServiceIPs();
+			
+			//Append user ranges
 			$wfIPWhitelist['user'] = array();
-
 			foreach (array_filter(explode(',', wfConfig::get('whitelisted'))) as $ip) {
 				$wfIPWhitelist['user'][] = new wfUserIPRange($ip);
 			}
 		}
 
 		$whitelist = array();
-
 		foreach ($wfIPWhitelist as $group => $values) {
 			if ($filter === null || $group === $filter) {
 				$whitelist = array_merge($whitelist, $values);
@@ -1347,8 +1391,8 @@ class wfUtils {
 		}
 		
 		try {
-			$geoip = wfGeoIP2::shared();
-			$code = $geoip->countryCode($IP);
+			$geoip = @wfGeoIP2::shared();
+			$code = @$geoip->countryCode($IP);
 			return is_string($code) ? $code : '';
 		}
 		catch (Exception $e) {
@@ -1367,8 +1411,8 @@ class wfUtils {
 		}
 		
 		try {
-			$geoip = wfGeoIP2::shared();
-			return $geoip->version();
+			$geoip = @wfGeoIP2::shared();
+			return @$geoip->version();
 		}
 		catch (Exception $e) {
 			//Ignore
@@ -2061,6 +2105,12 @@ class wfUtils {
 				$homeurl = home_url($path, $scheme);
 			}
 		}
+		else {
+			$homeurl = set_url_scheme($homeurl, $scheme);
+			if ($path && is_string($path)) {
+				$homeurl .= '/' . ltrim($path, '/');
+			}
+		}
 		return $homeurl;
 	}
 	
@@ -2127,6 +2177,14 @@ class wfUtils {
 		}
 	}
 	
+	/**
+	 * Equivalent to network_site_url but uses the cached value for the URL if we have it
+	 * to avoid breaking on sites that define it based on the requesting hostname.
+	 * 
+	 * @param string $path
+	 * @param null|string $scheme
+	 * @return string
+	 */
 	public static function wpSiteURL($path = '', $scheme = null) {
 		$siteurl = wfConfig::get('wp_site_url', '');
 		if (function_exists('get_bloginfo') && empty($siteurl)) {
@@ -2137,7 +2195,40 @@ class wfUtils {
 				$siteurl = site_url($path, $scheme);
 			}
 		}
+		else {
+			$siteurl = set_url_scheme($siteurl, $scheme);
+			if ($path && is_string($path)) {
+				$siteurl .= '/' . ltrim($path, '/');
+			}
+		}
 		return $siteurl;
+	}
+	
+	/**
+	 * Equivalent to network_admin_url but uses the cached value for the URL if we have it
+	 * to avoid breaking on sites that define it based on the requesting hostname.
+	 *
+	 * @param string $path
+	 * @param null|string $scheme
+	 * @return string
+	 */
+	public static function wpAdminURL($path = '', $scheme = null) {
+		if (!is_multisite()) {
+			$adminURL = self::wpSiteURL('wp-admin/', $scheme);
+		}
+		else {
+			$adminURL = self::wpSiteURL('wp-admin/network/', $scheme);
+		}
+		
+		if ($path && is_string($path)) {
+			$adminURL .= ltrim($path, '/');
+		}
+		
+		if (!is_multisite()) {
+			return apply_filters('admin_url', $adminURL, $path, null);
+		}
+		
+		return apply_filters('network_admin_url', $adminURL, $path);
 	}
 	
 	public static function wafInstallationType() {
@@ -2569,6 +2660,79 @@ class wfUtils {
 			}
 		}
 		return new DateTime($timestring);
+	}
+	
+	/**
+	 * Base64URL-encodes the given payload. This is identical to base64_encode except it substitutes characters
+	 * not safe for use in URLs.
+	 * 
+	 * @param string $payload
+	 * @return string
+	 */
+	public static function base64url_encode($payload) {
+		$intermediate = base64_encode($payload);
+		$intermediate = rtrim($intermediate, '=');
+		$intermediate = str_replace('+', '-', $intermediate);
+		$intermediate = str_replace('/', '_', $intermediate);
+		return $intermediate;
+	}
+	
+	/**
+	 * Base64URL-decodes the given payload. This is identical to base64_encode except it allows for the characters
+	 * substituted by base64url_encode.
+	 * 
+	 * @param string $payload
+	 * @return string
+	 */
+	public static function base64url_decode($payload) {
+		$intermediate = str_replace('_', '/', $payload);
+		$intermediate = str_replace('-', '+', $intermediate);
+		$intermediate = base64_decode($intermediate);
+		return $intermediate;
+	}
+	
+	/**
+	 * Returns a signed JWT for the given payload. Payload is expected to be an array suitable for JSON-encoding.
+	 * 
+	 * @param array $payload
+	 * @param int $maxAge How long the JWT will be considered valid.
+	 * @return string
+	 */
+	public static function generateJWT($payload, $maxAge = 604800 /* 7 days */) {
+		$payload['_exp'] = time() + $maxAge;
+		$key = wfConfig::get('longEncKey');
+		$header = '{"alg":"HS256","typ":"JWT"}';
+		$body = self::base64url_encode($header) . '.' . self::base64url_encode(json_encode($payload));
+		$signature = hash_hmac('sha256', $body, $key, true);
+		return $body . '.' . self::base64url_encode($signature);
+	}
+	
+	/**
+	 * Decodes and returns the payload of a JWT. This also validates the signature.
+	 * 
+	 * @param string $token
+	 * @return array|bool The decoded payload or false if the token is invalid or fails validation.
+	 */
+	public static function decodeJWT($token) {
+		$components = explode('.', $token);
+		if (count($components) != 3) {
+			return false;
+		}
+		
+		$key = wfConfig::get('longEncKey');
+		$body = $components[0] . '.' . $components[1];
+		$signature = hash_hmac('sha256', $body, $key, true);
+		$testSignature = self::base64url_decode($components[2]);
+		if (!hash_equals($signature, $testSignature)) {
+			return false;
+		}
+		
+		$json = self::base64url_decode($components[1]);
+		$payload = @json_decode($json, true);
+		if (isset($payload['_exp']) && $payload['_exp'] < time()) {
+			return false;
+		}
+		return $payload;
 	}
 }
 

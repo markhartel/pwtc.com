@@ -2311,4 +2311,81 @@ if( function_exists('acf_add_local_field_group') ):
         'description' => '',
     ));
 
+    acf_add_local_field_group(array (
+        'key' => 'group_rider_details',
+        'title' => 'Member Details',
+        'fields' => array (
+            array (
+                'key' => 'field_release_accepted',
+                'label' => 'Release Accepted',
+                'name' => 'release_accepted',
+                'type' => 'true_false',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+                'message' => 'Legal release statement has been accepted by member.',
+                'default_value' => 0,
+            ),
+            array (
+                'key' => 'field_directory_excluded',
+                'label' => 'Directory Excluded',
+                'name' => 'directory_excluded',
+                'type' => 'true_false',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+                'message' => 'Exclude member from the Membership Directory listing.',
+                'default_value' => 0,
+            ),
+            array (
+                'key' => 'field_rider_id',
+                'label' => 'Rider ID',
+                'name' => 'rider_id',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => array (
+                    'width' => 50,
+                    'class' => '',
+                    'id' => '',
+                ),
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'maxlength' => '',
+                'readonly' => 0,
+                'disabled' => 0,
+            ),
+        ),
+        'location' => array (
+            array (
+                array (
+                    'param' => 'user_form',
+                    'operator' => '==',
+                    'value' => 'all',
+                ),
+            ),
+        ),
+        'menu_order' => 0,
+        'position' => 'normal',
+        'style' => 'default',
+        'label_placement' => 'top',
+        'instruction_placement' => 'label',
+        'hide_on_screen' => '',
+        'active' => 1,
+        'description' => '',
+    ));
+
 endif;

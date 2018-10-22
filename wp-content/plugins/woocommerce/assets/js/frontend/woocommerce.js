@@ -48,7 +48,7 @@ jQuery( function( $ ) {
 				return false;
 			}
 		} )
-		.on( 'focus', function() {
+		.on( 'click focus', function() {
 			var input       = $( this ),
 				parent      = input.parent(),
 				description = parent.find( 'span.description' );
@@ -66,19 +66,10 @@ jQuery( function( $ ) {
 
 	// Common scroll to element code.
 	$.scroll_to_notices = function( scrollElement ) {
-		var isSmoothScrollSupported = 'scrollBehavior' in document.documentElement.style;
-
 		if ( scrollElement.length ) {
-			if ( isSmoothScrollSupported ) {
-				scrollElement[0].scrollIntoView({
-					behavior: 'smooth',
-					block:    'center'
-				});
-			} else {
-				$( 'html, body' ).animate( {
-					scrollTop: ( scrollElement.offset().top - 100 )
-				}, 1000 );
-			}
+			$( 'html, body' ).animate( {
+				scrollTop: ( scrollElement.offset().top - 100 )
+			}, 1000 );
 		}
 	};
 });
