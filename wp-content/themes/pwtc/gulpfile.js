@@ -23,9 +23,9 @@ var options = {
     },
     scripts: {
         src: [
-            'assets/libs/foundation-sites/dist/js/foundation.js',
-            'assets/libs/slick-carousel/slick/slick.js',
-            'assets/libs/fancybox/source/jquery.fancybox.js',
+            'node_modules/foundation-sites/dist/js/foundation.js',
+            'node_modules/slick-carousel/slick/slick.js',
+            'node_modules/fancybox/dist/js/jquery.fancybox.js',
             'assets/scripts/app.js'
         ],
         dist: 'assets/scripts-min'
@@ -37,10 +37,10 @@ var options = {
         dist: 'assets/styles',
         style: 'compressed',
         includePaths: [
-            'assets/libs/slick-carousel/slick',
-            'assets/libs/fancybox/source',
-            'assets/libs/font-awesome/scss',
-            'assets/libs/foundation-sites/scss'
+            'node_modules/slick-carousel/slick',
+            'node_modules/fancybox/dist/scss',
+            'node_modules/font-awesome/scss',
+            'node_modules/foundation-sites/scss'
         ],
         sourceComments: true
     }
