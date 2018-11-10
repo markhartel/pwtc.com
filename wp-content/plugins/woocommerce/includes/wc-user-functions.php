@@ -73,13 +73,14 @@ if ( ! function_exists( 'wc_create_new_customer' ) ) {
 		}
 
 		// Handle password creation.
+		$password_generated = false;
 		if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) && empty( $password ) ) {
 			$password           = wp_generate_password();
 			$password_generated = true;
-		} elseif ( empty( $password ) ) {
+		}
+
+		if ( empty( $password ) ) {
 			return new WP_Error( 'registration-error-missing-password', __( 'Please enter an account password.', 'woocommerce' ) );
-		} else {
-			$password_generated = false;
 		}
 
 		// Use WP_Error to handle registration errors.
@@ -105,7 +106,7 @@ if ( ! function_exists( 'wc_create_new_customer' ) ) {
 		$customer_id = wp_insert_user( $new_customer_data );
 
 		if ( is_wp_error( $customer_id ) ) {
-			return new WP_Error( 'registration-error', '<strong>' . __( 'Error:', 'woocommerce' ) . '</strong> ' . __( 'Couldn&#8217;t register you&hellip; please contact us if you continue to have problems.', 'woocommerce' ) );
+			return new WP_Error( 'registration-error', __( 'Couldn&#8217;t register you&hellip; please contact us if you continue to have problems.', 'woocommerce' ) );
 		}
 
 		do_action( 'woocommerce_created_customer', $customer_id, $new_customer_data, $password_generated );
@@ -569,13 +570,7 @@ add_action( 'deleted_user', 'wc_reset_order_customer_id_on_deleted_user' );
  */
 function wc_review_is_from_verified_owner( $comment_id ) {
 	$verified = get_comment_meta( $comment_id, 'verified', true );
-
-	// If no "verified" meta is present, generate it (if this is a product review).
-	if ( '' === $verified ) {
-		$verified = WC_Comments::add_comment_purchase_verification( $comment_id );
-	}
-
-	return (bool) $verified;
+	return '' === $verified ? WC_Comments::add_comment_purchase_verification( $comment_id ) : (bool) $verified;
 }
 
 /**
@@ -621,16 +616,10 @@ add_action( 'profile_update', 'wc_update_profile_last_update_time', 10, 2 );
  */
 function wc_meta_update_last_update_time( $meta_id, $user_id, $meta_key, $_meta_value ) {
 	$keys_to_track = apply_filters( 'woocommerce_user_last_update_fields', array( 'first_name', 'last_name' ) );
-	$update_time   = false;
-	if ( in_array( $meta_key, $keys_to_track, true ) ) {
-		$update_time = true;
-	}
-	if ( 'billing_' === substr( $meta_key, 0, 8 ) ) {
-		$update_time = true;
-	}
-	if ( 'shipping_' === substr( $meta_key, 0, 9 ) ) {
-		$update_time = true;
-	}
+
+	$update_time = in_array( $meta_key, $keys_to_track, true ) ? true : false;
+	$update_time = 'billing_' === substr( $meta_key, 0, 8 ) ? true : $update_time;
+	$update_time = 'shipping_' === substr( $meta_key, 0, 9 ) ? true : $update_time;
 
 	if ( $update_time ) {
 		wc_set_user_last_update_time( $user_id );
@@ -744,6 +733,7 @@ add_action( 'wp_login', 'wc_maybe_store_user_agent', 10, 2 );
  */
 function wc_user_logged_in( $user_login, $user ) {
 	wc_update_user_last_active( $user->ID );
+	update_user_meta( $user->ID, '_woocommerce_load_saved_cart_after_login', 1 );
 }
 add_action( 'wp_login', 'wc_user_logged_in', 10, 2 );
 
