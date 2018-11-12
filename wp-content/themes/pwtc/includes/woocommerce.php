@@ -45,26 +45,30 @@ add_action('init', function() {
         return $prevent_access;
     });
 
-    add_filter('woocommerce_registration_errors', function ($reg_errors, $sanitized_user_login, $user_email){
-        global $woocommerce;
-        extract($_POST);
+    add_action( 'woocommerce_checkout_fields', function ($fields = []) {
+        if (get_option('woocommerce_registration_generate_password') == 'no') {
+            $fields['account']['account_confirm_password'] = [
+                'type'              => 'password',
+                'label'             => __( 'Confirm password', 'woocommerce' ),
+                'required'          => true,
+                'placeholder'       => _x( 'Confirm Password', 'placeholder', 'woocommerce' )
+            ];
 
-        if (strcmp($password, $password2) !== 0) {
-            return new WP_Error('registration-error', __('Passwords do not match.', 'woocommerce'));
+            $fields['account']['account_directory'] = [
+                'type'              => 'checkbox',
+                'label'             => __( 'Exclude member from the Membership Directory listing.', 'woocommerce' ),
+                'required'          => false,
+            ];
+
+            $fields['account']['account_release'] = [
+                'type'              => 'checkbox',
+                'label'             => __( 'Legal release statement has been accepted by member.', 'woocommerce' ),
+                'required'          => true,
+            ];
+
+            return $fields;
         }
-
-        return $reg_errors;
-    }, 10,3);
-
-    add_action('woocommerce_register_form', function (){
-        ?>
-        <p class="form-row form-row-wide">
-            <label for="reg_password2"><?php _e('Password Repeat', 'woocommerce'); ?> <span class="required">*</span></label>
-            <input type="password" class="input-text" name="password2" id="reg_password2" value="<?php if (!empty($_POST['password2'])) echo esc_attr($_POST['password2']); ?>" />
-        </p>
-        <?php
-    });
-
+    }, 10, 1);
 
     add_action('woocommerce_after_checkout_validation', function($posted){
         $checkout = WC()->checkout;
@@ -75,18 +79,35 @@ add_action('init', function() {
         }
     }, 10, 2);
 
-    add_action( 'woocommerce_checkout_init', function ($checkout) {
-        if (get_option('woocommerce_registration_generate_password') == 'no') {
-            $fields = $checkout->get_checkout_fields();
-
-            $fields['account']['account_confirm_password'] = [
-                'type'              => 'password',
-                'label'             => __( 'Confirm password', 'woocommerce' ),
-                'required'          => true,
-                'placeholder'       => _x( 'Confirm Password', 'placeholder', 'woocommerce' )
-            ];
-
-            $checkout->__set('checkout_fields', $fields);
+    add_action('woocommerce_checkout_update_user_meta', function($customer_id, $posted){
+        if (isset($posted['account_release'])) {
+            update_field('release_accepted', (bool) $posted['account_release'], 'user_'.get_current_user_id());
         }
-    }, 10, 1);
+
+        if (isset($posted['account_directory'])) {
+            update_field('directory_excluded', (bool) $posted['account_directory'], 'user_'.get_current_user_id());
+        }
+    }, 10, 2);
+
+    add_action( 'woocommerce_edit_account_form', function(){
+        $fields = [];
+        $fields['account_directory'] = [
+            'type'              => 'checkbox',
+            'label'             => __( 'Exclude member from the Membership Directory listing.', 'woocommerce' ),
+            'required'          => false,
+            'default'           => (bool) get_field('directory_excluded', 'user_'.get_current_user_id()),
+        ];
+
+        foreach ($fields as $key => $field_args) {
+            woocommerce_form_field($key, $field_args);
+        }
+    }, 10 );
+
+    add_action('woocommerce_save_account_details', function($customer_id) {
+        if (isset($_POST['account_directory'])) {
+            update_field('directory_excluded', (bool) $_POST['account_directory'], 'user_'.get_current_user_id());
+        } else {
+            update_field('directory_excluded', false, 'user_'.get_current_user_id());
+        }
+    });
 });
