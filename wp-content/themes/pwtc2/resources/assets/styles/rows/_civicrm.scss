@@ -1,0 +1,36 @@
+// civi forms
+.crm-container div.form-item {
+  height: auto !important;
+}
+.crm-section .label, .messages .crm-container h3 {
+  background-color: transparent;
+}
+.crm-container .crm-section .content {
+  margin-left: 17%;
+}
+.page .crm-container .help {
+  border-radius: 0;
+  border-color: $secondary-color;
+  background-color: scale_color($secondary-color, $lightness: 30%);
+  padding: 1rem;
+  margin-left: 19%;
+}
+.page .crm-container h3 {
+  background-color: transparent;
+  font-weight: normal;
+}
+.page .crm-section.recaptcha-section {
+  margin-left: 19%;
+}
+.page .form-layout-compressed > tbody {
+  border: none;
+}
+.page .crm-container .form-layout-compressed td, .page .crm-container .form-layout-compressed th {
+  padding: 0;
+}
+.page .recaptcha_label {
+  display: none;
+}
+.page #crm-container.crm-public #crm-submit-buttons {
+  margin-left: 19%;
+}

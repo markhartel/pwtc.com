@@ -1,0 +1,16 @@
+<section class="copyright">
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                {% if copyright_type == "custom" %}
+                    {{ copyright }}
+                {% elseif copyright_type == "plain" %}
+                    &copy; {{ 'now'|date('Y') }} All rights reserved
+                {% elseif copyright_type == "stellar" %}
+                    &copy; {{ 'now'|date('Y') }} All rights reserved Website built by: <a href="https://robert-parker.me" target="new" title="Robert Parker">Robert Parker</a>
+                {% elseif copyright_type == "none" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

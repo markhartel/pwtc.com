@@ -1,0 +1,36 @@
+<section class="rides">
+    <div class="row column">
+        <h2>Rides</h2>
+    </div>
+    {% for ride in rides %}
+        {% if loop.first or ride.get_field('date') | date("l, M j") != prev_date %}
+            {% set prev_date = ride.get_field('date') | date("l, M j") %}
+            <div class="date">
+                <div class="row column">
+                    <h4>{{ ride.get_field('date') | date("l, M j") }}<sup>{{ ride.get_field('date') | date("S") }}</sup></h4>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row column card">
+            <div class="row callout">
+                <div class="small-4 medium-2 columns">
+                    <h4 class="time">{{ ride.get_field('date') | date('g:i') }}<sup>{{ ride.get_field('date') | date('a') }}</sup></h4>
+                </div>
+                <div class="small-8 medium-10 columns">
+                    <h4 class="{% if ride.get_field('is_canceled') %}canceled{% endif %}"><a href="{{ ride.link }}">{{ ride.title }}</a></h4>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="date">
+            <div class="row column">
+                <h4>There are no rides scheduled. Please check again later</h4>
+            </div>
+        </div>
+    {% endfor %}
+    {% if rides %}
+        <div class="row column text-center">
+            <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}" class="large dark button">More Rides</a>
+        </div>
+    {% endif %}
+</section>

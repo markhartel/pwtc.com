@@ -1,0 +1,86 @@
+parameters:
+  wordpress.acf_path: "%template_dir%/../config/acf"
+  wordpress.acf_menu: "%wp_debug%"
+  wordpress.theme_support:
+    - "html5"
+    - "post-thumbnails"
+    - "custom-logo"
+    - "menus"
+    - "automatic-feed-links"
+    - "woocommerce"
+    - "wc-product-gallery-zoom"
+    - "wc-product-gallery-lightbox"
+    - "wc-product-gallery-slider"
+  wordpress.translations: "%template_dir%/languages"
+  wordpress.jpeg_quality: 100
+  wordpress.image_sizes:
+      fullscreen: [1920, 1080, true]
+      teaser: [600, 600, true]
+      desktop_slider: [1900, 630, true]
+      mobile_slider: [600, 300, true]
+  wordpress.menus:
+      member_menu: "Member Menu"
+      primary_menu: "Primary Menu"
+      footer_menu: "Footer Menu"
+  wordpress.sidebars:
+      - id: "left_sidebar"
+        name: "Left Sidebar"
+        description: "Left Sidebar"
+        before_widget: '<section id="%1$s" class="widget %2$s">'
+        after_widget: '</section>'
+        before_title: '<h4 class="widgettitle">'
+        after_title: '</h4>'
+      - id: "right_sidebar"
+        name: "Right Sidebar"
+        description: "Right Sidebar"
+        before_widget: '<section id="%1$s" class="widget %2$s">'
+        after_widget: '</section>'
+        before_title: '<h4 class="widgettitle">'
+        after_title: '</h4>'
+  wordpress.styles: []
+#    - { id: "font", source: "https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i", deps: ~ }
+#    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ['font'] }
+  wordpress.scripts:
+      - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
+      - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyB869ZHXQOQYCYEDxpDkMcD7BkTUpCRVeQ", deps: [], header: false, version: "1.0" }
+  wordpress.post_types: []
+#    reviews:
+#      labels:
+#        name: "Reviews"
+#        singular_name: "review"
+#      menu_icon: "dashicons-star-filled"
+#      description: "reviews"
+#      public: true
+#      capability_type: "post"
+#      has_archive: false
+#      hierarchical: false
+#      menu_position: 19
+#      supports: ["title"]
+  wordpress.taxonomies: []
+#    locations_cats:
+#      post_types: ["locations"]
+#      options:
+#        labels:
+#          name: "Categories"
+#          singular_name: "Category"
+#        public: true
+
+  wordpress.acf_pages: []
+#    -
+#      page_title: "Theme Options"
+#      menu_title: "Theme Options"
+#      menu_slug: "theme_options"
+#      capability: "edit_theme_options"
+#      position: 62
+#      parent_slug: ""
+#      icon_url: false
+#      post_id: "options"
+#      autoload: false
+#      update_button: "Save"
+#      updated_message: "Options Updated"
+#      redirect: false
+  wordpress.acf_sub_pages: []
+#    -
+#      page_title: "Theme Info"
+#      menu_title: "Theme Info"
+#      parent_slug: "theme_options"

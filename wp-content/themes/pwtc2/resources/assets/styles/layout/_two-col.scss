@@ -1,0 +1,90 @@
+.one-col-section {
+  .content {
+    position: relative;
+    padding-top: $global-margin;
+    padding-bottom: $global-margin;
+    @include breakpoint(medium) {
+      padding-top: $global-margin * 4;
+      padding-bottom: $global-margin;
+    }
+  }
+}
+.two-col-section {
+  position: relative;
+  overflow: hidden;
+  .content {
+    position: relative;
+    padding-top: $global-margin;
+    padding-bottom: $global-margin;
+    @include breakpoint(medium) {
+      padding-top: $global-margin * 4;
+      padding-bottom: $global-margin;
+    }
+  }
+}
+.three-col-section {
+  background-color: #F6F6F6;
+  overflow: hidden;
+  .content {
+    background-color: $white;
+    position: relative;
+    padding-top: $global-margin;
+    padding-bottom: $global-margin;
+    @include breakpoint(medium) {
+      padding-top: $global-margin * 4;
+      padding-bottom: $global-margin;
+    }
+  }
+}
+.sidebar {
+  position: relative;
+  background-color: #F6F6F6;
+  padding: $global-margin;
+  .menu a {
+    padding: 0 0 1rem 0;
+  }
+  section {
+    margin-bottom: $global-margin * 2;
+  }
+  .widget_nav_menu {
+    ul {
+      border-top: 1px solid $dark-gray;
+    }
+    li {
+      border-bottom: 1px solid $dark-gray;
+      display: block;
+    }
+    a {
+      padding: $global-padding 0;
+    }
+    @include breakpoint(medium only) {
+      margin: $global-margin * -4 $global-padding * -1 $global-padding;
+      border-bottom: 1px solid $dark-gray;
+      padding: $global-padding;
+      ul, li {
+        border: none;
+      }
+      li:first-of-type a {
+        padding-left: 0;
+      }
+      li:last-of-type a {
+        padding-right: 0;
+      }
+    }
+  }
+}
+@include breakpoint(medium) {
+  .two-col-section .background {
+    background-color: #F6F6F6;
+    position: absolute;
+    top: 0;
+    bottom:0;
+    //center + half of grid to get right column
+    //- half of column width to get to left of column (without padding)
+    left:calc(50% + 600px - 12.5%);
+    right:0;
+  }
+  .sidebar {
+    padding: $global-margin * 4 $global-margin $global-margin;
+  }
+}

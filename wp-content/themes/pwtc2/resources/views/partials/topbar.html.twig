@@ -1,0 +1,17 @@
+<section class="top-banner hide-for-small-only">
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x align-bottom">
+            <div class="small-12 cell">
+                <nav>
+                    <ul class="vertical medium-horizontal menu align-right align-bottom">
+                        {% for link in top_bar.items  %}
+                            <li class="nav-main-item {{ link.classes|join(' ') }}">
+                                <a class="nav-main-link {% if item.current %}active{% endif %}" href="{{ link.link }}">{{ link.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>

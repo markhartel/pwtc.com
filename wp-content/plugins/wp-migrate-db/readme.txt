@@ -3,8 +3,9 @@ Contributors: bradt, deliciousbrains
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5VPMGLLK94XJC
 Tags: migrate, migration, export, data dump, backup, database, mysql, find & replace, search & replace, import
 Requires at least: 3.6
-Tested up to: 4.9.8
-Stable tag: 1.0.5
+Requires PHP: 5.4
+Tested up to: 5.0
+Stable tag: 1.0.8
 License: GPLv2
 
 Migrates your database by running find & replace on URLs and file paths, handling serialized data, and saving an SQL file.
@@ -90,6 +91,20 @@ If you upgrade to [WP Migrate DB Pro](http://deliciousbrains.com/wp-migrate-db-p
 3. Saving the exported database
 
 == Changelog ==
+= WP Migrate DB 1.0.8 - 2018-11-29  =
+* Bug fix: WordPress filesystem class not correctly loaded and causes 500 error
+* Improvement: Remove deprecated PHP code making PHP 7+ compatibility checks pass
+
+= WP Migrate DB 1.0.7 - 2018-11-21  =
+* Bug fix: WP Migrate DB Anonymization plugin no longer functions
+* Bug fix: 500 errors occur when another plugin is installed that includes Composer
+* Improvement: Add Theme & Plugin Files Addon to addons list
+* Improvement: Remove un-needed template files
+
+= WP Migrate DB 1.0.6 - 2018-11-19  =
+* New: Increased PHP version requirement from PHP 5.2+ to PHP 5.4+
+* Improvement: Major reorganization of the PHP code into better classes and a better folder structure
+
 = WP Migrate DB 1.0.5 - 2018-11-09  =
 * New: Updated YouTube video in migration progress modal
 * Bug fix: Duplicate JavaScript causes console error

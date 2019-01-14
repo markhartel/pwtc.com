@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="one-col-section">
+        <div class="background"></div>
+        <div class="row">
+            <article class="small-12 columns content">
+                <h1>{{ post.title }}</h1>
+                {{ post.content }}
+            </article>
+        </div>
+    </section>
+{% endblock %}

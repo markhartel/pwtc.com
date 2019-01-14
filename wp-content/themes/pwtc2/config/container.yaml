@@ -1,0 +1,22 @@
+imports:
+  - { resource: "wordpress.yaml" }
+
+parameters:
+  twig.paths:
+    - "%template_dir%/resources/views"
+  twig.options:
+    debug:            "%WP_DEBUG%"
+    charset:          "utf-8"
+    cache:            "%template_dir%/var/twig"
+    auto_reload:      "%WP_DEBUG%"
+    strict_variables: "%WP_DEBUG%"
+    autoescape:       false
+    optimizations:    -1
+  logger.name: "Stellar"
+  logger.path: "%template_dir%/var/logs.log"
+  logger.level: "WARNING"
+
+services:
+  # Get timber with it
+  timber:
+    class: "Timber\\Timber"

@@ -1,0 +1,39 @@
+<section class="alternating-content bg-{{ row.style }}">
+    {% if row.heading %}
+        <div class="row column">
+            <h2>{{ row.heading }}</h2>
+        </div>
+    {% endif %}
+
+    {% for r in row.rows %}
+        <div class="row" data-equalizer data-equalize-on="large">
+            <div class="small-12 medium-6 large-4 {% if loop.index is even %}medium-order-2{% endif %} columns" data-equalizer-watch>
+                <div class="content">
+                    <img src="{{ r.image.sizes.teaser }}"/>
+                    {% if row.video %}
+                        <a href="{{ r.video | slice(38, r.video|length - 48) }}" class="fancybox-media"><i class="fa fa-play"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="small-12 medium-6 large-8 {% if loop.index is even %}medium-order-1{% endif %} columns" data-equalizer-watch>
+                <div class="content">
+                    <h3>{{ r.heading }}</h3>
+                    {{ r.content }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% if row.has_button %}
+        <div class="row column text-center">
+            {% if row.external_url %}
+                <a href="{{ row.button_url }}" target="_blank" class="large {{ row.button_style }} button">
+                    {{ SP.ACF.get_sub_field('button_text') }}
+                </a>
+            {% else %}
+                <a href="{{ row.page_url }}" class="large {{ row.button_style }} button">
+                    {{ row.button_text }}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>

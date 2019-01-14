@@ -1,0 +1,27 @@
+<span class="term">Maps:</span>
+<span class="value">
+    {% for map in maps %}
+        {% if map.type == "link" %}
+            <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.title }}</a>
+        {% elseif map.type == "file"%}
+            <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.title }}</a>
+        {% endif %}
+        {% if not loop.last %}, {% else %}
+            {% if type == "nongroup" %}
+                <!-- <i class="missing">(paper maps will also be available at the ride start)</i> -->
+            {% elseif type == "regroup" %}
+                <!-- <i class="missing">(paper maps will also be available at the ride start)</i> -->
+            {% elseif type == "group" %}
+                <!-- <i class="missing">(riders will follow the ride leader)</i> -->
+            {% endif %}
+        {% endif %}
+    {% else%}
+        {% if type == "nongroup" %}
+            <!-- <i class="missing">Paper maps will be available at the ride start</i> -->
+        {% elseif type == "regroup" %}
+            <!-- <i class="missing">Paper maps will be available at the ride start</i> -->
+        {% elseif type == "group" %}
+            <!-- <i class="missing">No map necessary, riders will follow the ride leader</i> -->
+        {% endif %}
+    {% endfor %}
+</span>

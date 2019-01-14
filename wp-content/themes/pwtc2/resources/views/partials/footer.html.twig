@@ -1,0 +1,16 @@
+<footer class="footer">
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x align-top">
+            <div class="small-12 large-4 cell">
+                {{ footer_1 }}
+            </div>
+            <div class="small-12 large-4 cell medium-text-center">
+                {{ footer_2 }}
+            </div>
+            <div class="small-12 large-4 cell medium-text-right">
+                {% include 'partials/social.html.twig' with {rss: true} %}
+                {{ footer_3 }}
+            </div>
+        </div>
+    </div>
+</footer>

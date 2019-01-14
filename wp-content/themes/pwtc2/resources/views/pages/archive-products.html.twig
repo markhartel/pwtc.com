@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <h1 class="font-prequel">{% if title %}{{ title }}{% else %}Shop{% endif %}</h1>
+                {% do action('woocommerce_before_main_content') %}
+                {% do action('woocommerce_after_main_content') %}
+                {% do action('woocommerce_before_shop_loop') %}
+            </div>
+        </div>
+        <div class="grid-x grid-padding-x small-up-1 medium-up-2 large-up-4">
+            {% for post in products %}
+                <div class="cell">
+                    {% include ["partials/product-teaser.html.twig"] %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="grid-x grid-padding-x">
+            <div class="cell auto">
+                {% do action('woocommerce_after_shop_loop') %}
+            </div>
+        </div>
+    </div>
+{% endblock  %}

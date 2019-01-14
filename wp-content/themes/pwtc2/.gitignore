@@ -1,0 +1,9 @@
+npm-debug.log
+yarn-error.log
+resources/assets/config-local.json
+.cache-loader/
+node_modules/
+vendor/
+dist/
+var/twig
+var/*.log
