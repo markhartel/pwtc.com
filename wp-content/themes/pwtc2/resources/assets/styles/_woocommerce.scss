@@ -53,6 +53,33 @@
 .woocommerce ul.products li.product .button {
   margin: 0;
 }
+.woocommerce #respond input#submit.alt.disabled, .woocommerce #respond input#submit.alt.disabled:hover,
+.woocommerce #respond input#submit.alt:disabled, .woocommerce #respond input#submit.alt:disabled:hover,
+.woocommerce #respond input#submit.alt:disabled[disabled], .woocommerce #respond input#submit.alt:disabled[disabled]:hover,
+.woocommerce a.button.alt.disabled, .woocommerce a.button.alt.disabled:hover, .woocommerce a.button.alt:disabled,
+.woocommerce a.button.alt:disabled:hover, .woocommerce a.button.alt:disabled[disabled], .woocommerce a.button.alt:disabled[disabled]:hover,
+.woocommerce button.button.alt.disabled, .woocommerce button.button.alt.disabled:hover, .woocommerce button.button.alt:disabled,
+.woocommerce button.button.alt:disabled:hover, .woocommerce button.button.alt:disabled[disabled], .woocommerce button.button.alt:disabled[disabled]:hover,
+.woocommerce input.button.alt.disabled, .woocommerce input.button.alt.disabled:hover, .woocommerce input.button.alt:disabled,
+.woocommerce input.button.alt:disabled:hover, .woocommerce input.button.alt:disabled[disabled], .woocommerce input.button.alt:disabled[disabled]:hover,
+.woocommerce #respond input#submit.disabled, .woocommerce #respond input#submit:disabled,
+.woocommerce #respond input#submit:disabled[disabled], .woocommerce a.button.disabled,
+.woocommerce a.button:disabled, .woocommerce a.button:disabled[disabled], .woocommerce button.button.disabled,
+.woocommerce button.button:disabled, .woocommerce button.button:disabled[disabled], .woocommerce input.button.disabled,
+.woocommerce input.button:disabled, .woocommerce input.button:disabled[disabled] {
+    background-color: $alert-color;
+    color: $white;
+    padding: 0.75em 1em;
+}
+.woocommerce #respond input#submit.disabled:hover, .woocommerce #respond input#submit:disabled:hover,
+.woocommerce #respond input#submit:disabled[disabled]:hover, .woocommerce a.button.disabled:hover,
+.woocommerce a.button:disabled:hover, .woocommerce a.button:disabled[disabled]:hover, .woocommerce button.button.disabled:hover,
+.woocommerce button.button:disabled:hover, .woocommerce button.button:disabled[disabled]:hover, .woocommerce input.button.disabled:hover,
+.woocommerce input.button:disabled:hover, .woocommerce input.button:disabled[disabled]:hover {
+    background-color: $alert-color;
+    color: $white;
+    padding: 0.75em 1em;
+}
 
 // tabs for reviews/details
 .woocommerce div.product .woocommerce-tabs ul.tabs {
@@ -158,4 +185,69 @@ a.pp_previous::before {
 }
 .product.has-default-attributes.has-children > .images {
   opacity: 1;
+}
+
+// magnifying class
+.woocommerce div.product div.images .woocommerce-product-gallery__trigger {
+    z-index: 1;
+}
+
+// coupon on checkout
+.woocommerce #content table.cart td.actions .input-text, .woocommerce table.cart td.actions .input-text, .woocommerce-page #content table.cart td.actions .input-text, .woocommerce-page table.cart td.actions .input-text {
+    width: rem-calc(200px);
+}
+
+// messages
+.woocommerce-message {
+    background-color: scale_color($success-color, $lightness: 90%);
+    color: $success-color;
+    border: none;
+    border-left: 4px solid $success-color;
+    a {
+        color: $success-color;
+        text-decoration: underline;
+
+        &.button {
+            background-color: $success-color;
+        }
+    }
+    &::before {
+        color: $success-color;
+    }
+}
+
+.woocommerce-info {
+    background-color: scale_color($primary-color, $lightness: 90%);
+    color: $primary-color;
+    border: none;
+    border-left: 4px solid $primary-color;
+    a {
+        color: $primary-color;
+        text-decoration: underline;
+
+        &.button {
+            background-color: $primary-color;
+        }
+    }
+    &::before {
+        color: $primary-color;
+    }
+}
+
+.woocommerce-error {
+    background-color: scale_color($alert-color, $lightness: 90%);
+    color: $alert-color;
+    border: none;
+    border-left: 4px solid $alert-color;
+    a {
+        color: $alert-color;
+        text-decoration: underline;
+
+        &.button {
+            background-color: $alert-color;
+        }
+    }
+    &::before {
+        color: $alert-color;
+    }
 }

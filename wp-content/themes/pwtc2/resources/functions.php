@@ -56,3 +56,6 @@ function excerpt() {
 
     return apply_filters( 'wp_trim_excerpt', $text, $raw_excerpt );
 }
+
+//remove_action('wpua_before_avatar', 'wpua_do_before_avatar');
+//remove_action('wpua_after_avatar', 'wpua_do_after_avatar');

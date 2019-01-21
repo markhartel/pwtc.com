@@ -1,0 +1,67 @@
+.product-teaser {
+    text-align: center;
+    
+    .price {
+        display: block;
+        margin-bottom: $global-margin/2;
+    }
+
+    .amount {
+        font-size: 1rem;
+    }
+
+    a.button {
+        margin-bottom: $global-margin*2;
+    }
+}
+
+.product-template-default {
+    .content-area {
+        padding: $global-padding * 4 0;
+    }
+    .product_meta {
+        display: none;
+    }
+    .tabs {
+        clear: both;
+    }
+    a.reset_variations {
+        color: $alert-color;
+    }
+}
+
+.woocommerce a.leave_team.button,
+.woocommerce a.set_as_manager.button,
+.my-membership-detail-user-membership-actions,
+.my-team-detail-team-actions,
+.my-team-section.settings #team-name_field {
+    display: none;
+}
+
+.woocommerce-account-my-teams {
+    h3:first-of-type {
+        display: none;
+    }
+    h3:first-of-type + p {
+        display: none;
+    }
+    #registration-link-form {
+        display: none;
+    }
+    #role_field {
+        display: none;
+    }
+    #add-member-form input[type=submit] {
+        background-color: $button-background;
+        color: $white;
+        font-weight: normal;
+        padding: $button-padding;
+        border: 1px solid $button-background;
+        &:hover {
+            background-color: $button-background-hover;
+            border: 1px solid $button-background;
+            color: $white;
+            font-weight: normal;
+        }
+    }
+}
