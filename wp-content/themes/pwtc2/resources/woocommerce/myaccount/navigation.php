@@ -30,6 +30,10 @@ $current_user = wp_get_current_user();
     <h4 class="medium-text-center"><?php echo $current_user->first_name . ' ' . $current_user->last_name; ?></h4>
     <ul class="vertical tabs" data-tabs id="myaccount-tabs">
 		<?php foreach ( wc_get_account_menu_items() as $endpoint => $label ) : ?>
+        <?php
+            if($label == "Teams") {$label = "Family Members"; }
+            else if($label == "Team Settings") { $label = "Family Settings"; }
+        ?>
 			<li class="tabs-title <?php echo wc_get_account_menu_item_classes( $endpoint ); ?>">
 				<a
                     href="<?php echo esc_url( wc_get_account_endpoint_url( $endpoint ) ); ?>"

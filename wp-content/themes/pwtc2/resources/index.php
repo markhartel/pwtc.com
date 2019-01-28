@@ -21,6 +21,7 @@ if(is_singular())
             if(get_row_layout() == "news") {
                 $context['news'] = Timber::get_posts([
                     'posts_per_page' => 8,
+                    'cat' => '-40',
                     'orderby' => array(
                         'date' => 'DESC'
                     )

@@ -121,3 +121,21 @@ add_action('init', function() {
     remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
     remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 });
+
+add_action('woocommerce_before_my_account', function(){
+    $user_id = get_current_user_id();
+
+    //set the display name
+    $info = get_userdata( $user_id );
+
+    $display_name = trim($info->first_name . ' ' . $info->last_name);
+    if(!$display_name)
+        $display_name = $info->user_login;
+
+    $args = array(
+        'ID' => $user_id,
+        'display_name' => $display_name
+    );
+
+    wp_update_user( $args ) ;
+});

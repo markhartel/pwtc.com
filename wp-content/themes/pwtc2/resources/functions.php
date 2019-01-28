@@ -57,5 +57,8 @@ function excerpt() {
     return apply_filters( 'wp_trim_excerpt', $text, $raw_excerpt );
 }
 
-//remove_action('wpua_before_avatar', 'wpua_do_before_avatar');
-//remove_action('wpua_after_avatar', 'wpua_do_after_avatar');
+add_action( 'pre_get_posts', function ( $query ) {
+    if ( $query->is_home() && $query->is_main_query() ) {
+        $query->set( 'cat', '-40' );
+    }
+});

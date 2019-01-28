@@ -58,6 +58,11 @@ $teams_area_sections = $teams_area->get_teams_area_navigation_items( $team );
 	<nav class="woocommerce-MyAccount-navigation wc-memberships-for-teams-teams-area-navigation">
         <ul class="vertical tabs" data-tabs id="myaccount-tabs">
 			<?php foreach ( $teams_area_sections as $section_id => $section_data ) : ?>
+            <?php
+
+                if($section_data['label'] == "Teams") {$section_data['label'] = "Family Members"; }
+                else if($section_data['label'] == "Team Settings") { $section_data['label'] = "Family Settings"; }
+            ?>
 				<li class="tabs-title <?php echo wc_get_account_menu_item_classes( $section_id ) . ' ' . $section_data['class']; ?>">
 					<a
                         href="<?php echo esc_url( $section_data['url'] ); ?>"
