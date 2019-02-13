@@ -12,12 +12,12 @@ export default {
           // slick
           jQuery('.slick').slick({
               arrows: true,
-              appendDots: false,
               pauseOnHover: true,
-              fade: false,
-              speed: 500,
               autoplay: true,
-              autoplaySpeed: 10000,
+              autoplaySpeed: 4000,
+              fade: true,
+              speed: 500,
+              dots: true,
           });
 
           // scroll to top
@@ -26,14 +26,21 @@ export default {
               e.preventDefault();
               return false;
           });
-          // jQuery(window).scroll(() => {
-          //     if (jQuery('.is-stuck').length !== 0) {
-          //         jQuery('.scroll-top').fadeIn(250);
-          //     }
-          //     else {
-          //         jQuery('.scroll-top').fadeOut(250);
-          //     }
-          // });
+
+          jQuery(window).scroll(() => {
+              if (jQuery(document).scrollTop() > 400) {
+                  jQuery('.scroll-top').fadeIn(250);
+              }
+              else {
+                  jQuery('.scroll-top').fadeOut(250);
+              }
+          });
+
+          // teams
+          if(jQuery('#team_name'))
+          {
+              jQuery('#team_name').val(Date.now());
+          }
       });
   },
   finalize() {

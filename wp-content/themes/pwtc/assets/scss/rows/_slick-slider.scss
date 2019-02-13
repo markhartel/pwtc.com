@@ -9,6 +9,10 @@
   }
   .slick-slide {
     height: auto;
+
+    > div {
+      position: relative;
+    }
   }
   .slick-prev {
     display: none;

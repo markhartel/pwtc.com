@@ -35,6 +35,15 @@
       margin: 0.7rem 0 0.7rem 0.5rem;
     }
   }
+  .title-bar-right > .menu {
+      @include breakpoint(small only) {
+          float: right !important;
+          & + span {
+              position: relative;
+              top: rem-calc(20px);
+          }
+      }
+  }
   .my-profile-pic {
     border-radius: 100%;
     width: 32px;

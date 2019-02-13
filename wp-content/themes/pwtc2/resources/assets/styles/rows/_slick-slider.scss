@@ -9,6 +9,10 @@
   }
   .slick-slide {
     height: auto;
+
+    > div {
+      position: relative;
+    }
   }
   .slick-prev {
     display: none;
@@ -19,9 +23,10 @@
       width: auto;
       z-index: 1;
       &::before {
-        font-family: FontAwesome;
-        content: "\f104";
+        font-family: "Font Awesome 5 Free";
+        content: "\f053";
         font-size: 8rem;
+          font-weight: 900;
       }
     }
   }
@@ -34,9 +39,10 @@
       width: auto;
       z-index: 1;
       &::before {
-        font-family: FontAwesome;
-        content: "\f105";
+        font-family: "Font Awesome 5 Free";
+        content: "\f054";
         font-size: 8rem;
+        font-weight: 900;
       }
     }
   }
@@ -74,6 +80,9 @@
     width: 100%;
     font-size: 2rem;
     line-height: 1.2;
+    max-width: 900px;
+    margin: 0 auto;
+
     @include breakpoint(medium) {
       font-size: 3rem;
       line-height: 1.4;

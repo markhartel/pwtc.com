@@ -251,3 +251,14 @@ a.pp_previous::before {
         color: $alert-color;
     }
 }
+
+.wc-memberships-for-teams-team-fields-wrapper,
+.variation-TeamName,
+.woocommerce-table--order-details .wc-item-meta {
+    display: none;
+}
+
+.single_variation_wrap .price {
+    margin-bottom: 2rem;
+    display: inline-block;
+}

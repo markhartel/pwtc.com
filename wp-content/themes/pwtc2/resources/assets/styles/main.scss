@@ -24,6 +24,13 @@ $fa-font-path: "../libs/font-awesome/fonts/";
 @import "rows/shop";
 @import "print";
 
+.admin-bar {
+    padding-top: rem-calc(46px);
+    @include breakpoint(782px) {
+        padding-top: rem-calc(32px);
+    }
+}
+
 .alignright {
   float: right;
   padding: 0 0 $global-padding $global-padding;
@@ -218,7 +225,7 @@ a.scroll-to-top {
     z-index: 4;
     background-color: map-get($foundation-palette, primary);
     color: $white;
-    display: block;
+    display: none;
     text-align: center;
     font-size: rem-calc(48px);
     width: rem-calc(48px);

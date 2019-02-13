@@ -139,3 +139,15 @@ add_action('woocommerce_before_my_account', function(){
 
     wp_update_user( $args ) ;
 });
+
+
+add_filter('wp_insert_post', function($data, $postarr){
+    if($postarr->post_type != "wc_memberships_team") {
+        return $data;
+    }
+
+    $user = get_userdata($postarr->post_author);
+    $data['post_title'] = $user->first_name . ' ' . $user->last_name;
+
+    return $data;
+}, 10, 2);

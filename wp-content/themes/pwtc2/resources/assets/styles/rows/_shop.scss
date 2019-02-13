@@ -1,6 +1,20 @@
-.product-teaser {
+.page-template .woocommerce {
+    padding: $global-padding*2 0;
+}
+
+.product-teaser, .products > .product {
     text-align: center;
-    
+    margin-bottom: $global-margin*2;
+
+    img {
+        margin-bottom: $global-margin;
+    }
+
+    .woocommerce-LoopProduct-link {
+        color: $anchor-color;
+        font-size: rem-calc(20px);
+    }
+
     .price {
         display: block;
         margin-bottom: $global-margin/2;
@@ -11,7 +25,7 @@
     }
 
     a.button {
-        margin-bottom: $global-margin*2;
+        margin: 0 auto $global-margin*2;
     }
 }
 
