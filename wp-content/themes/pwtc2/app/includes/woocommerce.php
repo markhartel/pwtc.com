@@ -151,3 +151,18 @@ add_filter('wp_insert_post', function($data, $postarr){
 
     return $data;
 }, 10, 2);
+
+
+add_filter('wc_memberships_for_teams_new_team_data', function($team_post_data) {
+    $user_data = get_userdata($team_post_data['post_author']);
+
+    if (!$user_data) {
+        $team_post_data['post_title'] = 'Unknown';
+    }
+
+    else {
+        $team_post_data['post_title'] = $user_data->last_name . ', ' . $user_data->first_name;
+    }
+
+    return $team_post_data;
+});

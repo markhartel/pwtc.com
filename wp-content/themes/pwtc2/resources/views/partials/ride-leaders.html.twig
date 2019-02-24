@@ -1,7 +1,7 @@
 {% for leader in leaders %}
     <div class="leader">
         {{ fn('get_avatar', leader.ID, 256) }}
-        <h5 class="name">{{ leader.user_firstname }} {{ leader.user_firstname }}{{ leader.user_lastname }}</h5>
+        <h5 class="name">{{ leader.user_firstname }} {{ leader.user_lastname }}</h5>
         <ul class="contact vertical menu">
             {% if fn('get_field', 'use_contact_email', 'user_'~leader.ID) %}
                 {% if fn('get_field', 'contact_email', 'user_'~leader.ID) %}

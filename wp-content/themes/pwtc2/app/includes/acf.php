@@ -2291,8 +2291,8 @@ if( function_exists('acf_add_local_field_group') ):
             ),
             array (
                 'key' => 'field_577412b7b046a',
-                'label' => 'Twitter',
-                'name' => 'twitter',
+                'label' => 'Instagram',
+                'name' => 'instagram',
                 'type' => 'url',
                 'instructions' => '',
                 'required' => 1,
