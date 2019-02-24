@@ -1,0 +1,9 @@
+#woocommerce-product-data .wc-tabs li.ticket_options a:before {
+  content: '\e032';
+}
+#woocommerce-product-data .wc-tabs li.ticket-content_options a:before {
+  content: '\e600';
+}
+#woocommerce-product-data .wc-tabs li.ticket-email_options a:before {
+  content: '\e02d';
+}
