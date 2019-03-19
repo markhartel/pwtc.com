@@ -27,5 +27,10 @@ add_action('manage_posts_custom_column', function($column_name, $post_ID){
     }
 
     $date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $post_ID, false));
+
+    if(!$date) {
+        return;
+    }
+
     echo $date->format('D F j, Y \a\t g:i a');
 }, 10, 2);

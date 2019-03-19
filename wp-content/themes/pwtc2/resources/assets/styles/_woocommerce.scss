@@ -266,3 +266,7 @@ a.pp_previous::before {
 .reset_variations {
     display: none !important;
 }
+
+.blockOverlay {
+    z-index: 1 !important;
+}

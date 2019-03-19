@@ -166,3 +166,9 @@ add_filter('wc_memberships_for_teams_new_team_data', function($team_post_data) {
 
     return $team_post_data;
 });
+
+add_action('wp_print_scripts', function(){
+    if (wp_script_is('wc-password-strength-meter', 'enqueued') ) {
+        wp_dequeue_script('wc-password-strength-meter');
+    }
+}, 100);
