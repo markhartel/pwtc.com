@@ -172,3 +172,15 @@ add_action('wp_print_scripts', function(){
         wp_dequeue_script('wc-password-strength-meter');
     }
 }, 100);
+
+add_filter('wc_memberships_members_area_my-memberships_actions', function ($actions) {
+    unset($actions['cancel']);
+    
+    return $actions;
+});
+
+add_filter('wc_memberships_members_area_my-membership-details_actions', function ($actions) {
+    unset($actions['cancel']);
+
+    return $actions;
+});
