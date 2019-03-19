@@ -1,13 +1,13 @@
 === Smush Image Compression and Optimization ===
 Plugin Name: Smush Image Compression and Optimization
-Version: 3.1.1
+Version: 3.2.0.1
 Author: WPMU DEV
 Author URI: https://premium.wpmudev.org/
 Contributors: WPMUDEV, alexdunae
 Tags: image, resize, optimize, optimise, compress, performance, optimisation, optimise JPG, WebP, photography, optimizer, Smush WordPress Compression, Smush.it
 Requires at least: 4.6
-Tested up to: 5.0.3
-Stable tag: 3.1.1
+Tested up to: 5.1.1
+Stable tag: 3.2.0.1
 Requires PHP: 5.2.4
 License: GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -155,6 +155,29 @@ It depends what side of the pond you live on...but whether you say optimize, opt
 3. Smush will find and optimize images for you.
 
 == Changelog ==
+
+= 3.2.0.1 =
+
+* Fix: CDN upgrade link not showing when bandwidth is over limit
+
+= 3.2.0 =
+
+* New: Image lazy loading
+* New: CDN support for mapped domains in multisite
+* New: Auto update free version of the plugin to Pro if Dashboard plugin is installed and activated
+* New: Options to preserve settings and data on plugin uninstall
+* New: Option to reset settings to defaults
+* New: Ignore images with errors during bulk Smush
+* Enhance: Performance
+* Enhance: Clean up outdated and deprecated code
+* Enhance: Onboarding experience
+* Enhance: Skip auto resized images on CDN from highlighting in image resize detection tab
+* Enhance: Directory Smush where wp-content is placed in a custom location
+* Fix: [NextGEN Gallery] bug with stats count
+* Fix: Translation strings and typos
+* Fix: wp_smush_skip_folder filter
+* Fix: Recalculate stats when clicking 'Re-check status' button
+* Fix: Illegal string offset 'file' warning in PHP
 
 = 3.1.1 =
 

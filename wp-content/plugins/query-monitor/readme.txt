@@ -3,7 +3,7 @@ Contributors: johnbillion
 Tags: debug, debug-bar, debugging, development, developer, performance, profiler, queries, query monitor, rest-api
 Requires at least: 3.7
 Tested up to: 5.1
-Stable tag: 3.3.2
+Stable tag: 3.3.3
 License: GPLv2 or later
 Requires PHP: 5.3
 
@@ -93,6 +93,10 @@ Yep! You just need to add `define( 'WPCOM_VIP_QM_ENABLE', true );` to your `vip-
 = I'm using multiple instances of `wpdb`. How do I get my additional instances to show up in Query Monitor? =
 
 You'll need to hook into the `qm/collect/db_objects` filter and add an item to the array with your connection name as the key and the `wpdb` instance as the value. Your `wpdb` instance will then show up as a separate panel, and the query time and query count will show up separately in the admin toolbar menu. Aggregate information (queries by caller and component) will not be separated.
+
+= Can I click on stack traces to open the file in my editor? =
+
+Yes! You just need to [enable clickable stack traces](https://querymonitor.com/blog/2019/02/clickable-stack-traces-and-function-names-in-query-monitor/).
 
 = Do you accept donations? =
 
