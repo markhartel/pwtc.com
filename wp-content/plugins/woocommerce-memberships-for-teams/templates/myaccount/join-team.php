@@ -17,8 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Templates
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -51,14 +50,14 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 
 	<?php if ( $current_user ) : ?>
 
-		<p><?php
-			/* translators: 1: user display name 2: logout url */
-			printf(
+		<p>
+			<?php printf(
+				/* translators: Placeholders: %1$s user display name, %2$s logout url */
 				__( 'Hello %1$s (not %1$s? <a href="%2$s">Log out</a>)', 'woocommerce' ),
 				'<strong>' . esc_html( $current_user->display_name ) . '</strong>',
 				esc_url( $logout_url )
-			);
-		?></p>
+			); ?>
+		</p>
 
 	<?php else : ?>
 
@@ -68,10 +67,10 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 
 	<p>
 		<?php if ( $invitation && $sender = $invitation->get_sender() ) : ?>
-			<?php /* translators: %1$s - inviter name, %2$s - team name */ ?>
+			<?php /* translators: Placeholders: %1$s - inviter name, %2$s - team name */ ?>
 			<?php printf( esc_html__( 'You\'ve been invited by %1$s to join %2$s.', 'woocommerce-memberships-for-teams' ), $sender->display_name, $team->get_name() ); ?>
 		<?php else : ?>
-			<?php /* translators: %s - team name */ ?>
+			<?php /* translators: Placeholders: %s - team name */ ?>
 			<?php printf( esc_html__( "You've been invited to join %s.", 'woocommerce-memberships-for-teams' ), $team->get_name() ); ?>
 		<?php endif; ?>
 
@@ -86,10 +85,10 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 			}
 
 			?>
-			<?php /* translators: %1$s - membership plan name, %2$s - date */ ?>
+			<?php /* translators: Placeholders: %1$s - membership plan name, %2$s - date */ ?>
 			<?php printf( esc_html__( 'This will give you %1$s access until %2$s.', 'woocommerce-memberships-for-teams' ), $team->get_plan()->get_name(), date_i18n( wc_date_format(), $end_date ) ); ?>
 		<?php else : ?>
-			<?php /* translators: %s - membership plan name */ ?>
+			<?php /* translators: Placeholders: %s - membership plan name */ ?>
 			<?php printf( esc_html__( 'This will give you %s access.', 'woocommerce-memberships-for-teams' ), $team->get_plan()->get_name() ); ?>
 		<?php endif; ?>
 
@@ -114,10 +113,10 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 	<?php // notify about user membership reassignment ?>
 	<?php if ( ( $current_user && ! $invitation || $current_user && $current_user_matches_invitee ) && $existing_user_membership ) : ?>
 		<?php if ( $current_team = wc_memberships_for_teams()->get_teams_handler_instance()->get_user_membership_team( $existing_user_membership->get_id() ) ) : ?>
-			<?php /* translators: %1$s - current team name, %2$s - membership plan name, %3$s - new team name */ ?>
+			<?php /* translators: Placeholders: %1$s - current team name, %2$s - membership plan name, %3$s - new team name */ ?>
 			<p class="woocommerce-info"><?php printf( esc_html__( 'You are a member of %1$s, which already gives you access to %2$s. Joining %3$s means you will leave your current team and your existing membership will be moved under new team management.' ), $current_team->get_name(), $team->get_plan()->get_name(), $team->get_name() ); ?></p>
 		<?php else : ?>
-			<?php /* translators: %s - membership plan name */ ?>
+			<?php /* translators: Placeholders: %s - membership plan name */ ?>
 			<p class="woocommerce-info"><?php printf( esc_html__( 'Your existing %s membership will be moved under team management.' ), $team->get_plan()->get_name() ); ?></p>
 		<?php endif; ?>
 	<?php endif; ?>
@@ -126,7 +125,7 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 
 		<?php if ( $team->is_user_member( $current_user->ID ) ) : ?>
 
-			<?php /* translators: %1$s - opening <a> tag, %2$s - closing </a> tag */ ?>
+			<?php /* translators: Placeholders: %1$s - opening <a> tag, %2$s - closing </a> tag */ ?>
 			<p class="woocommerce-info"><?php printf( esc_html__( 'You are already a member of this team. %1$sClick here to view your account%2$s.', 'woocommerce-memberships-for-teams' ), '<a href="' . wc_get_page_permalink( 'myaccount' ) . '">', '</a>' ); ?></p>
 
 		<?php else : ?>
@@ -152,8 +151,8 @@ $existing_user_membership     = $team && $current_user ? $team->get_existing_use
 				?>
 
 				<?php if ( $invitation && ! $current_user_matches_invitee ) : ?>
-					<button class="button" type="submit"><?php /* translators: %s - email */ printf( esc_html__( 'Join Team as %s', 'woocommerce-memberships-for-teams' ), $current_user->user_email ); ?></button>
-					<?php /* translators: %1$s - opening <a> tag, %2$s - closing </a> tag */ printf( __( 'Or %1$sLog Out%2$s to create a new account', 'woocommerce-memberships-for-teams' ), '<a href="' . $logout_url . '">', '</a>' ); ?>
+					<button class="button" type="submit"><?php /* translators: Placeholders: %s - email */ printf( esc_html__( 'Join Team as %s', 'woocommerce-memberships-for-teams' ), $current_user->user_email ); ?></button>
+					<?php /* translators: Placeholders: %1$s - opening <a> tag, %2$s - closing </a> tag */ printf( __( 'Or %1$sLog Out%2$s to create a new account', 'woocommerce-memberships-for-teams' ), '<a href="' . $logout_url . '">', '</a>' ); ?>
 				<?php else : ?>
 					<button class="button" type="submit"><?php esc_html_e( 'Join Team', 'woocommerce-memberships-for-teams' ); ?></button>
 				<?php endif; ?>

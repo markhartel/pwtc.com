@@ -17,17 +17,20 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Emails;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+
 defined( 'ABSPATH' ) or exit;
 
 /**
  * Team Invitation Email class.
+ *
+ * TODO consider using \WC_Memberships_User_Membership_Email as the default abstract {FN 2019-01-16}
  *
  * @since 1.0.0
  */
@@ -51,7 +54,6 @@ class Invitation extends \WC_Email {
 		$this->template_html  = 'emails/team-invitation.php';
 		$this->template_plain = 'emails/plain/team-invitation.php';
 
-		// call parent constuctor
 		parent::__construct();
 	}
 
@@ -94,6 +96,7 @@ class Invitation extends \WC_Email {
 		wc_get_template( $this->template_html, array(
 			'invitation'      => $this->object,
 			'email_heading'   => $this->get_heading(),
+			'email'           => $this,
 			'sent_to_admin'   => false,
 			'plain_text'      => false
 		) );

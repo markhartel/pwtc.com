@@ -17,10 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -40,10 +41,11 @@ defined( 'ABSPATH' ) or exit;
  *     @type int $seats the number of seats to add to the team - if not provided, will use the max member count from the product/variation
  * }
  * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
- * @throws \SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
  * @return \SkyVerge\WooCommerce\Memberships\Teams\Team team instance
+ * @throws Framework\SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
  */
 function wc_memberships_for_teams_create_team( $args = array(), $action = 'create' ) {
+
 	return wc_memberships_for_teams()->get_teams_handler_instance()->create_team( $args, $action );
 }
 
@@ -58,6 +60,20 @@ function wc_memberships_for_teams_create_team( $args = array(), $action = 'creat
  */
 function wc_memberships_for_teams_get_team( $post = null ) {
 	return wc_memberships_for_teams()->get_teams_handler_instance()->get_team( $post );
+}
+
+
+/**
+ * Returns the team that is associated with an Order Item, if it has one.
+ *
+ * @since 1.1.0
+ *
+ * @param \WC_Order_Item $item
+ * @return false|\SkyVerge\WooCommerce\Memberships\Teams\Team team instance or false if not found
+ * @throws \Exception
+ */
+function wc_memberships_for_teams_get_team_for_order_item( $item ) {
+	return wc_memberships_for_teams_get_team( wc_get_order_item_meta( $item->get_id(), '_wc_memberships_for_teams_team_id', true ) );
 }
 
 
@@ -86,11 +102,11 @@ function wc_memberships_for_teams_get_teams( $user_id = null, $args = array(), $
 
 
 /**
- * Returns team ID for the given user membership, if any.
+ * Returns a team ID for the given user membership, if any.
  *
  * @since 1.0.0
  *
- * @param int $user_membership_id user membership id
+ * @param int|\WC_Memberships_User_Membership $user_membership_id a user membership
  * @return int|null team id or null if no link found
  */
 function wc_memberships_for_teams_get_user_membership_team_id( $user_membership_id ) {
@@ -103,7 +119,7 @@ function wc_memberships_for_teams_get_user_membership_team_id( $user_membership_
  *
  * @since 1.0.0
  *
- * @param int $user_membership_id user membership id
+ * @param int|\WC_Memberships_User_Membership $user_membership_id a user membership
  * @return \SkyVerge\WooCommerce\Memberships\Teams\Team|false team instance or false if not found
  */
 function wc_memberships_for_teams_get_user_membership_team( $user_membership_id ) {

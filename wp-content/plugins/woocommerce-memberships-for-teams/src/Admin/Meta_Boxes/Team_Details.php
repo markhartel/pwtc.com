@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\Meta_Boxes;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -213,15 +214,15 @@ class Team_Details {
 
 		$date = $timestamp ? date_i18n( 'Y-m-d', $timestamp ) : '';
 
-		// translators: date placeholder for input, javascript format
+		/* translators: date placeholder for input, javascript format */
 		$date_input = '<input type="text" class="date-picker" placeholder="' . esc_attr__( 'YYYY-MM-DD', 'woocommerce-memberships-for-teams' ) . '" name="' . esc_attr( $args['name_attr'] ) . '" id="' . esc_attr( $args['name_attr'] ) . '" maxlength="10" value="' . esc_attr( $date ) . '" pattern="([0-9]{4})-(0[1-9]|1[012])-(##|0[1-9#]|1[0-9]|2[0-9]|3[01])"/>';
 
 		if ( true === $args['include_time'] ) {
 			$hours        = $timestamp ? date_i18n( 'H', $timestamp ) : '';
-			// translators: hour placeholder for time input, javascript format
+			/* translators: hour placeholder for time input, javascript format */
 			$hour_input   = '<input type="text" class="hour" placeholder="' . esc_attr__( 'HH', 'woocommerce-memberships-for-teams' ) . '" name="' . esc_attr( $args['name_attr'] ) . '_hour" id="' . esc_attr( $args['name_attr'] ) . '_hour" value="' . esc_attr( $hours ) . '" maxlength="2" size="2" pattern="([01]?[0-9]{1}|2[0-3]{1})" />';
 			$minutes      = $timestamp ? date_i18n( 'i', $timestamp ) : '';
-			// translators: minute placeholder for time input, javascript format
+			/* translators: minute placeholder for time input, javascript format */
 			$minute_input = '<input type="text" class="minute" placeholder="' . esc_attr__( 'MM', 'woocommerce-memberships-for-teams' ) . '" name="' . esc_attr( $args['name_attr'] ) . '_minute" id="' . esc_attr( $args['name_attr'] ) . '_minute" value="' . esc_attr( $minutes ) . '" maxlength="2" size="2" pattern="[0-5]{1}[0-9]{1}" />';
 			$date_input   = sprintf( '%s@%s:%s', $date_input, $hour_input, $minute_input );
 		}
@@ -304,7 +305,7 @@ class Team_Details {
 			$seat_count = ! empty( $_POST['seat_count'] ) ? absint( $_POST['seat_count'] ) : '';
 
 			if ( $seat_count && $used_seats > $seat_count ) {
-				/* translators: %1$d - a number, %2$d - a number */
+				/* translators: Placeholders: %1$d - a number, %2$d - a number */
 				wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Could not update seat count - the value provided (%1$d) is lower than the number of seats used (%2$d).', 'woocommerce-memberships-for-teams' ), $seat_count, $used_seats ) );
 			} else {
 				update_post_meta( $post->ID, '_seat_count', $seat_count );
@@ -318,8 +319,8 @@ class Team_Details {
 
 			try {
 				$team->set_plan_id( $plan_id );
-			} catch ( \SV_WC_Plugin_Exception $e ) {
-				/* translators: %s - error message */
+			} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+				/* translators: Placeholder: %s - error message */
 				wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Could not update team plan: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 			}
 		}

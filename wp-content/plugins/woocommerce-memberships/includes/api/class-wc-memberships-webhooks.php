@@ -16,15 +16,14 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\API;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -57,7 +56,7 @@ class Webhooks {
 			add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'add_topic_hooks' ), 10, 2 );
 
 			// create webhook payloads
-			add_filter( 'woocommerce_webhook_payload', array( $this, 'create_payload' ), 10, 4 );
+			add_filter( 'woocommerce_webhook_payload', array( $this, 'create_payload' ), 1, 4 );
 
 			// check whether webhook should be delivered
 			add_filter( 'woocommerce_webhook_should_deliver', array( $this, 'handle_webhook_delivery' ), 100, 3 );
@@ -152,8 +151,13 @@ class Webhooks {
 		if ( $is_api_webhook_page && Framework\SV_WC_Plugin_Compatibility::is_wc_version_lt( '3.4.3' ) ) {
 
 			$webhook_id = ! empty( $_GET['edit-webhook'] ) ? (int) $_GET['edit-webhook'] : 0;
-			$webhook    = $webhook_id > 0 ? new \WC_Webhook( $webhook_id ) : null;
-			$topic      = $webhook ? $webhook->get_topic() : null;
+
+			try {
+				$webhook = $webhook_id > 0 ? new \WC_Webhook( $webhook_id ) : null;
+				$topic   = $webhook ? $webhook->get_topic() : null;
+			} catch ( \Exception $e ) {
+				$topic   = null;
+			}
 
 			if ( $topic && ( Framework\SV_WC_Helper::str_starts_with( $topic, 'membership_plan' ) || Framework\SV_WC_Helper::str_starts_with( $topic, 'user_membership' ) ) ) {
 
@@ -255,6 +259,24 @@ class Webhooks {
 
 
 	/**
+	 * Parses a Webhook API version (helper method).
+	 *
+	 * @param string $version e.g. `wp_api_v2` or `v3`
+	 * @return null|string
+	 */
+	private function parse_api_version( $version ) {
+
+		$version = strtolower( (string) $version );
+
+		if ( 'false' !== strpos( $version, 'wp_api_' ) ) {
+			$version = substr( $version, 7 );
+		}
+
+		return is_string( $version ) && wc_memberships()->get_rest_api_instance()->is_supported_version( $version ) ? $version : null;
+	}
+
+
+	/**
 	 * Creates a payload for memberships webhook deliveries.
 	 *
 	 * @internal
@@ -271,13 +293,24 @@ class Webhooks {
 
 		if ( empty( $payload ) ) {
 
-			$membership_plans_api = wc_memberships()->get_rest_api_instance()->get_membership_plans();
-			$user_memberships_api = wc_memberships()->get_rest_api_instance()->get_user_memberships();
+			// get API version to use
+			try {
+				$webhook = new \WC_Webhook( $webhook_id );
+				$version = $this->parse_api_version( $webhook->get_api_version() );
+			} catch ( \Exception $e ) {
+				$version = null;
+			}
 
-			if ( $user_memberships_api && 'user_membership' === $resource ) {
-				$payload = $this->get_payload( $user_memberships_api, $resource_id, $webhook_id );
-			} elseif ( $membership_plans_api && 'membership_plan' === $resource ) {
-				$payload = $this->get_payload( $membership_plans_api, $resource_id, $webhook_id );
+			if ( null !== $version ) {
+
+				$membership_plans_api = wc_memberships()->get_rest_api_instance()->get_membership_plans( $version );
+				$user_memberships_api = wc_memberships()->get_rest_api_instance()->get_user_memberships( $version );
+
+				if ( $user_memberships_api && 'user_membership' === $resource ) {
+					$payload = $this->get_payload( $user_memberships_api, $resource_id, $webhook_id );
+				} elseif ( $membership_plans_api && 'membership_plan' === $resource ) {
+					$payload = $this->get_payload( $membership_plans_api, $resource_id, $webhook_id );
+				}
 			}
 		}
 
@@ -290,28 +323,33 @@ class Webhooks {
 	 *
 	 * @since 1.11.0
 	 *
-	 * @param \SkyVerge\WooCommerce\Memberships\API\v2\User_Memberships|\SkyVerge\WooCommerce\Memberships\API\v2\Membership_Plans $api membership object API handler
+	 * @param Controller\User_Memberships|Controller\Membership_Plans $api membership object API controller instance
 	 * @param int $resource_id membership object ID
 	 * @param int $webhook_id WooCommerce webhook ID
 	 * @return array|\WP_REST_Response
 	 */
 	private function get_payload( $api, $resource_id, $webhook_id ) {
 
-		$payload  = array();
-		$webhook  = new \WC_Webhook( $webhook_id );
-		$old_user = get_current_user_id();
+		$payload = array();
 
-		wp_set_current_user( $webhook->get_user_id() );
+		try {
 
-		if ( 'deleted' === $webhook->get_event() || ! get_post( $resource_id ) ) {
-			$payload = array( 'id' => (int) $resource_id );
-		} elseif ( $api instanceof \SkyVerge\WooCommerce\Memberships\API\v2\User_Memberships ) {
-			$payload = $api->get_formatted_item_data( wc_memberships_get_user_membership( $resource_id ) );
-		} elseif ( $api instanceof \SkyVerge\WooCommerce\Memberships\API\v2\Membership_Plans ) {
-			$payload = $api->get_formatted_item_data( wc_memberships_get_membership_plan( $resource_id ) );
-		}
+			$webhook  = new \WC_Webhook( $webhook_id );
+			$old_user = get_current_user_id();
 
-		wp_set_current_user( $old_user );
+			wp_set_current_user( $webhook->get_user_id() );
+
+			if ( 'deleted' === $webhook->get_event() || ! get_post( $resource_id ) ) {
+				$payload = array( 'id' => (int) $resource_id );
+			} elseif ( $api instanceof Controller\User_Memberships ) {
+				$payload = $api->get_formatted_item_data( wc_memberships_get_user_membership( $resource_id ) );
+			} elseif ( $api instanceof Controller\Membership_Plans ) {
+				$payload = $api->get_formatted_item_data( wc_memberships_get_membership_plan( $resource_id ) );
+			}
+
+			wp_set_current_user( $old_user );
+
+		} catch( \Exception $e ) {}
 
 		return $payload;
 	}
@@ -343,14 +381,18 @@ class Webhooks {
 
 			} elseif ( $deliver_payload ) {
 
-				if ( 'user_membership' === $resource ) {
-					$user_memberships_api = wc_memberships()->get_rest_api_instance()->get_user_memberships();
-					$user_membership      = wc_memberships_get_user_membership( $resource_id );
-					$data                 = $user_memberships_api && $user_membership ? $user_memberships_api->get_formatted_item_data( $user_membership ) : null;
-				} elseif ( 'membership_plan' === $resource ) {
-					$membership_plan_api  = wc_memberships()->get_rest_api_instance()->get_membership_plans();
-					$membership_plan      = wc_memberships_get_membership_plan( $resource_id );
-					$data                 = $membership_plan_api && $membership_plan  ? $membership_plan_api->get_formatted_item_data( $membership_plan )  : null;
+				$api_version = $this->parse_api_version( $webhook->get_api_version() );
+
+				if ( null !== $api_version ) {
+					if ( 'user_membership' === $resource ) {
+						$user_memberships_api = wc_memberships()->get_rest_api_instance()->get_user_memberships( $api_version );
+						$user_membership      = wc_memberships_get_user_membership( $resource_id );
+						$data                 = $user_memberships_api && $user_membership ? $user_memberships_api->get_formatted_item_data( $user_membership ) : null;
+					} elseif ( 'membership_plan' === $resource ) {
+						$membership_plan_api  = wc_memberships()->get_rest_api_instance()->get_membership_plans( $api_version );
+						$membership_plan      = wc_memberships_get_membership_plan( $resource_id );
+						$data                 = $membership_plan_api && $membership_plan  ? $membership_plan_api->get_formatted_item_data( $membership_plan )  : null;
+					}
 				}
 
 				$deliver_payload = ! empty( $data ) && count( $data ) > 1;

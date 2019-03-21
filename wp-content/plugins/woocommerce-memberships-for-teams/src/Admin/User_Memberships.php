@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -41,45 +42,76 @@ class User_Memberships {
 	 */
 	public function __construct() {
 
-		add_action( 'wc_memberships_after_user_membership_details',   array( $this, 'disable_user_membership_fields' ) );
+		// extend user membership columns in admin edit screen
+		add_filter( 'manage_edit-wc_user_membership_columns',        array( $this, 'handle_edit_screen_columns' ), 20 );
+		add_action( 'manage_wc_user_membership_posts_custom_column', array( $this, 'handle_edit_screen_column_content' ), 20, 2 );
+
+		// add user membership team details
 		add_filter( 'wc_memberships_user_membership_billing_details', array( $this, 'replace_user_membership_billing_details' ), 11, 2 );
-		add_filter( 'wc_memberships_user_membership_actions',         array( $this, 'remove_transfer_action' ), 10, 2 );
 
-		add_action( 'admin_init', array( $this, 'maybe_disable_updating_user_membership' ) );
+		// disable user membership fields and transfer action when part of a team
+		add_action( 'wc_memberships_after_user_membership_details', array( $this, 'disable_user_membership_fields' ) );
+		add_filter( 'wc_memberships_user_membership_actions',       array( $this, 'remove_transfer_action' ), 10, 2 );
+		add_filter( 'post_row_actions',                             array( $this, 'remove_row_actions' ), 20, 2 );
 
+		// add teams sorting / filtering abilities to user memberships
 		add_action( 'restrict_manage_posts', array( $this, 'output_user_memberships_team_filters' ), 11 );
-
-		// filter/sort by custom columns
-		add_filter( 'request', array( $this, 'request_query' ) );
+		add_filter( 'request',               array( $this, 'request_query' ) );
 	}
 
 
 	/**
-	 * Disables editing user membership details for team-based memberships.
+	 * Customizes the user membership admin screen columns.
 	 *
 	 * @internal
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.2
 	 *
-	 * @param \WC_Memberships_User_Membership $user_membership user membership instance
+	 * @param array $columns
+	 * @return array
 	 */
-	public function disable_user_membership_fields( $user_membership ) {
+	public function handle_edit_screen_columns( $columns ) {
 
-		$team_id = wc_memberships_for_teams_get_user_membership_team_id( $user_membership->get_id() );
+		$team_column = array( 'team' => __( 'Team', 'woocommerce-memberships-for-teams' ) );
 
-		if ( $team_id ) {
+		if ( isset( $columns['plan'] ) ) {
+			$columns = Framework\SV_WC_Helper::array_insert_after( $columns, 'plan', $team_column );
+		} else {
+			$columns = array_merge( $columns, $team_column );
+		}
 
-			/** translators: %1$s - opening <a> tag, %2$s - closing </a> tag */
-			echo '<p class="form-field"><span class="description">' . sprintf( esc_html__( 'Editing has been disabled because this membership belongs to a team. %1$sEdit team details%2$s instead.', 'woocommerce-memberships-for-teams' ), '<a href="' . get_edit_post_link( $team_id ) . '">', '</a>' ) . '</span></p>';
+		return $columns;
+	}
 
-			// disable all input fields and remove any datepickers
-			wc_enqueue_js( "
-				var membership_data = jQuery( '#wc-memberships-user-membership-data' );
-				membership_data.find( 'input, select, textarea' ).prop( 'disabled', true );
-				membership_data.find( '.hasDatepicker' ).datepicker( 'destroy' ).next( '.description' ).remove();
 
-				wc_memberships_admin.i18n.delete_membership_confirm += ' " . esc_html__( 'This will remove the member from the team.' ) . "';
-			" );
+	/**
+	 * Handles content for the teams columns in user memberships edit screen.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param string $column column name
+	 * @param int $user_membership_id the corresponding post ID
+	 */
+	public function handle_edit_screen_column_content( $column, $user_membership_id ) {
+		global $post;
+
+		if ( 'team' === $column ) {
+
+			$team = wc_memberships_for_teams_get_user_membership_team( $user_membership_id );
+
+			if ( $team ) {
+
+				$member = wc_memberships_for_teams_get_team_member( $team->get_id(), $post ? $post->post_author : 0 );
+
+				echo '<a href="' . get_edit_post_link( $team->get_id() ) .' ">' . $team->get_formatted_name() . '</a>';
+				echo $member ? '<br /><em>' . $member->get_role( 'label' ) . '</em>' : '';
+
+			} else {
+
+				echo '&ndash;';
+			}
 		}
 	}
 
@@ -91,8 +123,9 @@ class User_Memberships {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string[] $billing_fields associative array of labels and data or inputs
+	 * @param array $billing_fields associative array of labels and data or inputs
 	 * @param \WC_Memberships_User_Membership $user_membership user membership instance
+	 * @return array
 	 */
 	public function replace_user_membership_billing_details( $billing_fields, $user_membership ) {
 
@@ -119,7 +152,7 @@ class User_Memberships {
 			$role  = $member->get_role( 'label' );
 
 			$billing_fields = array(
-				__( 'Granted from team:', 'woocommerce-memberships-for-teams' ) => '<a href="' . get_edit_post_link( $team_id ) . '">' . esc_html( $team->get_name() ) . '</a>',
+				__( 'Granted from team:', 'woocommerce-memberships-for-teams' ) => '<a href="' . get_edit_post_link( $team_id ) . '">' . esc_html( $team->get_formatted_name() ) . '</a>',
 				__( 'Member added:', 'woocommerce-memberships-for-teams' )      => esc_html( $added ),
 				__( 'Team role:', 'woocommerce-memberships-for-teams' )         => esc_html( $role ),
 			);
@@ -130,56 +163,117 @@ class User_Memberships {
 
 
 	/**
-	 * Disables updating user membership for team-based memberships.
-	 *
-	 * Unhooks the \WC_Memberships_User_Memberships::save_user_membership() method when on a team-based membership screen.
+	 * Disables editing user membership details for team-based memberships.
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
+	 *
+	 * @param \WC_Memberships_User_Membership $user_membership user membership instance
 	 */
-	public function maybe_disable_updating_user_membership() {
-		global $typenow, $pagenow, $wp_filter;
+	public function disable_user_membership_fields( $user_membership  ) {
 
-		if ( 'wc_user_membership' !== $typenow || 'post.php' !== $pagenow ) {
-			return;
-		}
+		if ( $team_id = wc_memberships_for_teams_get_user_membership_team_id( $user_membership->get_id() ) ) :
 
-		$post_id = isset( $_REQUEST['post_ID'] ) ? $_REQUEST['post_ID'] : null;
+			?>
+			<div id="wc-memberships-for-teams-user-membership-editing-locked">
+				<input
+					type="hidden"
+					name="_team_membership_allow_edit"
+					id="wc-memberships-for-teams-allow-edit-user-membership"
+					value=""
+				/>
+				<?php
 
-		if ( ! $post_id ) {
-			return;
-		}
+				$editing_actions = array( sprintf(
+					/* translators: Placeholders: %1$s - opening <a> HTML link tag, %2$s - closing </a> HTML link tag */
+					'<br />' . esc_html__( '%1$sEdit team details%2$s instead', 'woocommerce-memberships-for-teams' ),
+					'<a href="' . get_edit_post_link( $team_id ) . '">', '</a>'
+				) );
 
-		$team_id = wc_memberships_for_teams_get_user_membership_team_id( $post_id );
+				/**
+				 * Filters whether editing of a team user membership is allowed.
+				 *
+				 * Confirmation will be required by the admin user.
+				 *
+				 * @since 1.1.2
+				 *
+				 * @param bool $allow_edit default true for non-subscription linked memberships
+				 * @param \WC_Memberships_User_Membership|\WC_Memberships_Integration_Subscriptions_User_Membership $user_membership membership object
+				 */
+				if ( true === apply_filters( 'wc_memberships_for_teams_allow_editing_user_membership', ! $user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership, $user_membership ) ) :
 
-		// TODO: when doing code review, consider if this approach is necessary, as it may yield unexpected results with
-		// 3rd party plugins/integrations/customizations that expect to customize the membership data even for team-based memberships {IT 2017-08-08}
-		if ( $team_id && isset( $wp_filter['save_post'], $wp_filter['save_post']->callbacks[10] ) ) {
+					$editing_actions[] = strtolower( sprintf(
+						/* translators: Placeholders: %1$s - opening <a> HTML link tag, %2$s closing </a> HTML link tag */
+						esc_html__( '%1$sEnable editing%2$s for this user membership.', 'woocommerce-memberships-for-teams' ),
+						'<a id="wc-memberships-for-teams-user-membership-edit-override" href="#">', '</a>'
+					) );
 
-			foreach ( $wp_filter['save_post']->callbacks[10] as $key => $hook ) {
-				if ( is_array( $hook['function'] ) && $hook['function'][0] instanceof \WC_Memberships_User_Memberships && $hook['function'][1] === 'save_user_membership' ) {
-					unset( $wp_filter['save_post']->callbacks[10][ $key ] );
-				}
-			}
-		}
+				endif;
+
+				?>
+				<p class="form-field">
+					<?php printf(
+						/* translators: Placeholders: %s - text with possible actions for the user */
+						esc_html__( 'Editing has been disabled because this membership belongs to a team. %s', 'woocommerce-memberships-for-teams' ),
+						wc_memberships_list_items( $editing_actions )
+					); ?>
+				</p>
+			</div>
+			<?php
+
+			// alter the deletion alert text
+			wc_enqueue_js( " 
+				wc_memberships_admin.i18n.delete_membership_confirm += ' " . esc_html__( 'This will remove the member from the team.', 'woocommerce-memberships-for-teams' ) . "'; 
+			" );
+
+		endif;
 	}
 
 
 	/**
 	 * Removes transfer membership action for team-based memberships.
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $user_membership_actions membership admin actions
-	 * @param int $post_id the post id of the wc_user_membership post
+	 * @param string[] $actions array of membership admin actions
+	 * @param int $user_membership_id the post id of the wc_user_membership post
+	 * @return string[]
 	 */
 	public function remove_transfer_action( $actions, $user_membership_id ) {
 
 		$team_id = wc_memberships_for_teams_get_user_membership_team_id( $user_membership_id );
 
-		if ( $team_id && isset( $actions['transfer-action'] ) ) {
+		if ( (int) $team_id > 0 ) {
 			unset( $actions['transfer-action'] );
+		}
+
+		return $actions;
+	}
+
+
+	/**
+	 * Removes edit screen row actions from team-based user memberships.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param array $actions associative array of row actions
+	 * @param \WP_Post $post related membership post object
+	 * @return array
+	 */
+	public function remove_row_actions( $actions, $post ) {
+
+		if ( 'wc_user_membership' === $post->post_type ) {
+
+			$team_id = wc_memberships_for_teams_get_user_membership_team_id( $post->ID );
+
+			if ( (int) $team_id > 0 ) {
+				unset( $actions['pause'], $actions['cancel'] );
+			}
 		}
 
 		return $actions;
@@ -197,61 +291,52 @@ class User_Memberships {
 	 */
 	public function output_user_memberships_team_filters( $post_type ) {
 
-		if ( 'wc_user_membership' === $post_type ) {
+		if ( 'wc_user_membership' === $post_type ) :
 
-			$selected = array();
+			$team_id   = 0;
+			$team_name = '';
 
 			if ( ! empty( $_GET['_team_id'] ) ) {
 
 				$team_id = absint( $_GET['_team_id'] );
-				$team    = wc_memberships_for_teams_get_team( $team_id );
 
-				/* translators: %1$s - team name, %2$s - team id */
-				$team_string = sprintf(
-					esc_html__( '%1$s (#%2$s)', 'woocommerce-memberships-for-teams' ),
-					$team->get_name(),
-					$team_id
-				);
+				if ( $team = wc_memberships_for_teams_get_team( $team_id ) ) {
 
-				$selected[ $team_id ] = $team_string;
+					$team_name = esc_html( $team->get_formatted_name() );
+				}
 			}
+
 			?>
-
-			<?php if ( \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) : ?>
-
+			<span class="wc-memberships-for-teams-filter-by-team-id-wrapper" style="display:inline-block;width:200px;">
 				<select
-						name="_team_id"
-						class="sv-wc-enhanced-search"
-						style="min-width: 200px;"
-						data-action="wc_memberships_for_teams_json_search_teams"
-						data-nonce="<?php echo wp_create_nonce( 'search-teams' ); ?>"
-						data-placeholder="<?php esc_attr_e( 'Search for a team&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
-						data-allow_clear="true">
-					<?php if ( ! empty( $selected ) ) : ?>
-						<option value="<?php echo esc_attr( key( $selected ) ); ?>" selected><?php echo esc_html( $team_string ); ?></option>
+					name="_team_id"
+					class="sv-wc-enhanced-search"
+					id="wc-memberships-for-teams-filter-by-team-id"
+					style="min-width:200px;"
+					data-action="wc_memberships_for_teams_json_search_teams"
+					data-nonce="<?php echo wp_create_nonce( 'search-teams' ); ?>"
+					data-placeholder="<?php esc_attr_e( 'Search for a team&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
+					data-allow_clear="true">
+					<?php if ( $team_id > 0 ) : ?>
+						<option value="<?php echo esc_attr( $team_id ); ?>" selected><?php echo esc_html( $team_name ); ?></option>
 					<?php endif; ?>
 				</select>
+			</span>
 
-			<?php else : ?>
+			<?php Framework\SV_WC_Helper::render_select2_ajax(); ?>
 
+			<label style="margin: 0 4px;">
 				<input
-						type="hidden"
-						name="_team_id"
-						class="sv-wc-enhanced-search"
-						style="min-width: 200px;"
-						data-multiple="false"
-						data-action="wc_memberships_for_teams_json_search_teams"
-						data-nonce="<?php echo wp_create_nonce( 'search-teams' ); ?>"
-						data-placeholder="<?php esc_attr_e( 'Search for a team&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
-						data-allow_clear="true"
-						data-selected="<?php echo esc_attr( current( $selected ) ); ?>"
-						value="<?php echo esc_attr( key( $selected ) ); ?>"
-				/>
+					type="checkbox"
+					name="_excl_teams"
+					id="wc-memberships-for-teams-filter-by-no-team"
+					value="yes"
+					<?php checked( isset( $_GET['_excl_teams'] ) && 'yes' === $_GET['_excl_teams'] ); ?>
+				/><?php esc_html_e( 'Exclude team members', 'woocommerce-memberships-for-teams' ); ?>
+			</label>
+			<?php
 
-			<?php endif;
-
-			\SV_WC_Helper::render_select2_ajax();
-		}
+		endif;
 	}
 
 
@@ -270,25 +355,44 @@ class User_Memberships {
 
 		if ( 'wc_user_membership' === $typenow ) {
 
-			if ( ! empty( $_GET['_team_id'] ) ) {
+			$team_id  = isset( $_GET['_team_id'] )    && is_numeric( $_GET['_team_id'] ) ? absint( $_GET['_team_id'] ) : 0;
+			$no_teams = isset( $_GET['_excl_teams'] ) && 'yes' === $_GET['_excl_teams'];
 
-				$team_id = absint( $_GET['_team_id'] );
+			if ( ( $team_id > 0 || $no_teams ) && ! isset( $vars['meta_query'] ) ) {
+				$vars['meta_query'] = array();
+			}
 
-				if ( $team_id ) {
-
-					if ( ! isset( $vars['meta_query'] ) ) {
-						$vars['meta_query'] = array();
-					}
-
-					$vars['meta_query'][] = array(
-						'key' => '_team_id',
-						'value' => $team_id,
-					);
-				}
+			if ( $no_teams ) {
+				$vars['meta_query'][] = array(
+					'key'     => '_team_id',
+					'compare' => 'NOT EXISTS',
+				);
+			} elseif ( $team_id > 0 ) {
+				$vars['meta_query'][] = array(
+					'key'   => '_team_id',
+					'value' => $team_id,
+				);
 			}
 		}
 
 		return $vars;
 	}
+
+
+	/**
+	 * Disables updating user membership for team-based memberships.
+	 *
+	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes first {FN 2019-01-15}
+	 *
+	 * @internal
+	 *
+	 * @since 1.0.0
+	 * @deprecated since 1.1.1
+	 */
+	public function maybe_disable_updating_user_membership() {
+
+		_deprecated_function( 'SkyVerge\WooCommerce\Memberships\Teams\Admin\User_Memberships::maybe_disable_updating_user_membership::()', '1.1.1' );
+	}
+
 
 }

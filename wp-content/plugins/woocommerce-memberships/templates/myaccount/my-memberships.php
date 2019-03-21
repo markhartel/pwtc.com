@@ -16,15 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
-
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 /**
  * Renders a section on My Account page to list customer memberships.
@@ -32,7 +29,7 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
  * @type \WC_Memberships_User_Membership[] $customer_memberships array of user membership objects
  * @type int $user_id the current user ID
  *
- * @version 1.11.0
+ * @version 1.12.0
  * @since 1.0.0
  */
 global $post;
@@ -77,27 +74,11 @@ global $post;
 
 					?>
 					<?php foreach ( $my_memberships_columns as $column_id => $column_name ) : ?>
-						<?php
 
-						// TODO remove `wc_memberships_my_memberships_column_headers` deprecated action by version 1.12.0 {FN 2017-06-28}
-						if ( 'membership-actions' === $column_id && has_action( 'wc_memberships_my_memberships_column_headers' ) ) {
+						<th class="<?php echo esc_attr( $column_id ); ?>">
+							<span class="nobr"><?php echo esc_html( $column_name ); ?></span>
+						</th>
 
-							_deprecated_function( 'The "wc_memberships_my_memberships_column_headers" action', '1.9.0', '"wc_memberships_my_memberships_column_names" filter' );
-
-							/**
-							 * Fires after the membership columns, before the actions column in my memberships table header.
-							 *
-							 * @since 1.0.0
-							 *
-							 * @deprecated use 'wc_memberships_my_memberships_column_names' filter hook instead
-							 *
-							 * @param WC_Memberships_User_Membership $customer_membership
-							 */
-							do_action( 'wc_memberships_my_memberships_column_headers', $customer_membership );
-						}
-
-						?>
-						<th class="<?php echo esc_attr( $column_id ); ?>"><span class="nobr"><?php echo esc_html( $column_name ); ?></span></th>
 					<?php endforeach; ?>
 				</tr>
 			</thead>
@@ -132,12 +113,13 @@ global $post;
 									<?php
 
 									$order           = $customer_membership->get_order();
-									$order_datetime  = $order ? Framework\SV_WC_Order_Compatibility::get_date_created( $order ) : null;
-									$past_start_date = $order && $order_datetime ? ( $customer_membership->get_start_date( 'timestamp' ) < $order_datetime->getTimestamp() ) : false;
+									$order_datetime  = $order ? wc_memberships_get_order_date( $order, 'created' ) : null;
+									$order_timestamp = $order_datetime ? $order_datetime->getTimestamp() : null;
+									$past_start_date = $order_timestamp ? ( $customer_membership->get_start_date( 'timestamp' ) < $order_timestamp ) : false;
 
 									// show the order date instead if the start date is in the past
 									if ( $past_start_date && $order && $customer_membership->get_plan()->is_access_length_type( 'fixed' ) ) {
-										$start_time = Framework\SV_WC_Order_Compatibility::get_date_created( $order )->getTimestamp();
+										$start_time = $order_timestamp;
 									} else {
 										$start_time = $customer_membership->get_local_start_date( 'timestamp' );
 									}
@@ -166,25 +148,8 @@ global $post;
 									<?php echo esc_html( wc_memberships_get_user_membership_status_name( $customer_membership->get_status() ) ); ?>
 								</td>
 
-							<?php elseif ( 'membership-actions' === $column_id ) :
+							<?php elseif ( 'membership-actions' === $column_id ) : ?>
 
-								// TODO remove `wc_memberships_my_memberships_columns` deprecated action by version 1.12.0 {FN 2017-06-28}
-								if ( has_action( 'wc_memberships_my_memberships_columns' ) ) {
-
-									_deprecated_function( 'The "wc_memberships_my_memberships_columns" action', '1.9.0', '"wc_memberships_my_memberships_column_names" filter' );
-
-									/**
-									 * Fires after the membership columns, before the actions column in my memberships table.
-									 *
-									 * @since 1.0.0
-									 * @deprecated Use 'wc_memberships_my_memberships_column_names' filter hook and matching id actions
-									 *
-									 * @param \WC_Memberships_User_Membership $user_membership
-									 */
-									do_action( 'wc_memberships_my_memberships_columns', $customer_membership );
-								}
-
-								?>
 								<td class="membership-actions order-actions" data-title="<?php echo esc_attr( $column_name ); ?>">
 									<?php
 
@@ -247,7 +212,6 @@ global $post;
 		</p>
 
 	<?php endif; ?>
-
 
 	<?php
 

@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -215,6 +213,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends \WC_Membersh
 								name="_content_restriction_rules[<?php echo esc_attr( $index ); ?>][membership_plan_id]"
 								id="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_membership_plan_id"
 								class="<?php echo '__INDEX__' !== $index ? 'wc-enhanced-select' : ''; ?> membership-plan wide"
+								style="width:100%;"
 								<?php if ( ! $this->rule->current_user_can_edit() || ! $this->rule->current_context_allows_editing() ) : ?>disabled<?php endif; ?>>
 								<?php foreach ( $this->meta_box->get_membership_plan_options() as $id => $label ) : ?>
 									<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $id, $this->rule->get_membership_plan_id() ); ?>><?php echo esc_html( $label ); ?></option>

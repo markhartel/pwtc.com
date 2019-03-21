@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\List_Tables;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -94,19 +95,19 @@ class Team_Members extends \WP_List_Table {
 	 *
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team_Member $member team member instance
 	 * @param string $column_name
-	 * @return array
+	 * @return string
 	 */
 	public function column_default( $member, $column_name ) {
 
 		switch ( $column_name ) {
 
 			case 'email':
+
 				return $member->get_email();
-			break;
 
 			case 'role':
+
 				return $member->get_role( 'label' );
-			break;
 
 			case 'added':
 
@@ -123,7 +124,10 @@ class Team_Members extends \WP_List_Table {
 				$time = esc_html( date_i18n( $time_format, (int) $added_time ) );
 
 				return sprintf( '%1$s %2$s', $date, $time );
-			break;
+
+			default :
+
+				return '';
 		}
 	}
 
@@ -215,7 +219,7 @@ class Team_Members extends \WP_List_Table {
 					'user'     => $member->get_id(),
 					'_wpnonce' => wp_create_nonce( 'team-set-as-manager-' . $member->get_id() ),
 				), $this->team->get_edit_url() ),
-				/* translators: %s: user's name */
+				/* translators: Placeholder: %s - user's name */
 				esc_attr( sprintf( __( 'Set &#8220;%s&#8221; as a manager of this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 				__( 'Set as manager', 'woocommerce-memberships-for-teams' )
 			);
@@ -228,7 +232,7 @@ class Team_Members extends \WP_List_Table {
 					'user'     => $member->get_id(),
 					'_wpnonce' => wp_create_nonce( 'team-set-as-member-' . $member->get_id() ),
 				), $this->team->get_edit_url() ),
-				/* translators: %s: user's name */
+				/* translators: Placeholder: %s - user's name */
 				esc_attr( sprintf( __( 'Set &#8220;%s&#8221; as a member of this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 				__( 'Set as member', 'woocommerce-memberships-for-teams' )
 			);
@@ -241,7 +245,7 @@ class Team_Members extends \WP_List_Table {
 					'user'     => $member->get_id(),
 					'_wpnonce' => wp_create_nonce( 'team-remove-member-' . $member->get_id() ),
 				), $this->team->get_edit_url() ),
-			/* translators: %s: user's name */
+			/* translators: Placeholder: %s - user's name */
 			esc_attr( sprintf( __( 'Remove &#8220;%s&#8221; from this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 			__( 'Remove', 'woocommerce-memberships-for-teams' )
 		);

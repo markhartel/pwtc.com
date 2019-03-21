@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -86,20 +87,25 @@ class Teams_Handler {
 	 *     @type int $seats the number of seats to add to the team - if not provided, will use the max member count from the product/variation
 	 * }
 	 * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
-	 * @throws \SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
 	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Team team instance
+	 * @throws Framework\SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
 	 */
 	public function create_team( $args = array(), $action = 'create' ) {
 
+		$name = __( 'Team', 'woocommerce-memberships-for-teams' );
 		$args = wp_parse_args( $args, array(
-			'team_id'   => 0,
+			'team_id'    => 0,
 			'owner_id'   => 0,
 			'plan_id'    => 0,
 			'product_id' => 0,
 			'order_id'   => 0,
 			'seats'      => null,
-			'name'       => __( 'Team', 'woocommerce-memberships-for-teams' ),
+			'name'       => $name,
 		) );
+
+		if ( empty( $args['name'] ) ) {
+			$args['name'] = $name;
+		}
 
 		$product = null;
 
@@ -131,17 +137,17 @@ class Teams_Handler {
 
 		// an owner is required
 		if ( empty( $args['owner_id'] ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Owner is required', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Owner is required', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// a plan id is required
 		if ( empty( $args['plan_id'] ) || ! ( $plan = wc_memberships_get_membership_plan( $args['plan_id'] ) ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid plan', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid plan', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// if team id is provided, ensure it's valid
 		if ( ! empty( $args['team_id'] ) && ! ( $team = $this->get_team( $args['team_id'] ) ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$team_post_data = array(
@@ -188,7 +194,7 @@ class Teams_Handler {
 
 		// bail out on error
 		if ( is_wp_error( $team_id ) ) {
-			throw new \SV_WC_Plugin_Exception( $team_id->get_error_message() );
+			throw new Framework\SV_WC_Plugin_Exception( $team_id->get_error_message() );
 		}
 
 		$team = $this->get_team( $team_id );
@@ -344,7 +350,7 @@ class Teams_Handler {
 
 		try {
 			$team = new Team( $post );
-		} catch ( \SV_WC_Plugin_Exception $e ) {
+		} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 			return false;
 		}
 
@@ -392,7 +398,7 @@ class Teams_Handler {
 
 		$args = wp_parse_args( $args, array(
 			'status'   => 'any',
-			'role'     => 'owner, manager',
+			'role'     => 'owner, manager, member',
 			'nopaging' => true,
 		) );
 
@@ -415,7 +421,7 @@ class Teams_Handler {
 			$args['nopaging'] = false;
 		}
 
-		// parse roles - can be passed in as an array or comma-separated list, ie role => array( 'owner', 'manager' ), or role => 'owner,manager'
+		// parse roles - can be passed in as an array or comma-separated list, ie role => array( 'owner', 'manager', 'member' ), or role => 'owner,manager,member'
 		$roles = array_map( 'trim', ( is_array( $args['role'] ) ? $args['role'] : explode( ',', $args['role'] ) ) );
 
 		// simple case - if the only queried role is owner, we can simply look for a matching author
@@ -555,7 +561,7 @@ class Teams_Handler {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $post_id post object ID of the user membership being deleted
+	 * @param int $team_id post object ID of the user membership being deleted
 	 */
 	private function handle_team_deletion( $team_id ) {
 
@@ -568,7 +574,7 @@ class Teams_Handler {
 			foreach ( $team->get_member_ids() as $user_id ) {
 				try {
 					$team->remove_member( $user_id, $keep_user_membership );
-				} catch ( \SV_WC_Plugin_Exception $e ) {}
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 			}
 		}
 	}
@@ -627,7 +633,7 @@ class Teams_Handler {
 				// TODO: this will likely need reconsidering if/when adding support for multiple plans per team {IT 2019-09-25}
 				try{
 					$team->remove_member( $user_id, true );
-				} catch( \SV_WC_Plugin_Exception $e ) {}
+				} catch( Framework\SV_WC_Plugin_Exception $e ) {}
 			}
 		}
 	}
@@ -662,12 +668,14 @@ class Teams_Handler {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $user_membership_id user membership id
+	 * @param int|\WC_Memberships_User_Membership $user_membership_id a user membership
 	 * @return int|null team id or null if no link found
 	 */
 	public function get_user_membership_team_id( $user_membership_id ) {
 
-		if ( ! $user_membership_id ) {
+		$user_membership_id = $user_membership_id instanceof \WC_Memberships_User_Membership ? $user_membership_id->get_id() : $user_membership_id;
+
+		if ( ! is_numeric( $user_membership_id ) ) {
 			return null;
 		}
 
@@ -684,7 +692,7 @@ class Teams_Handler {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $user_membership_id user membership id
+	 * @param int|\WC_Memberships_User_Membership $user_membership_id a user membership
 	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Team|false team instance or false if not found
 	 */
 	public function get_user_membership_team( $user_membership_id ) {

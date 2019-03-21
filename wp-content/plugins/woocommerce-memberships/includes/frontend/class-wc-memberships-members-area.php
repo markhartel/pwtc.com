@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Frontend
  * @author    SkyVerge
- * @category  Frontend
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -277,22 +275,6 @@ class WC_Memberships_Members_Area {
 			} else {
 				$endpoint_title .= ' &raquo; ' . $plan->get_name();
 			}
-		}
-
-		// TODO remove this filter by version 1.12.0 or later {FN 2017-08-17}
-		if ( has_filter( 'wc_memberships_my_memberships_title' ) ) {
-
-			_deprecated_function( 'the filter "wc_memberships_my_memberships_title"', '1.9.0', '"wc_memberships_my_account_memberships_title" filter' );
-
-			/**
-			 *  Filters the "Memberships" members area title on my Account page.
-			 *
-			 * @since 1.4.0
-			 * @deprecated since 1.9.0
-			 *
-			 * @param string $endpoint_title
-			 */
-			$endpoint_title = apply_filters( 'wc_memberships_my_memberships_title', $endpoint_title );
 		}
 
 		/**
@@ -704,14 +686,7 @@ class WC_Memberships_Members_Area {
 				// Members Area should have at least one section enabled
 				if ( ! empty( $members_area ) ) {
 
-					$my_account_page = get_post( wc_get_page_id( 'myaccount' ) );
-
-					$html_before = isset( $content_pieces[0] ) ? $content_pieces[0] : '';
-					$html_after  = isset( $content_pieces[1] ) ? $content_pieces[1] : '';
-
 					ob_start();
-
-					echo $html_before;
 
 					// Get the section to display, or use the first designated section as fallback:
 					$section = $this->get_members_area_section();
@@ -732,8 +707,6 @@ class WC_Memberships_Members_Area {
 						) ); ?>
 					</div>
 					<?php
-
-					echo $html_after;
 
 					// grab everything that was output above while processing any shortcode in between
 					$the_content = do_shortcode( ob_get_clean() );
@@ -871,7 +844,6 @@ class WC_Memberships_Members_Area {
 
 
 	/**
-	 *
 	 * Backwards compatibility handler for deprecated methods.
 	 *
 	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-06-23}
@@ -889,12 +861,12 @@ class WC_Memberships_Members_Area {
 
 		switch ( $method ) {
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 or higher {FN 2017-08-18} */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 or higher {FN 2017-08-18} */
 			case 'filter_breadcrumbs' :
 				_deprecated_function( $deprecated, '1.9.0', "{$class}::filter_account_page_breadcrumbs()" );
 				return $this->adjust_account_page_breadcrumbs( $args );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 or higher {FN 2017-08-18} */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 or higher {FN 2017-08-18} */
 			case 'my_account_memberships' :
 				_deprecated_function( $deprecated, '1.9.0', "{$class}::output_members_area()" );
 				$this->output_members_area();

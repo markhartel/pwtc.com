@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -43,7 +44,8 @@ class Product {
 	 * @return int product id
 	 */
 	public static function get_parent_id( \WC_Product $product ) {
-		return (int) ( $parent_id = \SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) ) ? $parent_id : \SV_WC_Product_Compatibility::get_prop( $product, 'id' );
+
+		return (int) ( $parent_id = Framework\SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) ) ? $parent_id : Framework\SV_WC_Product_Compatibility::get_prop( $product, 'id' );
 	}
 
 
@@ -74,7 +76,7 @@ class Product {
 
 
 	/**
-	 * Returns the min member count for the guven team product.
+	 * Returns the min member count for the given team product.
 	 *
 	 * @since 1.0.0
 	 *
@@ -90,7 +92,7 @@ class Product {
 
 
 	/**
-	 * Returns the max member count for the guven team product.
+	 * Returns the max member count for the given team product.
 	 *
 	 * @since 1.0.0
 	 *
@@ -118,7 +120,7 @@ class Product {
 		$plan_id = get_post_meta( $product->get_id(), '_wc_memberships_for_teams_plan', true );
 
 		if ( ! $plan_id && $product->is_type( 'variation' ) ) {
-			$plan_id = get_post_meta( \SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ), '_wc_memberships_for_teams_plan', true );
+			$plan_id = get_post_meta( Framework\SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ), '_wc_memberships_for_teams_plan', true );
 		}
 
 		return $plan_id ? (int) $plan_id : null;

@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Frontend/Checkout
  * @author    SkyVerge
- * @category  Frontend
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -378,7 +376,7 @@ class WC_Memberships_Products_Restrictions {
 		     || ! current_user_can( 'wc_memberships_purchase_restricted_product', $product_id )
 		     || ! current_user_can( 'wc_memberships_purchase_delayed_product',    $product_id ) ) {
 
-			$purchasable = 'yes' === wc_memberships_get_content_meta( $product, '_wc_memberships_force_public' );
+			$purchasable = wc_memberships()->get_restrictions_instance()->is_product_public( $product_id );
 		}
 
 		return $purchasable;
@@ -456,7 +454,7 @@ class WC_Memberships_Products_Restrictions {
 					// if the product isn't purchasable, check if the parent is forced public
 					if ( ! $purchasable ) {
 
-						$purchasable = 'yes' === wc_memberships_get_content_meta( $parent_product->get_id(), '_wc_memberships_force_public' );
+						$purchasable = wc_memberships()->get_restrictions_instance()->is_product_public( $parent_product->get_id() );
 
 					// if the product is purchasable, check if the parent is restricted in the first place
 					} else {
@@ -563,7 +561,7 @@ class WC_Memberships_Products_Restrictions {
 		}
 
 		if ( ! $is_visible && ! empty( $parent_id ) ) {
-			$is_visible = 'yes' === wc_memberships_get_content_meta( $parent_id, '_wc_memberships_force_public', true );
+			$is_visible = wc_memberships()->get_restrictions_instance()->is_product_public( $parent_id );
 		}
 
 		return $is_visible;

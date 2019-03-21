@@ -17,8 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Templates
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -83,7 +82,7 @@ $table_args       = array( 'team' => $team, 'paged' => $paged, 'teams_area' => $
 	 *
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team current team instance
 	 */
-	do_action( 'wc_memberships_for_teams_before_my_team_members', $team );
+	do_action( 'wc_memberships_for_teams_after_my_team_members', $team );
 
 	?>
 

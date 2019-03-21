@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -271,6 +269,9 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		$attrs['total']    = $rows;
 		$attrs['position'] = 0;
 
+		wc_memberships()->log( 'Started new user memberships CSV import job...' );
+		wc_memberships()->log( print_r( $attrs, true ) );
+
 		return parent::create_job( $attrs );
 	}
 
@@ -475,8 +476,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		}
 
 		// try to get an existing user membership from an id
-		$user_membership_id       = isset( $row['user_membership_id'] ) && is_numeric( $row['user_membership_id'] ) ? (int) $row['user_membership_id'] : null;
-		$existing_user_membership = is_int( $user_membership_id ) && $user_membership_id > 0 ? wc_memberships_get_user_membership( $user_membership_id ) : null;
+		$existing_user_membership = $this->get_user_membership_from_row( $row, $membership_plan );
 
 		if ( ! $membership_plan && ! $existing_user_membership ) {
 			// bail out if we can't process a plan or a user membership to begin with
@@ -500,8 +500,8 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			$import_data['membership_plan_slug']  = $membership_plan_slug;
 			$import_data['membership_plan_name']  = ! empty( $row['membership_plan'] )   ? $row['membership_plan']   : null;
 			$import_data['membership_plan']       = $membership_plan;
-			$import_data['user_membership_id']    = $user_membership_id;
 			$import_data['user_membership']       = $existing_user_membership;
+			$import_data['user_membership_id']    = $existing_user_membership instanceof \WC_Memberships_User_Membership ? $existing_user_membership->get_id() : 0;
 			$import_data['user_id']               = ! empty( $row['user_id'] )           ? $row['user_id']           : null;
 			$import_data['user_name']             = ! empty( $row['user_name'] )         ? $row['user_name']         : null;
 			$import_data['product_id']            = ! empty( $row['product_id'] )        ? $row['product_id']        : null;
@@ -550,6 +550,48 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		unset( $membership_plan, $existing_user_membership, $import_data );
 
 		return $job;
+	}
+
+
+	/**
+	 * Gets a user membership from row data.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @param array $row_data CSV row data
+	 * @param \WC_Memberships_Membership_Plan $membership_plan the plan
+	 * @return null|\WC_Memberships_User_Membership|\WC_Memberships_User_Membership[]
+	 */
+	private function get_user_membership_from_row( $row_data, $membership_plan ) {
+
+		$user_membership = null;
+
+		// try by getting the user membership ID directly
+		if ( isset( $row_data['user_membership_id'] ) && '' !== trim( $row_data['user_membership_id'] ) ) {
+
+			$user_membership = wc_memberships_get_user_membership( is_numeric( $row_data['user_membership_id'] ) ? (int) $row_data['user_membership_id'] : 0 );
+
+		// for anything else we need a plan
+		} elseif ( $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
+
+			$user = null;
+
+			// try by user login
+			if ( isset( $row_data['user_id'] ) && is_numeric( $row_data['user_id'] ) ) {
+				$user = get_user_by( 'id', (int) $row_data['user_id'] );
+			}
+			if ( ! $user && isset( $row_data['user_name'] ) && '' !== trim( $row_data['user_name'] ) ) {
+				$user = get_user_by( 'login', trim( $row_data['user_name'] ) );
+			}
+			// try by user email
+			if ( ! $user && isset( $row_data['member_email'] ) && is_email( trim( $row_data['member_email'] ) ) ) {
+				$user = get_user_by( 'email', trim( $row_data['member_email'] ) );
+			}
+
+			$user_membership = $user ? wc_memberships_get_user_membership( $user->ID, $membership_plan ) : null;
+		}
+
+		return $user_membership;
 	}
 
 
@@ -638,7 +680,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 					}
 
 					// update meta upon create or update action
-					$this->update_user_membership_meta( $user_membership, $action, $import_data, $job );
+					$user_membership = $this->update_user_membership_meta( $user_membership, $action, $import_data, $job );
 
 					/**
 					 * Fires upon creating or updating a User Membership from import data.
@@ -748,6 +790,8 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			if ( 0 === $update || is_wp_error( $update ) ) {
 				return false;
 			}
+
+			$user_membership = new \WC_Memberships_User_Membership( $update );
 		}
 
 		// maybe transfer this membership
@@ -772,6 +816,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	 * @param string $action either 'create' or 'merge' a User Membership
 	 * @param array $data import data
 	 * @param \stdClass $job job object being processed
+	 * @return \WC_Memberships_User_Membership
 	 */
 	private function update_user_membership_meta( \WC_Memberships_User_Membership $user_membership, $action, $data, $job ) {
 
@@ -856,6 +901,8 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 				$user_membership->update_status( 'delayed' );
 			}
 		}
+
+		return $user_membership;
 	}
 
 
@@ -1064,7 +1111,29 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	 * @return bool
 	 */
 	public function delete_import_file( $job ) {
-		return parent::delete_attached_file( $job );
+
+		$success = parent::delete_attached_file( $job );
+
+		switch ( current_action() ) {
+			case "{$this->identifier}_job_failed" :
+				$log_message = 'User memberships CSV import job failed.';
+			break;
+			case "{$this->identifier}_job_deleted" :
+				$log_message = 'User memberships CSV import job deleted.';
+			break;
+			case "{$this->identifier}_job_complete" :
+			default:
+				$log_message = 'User memberships CSV import job completed.';
+			break;
+		}
+
+		wc_memberships()->log( $log_message );
+
+		if ( null !== $job && is_object( $job ) ) {
+			wc_memberships()->log( print_r( (array) $job, true ) );
+		}
+
+		return $success;
 	}
 
 

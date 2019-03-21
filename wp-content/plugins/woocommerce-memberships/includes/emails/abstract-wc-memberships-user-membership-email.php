@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -38,6 +37,9 @@ abstract class WC_Memberships_User_Membership_Email extends \WC_Email {
 
 	/** @var string the email content body */
 	protected $body = '';
+
+	/** @var bool whether the email should be send to an admin (default false) */
+	protected $sent_to_admin = false;
 
 	/** @var int default schedule (optional, used by some emails) */
 	protected $default_schedule = 0;
@@ -70,6 +72,7 @@ abstract class WC_Memberships_User_Membership_Email extends \WC_Email {
 		}
 
 		$user_membership = $this->object;
+		$membership_plan = $user_membership->get_plan();
 
 		// get member data
 		$member            = get_user_by( 'id', $user_membership->get_user_id() );
@@ -87,9 +90,10 @@ abstract class WC_Memberships_User_Membership_Email extends \WC_Email {
 			'member_first_name'           => $member_first_name,
 			'member_last_name'            => $member_last_name,
 			'member_full_name'            => $member_full_name,
-			'membership_plan'             => $user_membership->get_plan() ? $user_membership->get_plan()->get_name() : '',
+			'membership_plan'             => $membership_plan ? $membership_plan->get_name() : '',
 			'membership_expiration_date'  => date_i18n( wc_date_format(), $expiration_date_timestamp ),
 			'membership_expiry_time_diff' => human_time_diff( current_time( 'timestamp', true ), $expiration_date_timestamp ),
+			'membership_view_url'         => esc_url( $user_membership->get_view_membership_url() ),
 			'membership_renewal_url'      => esc_url( $user_membership->get_renew_membership_url() ),
 		);
 
@@ -241,6 +245,64 @@ abstract class WC_Memberships_User_Membership_Email extends \WC_Email {
 		}
 
 		return $success;
+	}
+
+
+	/**
+	 * Returns the arguments that should be passed to an email template.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array $args default args
+	 * @return array associative array
+	 */
+	protected function get_template_args( $args = array() ) {
+
+		return array(
+			'user_membership' => $this->object,
+			'email'           => $this,
+			'email_heading'   => $this->get_heading(),
+			'email_body'      => $this->get_body(),
+			'sent_to_admin'   => $this->sent_to_admin,
+		);
+	}
+
+
+	/**
+	 * Returns the email HTML content.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string HTML
+	 */
+	public function get_content_html() {
+
+		$args = array( 'plain_text' => false );
+
+		ob_start();
+
+		wc_get_template( $this->template_html, array_merge( $args, $this->get_template_args( $args ) ) );
+
+		return ob_get_clean();
+	}
+
+
+	/**
+	 * Returns the email plain text content.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string plain text
+	 */
+	public function get_content_plain() {
+
+		$args = array( 'plain_text' => true );
+
+		ob_start();
+
+		wc_get_template( $this->template_html, array_merge( $args, $this->get_template_args( $args ) ) );
+
+		return ob_get_clean();
 	}
 
 

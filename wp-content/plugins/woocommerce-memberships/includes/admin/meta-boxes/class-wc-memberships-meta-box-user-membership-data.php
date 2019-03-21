@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -483,11 +481,13 @@ class WC_Memberships_Meta_Box_User_Membership_Data extends \WC_Memberships_Meta_
 
 				if ( $order ) {
 
+					$order_date = Framework\SV_WC_Order_Compatibility::get_date_created( $order );
+
 					/* translators: Placeholder: %s - order number */
 					$order_ref       = '<a href="' . esc_url( get_edit_post_link( Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' ) ) ) . '">' . sprintf(  __( 'Order %s', 'woocommerce-memberships' ), $order->get_order_number() ) . '</a>';
 					$billing_fields  = array(
 						__( 'Purchased in:', 'woocommerce-memberships' ) => $order_ref,
-						__( 'Order Date:', 'woocommerce-memberships' )   => date_i18n( wc_date_format(), Framework\SV_WC_Order_Compatibility::get_date_created( $order )->getTimestamp() ),
+						__( 'Order Date:', 'woocommerce-memberships' )   => $order_date ? date_i18n( wc_date_format(), $order_date->getTimestamp() ) : '',
 						__( 'Order Total:', 'woocommerce-memberships' )  => $order->get_formatted_order_total(),
 					);
 

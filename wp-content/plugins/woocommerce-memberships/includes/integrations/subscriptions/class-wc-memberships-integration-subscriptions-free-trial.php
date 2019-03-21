@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -129,7 +128,7 @@ class WC_Memberships_Integration_Subscriptions_Free_Trial {
 
 		$user_membership = wc_memberships_get_user_membership( $user_membership_id );
 
-		if ( 'free_trial' !== $user_membership->get_status() ) {
+		if ( $user_membership && 'free_trial' !== $user_membership->get_status() ) {
 			unset( $statuses['wcm-free_trial'] );
 		}
 

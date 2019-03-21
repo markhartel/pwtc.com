@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -31,11 +32,11 @@ defined( 'ABSPATH' ) or exit;
  *
  * @since 1.0.0
  */
-class Plugin extends \SV_WC_Plugin {
+class Plugin extends Framework\SV_WC_Plugin {
 
 
 	/** plugin version number */
-	const VERSION = '1.0.5-dev.2';
+	const VERSION = '1.1.3';
 
 	/** @var \SkyVerge\WooCommerce\Memberships\Teams\Plugin single instance of this plugin */
 	protected static $instance;
@@ -76,12 +77,15 @@ class Plugin extends \SV_WC_Plugin {
 	/** @var \SkyVerge\WooCommerce\Memberships\Teams\Membership_Plans instance */
 	protected $membership_plans;
 
+	/** @var \SkyVerge\WooCommerce\Memberships\Teams\Utilities instance */
+	private $utilities;
+
 	/** @var \SkyVerge\WooCommerce\Memberships\Teams\Integrations instance */
 	protected $integrations;
 
 
 	/**
-	 * Initializes the plugin.
+	 * Sets up the plugin.
 	 *
 	 * @since 1.0.0
 	 */
@@ -91,35 +95,90 @@ class Plugin extends \SV_WC_Plugin {
 			self::PLUGIN_ID,
 			self::VERSION,
 			array(
-				'text_domain'        => 'woocommerce-memberships-for-teams',
-				'display_php_notice' => true,
-				'dependencies'       => array(
-					'mbstring',
+				'text_domain'  => 'woocommerce-memberships-for-teams',
+				'dependencies' => array(
+					'php_extensions' => array(
+						'mbstring',
+					),
 				),
 			)
 		);
 
-		// include required files
-		add_action( 'sv_wc_framework_plugins_loaded', array( $this, 'includes' ) );
-
-		// initialize
-		add_action( 'init', array( $this, 'init' ) );
-
-		// lifecycle
-		add_action( 'admin_init', array ( $this, 'maybe_activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		// init post types and rewrite endpoints
+		add_action( 'init', array( $this, 'init_post_types' ) );
+		// add query vars for rewrite endpoints
+		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
 
 		// make sure template files are searched for in our plugin
 		add_filter( 'woocommerce_locate_template',      array( $this, 'locate_template' ), 20, 3 );
 		add_filter( 'woocommerce_locate_core_template', array( $this, 'locate_template' ), 20, 3 );
-
-		// add query vars for rewrite endpoints
-		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
 	}
 
 
 	/**
-	 * Includes required files.
+	 * Initializes the plugin.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 */
+	public function init_plugin() {
+
+		$this->includes();
+	}
+
+
+	/**
+	 * Initializes post types.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 */
+	public function init_post_types() {
+
+		Post_Types::initialize();
+
+		$this->add_rewrite_endpoints();
+	}
+
+
+	/**
+	 * Initializes the plugin (legacy method).
+	 *
+	 *
+	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes first {FN 2019-01-14}
+	 *
+	 * @internal
+	 *
+	 * @since 1.0.0
+	 * @deprecated since 1.1.2
+	 */
+	public function init() {
+
+		_deprecated_function( 'SkyVerge\WooCommerce\Memberships\Teams\Plugin::init()', '1.1.1', 'SkyVerge\WooCommerce\Memberships\Teams\Plugin::init_plugin()' );
+
+		$this->init_plugin();
+	}
+
+
+	/**
+	 * Loads and initializes the plugin's lifecycle handler.
+	 *
+	 * @internal
+	 *
+	 * @since 1.11.0
+	 */
+	protected function init_lifecycle_handler() {
+
+		$this->lifecycle_handler = new Upgrade( $this );
+	}
+
+
+	/**
+	 * Loads required handlers.
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 */
@@ -133,15 +192,14 @@ class Plugin extends \SV_WC_Plugin {
 		$this->invitations      = new Invitations;
 		$this->team_members     = new Team_Members;
 		$this->membership_plans = new Membership_Plans;
+		$this->utilities        = new Utilities;
 		$this->integrations     = new Integrations;
 
 		// frontend includes
 		if ( ! is_admin() ) {
 			$this->frontend_includes();
-		}
-
 		// admin includes
-		if ( is_admin() ) {
+		} else {
 			$this->admin_includes();
 		}
 
@@ -153,7 +211,7 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
-	 * Includes required admin classes.
+	 * Loads required admin classes.
 	 *
 	 * @since 1.0.0
 	 */
@@ -167,7 +225,7 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
-	 * Includes required AJAX classes.
+	 * Loads required AJAX classes.
 	 *
 	 * @since 1.0.0
 	 */
@@ -177,7 +235,7 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
-	 * Includes required frontend classes.
+	 * Loads required frontend classes.
 	 *
 	 * @since 1.0.0
 	 */
@@ -309,6 +367,19 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
+	 * Gets the utilities instance.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Utilities
+	 */
+	public function get_utilities_instance() {
+
+		return $this->utilities;
+	}
+
+
+	/**
 	 * Returns the Integrations instance.
 	 *
 	 * @since 1.0.0
@@ -321,22 +392,10 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
-	 * Initializes the plugin.
-	 *
-	 * @since 1.0.0
-	 */
-	public function init() {
-
-		Post_Types::initialize();
-
-		$this->add_rewrite_endpoints();
-	}
-
-
-	/**
 	 * Locates the WooCommerce template files from our templates directory.
 	 *
 	 * @internal
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string $template Already found template
@@ -348,7 +407,7 @@ class Plugin extends \SV_WC_Plugin {
 
 		// only keep looking if no custom theme template was found
 		// or if a default WooCommerce template was found
-		if ( ! $template || \SV_WC_Helper::str_starts_with( $template, WC()->plugin_path() ) ) {
+		if ( ! $template || Framework\SV_WC_Helper::str_starts_with( $template, WC()->plugin_path() ) ) {
 
 			// set the path to our templates directory
 			$plugin_path = $this->get_plugin_path() . '/templates/';
@@ -364,6 +423,50 @@ class Plugin extends \SV_WC_Plugin {
 
 
 	/**
+	 * Generates a unique token for internal uses.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string
+	 */
+	public static function generate_token() {
+
+		return md5( wp_generate_password() . time() );
+	}
+
+
+	/**
+	 * Renders a notice for the user to read the docs before adding add-ons.
+	 *
+	 * @internal
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_admin_notices() {
+
+		// show any dependency notices
+		parent::add_admin_notices();
+
+		$screen = get_current_screen();
+
+		// only render on plugins or settings screen
+		if ( ( $screen && 'plugins' === $screen->id ) || $this->is_plugin_settings() ) {
+
+			$this->get_admin_notice_handler()->add_admin_notice(
+			/* translators: the %s placeholders are meant for pairs of opening <a> and closing </a> link tags */
+				sprintf( __( 'Thanks for installing Memberships for Teams! To get started, take a minute to %1$sread the documentation%2$s and then %3$ssetup a membership plan%4$s :)', 'woocommerce-memberships-for-teams' ),
+					'<a href="https://docs.woocommerce.com/document/teams-woocommerce-memberships/" target="_blank">',
+					'</a>',
+					'<a href="' . admin_url( 'edit.php?post_type=wc_membership_plan' ) . '">',
+					'</a>' ),
+				'get-started-notice',
+				array( 'always_show_on_settings' => false, 'notice_class' => 'updated' )
+			);
+		}
+	}
+
+
+	/**
 	 * Adds rewrite rules endpoints.
 	 *
 	 * TODO when WC 3.3+ is the minimum required version check if we still need this as WC 3.3 adds endpoints dynamically {IT 2018-05-09}
@@ -372,13 +475,15 @@ class Plugin extends \SV_WC_Plugin {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_rewrite_endpoints() {
+	public function add_rewrite_endpoints() {
 
 		// add Teams Area endpoint
 		add_rewrite_endpoint( get_option( 'woocommerce_myaccount_teams_area_endpoint', 'teams' ), EP_ROOT | EP_PAGES );
 
 		// add join team endpoint
 		add_rewrite_endpoint( get_option( 'woocommerce_myaccount_join_team_endpoint', 'join-team' ), EP_ROOT | EP_PAGES );
+
+		flush_rewrite_rules();
 	}
 
 
@@ -404,142 +509,88 @@ class Plugin extends \SV_WC_Plugin {
 		return $query_vars;
 	}
 
-	/** Admin methods ******************************************************/
-
-
-	/**
-	 * Retrurns the plugin configuration URL.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @see SV_WC_Plugin::get_settings_url()
-	 *
-	 * @param string $plugin_id the plugin identifier
-	 * @return string plugin settings URL
-	 */
-	public function get_settings_url( $plugin_id = null ) {
-		return admin_url( 'admin.php?page=wc-settings&tab=memberships&section=teams' );
-	}
-
 
 	/**
 	 * Checks whether currently on the Teams settings screen.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see SV_WC_Plugin::is_plugin_settings()
-	 *
 	 * @return boolean true if on the admin settings page
 	 */
 	public function is_plugin_settings() {
 
-		return isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] && isset( $_GET['tab'] ) && isset( $_GET['section'] )
-		       // main memberships settings page
+		return isset( $_GET['page'], $_GET['tab'], $_GET['section'] )
+		       // WooCommerce core settings Wordpress admin page
+		       && 'wc-settings' === $_GET['page']
+		       // main Memberships settings sub-page
 		       && ( 'memberships' === $_GET['tab']
-		       // the teams settings section
-		       && ( 'teams' === $_GET['section'] ) );
+		            // the Teams settings section
+		            && ( 'teams' === $_GET['section'] ) );
 	}
 
 
 	/**
-	 * Renders a notice for the user to read the docs before adding add-ons.
+	 * Gets the plugin configuration URL.
 	 *
 	 * @since 1.0.0
-	 * @see \SV_WC_Plugin::add_admin_notices()
+	 *
+	 * @param string $plugin_id the plugin identifier
+	 * @return string plugin settings URL
 	 */
-	public function add_admin_notices() {
+	public function get_settings_url( $plugin_id = null ) {
 
-		// show any dependency notices
-		parent::add_admin_notices();
-
-		$screen = get_current_screen();
-
-		// only render on plugins or settings screen
-		if ( 'plugins' === $screen->id || $this->is_plugin_settings() ) {
-
-			$this->get_admin_notice_handler()->add_admin_notice(
-				/* translators: the %s placeholders are meant for pairs of opening <a> and closing </a> link tags */
-				sprintf( __( 'Thanks for installing Memberships for Teams! To get started, take a minute to %1$sread the documentation%2$s and then %3$ssetup a membership plan%4$s :)', 'woocommerce-memberships-for-teams' ),
-					'<a href="https://docs.woocommerce.com/document/teams-woocommerce-memberships/" target="_blank">',
-					'</a>',
-					'<a href="' . admin_url( 'edit.php?post_type=wc_membership_plan' ) . '">',
-					'</a>' ),
-				'get-started-notice',
-				array( 'always_show_on_settings' => false, 'notice_class' => 'updated' )
-			);
-		}
+		return admin_url( 'admin.php?page=wc-settings&tab=memberships&section=teams' );
 	}
 
 
-	/** Helper methods ******************************************************/
-
-
 	/**
-	 * Returns the main Memberships for Teams Instance, ensures only one instance is/can be loaded.
+	 * Gets the plugin documentation URL.
 	 *
 	 * @since 1.0.0
-	 * @see wc_memberships_for_teams()
-	 *
-	 * @return Plugin
-	 */
-	public static function instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-
-
-	/**
-	 * Returns the admin message handler instance
-	 *
-	 * TODO: remove this when the method gets fixed in framework {IT 2017-06-21}
-	 *
-	 * @since 1.0.0
-	 */
-	public function get_message_handler() {
-
-		require_once( $this->get_framework_path() . '/class-sv-wp-admin-message-handler.php' );
-
-		return parent::get_message_handler();
-	}
-
-
-	/**
-	 * Returns the plugin documentation URL.
-	 *
-	 * @since 1.2.0
-	 * @see \SV_WC_Plugin::get_documentation_url()
 	 *
 	 * @return string
 	 */
 	public function get_documentation_url() {
+
 		return 'https://docs.woocommerce.com/document/teams-woocommerce-memberships/';
 	}
 
 
 	/**
-	 * Returns the plugin support URL.
+	 * Gets the plugin support URL.
 	 *
-	 * @since 1.2.0
-	 * @see \SV_WC_Plugin::get_support_url()
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
 	public function get_support_url() {
+
 		return 'https://woocommerce.com/my-account/tickets/';
 	}
 
 
 	/**
-	 * Returns the plugin name, localized.
+	 * Gets the plugin sales page URL
+	 *
+	 * @since 1.1.2
+	 *
+	 * @return string
+	 */
+	public function get_sales_page_url() {
+
+		return 'https://woocommerce.com/products/teams-woocommerce-memberships/';
+	}
+
+
+	/**
+	 * Gets the plugin name, localized.
 	 *
 	 * @since 1.0.0
-	 * @see \SV_WC_Plugin::get_plugin_name()
 	 *
 	 * @return string the plugin name
 	 */
 	public function get_plugin_name() {
+
 		return __( 'Teams for WooCommerce Memberships', 'woocommerce-memberships-for-teams' );
 	}
 
@@ -548,96 +599,34 @@ class Plugin extends \SV_WC_Plugin {
 	 * Returns the full path to the plugin entry script.
 	 *
 	 * @since 1.0.0
-	 * @see \SV_WC_Plugin::get_file()
 	 *
 	 * @return string the full path and filename of the plugin file
 	 */
 	protected function get_file() {
+
 		return dirname( __DIR__ ) . "/woocommerce-{$this->get_id()}.php";
 	}
 
 
 	/**
-	 * Generates a unique token.
+	 * Returns the main Memberships for Teams Instance, ensures only one instance is/can be loaded.
+	 *
+	 * @see wc_memberships_for_teams()
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return string
+	 * @return Plugin
 	 */
-	public static function generate_token() {
-		return md5( wp_generate_password() . time() );
-	}
+	public static function instance() {
 
+		if ( null === self::$instance ) {
 
-	/** Lifecycle methods ******************************************************/
+			self::$instance = new self();
 
-
-	/**
-	 * Handles plugin activation.
-	 *
-	 * @internal
-	 *
-	 * @since 1.0.0
-	 */
-	public function maybe_activate() {
-
-		$is_active = get_option( 'wc_memberships_for_teams_is_active', false );
-
-		if ( ! $is_active ) {
-
-			update_option( 'wc_memberships_for_teams_is_active', true );
-
-			/**
-			 * Runs when Memberships for Teams is activated.
-			 *
-			 * @since 1.0.0
-			 */
-			do_action( 'wc_memberships_for_teams_activated' );
-
-			$this->add_rewrite_endpoints();
-			flush_rewrite_rules();
 		}
+
+		return self::$instance;
 	}
 
 
-	/**
-	 * Handles plugin deactivation.
-	 *
-	 * @internal
-	 *
-	 * @since 1.0.0
-	 */
-	public function deactivate() {
-
-		delete_option( 'wc_memberships_for_teams_is_active' );
-
-		/**
-		 * Runs when Memberships is deactivated.
-		 *
-		 * @since 1.0.0
-		 */
-		do_action( 'wc_memberships_for_teams_deactivated' );
-
-		flush_rewrite_rules();
-	}
-
-
-	/**
-	 * Runs upgrade scripts.
-	 *
-	 * @see \SV_WC_Plugin::install()
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $installed_version semver
-	 */
-	protected function upgrade( $installed_version ) {
-
-		Upgrade::run_update_scripts( $installed_version );
-
-		$this->add_rewrite_endpoints();
-		flush_rewrite_rules();
-	}
-
-
-} // end Teams class
+}

@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -293,14 +292,17 @@ class WC_Memberships_Post_Types {
 			 */
 			$allowed_meta_box_ids = apply_filters( 'wc_memberships_allowed_meta_box_ids', array_merge( array( 'submitdiv' ), wc_memberships()->get_admin_instance()->get_meta_box_ids() ) );
 
-			foreach ( $GLOBALS['wp_meta_boxes'][ $screen->id ] as $context => $meta_boxes_by_context ) {
+			if ( $screen && isset( $GLOBALS['wp_meta_boxes'][ $screen->id ] ) ) {
 
-				foreach ( $meta_boxes_by_context as $subcontext => $meta_boxes_by_subcontext ) {
+				foreach ( $GLOBALS['wp_meta_boxes'][ $screen->id ] as $context => $meta_boxes_by_context ) {
 
-					foreach ( $meta_boxes_by_subcontext as $meta_box_id => $meta_box ) {
+					foreach ( $meta_boxes_by_context as $subcontext => $meta_boxes_by_subcontext ) {
 
-						if ( ! in_array( $meta_box_id, $allowed_meta_box_ids, true ) ) {
-							remove_meta_box( $meta_box_id, $post_type, $context );
+						foreach ( $meta_boxes_by_subcontext as $meta_box_id => $meta_box ) {
+
+							if ( ! in_array( $meta_box_id, $allowed_meta_box_ids, true ) ) {
+								remove_meta_box( $meta_box_id, $post_type, $context );
+							}
 						}
 					}
 				}

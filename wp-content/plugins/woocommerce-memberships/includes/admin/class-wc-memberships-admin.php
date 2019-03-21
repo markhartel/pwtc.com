@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -87,6 +85,12 @@ class WC_Memberships_Admin {
 		// init import/export page
 		add_action( 'admin_menu',  array( $this, 'add_import_export_admin_page' ) );
 
+		// add additional bulk actions to memberships-restrictable post types
+		// TODO when WordPress 4.7 is the minimum required version, this may be updated to use new hooks {FN 2018-11-05}
+		add_action( 'admin_footer-edit.php', array( $this, 'add_restrictable_post_types_bulk_actions' ), 100 );
+		add_action( 'load-edit.php',         array( $this, 'process_restrictable_post_types_bulk_actions' ), 100 );
+		add_action( 'admin_notices',         array( $this, 'display_restrictable_post_types_bulk_actions_notices' ), 100 );
+
 		// conditionally remove duplicate submenu link
 		add_action( 'admin_menu', array( $this, 'remove_submenu_link' ) );
 		// remove "New User Membership" item from Admin bar
@@ -96,6 +100,9 @@ class WC_Memberships_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this,  'enqueue_scripts_and_styles' ) );
 		// load admin scripts & styles
 		add_filter( 'woocommerce_screen_ids', array( $this, 'load_wc_scripts' ) );
+
+		// add system status report data
+		add_action( 'woocommerce_system_status_report', array( $this, 'add_system_status_report_block' ), 9 );
 	}
 
 
@@ -229,6 +236,8 @@ class WC_Memberships_Admin {
 			'profile',
 			// WooCommerce Settings page tab
 			$settings_page_id,
+			// WooCommerce system status
+			'woocommerce_page_wc-status',
 		);
 
 		$meta_boxes_screens = array(
@@ -425,6 +434,191 @@ class WC_Memberships_Admin {
 		 * @since 1.6.0
 		 */
 		do_action( 'wc_memberships_render_import_export_page' );
+	}
+
+
+	/**
+	 * Gets a list of membership-related bulk actions applicable to restrictable post types.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param bool $with_labels whether to return only ID keys (false) or include labels (true)
+	 * @return string[]|array list of IDs or associative array of IDs and labels
+	 */
+	private function get_restrictable_post_types_bulk_actions( $with_labels = false ) {
+
+		$bulk_actions = array(
+			'wc_memberships_force_content_public'      => __( 'Disallow restrictions rules', 'woocommerce-memberships' ),
+			'wc_memberships_dont_force_content_public' => __( 'Allow restriction rules', 'woocommerce-memberships' ),
+		);
+
+		return true === $with_labels ? $bulk_actions : array_keys( $bulk_actions );
+	}
+
+
+	/**
+	 * Adds bulk actions to restrictable post types.
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function add_restrictable_post_types_bulk_actions() {
+		global $post_type;
+
+		if ( $post_type && current_user_can( 'manage_woocommerce' ) ) :
+
+			$post_type_name = $post_type instanceof \WP_Post_Type ? $post_type->name : $post_type;
+
+			if ( array_key_exists( $post_type_name, WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules( true ) ) ) :
+
+				?>
+				<script type="text/javascript">
+					jQuery( document ).ready( function( $ ) {
+						<?php foreach ( $this->get_restrictable_post_types_bulk_actions( true ) as $id => $label ) : ?>
+							$( '<option>' ).val( '<?php echo esc_js( $id ); ?>' ).text( '<?php echo esc_js( $label ); ?>' ).appendTo( 'select[name="action"]' );
+							$( '<option>' ).val( '<?php echo esc_js( $id ); ?>' ).text( '<?php echo esc_js( $label ); ?>' ).appendTo( 'select[name="action2"]' );
+						<?php endforeach; ?>
+					} );
+				</script>
+				<?php
+
+			endif;
+
+		endif;
+	}
+
+
+	/**
+	 * Processes membership-related bulk actions for restrictable post types.
+	 *
+	 * TODO update this deprecated handling when WordPress 4.7 is the minimum required version {FN 2018-11-05}
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function process_restrictable_post_types_bulk_actions() {
+		global $post_type;
+
+		if ( $wp_list_table = _get_list_table( 'WP_Posts_List_Table' ) ) {
+
+			$action       = $wp_list_table->current_action();
+			$bulk_actions = $this->get_restrictable_post_types_bulk_actions();
+
+			if ( $action && current_user_can( 'manage_woocommerce' ) && in_array( $action, $bulk_actions, true ) ) {
+
+				$content_ids = isset( $_REQUEST['post'] ) ? array_map( 'intval', (array) $_REQUEST['post'] ) : array();
+				$handled     = true;
+
+				switch ( $action ) {
+					case 'wc_memberships_force_content_public' :
+						$processed = wc_memberships()->get_restrictions_instance()->set_content_public( $content_ids );
+					break;
+					case 'wc_memberships_dont_force_content_public' :
+						$processed = wc_memberships()->get_restrictions_instance()->unset_content_public( $content_ids );
+					break;
+					default :
+						$processed = 0;
+						$handled   = false;
+					break;
+				}
+
+				if ( $handled ) {
+
+					// remove bulk actions set on the request URL
+					$clean_original_url = remove_query_arg( array_merge( $bulk_actions, array( 'untrashed', 'deleted', 'ids', 'action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status',  'post', 'bulk_edit', 'post_view' ) ), wp_get_referer() );
+
+					if ( $clean_original_url ) {
+						$processed_url = $clean_original_url;
+					} else {
+						$post_type_name = $post_type instanceof \WP_Post_Type ? $post_type->name : $post_type;
+						$processed_url  = empty( $post_type_name ) ? admin_url( 'edit.php' ) : admin_url( "edit.php?post_type={$post_type_name}" );
+					}
+
+					if ( $processed_url ) {
+
+						// re-add the processed bulk action and pagination information
+						$redirect_url = add_query_arg( array(
+							$action => $processed,
+							'paged' => $wp_list_table->get_pagenum(),
+						), $processed_url );
+
+						// redirect to the products edit screen carrying bulk action results
+						wp_redirect( $redirect_url );
+						exit;
+					}
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Displays an admin notice after a membership-related bulk action has been processed.
+	 *
+	 * TODO update this deprecated handling when WordPress 4.7 is the minimum required version {FN 2018-11-05}
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function display_restrictable_post_types_bulk_actions_notices() {
+		global $post_type, $pagenow;
+
+		if ( $post_type && 'edit.php' === $pagenow ) {
+
+			$content_type            = $post_type instanceof \WP_Post_Type ? $post_type->name : $post_type;
+			$restrictable_post_types = WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules( true );
+
+			if ( array_key_exists( $content_type, $restrictable_post_types ) ) {
+
+				$bulk_actions  = $this->get_restrictable_post_types_bulk_actions();
+				$name_singular = $restrictable_post_types[ $content_type ]->labels->singular_name;
+				$name_plural   = $restrictable_post_types[ $content_type ]->labels->name;
+				$message       = '';
+
+				foreach ( $bulk_actions as $bulk_action ) {
+
+					if ( isset( $_GET[ $bulk_action ] ) ) {
+
+						$processed = is_numeric( $_GET[ $bulk_action ] ) ? max( 0, (int) $_GET[ $bulk_action ] ) : 0;
+
+						if ( 0 === $processed ) {
+
+							switch ( $bulk_action ) {
+								case 'wc_memberships_force_content_public' :
+									/* translators: Placeholder: %s - post type name (plural) */
+									$message .= sprintf( __( 'No %s have been marked as public.', 'woocommerce-memberships' ), $name_plural );
+								break;
+								case 'wc_memberships_dont_force_content_public' :
+									/* translators: Placeholder: %s - post type name (plural) */
+									$message .= sprintf( __( 'No %s have been unmarked as public.', 'woocommerce-memberships' ), $name_plural );
+								break;
+							}
+
+						} else {
+
+							switch ( $bulk_action ) {
+								case 'wc_memberships_force_content_public' :
+									/* translators: Placeholder: %1$s - processed items (number), %2$s - post type name (singular), %3$s - post type name (plural) */
+									$message .= sprintf( _n( '%1$s %2$s has been marked as public and excluded from memberships restriction rules.', '%1$s %3$s have been marked as public and excluded from memberships restriction rules.', $processed, 'woocommerce-memberships' ), $processed, $name_singular, $name_plural );
+								break;
+								case 'wc_memberships_dont_force_content_public' :
+									/* translators: Placeholder: %1$s - processed items (number), %2$s - post type name (singular), %3$s - post type name (plural) */
+									$message .= sprintf( _n( '%1$s %2$s has been unmarked as public and will now follow any membership plan rules that may affect it.', '%1$s %3$s have been unmarked as public and will now follow any membership plan rules that may affect them.', $processed, 'woocommerce-memberships' ), $processed, $name_singular, $name_plural );
+								break;
+							}
+						}
+					}
+				}
+
+				if ( '' !== $message ) {
+					// duplicate %1$s is intended, to have notice-warning to work properly
+					printf( '<div class="notice notice-%1$s %1$s"><p>%2$s</p></div>', ! empty( $processed ) ? 'updated' : 'warning', esc_html( $message ) );
+				}
+			}
+		}
 	}
 
 
@@ -838,6 +1032,53 @@ class WC_Memberships_Admin {
 
 
 	/**
+	 * Adds a system status report block to the WooCommerce status page.
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function add_system_status_report_block() {
+
+		?>
+		<table id="wc-memberships" class="wc_status_table widefat" cellspacing="0">
+
+			<thead>
+				<tr>
+					<th colspan="3" data-export-label="Memberships">
+						<h2><?php esc_html_e( 'Memberships', 'woocommerce-memberships' ); ?> <?php echo wc_help_tip( __( 'This section shows troubleshooting information for WooCommerce Memberships.', 'woocommerce-memberships' ) ); ?></h2>
+					</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<?php
+
+				foreach ( \SkyVerge\WooCommerce\Memberships\System_Status_Report::get_system_status_report_data() as $export_key => $data ) :
+
+					if ( ! empty( $data['label'] ) && ! empty( $data['html'] ) ) :
+
+						?>
+						<tr data-export-label="<?php echo esc_html( $export_key ); ?>">
+							<td><?php echo esc_html( $data['label'] ); ?>:</td>
+							<td class="help"><?php echo ! empty( $data['help'] ) ? wc_help_tip( $data['help'] ) : '&nbsp;' ?></td>
+							<td><?php echo wp_kses_post( $data['html'] ); ?></td>
+						</tr>
+						<?php
+
+					endif;
+
+				endforeach;
+
+				?>
+			</tbody>
+
+		</table>
+		<?php
+	}
+
+
+	/**
 	 * Removes the duplicate submenu link for Memberships custom post type that is not being viewed.
 	 *
 	 * It's easier to add both submenu links via register_post_type() and conditionally remove them here than it is try to add them both correctly.
@@ -1015,6 +1256,7 @@ class WC_Memberships_Admin {
 	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-23-06}
 	 *
 	 * @since 1.6.0
+	 *
 	 * @param string $method method called
 	 * @param void|string|array|mixed $args optional argument(s)
 	 * @return null|void|mixed
@@ -1025,12 +1267,12 @@ class WC_Memberships_Admin {
 
 		switch ( $method ) {
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'get_valid_post_types_for_content_restriction' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules()' );
 				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules() : null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'get_valid_taxonomies_for_rule_type' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules class methods' );
 				switch ( isset( $args[0] ) ? $args[0] : $args ) {
@@ -1044,22 +1286,22 @@ class WC_Memberships_Admin {
 						return null;
 				}
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'get_valid_taxonomies_for_content_restriction' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules()' );
 				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules() : null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'get_valid_taxonomies_for_product_restriction' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_product_restriction_rules()' );
 				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_product_restriction_rules() : null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'get_valid_taxonomies_for_purchasing_discounts' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_purchasing_discounts_rules()' );
 				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_purchasing_discounts_rules() : null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'update_rules' :
 				_deprecated_function( "WC_Memberships_Admin::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::save_rules()' );
 				$post_id    = isset( $args[0] ) ? $args[0] : 0;
@@ -1067,44 +1309,40 @@ class WC_Memberships_Admin {
 				$target     = isset( $args[2] ) ? $args[2] : 'plan';
 				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::save_rules( $_POST, $post_id, $rule_types, $target ) : null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'load_meta_boxes' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->init_meta_boxes();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'render_order_data' :
 				_deprecated_function( $deprecated, '1.9.0', 'wc_memberships()->get_admin_instance()->get_orders_instance()->render_memberships_order_data()' );
 				wc_memberships()->get_admin_instance()->get_orders_instance()->render_memberships_order_data( isset( $args[0] ) ? $args[0] : $args );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'set_current_tab' :
 				_deprecated_function( $deprecated, '1.9.0', 'wc_memberships()->get_admin_instance()->get_current_tab()' );
 				return $this->get_current_tab( '' );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'update_custom_message' :
 				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_User_Messages::set_message()' );
 				$post_id  = isset( $args[0] ) ? $args[0] : 0;
 				$messages = isset( $args[1] ) ? $args[1] : array();
 				foreach ( $messages as $message_type ) {
-
 					$message      = '';
 					$message_code = "{$message_type}_message";
 					$use_custom   = 'no';
-
 					if ( ! empty( $_POST["_wc_memberships_{$message_code}"] ) ) {
 						$message    = wp_unslash( sanitize_post_field( 'post_content', $_POST["_wc_memberships_{$message_type}_message"], 0, 'db' ) );
 					}
 					if ( isset( $_POST["_wc_memberships_use_custom_{$message_code}"] ) && 'yes' === $_POST["_wc_memberships_use_custom_{$message_type}_message"] ) {
 						$use_custom = 'yes';
 					}
-
 					// save the message
 					\WC_Memberships_User_Messages::set_message( $message_code, $message );
-
 					// set the flag to use a custom message (for admin UI)
 					wc_memberships_set_content_meta( $post_id, "_wc_memberships_use_custom_{$message_code}", $use_custom );
 				}
@@ -1114,7 +1352,6 @@ class WC_Memberships_Admin {
 			case 'process_import_export_form' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
-
 		}
 
 		// you're probably doing it wrong

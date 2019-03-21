@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -41,6 +40,12 @@ class WC_Memberships_Rules {
 
 	/** @var array|\WC_Memberships_Membership_Plan_Rule[] queried rules (associative array with cache keys according to rule query) */
 	private $applied_rules = array();
+
+	/** @var array of product IDs that have been checked and are purchasable */
+	private $purchasable_product_ids = array();
+
+	/** @var array of product IDs that have been checked and aren't purchasable */
+	private $non_purchasable_product_ids = array();
 
 
 	/**
@@ -300,9 +305,18 @@ class WC_Memberships_Rules {
 	 * @param \WC_Memberships_Membership_Plan_Rule $rule a rule object
 	 * @return bool
 	 */
-	public function rule_content_type_exists( WC_Memberships_Membership_Plan_Rule $rule ) {
-		// content is either a taxonomy or a post type
-		return 'post_type' === $rule->get_content_type() ? post_type_exists( $rule->get_content_type_name() ) : taxonomy_exists( $rule->get_content_type_name() );
+	public function rule_content_type_exists( \WC_Memberships_Membership_Plan_Rule $rule ) {
+
+		$content_type      = $rule->get_content_type();
+		$content_type_name = $rule->get_content_type_name();
+
+		if ( 'post_type' === $content_type ) {
+			$exists = '' !== $content_type_name && post_type_exists( $content_type_name );
+		} else {
+			$exists = '' !== $content_type && '' !== $content_type_name && taxonomy_exists( $content_type_name );
+		}
+
+		return $exists;
 	}
 
 
@@ -436,7 +450,8 @@ class WC_Memberships_Rules {
 	 */
 	private function query_rules( array $args ) {
 
-		$applicable_rules = array();
+		$applicable_rules     = array();
+		$inherit_restrictions = wc_memberships()->get_restrictions_instance()->inherit_restriction_rules();
 
 		if ( ! empty( $this->rules ) ) {
 			foreach ( $this->rules as $key => $rule ) {
@@ -499,6 +514,7 @@ class WC_Memberships_Rules {
 
 					// Handle rule inheritance.
 					// For example, rules that apply to a taxonomy or post type must be applied to specific objects that match the taxonomy or post type.
+					// Or, when an option is set to have children content inherit restriction rules from their parent post.
 					if ( ! $args['exclude_inherited'] && $args['object_id'] ) {
 
 						switch ( $args['content_type'] ) {
@@ -577,11 +593,25 @@ class WC_Memberships_Rules {
 										}
 									}
 
-								} elseif ( empty( $rule_object_ids ) && $matches_content_type && $matches_content_type_name ) {
+								// Handle post-post type inheritance:
+								} elseif ( $matches_content_type && $matches_content_type_name ) {
 
-									// Handle post-post type inheritance:
-									// rules that apply to the same post type and have no object_ids specified, apply as well.
-									$apply_rule = true;
+									if ( empty( $rule_object_ids ) ) {
+
+										// rules that apply to the same post type and have no object_ids specified
+										$apply_rule = true;
+
+									} elseif ( $inherit_restrictions && 'content_restriction' === $rule_type ) {
+
+										$children = $rule->get_object_children_ids();
+
+										if ( ! empty( $children ) && in_array( $args['object_id'], $children, false ) ) {
+
+											// one of the object IDs of the rule is an ancestor of the queried post ID and we're allowing rules inheritance
+											$apply_rule = true;
+											break;
+										}
+									}
 								}
 
 							break;
@@ -1219,32 +1249,19 @@ class WC_Memberships_Rules {
 	 */
 	public function get_products_to_purchase_from_rules( $rules, $object = null, $rule_type = '', $args = array() ) {
 
+		$is_wc_version_lt_3_3 = Framework\SV_WC_Plugin_Compatibility::is_wc_version_lt( '3.3' );
+
 		$processed_plans = $filtered_products = $unfiltered_products = array();
 
+		// build an array of product IDs to check
 		foreach ( $rules as $rule ) {
 
 			// account for products being sent directly, so just check if they are purchasable
 			if ( is_numeric( $rule ) ) {
 
-				$product_id = (int) $rule;
-				$product    = wc_get_product( $product_id );
+				$unfiltered_products[] = (int) $rule;
 
-				if ( $product instanceof \WC_Product ) {
-
-					$unfiltered_products[] = $product_id;
-
-					if ( $product->is_purchasable() && $product->is_visible() ) {
-
-						// double-check for WC 3.0+, as a variation is always visible, but the parent could be hidden
-						if ( Framework\SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && $product->is_type( 'variation' ) && ! Framework\SV_WC_Product_Compatibility::get_parent( $product )->is_visible() ) {
-							continue;
-						}
-
-						$products[] = $product_id;
-					}
-				}
-
-				// normal handling: evaluate a rule
+			// normal handling: evaluate a rule
 			} elseif ( $rule instanceof \WC_Memberships_Membership_Plan_Rule ) {
 
 				// skip further checks if:
@@ -1258,30 +1275,57 @@ class WC_Memberships_Rules {
 
 				if ( $plan && $plan->has_products() ) {
 
-					foreach ( $plan->get_product_ids() as $product_id ) {
-
-						$product = wc_get_product( $product_id );
-
-						if ( $product instanceof \WC_Product ) {
-
-							$unfiltered_products[] = (int) $product_id;
-
-							if ( $product->is_purchasable() && $product->is_visible() ) {
-
-								// double-check for WC 3.0+, as a variation is always visible, but the parent could be hidden
-								if ( Framework\SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && $product->is_type( 'variation' ) && ! Framework\SV_WC_Product_Compatibility::get_parent( $product )->is_visible() ) {
-									continue;
-								}
-
-								$filtered_products[] = (int) $product_id;
-							}
-						}
+					foreach( $plan->get_product_ids() as $unfiltered_product_id ) {
+						$unfiltered_products[] = $unfiltered_product_id;
 					}
 				}
 
 				// mark this plan as processed, we do not need look into it any further, because we already know if it has any products that grant access or not
 				$processed_plans[] = $rule->get_membership_plan_id();
 			}
+		}
+
+		// check each product ID to determine if it's purchasable & visible
+		foreach ( $unfiltered_products as $key => $product_id ) {
+
+			// if a product is already known to be non-purchasable, skip it entirely
+			if ( in_array( $product_id, $this->non_purchasable_product_ids, true ) ) {
+				continue;
+			}
+
+			// if the product ID hasn't been confirmed either way, do some expensive checking
+			if ( ! in_array( $product_id, $this->purchasable_product_ids, true ) ) {
+
+				$product = wc_get_product( $product_id );
+
+				// bail if the product ID is invalid
+				if ( ! $product instanceof \WC_Product ) {
+					unset( $unfiltered_products[ $key ] );
+					continue;
+				}
+
+				// WC < 3.3 requires us to check a variation's parent's visibility
+				if ( $is_wc_version_lt_3_3 && $product->is_type( 'variation' ) && ( $parent = Framework\SV_WC_Product_Compatibility::get_parent( $product ) ) ) {
+					$is_visible = $parent->is_visible();
+				} else {
+					$is_visible = $product->is_visible();
+				}
+
+				// store the product as purchasable so it isn't re-checked
+				if ( $is_visible && $product->is_purchasable()  ) {
+
+					$this->purchasable_product_ids[] = $product_id;
+
+				// otherwise, store as non-purchasable and bail
+				} else {
+
+					$this->non_purchasable_product_ids[] = $product_id;
+					continue;
+				}
+			}
+
+			// finally, add the purchasable ID to the list of products
+			$filtered_products[] = $product_id;
 		}
 
 		unset( $processed_plans );
@@ -1325,21 +1369,21 @@ class WC_Memberships_Rules {
 
 		switch ( $method ) {
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_content_restriction_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_content_restriction_rules()', '1.9.0', 'WC_Memberships_Rules::get_rules()' );
 
 				return isset( $args[0] ) ? $this->get_rules( $args[0] ) : $this->get_rules();
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_the_product_restriction_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_the_product_restriction_rules()', '1.9.0', 'WC_Memberships_Rules::get_product_restriction_rules()' );
 
 				return $this->get_product_restriction_rules( isset( $args[0] ) ? $args[0] : $args );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_public_posts' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_public_posts()', '1.9.0', 'get_posts()' );
@@ -1351,7 +1395,7 @@ class WC_Memberships_Rules {
 					'meta_value'     => 'yes',
 				) );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_public_products' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_public_products()', '1.9.0', 'get_posts()' );
@@ -1363,7 +1407,7 @@ class WC_Memberships_Rules {
 					'meta_value'     => 'yes',
 				) );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_user_content_restriction_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_user_content_restriction_rules()', '1.9.0', 'WC_Memberships_Rules::get_rules()' );
@@ -1383,7 +1427,7 @@ class WC_Memberships_Rules {
 
 				return $user_rules;
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_user_product_restriction_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::get_user_product_restriction_rules()', '1.9.0', 'WC_Memberships_Rules::get_rules()' );
@@ -1413,21 +1457,21 @@ class WC_Memberships_Rules {
 
 				return $user_rules;
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'product_has_member_discount' :
 
 				_deprecated_function( 'WC_Memberships_Rules::product_has_member_discount()', '1.9.0', 'WC_Memberships_Rules::product_has_purchasing_discount_rules()' );
 
 				return $this->product_has_purchasing_discount_rules( isset( $args[0] ) ? $args[0] : $args );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'user_has_content_access_from_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::user_has_content_access_from_rules()', '1.9.0' );
 
 				list( $user_id, $rules ) = $args;
-				$object_id = ! empty( $args[2] ) ? $args[2] : null;
 
+				$object_id  = ! empty( $args[2] ) ? $args[2] : null;
 				$has_access = true;
 
 				if ( empty( $user_id ) ) {
@@ -1440,6 +1484,7 @@ class WC_Memberships_Rules {
 
 					/** @type \WC_Memberships_Membership_Plan_Rule[] $rules */
 					foreach ( $rules as $rule ) {
+
 						if ( empty( $object_id ) && $rule->has_object_ids() ) {
 							continue;
 						} elseif ( wc_memberships_is_user_active_or_delayed_member( $user_id, $rule->get_membership_plan_id() ) ) {
@@ -1451,7 +1496,7 @@ class WC_Memberships_Rules {
 
 				return $has_access;
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'user_has_product_member_discount' :
 
 				_deprecated_function( 'WC_Memberships_Rules::user_has_product_member_discount()', '1.9.0' );
@@ -1461,7 +1506,9 @@ class WC_Memberships_Rules {
 				$rules = $this->get_user_product_purchasing_discount_rules( $user_id, $product_id );
 
 				if ( ! empty( $rules ) ) {
+
 					foreach ( $rules as $key => $rule ) {
+
 						if ( ! $rule->is_active() || ! wc_memberships_is_user_active_member( $user_id, $rule->get_membership_plan_id() ) ) {
 							unset( $rules[ $key ] );
 						}
@@ -1470,14 +1517,14 @@ class WC_Memberships_Rules {
 
 				return ! empty( $rules );
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'user_has_product_view_access_from_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::user_has_product_view_access_from_rules()', '1.9.0' );
 
 				list( $user_id, $rules ) = $args;
-				$object_id = ! empty( $args[2] ) ? $args[2] : null;
 
+				$object_id  = ! empty( $args[2] ) ? $args[2] : null;
 				$has_access = true;
 
 				if ( empty( $user_id ) ) {
@@ -1488,6 +1535,7 @@ class WC_Memberships_Rules {
 
 					/** @type \WC_Memberships_Membership_Plan_Rule[] $rules */
 					foreach ( $rules as $rule ) {
+
 						if ( ! $object_id && $rule->has_object_ids() ) {
 							continue;
 						} elseif ( 'view' === $rule->get_access_type() ) {
@@ -1497,7 +1545,9 @@ class WC_Memberships_Rules {
 					}
 
 					if ( $user_id && ! $has_access ) {
+
 						foreach ( $rules as $rule ) {
+
 							if ( ! $object_id && $rule->has_object_ids() ) {
 								continue;
 							} elseif ( in_array( $rule->get_access_type(), array( 'view', 'purchase' ), true ) && wc_memberships_is_user_active_or_delayed_member( $user_id, $rule->get_membership_plan_id() ) ) {
@@ -1510,7 +1560,7 @@ class WC_Memberships_Rules {
 
 				return $has_access;
 
-			/* @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/* @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'user_has_product_purchase_access_from_rules' :
 
 				_deprecated_function( 'WC_Memberships_Rules::user_has_product_purchase_access_from_rules()', '1.9.0' );
@@ -1527,6 +1577,7 @@ class WC_Memberships_Rules {
 
 					/** @type \WC_Memberships_Membership_Plan_Rule[] $rules */
 					foreach ( $rules as $rule ) {
+
 						if ( 'purchase' === $rule->get_access_type() ) {
 							$has_access = false;
 							break;
@@ -1534,7 +1585,9 @@ class WC_Memberships_Rules {
 					}
 
 					if ( ! $has_access ) {
+
 						foreach ( $rules as $rule ) {
+
 							if ( 'purchase' === $rule->get_access_type() && wc_memberships_is_user_active_or_delayed_member( $user_id, $rule->get_membership_plan_id() ) ) {
 								$has_access = true;
 								break;

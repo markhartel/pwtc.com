@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -127,11 +126,14 @@ class WC_Memberships_Integration_Subscriptions_User_Membership extends \WC_Membe
 	/**
 	 * Flags the subscription tied membership to have an installment plan.
 	 *
+	 * Note: once set, normally this flag should persist even after a subscription link has been removed.
+	 * @see \WC_Memberships_Integration_Subscriptions_User_Membership::remove_installment_plan() for forcefully removing this flag.
+	 *
 	 * @since 1.7.0
 	 *
 	 * @return bool
 	 */
-	private function maybe_set_installment_plan() {
+	public function maybe_set_installment_plan() {
 
 		$plan = $this->get_plan();
 
@@ -154,6 +156,24 @@ class WC_Memberships_Integration_Subscriptions_User_Membership extends \WC_Membe
 
 
 	/**
+	 * Removes the flag that signals that the membership uses an installment plan via subscription.
+	 *
+	 * Note: it is intended for the post meta holding this status flag to exist after a subscription link has been removed.
+	 * Removing this flag should be intentional, possibly when the plan has been reassigned or its details changed.
+	 *
+	 * @see \WC_Memberships_Integration_Subscriptions_User_Membership::maybe_set_installment_plan() counterpart
+	 *
+	 * @since 1.12.3
+	 *
+	 * @return bool success
+	 */
+	public function remove_installment_plan() {
+
+		return delete_post_meta( $this->id, $this->has_installment_plan_meta );
+	}
+
+
+	/**
 	 * Checks whether the membership is tied to a subscription.
 	 *
 	 * @since 1.7.0
@@ -171,7 +191,7 @@ class WC_Memberships_Integration_Subscriptions_User_Membership extends \WC_Membe
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param string|int $subscription_id the subscription ID.
+	 * @param string|int $subscription_id the subscription ID
 	 * @return bool success
 	 */
 	public function set_subscription_id( $subscription_id ) {

@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -140,6 +138,8 @@ class WC_Settings_Memberships extends \WC_Settings_Page {
 				'<strong><code>{products}</code></strong>'  => __( '%s automatically inserts the product(s) needed to gain access.', 'woocommerce-memberships' ),
 				/* translators: Placeholder: %s shows a message merge tag to be used */
 				'<strong><code>{date}</code></strong>'      => __( '%s inserts the date when the member will gain access to delayed content.', 'woocommerce-memberships' ),
+				/* translators: Placeholder: %s shows a message merge tag to be used */
+				'<strong><code>{discount}</code></strong>'  => __( '%s inserts the highest product discount obtainable by becoming a member.', 'woocommerce-memberships' ),
 				/* translators: Placeholder: %s shows a message merge tag to be used */
 				'<strong><code>{login_url}</code></strong>' => __( '%s inserts the URL to the "My Account" page with the login form.', 'woocommerce-memberships' ),
 				/* translators: Placeholder: %s shows a message merge tag to be used */
@@ -523,6 +523,14 @@ class WC_Settings_Memberships extends \WC_Settings_Page {
 					'name'     => __( 'Show Excerpts', 'woocommerce-memberships' ),
 					'desc'     => __( 'If enabled, an excerpt of the protected content will be displayed to non-members & search engines.', 'woocommerce-memberships' ),
 					'default'  => 'yes',
+				),
+
+				array(
+					'type'     => 'checkbox',
+					'id'       => 'wc_memberships_inherit_restrictions',
+					'name'     => __( 'Inherit Parent Restrictions', 'woocommerce-memberships' ),
+					'desc'     => __( 'If enabled, hierarchical post types such as pages will apply restriction rules to their children.', 'woocommerce-memberships' ),
+					'default'  => 'no',
 				),
 
 				array(

@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -99,36 +100,24 @@ class AJAX {
 
 		check_ajax_referer( 'search-teams', 'security' );
 
-		$search_term = (string) wc_clean( \SV_WC_Helper::get_request( 'term' ) );
+		$search_term = (string) wc_clean( Framework\SV_WC_Helper::get_request( 'term' ) );
 		$results     = array();
 
-		if ( ! $search_term ) {
-			wp_send_json( $results );
-		}
+		if ( ! empty( $search_term ) ) {
 
-		$team_posts = get_posts( array(
-			'post_type' => 'wc_memberships_team',
-			'status'    => 'any',
-			'fields'    => 'ids',
-			'nopaging'  => true,
-			's'         => $search_term,
-		) );
+			$team_posts = get_posts( array(
+				'post_type' => 'wc_memberships_team',
+				'status'    => 'any',
+				'fields'    => 'ids',
+				'nopaging'  => true,
+				's'         => $search_term,
+			) );
 
-		if ( ! empty( $team_posts ) ) {
 			foreach ( $team_posts as $team_id ) {
 
-				$team = wc_memberships_for_teams_get_team( $team_id );
+				if ( $team = wc_memberships_for_teams_get_team( $team_id ) ) {
 
-				if ( $team ) {
-
-					/* translators: %1$s - team name, %2$s - team id */
-					$team_string = sprintf(
-						esc_html__( '%1$s (#%2$s)', 'woocommerce-memberships-for-teams' ),
-						$team->get_name(),
-						$team_id
-					);
-
-					$results[ $team_id ] = $team_string;
+					$results[ $team_id ] = esc_html( $team->get_formatted_name() );
 				}
 			}
 		}
@@ -148,7 +137,7 @@ class AJAX {
 	 */
 	public function get_existing_user_membership_id() {
 
-				check_ajax_referer( 'get-existing-user-membership-id', 'security' );
+		check_ajax_referer( 'get-existing-user-membership-id', 'security' );
 
 		$user_id            = (int) $_GET['user_id'];
 		$team_id            = (int) $_GET['team_id'];

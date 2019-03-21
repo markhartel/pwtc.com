@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -88,8 +87,7 @@ class WC_Memberships_Integration_Bbpress {
 
 					// check for force public flag
 					if ( ! $can_view_topic ) {
-						/* this filter is first used in includes/wc-memberships-capabilities.php */
-						$can_view_topic = (bool) apply_filters( 'wc_memberships_is_post_public', 'yes' === wc_memberships_get_content_meta( $post->ID, '_wc_memberships_force_public' ), $post->ID );
+						$can_view_topic = wc_memberships()->get_restrictions_instance()->is_post_public( $post->ID );
 					}
 
 					$all_caps[ $cap ] = $can_view_topic;

@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\Meta_Boxes;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -83,10 +84,10 @@ class Team_Billing_Details {
 		if ( $order ) {
 
 			/* translators: Placeholder: %s - order number */
-			$order_ref       = '<a href="' . esc_url( get_edit_post_link( \SV_WC_Order_Compatibility::get_prop( $order, 'id' ) ) ) . '">' . sprintf(  esc_html__( 'Order %s', 'woocommerce-memberships-for-teams' ), $order->get_order_number() ) . '</a>';
+			$order_ref       = '<a href="' . esc_url( get_edit_post_link( Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' ) ) ) . '">' . sprintf(  esc_html__( 'Order %s', 'woocommerce-memberships-for-teams' ), $order->get_order_number() ) . '</a>';
 			$billing_fields  = array(
 				__( 'Purchased in:', 'woocommerce-memberships-for-teams' ) => $order_ref,
-				__( 'Order Date:', 'woocommerce-memberships-for-teams' )   => date_i18n( wc_date_format(), \SV_WC_Order_Compatibility::get_date_created( $order )->getTimestamp() ),
+				__( 'Order Date:', 'woocommerce-memberships-for-teams' )   => date_i18n( wc_date_format(), Framework\SV_WC_Order_Compatibility::get_date_created( $order )->getTimestamp() ),
 				__( 'Order Total:', 'woocommerce-memberships-for-teams' )  => $order->get_formatted_order_total(),
 			);
 
@@ -166,41 +167,20 @@ class Team_Billing_Details {
 
 		?><br>
 		<span class="wc-memberships-for-teams-edit-product-link-field">
-
-			<?php if ( \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) : ?>
-
-				<select
-					class="wc-product-search js-search-products"
-					id="_product_id"
-					name="_product_id"
-					style="width:100%;"
-					data-placeholder="<?php esc_attr_e( 'Select product&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
-					data-action="woocommerce_json_search_products_and_variations"
-					data-exclude="wc_memberships_for_teams_non_team_products">
-					<option value="<?php echo esc_attr( $product_id ); ?>" selected="selected"><?php echo wp_kses_post( $product_name ); ?></option>
-				</select>
-
-			<?php else : ?>
-
-				<input
-					type="hidden"
-					class="wc-product-search js-search-products"
-					id="_product_id"
-					name="_product_id"
-					style="width:100%;"
-					data-placeholder="<?php esc_attr_e( 'Select product&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
-					data-action="woocommerce_json_search_products_and_variations"
-					data-exclude="wc_memberships_for_teams_non_team_products"
-					data-selected="<?php echo esc_attr( wp_kses_post( $product_name ) ); ?>"
-					value="<?php echo esc_attr( $product_id ); ?>"
-				/>
-
-			<?php endif; ?>
-
+			<select
+				class="wc-product-search js-search-products"
+				id="_product_id"
+				name="_product_id"
+				style="width:100%;"
+				data-placeholder="<?php esc_attr_e( 'Select product&hellip;', 'woocommerce-memberships-for-teams' ); ?>"
+				data-action="woocommerce_json_search_products_and_variations"
+				data-exclude="wc_memberships_for_teams_non_team_products">
+				<option value="<?php echo esc_attr( $product_id ); ?>" selected="selected"><?php echo wp_kses_post( $product_name ); ?></option>
+			</select>
 		</span>
 		<?php
 
-		\SV_WC_Helper::render_select2_ajax();
+		Framework\SV_WC_Helper::render_select2_ajax();
 
 		$input .= ob_get_clean();
 
@@ -233,7 +213,7 @@ class Team_Billing_Details {
 
 			try {
 				$team->set_product_id( $product_id );
-			} catch ( \SV_WC_Plugin_Exception $e ) {
+			} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 				wc_memberships_for_teams()->get_message_handler()->add_error( $e->getMessage() );
 			}
 

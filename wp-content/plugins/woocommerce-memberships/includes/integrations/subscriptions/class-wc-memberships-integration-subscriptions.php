@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1099,7 +1098,7 @@ class WC_Memberships_Integration_Subscriptions {
 	/**
 	 * Removes cached value when a membership is unlinked from a subscription.
 	 *
-	 * TODO remove this method by version 1.12.0 {FN 2018-08-14}
+	 * TODO remove this method by version 1.13.0 {FN 2018-08-14}
 	 *
 	 * @internal
 	 *

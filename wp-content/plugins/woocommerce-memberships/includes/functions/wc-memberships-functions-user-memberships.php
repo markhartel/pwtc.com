@@ -16,15 +16,14 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 
 /**
@@ -197,7 +196,7 @@ function wc_memberships_user_can( $user_id, $action, $target, $when = '' ) {
  *
  * @param array $args array of arguments
  * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
- * @throws \SkyVerge\WooCommerce\PluginFramework\v5_3_0\SV_WC_Plugin_Exception may create an exception on errors
+ * @throws \SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin_Exception may create an exception on errors
  * @return \WC_Memberships_User_Membership
  */
 function wc_memberships_create_user_membership( $args = array(), $action = 'create' ) {

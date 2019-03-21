@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -80,6 +79,15 @@ class WC_Memberships_User_Memberships {
 		add_action( 'wc_memberships_user_membership_expiry',           array( $this, 'trigger_expiration_events' ), 10, 1 );
 		add_action( 'wc_memberships_user_membership_expiring_soon',    array( $this, 'trigger_expiration_events' ), 10, 1 );
 		add_action( 'wc_memberships_user_membership_renewal_reminder', array( $this, 'trigger_expiration_events' ), 10, 1 );
+
+		// schedule recurring cron to activate delayed User Memberships
+		if ( ! (bool) wp_next_scheduled( 'wc_memberships_activate_delayed_user_memberships', array() ) ) {
+
+			wp_schedule_event( current_time( 'timestamp', true ) + MINUTE_IN_SECONDS, 'hourly', 'wc_memberships_activate_delayed_user_memberships', array() );
+		}
+
+		// activate delayed User Memberships
+		add_action( 'wc_memberships_activate_delayed_user_memberships', array( $this, 'activate_delayed_user_memberships' ) );
 	}
 
 
@@ -608,7 +616,7 @@ class WC_Memberships_User_Memberships {
 				$user_membership = $this->get_user_membership( $user_id, $membership_plan );
 				$is_member       = (bool) $user_membership;
 
-				if ( $is_member && $must_be_active_member ) {
+				if ( $user_membership && $must_be_active_member ) {
 
 					$is_member = $user_membership->is_active() && $user_membership->is_in_active_period();
 
@@ -1058,10 +1066,14 @@ class WC_Memberships_User_Memberships {
 
 					if ( 'delayed' === $old_status ) {
 
-						// For sanity, delayed membership which are now active
-						// shouldn't ever had any of these set.
+						// delayed membership which are now active shouldn't ever had any of these set:
 						$user_membership->delete_paused_date();
 						$user_membership->delete_paused_intervals();
+
+						// trigger activation email
+						if ( $emails_instance = wc_memberships()->get_emails_instance() ) {
+							$emails_instance->send_membership_activated_email( $user_membership->get_id() );
+						}
 
 					} elseif ( $user_membership->get_paused_date() ) {
 
@@ -1074,6 +1086,30 @@ class WC_Memberships_User_Memberships {
 						$user_membership->delete_paused_date();
 
 					} elseif ( 'cancelled' === $old_status ) {
+
+						$cancelled_date = $user_membership->get_cancelled_date( 'timestamp' );
+
+						// create a paused interval spanning from the cancellation date to reactivation date (now)
+						if ( null !== $cancelled_date ) {
+
+							$paused_intervals = $user_membership->get_paused_intervals();
+
+							// make sure the last interval is closed
+							if ( ! empty( $paused_intervals ) ) {
+
+								end( $paused_intervals );
+								$last_resumed = current( $paused_intervals );
+
+								if ( empty( $last_resumed ) )  {
+									$user_membership->set_paused_interval( 'end', $cancelled_date );
+								}
+							}
+
+							$user_membership->set_paused_interval( 'start', $cancelled_date );
+						}
+
+						/* @see \WC_Memberships_User_Membership::get_total_time() this may be helpful to calculate drip */
+						$user_membership->set_paused_interval( 'end', current_time( 'timestamp', true ) );
 
 						// restore expiration events if previously cancelled
 						$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
@@ -1141,6 +1177,66 @@ class WC_Memberships_User_Memberships {
 		$this->membership_status_transition_note = null;
 
 		return $note;
+	}
+
+
+	/**
+	 * Activates delayed memberships, if found.
+	 *
+	 * Used mainly as a callback for a recurring WP Cron scheduled action.
+	 * Third parties can use this public method to manually activate delayed memberships too.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array $args optional arguments (may be used in callback or directly: accepts WP_Query arguments)
+	 */
+	public function activate_delayed_user_memberships( $args = array() ) {
+
+		if ( ! is_array( $args ) ) {
+			$args = array();
+		}
+
+		$args['post_type']   = 'wc_user_membership';
+		$args['post_status'] = 'wcm-delayed';
+
+		/**
+		 * Filters the number of delayed memberships that will be queried for activation on each batch.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param int $batch default 20
+		 * @param array $args optional arguments
+		 */
+		$args['posts_per_page'] = max( 1, (int) apply_filters( 'wc_memberships_activate_delayed_user_memberships_batch', ! empty( $args['posts_per_page'] ) ? (int) $args['posts_per_page'] : 20, $args ) );
+
+		// set meta query to look for memberships with a start date in the past
+		if ( ! isset( $args['meta_query'] ) || ! is_array( $args['meta_query'] ) ) {
+			$args['meta_query'] = array();
+		}
+
+		$args['meta_query'][] = array(
+			'key'     => '_start_date',
+			'value'   => date( 'Y-m-d H:i:s', current_time( 'timestamp', true ) ),
+			'compare' => '<=',
+			'type'    => 'DATETIME'
+		);
+
+		if ( count( $args['meta_query'] ) > 1 ) {
+			$args['meta_query']['relation'] = 'AND';
+		}
+
+		// look for memberships whose status is delayed and the start date is set in the past or matches now
+		$user_membership_posts = get_posts( $args );
+
+		foreach ( $user_membership_posts as $post ) {
+
+			$user_membership = $this->get_user_membership( $post );
+
+			// this simple check will also trigger an evaluation if the membership should stay delayed or activated instead
+			if ( $user_membership && ! $user_membership->is_delayed() ) {
+				$this->prune_object_caches( $user_membership );
+			}
+		}
 	}
 
 

@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 /**
  * Manage Membership Plan Rules from WP CLI.
@@ -59,13 +58,13 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wc memberships plan rule create --plan=123 --type="content_restriction" --content="post_type:post"
+	 *     wp wc memberships plan rule create --plan=123 --type="content_restriction" --target="post_type:post"
 	 *
-	 *     wp wc memberships plan rule create --name="Bronze Plan" --type="purchasing_discount" --content="taxonomy:product_cat" --ids=11,12,13 --discount="10%"
+	 *     wp wc memberships plan rule create --name="Bronze Plan" --type="purchasing_discount" --target="taxonomy:product_cat" --ids=11,12,13 --discount="10%"
 	 *
-	 *     wp wc memberships plan rule create --plan="Silver Plan" --type="product_restriction" --content="post_type:product" --ids=168,169 --access_type="purchase"
+	 *     wp wc memberships plan rule create --plan="Silver Plan" --type="product_restriction" --target="post_type:product" --ids=168,169 --access_type="purchase"
 	 *
-	 *     wp wc memberships plan rule create --name="Gold Plan" --type="purchasing_discount" --content="post_type:product" --discount=20 --exclude_trial="yes"
+	 *     wp wc memberships plan rule create --name="Gold Plan" --type="purchasing_discount" --target="post_type:product" --discount=20 --exclude_trial="yes"
 	 *
 	 *
 	 * @since 1.9.0
@@ -118,7 +117,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 			$content_type_name = isset( $target[1] ) ? $target[1] : null;
 
 			// ensure that the content type is coherent with the rule type
-			if ( ! $content_type || $content_type_name ) {
+			if ( ! $content_type || ! $content_type_name ) {
 				throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_rule_content', sprintf( 'The specified target combination for this rule does not seem valid: "%s".', $data['target'] ) );
 			} elseif ( ! in_array( $content_type, array( 'post_type', 'taxonomy' ), true ) ) {
 				throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_rule_content_type', sprintf( 'Invalid content type "%s". Must be one of "post_type" or "taxonomy".', $content_type ) );
@@ -337,13 +336,13 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 			if ( ! empty( $data['target'] ) ) {
 
 				// e.g. post_type:post, or taxonomy:product_cat
-				$target            = explode( ':', $data['target'] );
+				$target            = explode( ':', trim( $data['target'] ) );
 				$content_type      = isset( $target[0] ) ? $target[0] : null;
 				$content_type_name = isset( $target[1] ) ? $target[1] : null;
 				$rule_type         = $rule->get_rule_type();
 
 				// ensure that the content type is coherent with the rule type
-				if ( ! $content_type || $content_type_name ) {
+				if ( ! $content_type || ! $content_type_name ) {
 					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_rule_content', sprintf( 'The specified target combination for this rule does not seem valid: "%s".', $data['target'] ) );
 				} elseif ( ! in_array( $content_type, array( 'post_type', 'taxonomy' ), true ) ) {
 					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_rule_content_type', sprintf( 'Invalid content type "%s". Must be one of "post_type" or "taxonomy".', $content_type ) );

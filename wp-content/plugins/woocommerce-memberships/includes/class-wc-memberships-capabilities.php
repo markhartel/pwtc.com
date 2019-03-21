@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -92,7 +91,7 @@ class WC_Memberships_Capabilities {
 						$user_id = (int) $args[1];
 						$post_id = (int) $args[2];
 
-						if ( $this->is_post_public( $post_id ) ) {
+						if ( wc_memberships()->get_restrictions_instance()->is_post_public( $post_id ) ) {
 							$all_caps[ $cap ] = true;
 							break;
 						}
@@ -112,7 +111,7 @@ class WC_Memberships_Capabilities {
 						$user_id    = (int) $args[1];
 						$product_id = (int) $args[2];
 
-						if ( $this->is_post_public( $product_id ) ) {
+						if ( wc_memberships()->get_restrictions_instance()->is_product_public( $product_id ) ) {
 							$all_caps[ $cap ] = true;
 							break;
 						}
@@ -132,7 +131,7 @@ class WC_Memberships_Capabilities {
 						$user_id = (int) $args[1];
 						$post_id = (int) $args[2];
 
-						if ( $this->is_post_public( $post_id ) ) {
+						if ( wc_memberships()->get_restrictions_instance()->is_product_public( $post_id ) ) {
 							$all_caps[ $cap ] = true;
 							break;
 						}
@@ -308,7 +307,7 @@ class WC_Memberships_Capabilities {
 						$post_id    = (int) $args[2];
 						$has_access = false;
 
-						if ( $this->is_post_public( $post_id ) ) {
+						if ( wc_memberships()->get_restrictions_instance()->is_post_public( $post_id ) ) {
 							$all_caps[ $cap ] = true;
 							break;
 						}
@@ -334,7 +333,7 @@ class WC_Memberships_Capabilities {
 						$post_id    = (int) $args[2];
 						$has_access = false;
 
-						if ( $this->is_post_public( $post_id ) ) {
+						if ( wc_memberships()->get_restrictions_instance()->is_product_public( $post_id ) ) {
 							$all_caps[ $cap ] = true;
 							break;
 						}
@@ -439,42 +438,6 @@ class WC_Memberships_Capabilities {
 	 */
 	private function can_manage_woocommerce( $caps ) {
 		return isset( $caps['manage_woocommerce'] ) && $caps['manage_woocommerce'];
-	}
-
-
-	/**
-	 * Check if a given post or page is public and not subject to restrictions.
-	 *
-	 * This can happen either by an except set via post meta on the post, or if redirection is used and the content restricted page must be shown.
-	 *
-	 * @since 1.3.0
-	 *
-	 * @param int $post_id ID of a post, page or product
-	 * @return bool
-	 */
-	private function is_post_public( $post_id ) {
-
-		$is_public = 'yes' === wc_memberships_get_content_meta( $post_id, '_wc_memberships_force_public', true );
-
-		/**
-		 * Filters whether a post should be public (ie. not subject to any restriction for the current user or anonymous guest).
-		 *
-		 * @since 1.9.0
-		 *
-		 * @param bool $is_public whether the post is public (default false unless explicitly marked as public by an admin)
-		 * @param int $post_id the ID of the post being evaluated
-		 */
-		$is_public = (bool) apply_filters( 'wc_memberships_is_post_public', $is_public, $post_id );
-
-		// if using redirect mode, the redirect page must be made public regardless
-		if (    ! $is_public
-		     &&   'page' === get_post_type( $post_id )
-		     &&    wc_memberships()->get_restrictions_instance()->is_restriction_mode( 'redirect' ) ) {
-
-			$is_public = (int) $post_id === wc_memberships()->get_restrictions_instance()->get_restricted_content_redirect_page_id();
-		}
-
-		return $is_public;
 	}
 
 
@@ -858,7 +821,7 @@ class WC_Memberships_Capabilities {
 								// - if this rule has higher priority than last rule, override the previous access time
 								// - if this has the same priority as the last rule, and grants earlier access, override previous access time
 								if (    ( $rule_priority > $last_priority )
-								        || ( $rule_priority === $last_priority && ( ! $access_time || $rule_access_time < $access_time ) ) ) {
+								     || ( $rule_priority === $last_priority && ( ! $access_time || $rule_access_time < $access_time ) ) ) {
 
 									$access_time   = $rule_access_time;
 									$last_priority = $rule_priority;
@@ -902,7 +865,7 @@ class WC_Memberships_Capabilities {
 	 */
 	private function user_can_view( $user_id, $post_id ) {
 
-		if ( $this->is_post_public( $post_id ) ) {
+		if ( wc_memberships()->get_restrictions_instance()->is_post_public( $post_id ) ) {
 			$can_view = true;
 		} else {
 			if ( 'product' === get_post_type( $post_id ) ) {
@@ -929,7 +892,7 @@ class WC_Memberships_Capabilities {
 	 */
 	private function user_can_purchase( $user_id, $product_id )  {
 
-		if ( $this->is_post_public( $product_id ) ) {
+		if ( wc_memberships()->get_restrictions_instance()->is_product_public( $product_id ) ) {
 			$can_purchase = true;
 		} else {
 			$rules        = wc_memberships()->get_rules_instance()->get_product_restriction_rules( $product_id );

@@ -2,7 +2,8 @@
 Author: skyverge
 Tags: woocommerce, memberships, teams
 Requires at least: 4.6
-Tested up to: 4.9.8
+Tested up to: 5.1.1
+Requires PHP: 5.3
 
 See https://docs.woocommerce.com/document/teams-for-woocommerce-memberships/ for full documentation.
 

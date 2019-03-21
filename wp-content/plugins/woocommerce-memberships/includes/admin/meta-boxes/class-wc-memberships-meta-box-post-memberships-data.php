@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -149,9 +147,9 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends \WC_Memberships_Meta
 			// grab variables for the checkbox field and the custom message field below
 			$message_code            = \WC_Memberships_User_Messages::get_message_code_shorthand_by_post_type( $post );
 			$use_custom_message_meta = "_wc_memberships_use_custom_{$message_code}_message";
-			$use_custom              = $this->get_use_custom_message_flag( $post->ID, $message_code );
+			$use_custom              = 'yes' === wc_memberships_get_content_meta( $post, $use_custom_message_meta );
 			$message_meta            = "_wc_memberships_{$message_code}_message";
-			$message                 = $this->get_custom_message( $post->ID, $message_code );
+			$message                 = wc_memberships_get_content_meta( $post, $message_meta );
 
 			woocommerce_wp_checkbox( array(
 				'id'          => $use_custom_message_meta,
@@ -197,80 +195,15 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends \WC_Memberships_Meta
 
 		\WC_Memberships_Admin_Membership_Plan_Rules::save_rules( $_POST, $post_id, array( 'content_restriction' ), 'post' );
 
-		wc_memberships_set_content_meta( $post_id, '_wc_memberships_force_public', isset( $_POST[ '_wc_memberships_force_public' ] ) ? 'yes' : 'no' );
+		if ( ! empty( $_POST['_wc_memberships_force_public'] ) ) {
+			wc_memberships()->get_restrictions_instance()->set_content_public( $post );
+		} else {
+			wc_memberships()->get_restrictions_instance()->unset_content_public( $post );
+		}
 
 		$message_code = \WC_Memberships_User_Messages::get_message_code_shorthand_by_post_type( $post );
 
 		$this->update_custom_message( $post_id, array( $message_code ) );
-
-		// TODO remove legacy meta - these could be dropped by version 1.12.0 {FN 2017-08-03}
-		if ( 'content_restricted' !== $message_code ) {
-			wc_memberships_delete_content_meta( $post_id, '_wc_memberships_use_custom_content_restricted_message' );
-			wc_memberships_delete_content_meta( $post_id, '_wc_memberships_content_restricted_message' );
-		}
-	}
-
-
-	/**
-	 * Returns the use message flag for the post.
-	 *
-	 * This tries to retrieve a legacy custom message flag first.
-	 *
-	 * TODO drop this method by version 1.12.0 and replace by just calling wc_memberships_get_content_meta() on the new meta in use {FN 2017-08-03}
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param int $post_id the current post ID where the meta box appears
-	 * @param string $message_code message code tried to be retrieved
-	 * @return bool
-	 */
-	private function get_use_custom_message_flag( $post_id, $message_code ) {
-
-		$use_custom_message_meta        = "_wc_memberships_use_custom_{$message_code}_message";
-		$use_custom_message_legacy_meta = '_wc_memberships_use_custom_content_restricted_message';
-		$legacy_flag                    = wc_memberships_get_content_meta( $post_id, $use_custom_message_legacy_meta );
-
-		if ( 'yes' === $legacy_flag ) {
-			$use_custom_message = true;
-		} else {
-			$use_custom_message = 'yes' === wc_memberships_get_content_meta( $post_id, $use_custom_message_meta );
-		}
-
-		return $use_custom_message;
-	}
-
-
-	/**
-	 * Returns the custom message for the post.
-	 *
-	 * This tries to retrieve a legacy custom message first.
-	 *
-	 * TODO drop this method by version 1.12.0 and replace by just calling wc_memberships_get_content_meta() on the new meta in use {FN 2017-08-03}
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param int $post_id the current post ID where the meta box appears
-	 * @param string $message_code message code tried to be retrieved
-	 * @return string HTML
-	 */
-	private function get_custom_message( $post_id, $message_code ) {
-
-		$message_meta        = "_wc_memberships_{$message_code}_message";
-		$message_legacy_meta = '_wc_memberships_content_restricted_message';
-		$message             = wc_memberships_get_content_meta( $post_id, $message_meta );
-
-		// only try to use a legacy message when the current message post meta isn't found
-		if ( ! is_string( $message ) ) {
-
-			$message        = '';
-			$legacy_message = wc_memberships_get_content_meta( $post_id, $message_legacy_meta );
-
-			if ( is_string( $legacy_message ) ) {
-				$message = $legacy_message;
-			}
-		}
-
-		return $message;
 	}
 
 

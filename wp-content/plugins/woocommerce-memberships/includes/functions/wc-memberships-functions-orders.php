@@ -16,15 +16,30 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+
+
+/**
+ * Gets an order's date (compatibility function for template files).
+ *
+ * @since 1.12.0
+ *
+ * @param \WC_Order $order
+ * @param string $date the date to retrieve
+ * @param string $context WooCommerce context: 'view' or 'edit' (default)
+ * @return null|\WC_DateTime
+ */
+function wc_memberships_get_order_date( $order, $date, $context = 'edit' ) {
+
+	return Framework\SV_WC_Order_Compatibility::get_date_prop( $order, $date, $context );
+}
 
 
 /**
@@ -316,3 +331,4 @@ function wc_memberships_get_order_thank_you_links( $order_id ) {
 	 */
 	return apply_filters( 'woocommerce_memberships_thank_you_message', $message, $order_id );
 }
+

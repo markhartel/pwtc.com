@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -61,6 +59,7 @@ class WC_Memberships_Meta_Box_Membership_Plan_Email_Content_Merge_Tags extends \
 	 * @return string
 	 */
 	public function get_title() {
+
 		return __( 'Email Content Merge Tags', 'woocommerce-memberships' );
 	}
 
@@ -72,28 +71,18 @@ class WC_Memberships_Meta_Box_Membership_Plan_Email_Content_Merge_Tags extends \
 	 *
 	 * @param \WP_Post $post
 	 */
-	public function output( WP_Post $post ) {
+	public function output( \WP_Post $post ) {
 
 		$this->post            = $post;
-		$this->membership_plan = $membership_plan = wc_memberships_get_membership_plan( $post );
+		$this->membership_plan = wc_memberships_get_membership_plan( $post );
 
 		?>
 		<div class="panel-wrap data">
-
 			<small><?php esc_html_e( 'For any of the emails, or the renewal prompt content, you can use any of the following merge tags to add dynamic content to the membership plan emails:', 'woocommerce-memberships' ); ?><br><br></small>
-
 			<ul>
-				<?php
-
-				$merge_tags_help = wc_memberships()->get_emails_instance()->get_emails_merge_tags_help();
-
-				foreach ( $merge_tags_help as $merge_tag_help ) {
-
-					echo '<li><small>' . $merge_tag_help . '</small></li>';
-
-				}
-
-				?>
+				<?php foreach ( wc_memberships()->get_emails_instance()->get_emails_merge_tags_help() as $merge_tag_help ) : ?>
+					<li><small><?php echo $merge_tag_help; ?></small></li>
+				<?php endforeach; ?>
 			</ul>
 		</div>
 		<?php

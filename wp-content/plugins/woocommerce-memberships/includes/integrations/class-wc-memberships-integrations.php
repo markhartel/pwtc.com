@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -32,6 +31,7 @@ defined( 'ABSPATH' ) or exit;
  * - bbPress: https://bbpress.org/
  * - WooCommerce Bookings: https://woocommerce.com/products/woocommerce-bookings/
  * - Groups: https://wordpress.org/plugins/groups/
+ * - LearnDash: https://www.learndash.com/
  * - qTranslate X: https://wordpress.org/plugins/qtranslate-x/
  * - WooCommerce Measurement Price Calculator https://woocommerce.com/products/measurement-price-calculator/
  * - WooCommerce One Page Checkout https://woocommerce.com/products/woocommerce-one-page-checkout
@@ -51,6 +51,9 @@ class WC_Memberships_Integrations {
 
 	/** @var null|\WC_Memberships_Integration_Groups instance */
 	private $groups;
+
+	/** @var null|\SkyVerge\WooCommerce\Memberships\Integrations\LearnDash instance */
+	private $learndash;
 
 	/** @var null|\WC_Memberships_Integration_Measurement_Price_Calculator instance */
 	private $measurement_price_calculator;
@@ -85,6 +88,11 @@ class WC_Memberships_Integrations {
 		// Groups
 		if ( $this->is_groups_active() ) {
 			$this->groups = wc_memberships()->load_class( '/includes/integrations/groups/class-wc-memberships-integration-groups.php', 'WC_Memberships_Integration_Groups' );
+		}
+
+		// LearnDash
+		if ( wc_memberships()->is_plugin_active( 'sfwd_lms.php' ) ) {
+			$this->learndash = wc_memberships()->load_class( '/includes/integrations/Learndash/Learndash.php', '\\SkyVerge\\WooCommerce\\Memberships\\Integrations\\Learndash' );
 		}
 
 		// qTranslate-x
@@ -149,6 +157,18 @@ class WC_Memberships_Integrations {
 	 */
 	public function get_groups_instance() {
 		return $this->groups;
+	}
+
+
+	/**
+	 * Returns the LearnDash integration instance.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @return null|\SkyVerge\WooCommerce\Memberships\Integrations\Learndash
+	 */
+	public function get_learndash_instance() {
+		return $this->learndash;
 	}
 
 
@@ -221,9 +241,8 @@ class WC_Memberships_Integrations {
 	 * @return bool
 	 */
 	public function is_bookings_active() {
-		// the misspelling is intentional, as Bookings only fixed the typo for the main plugin file in v1.9.11
-		// TODO: Remove the bookings misspelling on or after 2017-09-01 {BR 2016-11-14}
-		return wc_memberships()->is_plugin_active( 'woocommmerce-bookings.php' ) || wc_memberships()->is_plugin_active( 'woocommerce-bookings.php' );
+
+		return wc_memberships()->is_plugin_active( 'woocommerce-bookings.php' );
 	}
 
 

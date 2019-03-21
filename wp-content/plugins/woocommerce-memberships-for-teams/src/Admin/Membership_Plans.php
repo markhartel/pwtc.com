@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -81,7 +82,7 @@ class Membership_Plans {
 				 */
 				if ( (bool) apply_filters( 'wc_memberships_for_teams_membership_plan_list_team_product', true, $product, $post->ID ) ) :
 
-					$product_name = sprintf( '%1$s (#%2$s)', \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ? $product->get_name() : $product->get_title(), $product->get_id() );
+					$product_name = sprintf( '%1$s (#%2$s)', $product->get_name(), $product->get_id() );
 
 					$items[] = '<a href="' . get_edit_post_link( $product->get_id() ) . '">' . $product_name . '</a>';
 
@@ -249,7 +250,7 @@ class Membership_Plans {
 	 */
 	private function get_edit_product_link( $product ) {
 
-		$product_name = sprintf( '%1$s (#%2$s)', \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ?  $product->get_name() : $product->get_title(), $product->get_id() );
+		$product_name = sprintf( '%1$s (#%2$s)', $product->get_name(), $product->get_id() );
 
 		if ( $product->is_type( 'variation' ) ) {
 			$product_link = get_edit_post_link( $product->get_parent_id() );

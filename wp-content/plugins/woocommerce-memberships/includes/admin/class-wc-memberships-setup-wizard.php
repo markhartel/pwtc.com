@@ -17,7 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -25,7 +25,7 @@ namespace SkyVerge\WooCommerce\Memberships\Admin;
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 /**
  * Onboarding Setup Wizard.
@@ -104,7 +104,7 @@ class Setup_Wizard extends Framework\Admin\Setup_Wizard {
 		parent::load_scripts_styles();
 
 		// register style dependencies
-		wp_register_style( 'jquery-ui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css' );
+		wp_register_style( 'jquery-ui', '//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css' );
 
 		// load styles
 		wp_enqueue_style( 'wc-memberships-setup-wizard', $this->get_plugin()->get_plugin_url() . '/assets/css/admin/wc-memberships-setup-wizard.min.css', array( 'sv-wc-admin-setup', 'jquery-ui' ), \WC_Memberships::VERSION );

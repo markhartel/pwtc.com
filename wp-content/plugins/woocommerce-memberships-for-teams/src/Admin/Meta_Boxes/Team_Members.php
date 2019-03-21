@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\Meta_Boxes;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -69,6 +70,7 @@ class Team_Members {
 		$show_invitations = ! empty( $_REQUEST['show_invitations'] );
 		$list_table_class = $show_invitations ? 'Invitations' : 'Team_Members';
 		$list_table_class = '\\SkyVerge\\WooCommerce\\Memberships\\Teams\\Admin\\List_Tables\\' . $list_table_class;
+		/* @type \WP_List_Table $list_table */
 		$list_table       = new $list_table_class( array( 'team' => $team ) );
 		$search_label     = $show_invitations ? __( 'Search Invitations', 'woocommerce-memberships-for-teams' ) : __( 'Search Members', 'woocommerce-memberships-for-teams' );
 

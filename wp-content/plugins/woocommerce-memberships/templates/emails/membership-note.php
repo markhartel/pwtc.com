@@ -16,32 +16,30 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
-
 /**
- * Membership note email
+ * Membership note email.
  *
- * @type string $email_heading Email heading
- * @type string $membership_note Membership note
- * @type \WC_Memberships_User_Membership $user_membership User Membership
+ * @type string $email_heading email heading
+ * @type string $membership_note membership note
+ * @type \WC_Memberships_User_Membership $user_membership user membership
+ * @type \WC_Memberships_User_Membership_Email $email the email object
  *
- * @version 1.0.0
+ * @version 1.12.4
  * @since 1.0.0
  */
  ?>
 
-<?php do_action( 'woocommerce_email_header', $email_heading ); ?>
+<?php do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <p><?php esc_html_e( 'Hello, a note has just been added to your membership:', 'woocommerce-memberships' ); ?></p>
 
 <blockquote><?php echo wpautop( wptexturize( $membership_note ) ) ?></blockquote>
 
-<?php do_action( 'woocommerce_email_footer' );
+<?php do_action( 'woocommerce_email_footer', $email );

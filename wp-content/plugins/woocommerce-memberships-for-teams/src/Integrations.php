@@ -17,12 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\Memberships\Teams\Integrations\Subscriptions;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -39,14 +41,14 @@ class Integrations {
 
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
 
 		if ( wc_memberships_for_teams()->is_plugin_active( 'woocommerce-subscriptions.php' ) && class_exists( 'WC_Subscriptions' ) ) {
-			$this->subscriptions = new \SkyVerge\WooCommerce\Memberships\Teams\Integrations\Subscriptions;
+			$this->subscriptions = new Subscriptions();
 		}
 	}
 
@@ -56,9 +58,12 @@ class Integrations {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Integrations\Subscriptions|void subscriptions instance if Subscriptions is active
+	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Integrations\Subscriptions|null subscriptions instance if Subscriptions is active
 	 */
 	public function get_subscriptions_instance() {
+
 		return $this->subscriptions;
 	}
+
+
 }

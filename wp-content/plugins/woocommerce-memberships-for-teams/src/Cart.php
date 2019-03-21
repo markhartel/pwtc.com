@@ -17,13 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 use SkyVerge\WooCommerce\Memberships\Teams\Product;
 
 defined( 'ABSPATH' ) or exit;
@@ -50,18 +50,15 @@ class Cart {
 		add_filter( 'woocommerce_order_again_cart_item_data', array( $this, 'add_order_again_cart_item_team_data'), 10, 2 );
 		add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session'), 10, 2 );
 		add_filter( 'woocommerce_get_item_data',              array( $this, 'display_team_data_in_cart'), 10, 2 );
-
-		if ( \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) {
-			add_action( 'woocommerce_new_order_item',      array( $this, 'add_order_item_team_data' ), 10, 2 );
-		} else {
-			add_action( 'woocommerce_add_order_item_meta', array( $this, 'add_order_item_team_data'), 10, 2 );
-		}
+		add_action( 'woocommerce_add_cart_item',              array( $this, 'enforce_seat_change_cart' ), 10, 2 );
+		add_action( 'woocommerce_new_order_item',             array( $this, 'add_order_item_team_data'), 10, 2 );
 	}
 
 
 	/**
-	 * Modifies the loop 'add to cart' button class for team products with required input fields to
-	 * link directly to the product page like a variable product.
+	 * Modifies the loop 'add to cart' button class for team products.
+	 *
+	 * Adds required input fields to link directly to the product page like a variable product.
 	 *
 	 * @internal
 	 *
@@ -73,21 +70,20 @@ class Cart {
 	 */
 	public function loop_add_to_cart_link( $tag, $product ) {
 
-		if ( $product && Product::has_team_membership( $product ) ) {
+		if (    $product
+		     && Product::has_team_membership( $product )
+		     && Product::has_required_team_user_input_fields( $product ) ) {
 
-			if ( Product::has_required_team_user_input_fields( $product ) ) {
-
-				// otherwise, for simple type products, the page javascript would take over and
-				// try to do an ajax add-to-cart, when really we need the customer to visit the
-				// product page to supply whatever input fields they require
-				$tag = sprintf( '<a href="%s" rel="nofollow" data-product_id="%s" data-product_sku="%s" class="button add_to_cart_button product_type_%s">%s</a>',
-					get_permalink( $product->get_id() ),
-					esc_attr( $product->get_id() ),
-					esc_attr( $product->get_sku() ),
-					'variable',
-					esc_html__( 'Select options', 'woocommerce-memberships-for-teams' )
-				);
-			}
+			// otherwise, for simple type products, the page javascript would take over and
+			// try to do an ajax add-to-cart, when really we need the customer to visit the
+			// product page to supply whatever input fields they require
+			$tag = sprintf( '<a href="%s" rel="nofollow" data-product_id="%s" data-product_sku="%s" class="button add_to_cart_button product_type_%s">%s</a>',
+				get_permalink( $product->get_id() ),
+				esc_attr( $product->get_id() ),
+				esc_attr( $product->get_sku() ),
+				'variable',
+				esc_html__( 'Select options', 'woocommerce-memberships-for-teams' )
+			);
 		}
 
 		return $tag;
@@ -107,7 +103,7 @@ class Cart {
 	 * @param boolean $valid whether the product as added is valid
 	 * @param int $product_id the product identifier
 	 * @param int $quantity the amount being added
-	 * @param int $variation_id optional variation id
+	 * @param int|string $variation_id optional variation id
 	 * @param array $variations optional variation configuration
 	 * @param array $cart_item_data optional cart item data. This will only be
 	 *        supplied when an order is being ordered again, in which case the
@@ -133,7 +129,7 @@ class Cart {
 						// user input may be provided via GET/POST or already attached to cart item data when ordering again
 						if ( empty( $_REQUEST[ $key ] ) && empty( $cart_item_data['team_meta_data'][ $key ] ) ) {
 
-							/* translators: %s - field label */
+							/* translators: Placeholder: %s - field label */
 							wc_add_notice( sprintf( __( "Field '%s' is required.", 'woocommerce-memberships-for-teams' ), $field['label'] ), 'error' );
 							$valid = false;
 						}
@@ -203,11 +199,11 @@ class Cart {
 		$max_count = Product::get_max_member_count( $product );
 
 		if ( $min_count > $quantity ) {
-			/** translators: %1$s - number of members, %2$s - team product name */
+			/* translators: Placeholders: %1$s - number of members, %2$s - team product name */
 			wc_add_notice( sprintf( _n( 'At least %1$d member must be added to %2$s.', 'A minimum of %1$d members must be added to %2$s.', $min_count, 'woocommerce-memberships-for-teams' ), $min_count, $product->get_title() ), 'error' );
 			$valid = false;
 		} elseif ( $max_count && $max_count < $quantity ) {
-			/** translators: %1$s - number of members, %2$s - team product name */
+			/* translators: Placeholders: %1$s - number of members, %2$s - team product name */
 			wc_add_notice( sprintf( _n( 'Only %1$d member can be added to %1$s.', 'A maximum of %1$d members can be added to %2$s.', $max_count, 'woocommerce-memberships-for-teams' ), $max_count, $product->get_title() ), 'error' );
 			$valid = false;
 		}
@@ -225,7 +221,7 @@ class Cart {
 	 *
 	 * @param array $cart_item_data associative-array of name/value pairs of cart item data
 	 * @param int $product_id the product identifier
-	 * @param int $variation_id optional product variation identifer
+	 * @param int $variation_id optional product variation identifier
 	 * @return array associative array of name/value pairs of cart item data to set in the session
 	 */
 	public function add_new_cart_item_team_data( $cart_item_data, $product_id, $variation_id ) {
@@ -306,8 +302,7 @@ class Cart {
 	 *
 	 * @param array $cart_item associative array of data representing a cart item (product)
 	 * @param array $values associative array of data for the cart item, currently in the session
-	 *
-	 * @return associative array of data representing a cart item (product)
+	 * @return array
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
 
@@ -358,6 +353,31 @@ class Cart {
 					}
 				}
 			}
+
+			$change_amount = isset( $item['team_meta_data']['_wc_memberships_for_teams_team_seat_change'] ) ? $item['team_meta_data']['_wc_memberships_for_teams_team_seat_change'] : null;
+			$team_id       = isset( $item['team_meta_data']['_wc_memberships_for_teams_team_id'] )          ? $item['team_meta_data']['_wc_memberships_for_teams_team_id']          : null;
+
+			if ( $team_id && $change_amount ) {
+
+				$team = wc_memberships_for_teams_get_team( $team_id );
+
+				if ( $team instanceof Team ) {
+
+					$new_total = $team->get_seat_change_total( $change_amount );
+
+					$data[] = array(
+						'name'    => __( 'Seat Change', 'woocommerce-memberships-for-teams' ),
+						'display' => sprintf(
+							/* translators: Placeholders: %1$d - current seat count, %2$s - <br/>, %3$d - new seat count */
+							__( 'Current Seat Count: %1$d%2$sNew Seat Count: %3$d', 'woocommerce-memberships-for-teams' ),
+							$team->get_seat_count(),
+							'</br>',
+							$new_total
+						),
+						'hidden'  => false,
+					);
+				}
+			}
 		}
 
 		return $data;
@@ -365,24 +385,54 @@ class Cart {
 
 
 	/**
+	 * Prevents other items from being added to the cart if it already has a seat-change item in it.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $cart_item_data cart item data
+	 * @param string $cart_item_key the cart item key
+	 * @return array
+	 * @throws Framework\SV_WC_Plugin_Exception
+	 */
+	public function enforce_seat_change_cart( $cart_item_data, $cart_item_key ) {
+
+		foreach( WC()->cart->cart_contents as $key => $data ) {
+
+			if ( isset( $data['team_meta_data']['_wc_memberships_for_teams_team_seat_change'] ) ) {
+
+				throw new Framework\SV_WC_Plugin_Exception( __( 'Oops! It looks like you’re currently changing the seat count for your team. Please complete checkout or remove that item from the cart in order to continue.', 'woocommerce-memberships-for-teams' ) );
+			}
+		}
+
+		return $cart_item_data;
+	}
+
+
+	/**
 	 * Stores team data on the order item.
 	 *
-	 * TODO: refactor this to use `woocommerce_checkout_create_order_line_item` and `$item->add_meta()` when
-	 * dropping support for WC < 3.0 {IT 2017-08-22}
+	 * TODO: refactor this to use `woocommerce_checkout_create_order_line_item` and `$item->add_meta()` {IT 2017-08-22}
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param int $item_id item identifier
-	 * @param \WC_Order_item|array $item order item instance or an array of order item checkout values
+	 * @param \WC_Order_Item_Product|array $item order item instance or an array of order item checkout values
+	 * @throws \Exception
 	 */
 	public function add_order_item_team_data( $item_id, $item ) {
 
-		$values = $this->get_cart_item_values( $item );
+		// since WC 3.0+, checkout values are available in the legacy_values property
+		if ( is_object( $item ) && property_exists( $item, 'legacy_values' ) ) {
+			$values = $item->legacy_values;
+		} else {
+			$values = $item;
+		}
 
-		if ( ! empty( $values ) && ! empty( $values['team_meta_data'] ) ) {
-
+		if ( ! empty( $values['team_meta_data'] ) ) {
 			foreach ( $values['team_meta_data'] as $key => $value ) {
 				wc_add_order_item_meta( $item_id, $key, $value );
 			}
@@ -395,33 +445,5 @@ class Cart {
 		}
 	}
 
-
-	/**
-	 * Returns cart item values for an order item.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param \WC_Order_item|array $item order item instance or an array of order item checkout values
-	 * @return array
-	 */
-	private function get_cart_item_values( $item ) {
-
-		// WC 3.0.0+ the second param is the order item object
-		if ( is_object( $item ) ) {
-
-			// since WC 3.0.0, checkout values are available in the legacy_values property
-			if ( ! property_exists( $item, 'legacy_values' ) ) {
-				return;
-			}
-
-			$values = $item->legacy_values;
-
-		// pre 3.0.0, the second param will be the checkout values for the order item
-		} else {
-			$values = $item;
-		}
-
-		return $values;
-	}
 
 }

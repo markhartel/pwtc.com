@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\List_Tables;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -94,19 +95,19 @@ class Invitations extends \WP_List_Table {
 	 *
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Invitation $invitation invitation instance
 	 * @param string $column_name
-	 * @return array
+	 * @return string
 	 */
 	public function column_default( $invitation, $column_name ) {
 
 		switch ( $column_name ) {
 
 			case 'email':
+
 				return $invitation->get_email();
-			break;
 
 			case 'role':
+
 				return $invitation->get_member_role( 'label' );
-			break;
 
 			case 'date':
 
@@ -123,7 +124,10 @@ class Invitations extends \WP_List_Table {
 				$time = esc_html( date_i18n( $time_format, (int) $added_time ) );
 
 				return sprintf( '%1$s %2$s', $date, $time );
-			break;
+
+			default :
+
+				return '';
 		}
 	}
 
@@ -201,7 +205,7 @@ class Invitations extends \WP_List_Table {
 						'invitation' => $invitation->get_id(),
 						'_wpnonce'   => wp_create_nonce( 'team-set-as-manager-' . $invitation->get_id() ),
 					), $this->team->get_edit_url() ),
-					/* translators: %s: user's name */
+					/* translators: Placeholder: %s - user's name */
 					esc_attr( sprintf( __( 'Set &#8220;%s&#8221; as a manager of this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 					__( 'Set as manager', 'woocommerce-memberships-for-teams' )
 				);
@@ -214,7 +218,7 @@ class Invitations extends \WP_List_Table {
 						'invitation' => $invitation->get_id(),
 						'_wpnonce'   => wp_create_nonce( 'team-set-as-member-' . $invitation->get_id() ),
 					), $this->team->get_edit_url() ),
-					/* translators: %s: user's name */
+					/* translators: Placeholder: %s - user's name */
 					esc_attr( sprintf( __( 'Set &#8220;%s&#8221; as a member of this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 					__( 'Set as member', 'woocommerce-memberships-for-teams' )
 				);
@@ -227,7 +231,7 @@ class Invitations extends \WP_List_Table {
 						'invitation' => $invitation->get_id(),
 						'_wpnonce'   => wp_create_nonce( 'team-resend-' . $invitation->get_id() ),
 					), $this->team->get_edit_url() ),
-				/* translators: %s: user's name */
+				/* translators: Placeholder: %s - user's name */
 				esc_attr( sprintf( __( 'Resend invitation to &#8220;%s&#8221;', 'woocommerce-memberships-for-teams' ), $name ) ),
 				__( 'Resend', 'woocommerce-memberships-for-teams' )
 			);
@@ -239,7 +243,7 @@ class Invitations extends \WP_List_Table {
 						'invitation' => $invitation->get_id(),
 						'_wpnonce'   => wp_create_nonce( 'team-cancel-' . $invitation->get_id() ),
 					), $this->team->get_edit_url() ),
-				/* translators: %s: user's name */
+				/* translators: Placeholder: %s - user's name */
 				esc_attr( sprintf( __( 'Cancel invitation for &#8220;%s&#8221; to join this team', 'woocommerce-memberships-for-teams' ), $name ) ),
 				__( 'Cancel', 'woocommerce-memberships-for-teams' )
 			);

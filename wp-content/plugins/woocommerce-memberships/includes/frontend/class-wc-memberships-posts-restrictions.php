@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Frontend/Checkout
  * @author    SkyVerge
- * @category  Frontend
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -281,7 +279,17 @@ class WC_Memberships_Posts_Restrictions {
 			$the_query = $wp_query;
 		}
 
-		return $the_query instanceof \WP_Query && $the_query->is_feed() && ! wc_memberships()->get_restrictions_instance()->is_restriction_mode( 'hide_content' );
+		$feed_is_restricted = $the_query instanceof \WP_Query && $the_query->is_feed() && ! wc_memberships()->get_restrictions_instance()->is_restriction_mode( 'hide_content' );
+
+		/**
+		 * Toggles whether the RSS feed should be restricted.
+		 *
+		 * @since 1.12.3
+		 *
+		 * @param bool $feed_is_restricted whether the feed should be restricted
+		 * @param \WP_Query $the_query the query object
+		 */
+		return (bool) apply_filters( 'wc_memberships_is_feed_restricted', $feed_is_restricted, $the_query );
 	}
 
 
@@ -326,7 +334,13 @@ class WC_Memberships_Posts_Restrictions {
 				// if the message code is non-empty, it means that the user has restricted or delayed access and one restriction message should be shown
 				if ( '' !== $message_code ) {
 
-					$args = array( 'term' => $restricted_term instanceof \WP_Term ? $restricted_term : $term );
+					if ( $restricted_term instanceof \WP_Term ) {
+						$args    = array( 'term' => $restricted_term );
+						$term_id = $restricted_term->term_id;
+					} else {
+						$args    = array( 'term' => $term );
+						$term_id = $term->term_id;
+					}
 
 					// if the message is for delayed access, we need to pass the access datetime to the message handler
 					if ( Framework\SV_WC_Helper::str_ends_with( $message_code, 'delayed' ) ) {
@@ -1311,7 +1325,7 @@ class WC_Memberships_Posts_Restrictions {
 					// handles exclusions
 					if ( ! empty( $post__not_in ) ) {
 						foreach ( $post__not_in as $i => $post_id ) {
-							if ( ! in_array( $post_id, $original_post_not_in, false ) && 'yes' === wc_memberships_get_content_meta( $post_id, '_wc_memberships_force_public' ) ) {
+							if ( ! in_array( $post_id, $original_post_not_in, false ) && wc_memberships()->get_restrictions_instance()->is_post_public( $post_id ) ) {
 								unset( $post__not_in[ $i ] );
 							}
 						}

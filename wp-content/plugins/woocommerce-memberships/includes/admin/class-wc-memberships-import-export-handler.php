@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -345,7 +343,8 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			array(
 				'id'            => 'wc_memberships_members_csv_import_merge_existing_user_memberships',
 				'title'         => __( 'Import Options', 'woocommerce-memberships' ),
-				'desc'          => __( 'Update existing records if a matching user membership is found (by User Membership ID)', 'woocommerce-memberships' ),
+				'desc'          => __( 'Update existing records if a matching user membership is found', 'woocommerce-memberships' ),
+				'desc_tip'      => __( 'User memberships can be found either by user membership ID, or by a combination of user ID, login name or email address and a membership plan ID or slug.', 'woocommerce-memberships' ),
 				'default'       => 'yes',
 				'type'          => 'checkbox',
 				'checkboxgroup' => 'start',
@@ -355,6 +354,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			array(
 				'id'            => 'wc_memberships_members_csv_import_allow_memberships_transfer',
 				'desc'          => __( 'Allow membership transfer between users if the imported user differs from the existing user for the membership (skips conflicting rows when disabled)', 'woocommerce-memberships' ),
+				'desc_tip'      => __( 'Will transfer a matched user membership if the user indicated in the same row differs from the one currently associated with the existing user membership.', 'woocommerce-memberships' ),
 				'default'       => 'no',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',
@@ -363,7 +363,8 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			// create new memberships?
 			array(
 				'id'            => 'wc_memberships_members_csv_import_create_new_user_memberships',
-				'desc'          => __( 'Create new user memberships if a matching User Membership ID is not found (skips rows when disabled)', 'woocommerce-memberships' ),
+				'desc'          => __( 'Create new user memberships if a matching user membership is not found (skips rows when disabled)', 'woocommerce-memberships' ),
+				'desc_tip'      => __( 'Requires matching a valid plan, by ID or slug, and a user, by ID, email address or login name.', 'woocommerce-memberships' ),
 				'default'       => 'yes',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',
@@ -373,6 +374,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			array(
 				'id'            => 'wc_memberships_members_csv_import_create_new_users',
 				'desc'          => __( 'Create a new user if no matching user is found (skips rows when disabled)', 'woocommerce-memberships' ),
+				'desc_tip'      => __( 'Users can be found either by ID, email address or login name provided.', 'woocommerce-memberships' ),
 				'default'       => 'no',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',

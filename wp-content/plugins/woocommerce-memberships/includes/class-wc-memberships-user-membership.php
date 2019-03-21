@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -619,11 +618,24 @@ class WC_Memberships_User_Membership {
 	 *
 	 * @param string $interval either 'start' or 'end'
 	 * @param int $time a valid timestamp in UTC
+	 * @return bool success
 	 */
 	public function set_paused_interval( $interval, $time ) {
 
-		if ( ! is_numeric( $time ) || (int) $time <= 0 ) {
-			return;
+		$update = false;
+
+		if ( ! is_numeric( $time ) ) {
+			return $update;
+		}
+
+		// if the thread is locked, wait until another period is being written to an interval
+		if ( true === get_post_meta( $this->id, $this->locked_meta, true ) ) {
+			return $this->set_paused_interval( $interval, $time );
+		}
+
+		// lock interval writing to avoid race conditions when setting either end of an interval too quickly
+		if ( ! get_post_meta( $this->id, $this->locked_meta, true ) ) {
+			add_post_meta( $this->id, $this->locked_meta, true );
 		}
 
 		$intervals = $this->get_paused_intervals();
@@ -632,7 +644,10 @@ class WC_Memberships_User_Membership {
 
 			// sanity check to avoid overwriting an existing key
 			if ( ! array_key_exists( $time, $intervals ) ) {
+
 				$intervals[ (int) $time ] = '';
+
+				$update = true;
 			}
 
 		} elseif ( 'end' === $interval ) {
@@ -645,17 +660,30 @@ class WC_Memberships_User_Membership {
 
 				// sanity check to avoid overwriting an existing value
 				if ( is_numeric( $last ) && empty( $intervals[ $last ] ) ) {
-					$intervals[ (int) $last ] = (int) $time;
+
+					$intervals[ (int) $last ] = max( (int) $last + 1, (int) $time );
+
+					$update = true;
 				}
 
 			// this might be the case where a paused membership didn't have interval tracking yet
-			} elseif ( $this->is_paused() && ( $paused_date = $this->get_paused_date( 'timestamp' ) ) ) {
+			} elseif ( $this->is_paused() ) {
 
-				$intervals[ (int) $paused_date ] = (int) $time;
+				$paused_date = $this->get_paused_date( 'timestamp' );
+
+				if ( null !== $paused_date ) {
+
+					$intervals[ (int) $paused_date ] = max( (int) $paused_date + 1, (int) $time );
+
+					$update = true;
+				}
 			}
 		}
 
-		update_post_meta( $this->id, $this->paused_intervals_meta, $intervals );
+		// unlock writing to intervals
+		delete_post_meta( $this->id, $this->locked_meta );
+
+		return $update && (bool) update_post_meta( $this->id, $this->paused_intervals_meta, $intervals );
 	}
 
 
@@ -663,10 +691,15 @@ class WC_Memberships_User_Membership {
 	 * Deletes the paused intervals data.
 	 *
 	 * @since 1.7.0
+	 *
+	 * @return bool success
 	 */
 	public function delete_paused_intervals() {
 
-		delete_post_meta( $this->id, $this->paused_intervals_meta );
+		/* @see \WC_Memberships_User_Membership::set_paused_interval() remove any lock set */
+		delete_post_meta( $this->id, $this->locked_meta );
+
+		return delete_post_meta( $this->id, $this->paused_intervals_meta );
 	}
 
 
@@ -695,7 +728,7 @@ class WC_Memberships_User_Membership {
 				$time = $this->get_cancelled_date( 'timestamp' );
 			}
 
-			if ( empty( $total ) ) {
+			if ( empty( $time ) ) {
 				$time = current_time( 'timestamp', true );
 			}
 		}
@@ -706,7 +739,7 @@ class WC_Memberships_User_Membership {
 			$last = key( $pauses );
 
 			// if the membership is currently paused, add the time until now
-			if ( isset( $pauses[ $last ] ) && '' === $pauses[ $last ] && $this->is_paused() ) {
+			if ( isset( $pauses[ $last ] ) && '' === $pauses[ $last ] && ( $this->is_paused() || $this->is_cancelled() ) ) {
 				$pauses[ $last ] = current_time( 'timestamp', true );
 			}
 
@@ -1110,7 +1143,7 @@ class WC_Memberships_User_Membership {
 		}
 
 		// standardise status names
-		$new_status = 0 === strpos( $new_status, 'wcm-' ) ? substr( $new_status, 4 ) : $new_status;
+		$new_status = 0 === strpos( $new_status, 'wcm-' ) ? (string) substr( $new_status, 4 ) : $new_status;
 		$old_status = $this->get_status();
 
 		// get valid statuses
@@ -1119,17 +1152,20 @@ class WC_Memberships_User_Membership {
 		// only update if they differ - and ensure post_status is a 'wcm' status.
 		if ( $new_status !== $old_status && array_key_exists( 'wcm-' . $new_status, $valid_statuses ) ) {
 
-			// note will be added to the membership by the general User_Memberships utility class,
-			// so that we add only 1 note instead of 2 when updating the status
-			wc_memberships()->get_user_memberships_instance()->set_membership_status_transition_note( $note );
-
 			// update the order
-			wp_update_post( array(
+			$updated = wp_update_post( array(
 				'ID'          => $this->id,
 				'post_status' => 'wcm-' . $new_status,
 			) );
 
-			$this->status = 'wcm-' . $new_status;
+			if ( $updated && ! $updated instanceof \WP_Error ) {
+
+				// note will be added to the membership by the general User_Memberships utility class,
+				// so that we add only 1 note instead of 2 when updating the status
+				wc_memberships()->get_user_memberships_instance()->set_membership_status_transition_note( $note );
+
+				$this->status = 'wcm-' . $new_status;
+			}
 		}
 	}
 
@@ -1179,6 +1215,8 @@ class WC_Memberships_User_Membership {
 	 */
 	public function is_delayed() {
 
+		$is_delayed = false;
+
 		if ( 'delayed' === $this->get_status() ) {
 
 			// always perform a check until start date is in the past...
@@ -1186,11 +1224,11 @@ class WC_Memberships_User_Membership {
 				// ... so we can activate the membership finally
 				$this->activate_membership();
 			} else {
-				return true;
+				$is_delayed = true;
 			}
 		}
 
-		return false;
+		return $is_delayed;
 	}
 
 
@@ -1386,10 +1424,12 @@ class WC_Memberships_User_Membership {
 		$was_paused      = 'paused'  === $previous_status;
 		$was_delayed     = 'delayed' === $previous_status;
 
-		if ( ! $was_delayed && $this->is_active() ) {
-			// bail out if already active (check for delay prevents infinite loops)
+		// bail out if already active (check for delay prevents infinite loops, skip for pending cancel)
+		if ( ! $was_delayed && 'pending' !== $previous_status && $this->is_active() ) {
 			return;
-		} elseif ( $was_paused ) {
+		}
+
+		if ( $was_paused ) {
 			// reactivation
 			$default_note = __( 'Membership resumed.', 'woocommerce-memberships' );
 			$this->set_paused_interval( 'end', current_time( 'timestamp', true ) );

@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 /**
  * Manage Membership Plans from WP CLI.
@@ -55,6 +54,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * * length
 	 * * start_date
 	 * * end_date
+	 * * rules
 	 *
 	 * ## EXAMPLES
 	 *
@@ -269,6 +269,13 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 				if ( 0 === $updated || is_wp_error( $updated ) ) {
 					\WP_CLI::warning( 'Could not set the slug "%1$s" for Membership Plan %2$s, auto-generated "%3$s" has been used instead.', $slug, $post_id, $post->post_name );
 				}
+			}
+
+			if ( ! empty( $data['rules'] ) ) {
+
+				$rules = json_decode( $data['rules'], true );
+
+				$this->set_membership_plan_rules( $membership_plan, $rules );
 			}
 
 			/**
@@ -549,6 +556,13 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 				}
 			}
 
+			if ( ! empty( $data['rules'] ) ) {
+
+				$rules = json_decode( $data['rules'], true );
+
+				$this->set_membership_plan_rules( $membership_plan, $rules );
+			}
+
 			/**
 			 * Upon updating a Membership Plan via CLI.
 			 *
@@ -565,6 +579,96 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 
 			\WP_CLI::error( $e->getMessage() );
 		}
+	}
+
+
+	/**
+	 * Sets rules for a given Membership Plan.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @param \WC_Memberships_Membership_Plan $membership_plan plan to set rules for
+	 * @param array $rules associative array of rules data
+	 * @return \WC_Memberships_Membership_Plan_Rule[] set rules
+	 */
+	protected function set_membership_plan_rules( \WC_Memberships_Membership_Plan $membership_plan, array $rules ) {
+
+		$set_rules = array();
+
+		foreach ( $rules as $rule_type => $rule_data ) {
+
+			if ( ! is_array( $rule_data ) || ! in_array( $rule_type, array( 'content_restriction', 'product_restriction', 'purchasing_discount' ), true ) ) {
+				continue;
+			}
+
+			$rule = new \WC_Memberships_Membership_Plan_Rule();
+
+			$rule->set_id();
+			$rule->set_membership_plan_id( $membership_plan->get_id() );
+			$rule->set_rule_type( $rule_type );
+
+			if ( 'purchasing_discount' === $rule_type ) {
+
+				$rule->set_inactive();
+
+				if ( isset( $rule_data['discount'] ) ) {
+
+					$rule->set_discount( $rule_data['discount'] );
+
+					if ( isset( $rule_data['active'] ) && in_array( $rule_data['active'], array( 'yes', true ), true ) ) {
+						$rule->set_active();
+					}
+				}
+			}
+
+			if ( isset( $rule_data['target'] ) ) {
+
+				$rule->set_target( $rule_data['target'] );
+
+			} elseif ( isset( $rule_data['content_type'], $rule_data['content_type_name'] ) ) {
+
+				$rule->set_content_type( $rule_data['content_type'] );
+				$rule->set_content_type_name( $rule_data['content_type_name'] );
+
+			} else {
+
+				continue;
+			}
+
+			if ( ! empty( $rule_data['object_ids'] ) ) {
+
+				$ids = is_string( $rule_data['object_ids'] ) ? explode( ',', $rule_data['object_ids'] ) : (array) $rule_data['object_ids'];
+
+				$rule->set_object_ids( $ids );
+			}
+
+			if ( ! empty( $rule_data['access_type'] ) ) {
+				$rule->set_access_type( $rule_data['access_type'] );
+			}
+
+			if ( ! empty( $rule_data['access_schedule'] ) ) {
+				$rule->set_access_schedule( $rule_data['access_schedule'] );
+			}
+
+			$access_exclude_trial = ! empty( $rule_data['access_exclude_trial'] ) && in_array( $rule_data['access_exclude_trial'], array( 'yes', true ), true );
+			$access_include_trial = ! empty( $rule_data['access_include_trial'] ) && in_array( $rule_data['access_include_trial'], array( 'yes', true ), true );
+
+			if ( $access_exclude_trial && ! $access_include_trial ) {
+				$rule->set_access_schedule_exclude_trial();
+			} elseif ( $access_include_trial && ! $access_exclude_trial ) {
+				$rule->set_access_schedule_include_trial();
+			}
+
+			$set_rules[] = $rule;
+		}
+
+		if ( ! empty( $set_rules ) ) {
+			$membership_plan->set_rules( $set_rules );
+		} else {
+			\WP_CLI::warning( 'Could not parse rules to set for Membership Plan %1$s.', $membership_plan->get_id() );
+		}
+
+		return $set_rules;
 	}
 
 

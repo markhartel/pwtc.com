@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -151,7 +150,7 @@ class WC_Memberships_User_Membership_Ending_Soon_Email extends \WC_Memberships_U
 			// adds a subject merge tag hint in field description
 			$form_fields['subject']['desc_tip']    = $form_fields['subject']['description'];
 			/* translators: Placeholder: %s - merge tag */
-			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_name}</code></strong>' );
+			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_title}</code></strong>' );
 		}
 
 		if ( isset( $form_fields['heading'] ) ) {
@@ -182,55 +181,15 @@ class WC_Memberships_User_Membership_Ending_Soon_Email extends \WC_Memberships_U
 	public function get_default_body() {
 
 		/* translators: Placeholders: the text within curly braces consists of email merge tags that shouldn't be changed in translation */
-		$body_html = __( '<p>Hey {member_name},</p><p>Heads up: your {membership_plan} at {site_title} is ending soon! Your membership access will stop on {membership_expiration_date}.</p><p>If you would like to continue to access members-only content and perks, please renew your membership.</p><p><a href="{membership_renewal_url}">Click here to log in and renew your membership now</a>.</p><p>{site_title}</p>', 'woocommerce-memberships' );
+		$body_html = __( '
+			<p>Hey {member_name},</p>
+			<p>Heads up: your {membership_plan} at {site_title} is ending soon! Your membership access will stop on {membership_expiration_date}.</p>
+			<p>If you would like to continue to access members-only content and perks, please renew your membership.</p>
+			<p><a href="{membership_renewal_url}">Click here to log in and renew your membership now</a>.</p>
+			<p>{site_title}</p>
+		', 'woocommerce-memberships' );
 
 		return wp_kses_post( $body_html );
-	}
-
-
-	/**
-	 * Returns the email HTML content.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @return string HTML
-	 */
-	public function get_content_html() {
-
-		ob_start();
-
-		wc_get_template( $this->template_html, array(
-			'user_membership' => $this->object,
-			'email_heading'   => $this->get_heading(),
-			'email_body'      => $this->get_body(),
-			'sent_to_admin'   => false,
-			'plain_text'      => false
-		) );
-
-		return ob_get_clean();
-	}
-
-
-	/**
-	 * Returns email plain text content.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @return string plain text
-	 */
-	public function get_content_plain() {
-
-		ob_start();
-
-		wc_get_template( $this->template_plain, array(
-			'user_membership' => $this->object,
-			'email_heading'   => $this->get_heading(),
-			'email_body'      => $this->get_body(),
-			'sent_to_admin'   => false,
-			'plain_text'      => true
-		) );
-
-		return ob_get_clean();
 	}
 
 

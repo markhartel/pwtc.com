@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -43,9 +42,9 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 	 *
 	 * @since 1.11.0
 	 *
-	 * @param \WC_Memberships|\SkyVerge\WooCommerce\PluginFramework\v5_3_0\SV_WC_Plugin $wc_memberships
+	 * @param \WC_Memberships|\SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin $wc_memberships
 	 */
-	public function __construct( \SkyVerge\WooCommerce\PluginFramework\v5_3_0\SV_WC_Plugin $wc_memberships ) {
+	public function __construct( \SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin $wc_memberships ) {
 
 		parent::__construct( $wc_memberships );
 
@@ -81,6 +80,10 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 			$this->get_plugin()->add_rewrite_endpoints();
 
 			flush_rewrite_rules();
+
+			// flush caches
+			wc_memberships()->get_restrictions_instance()->delete_public_content_cache();
+			wc_memberships()->get_member_discounts_instance()->delete_excluded_member_discounts_products_cache();
 		}
 	}
 
@@ -196,6 +199,10 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 		$this->get_plugin()->add_rewrite_endpoints();
 
 		flush_rewrite_rules();
+
+		// flush caches
+		wc_memberships()->get_restrictions_instance()->delete_public_content_cache();
+		wc_memberships()->get_member_discounts_instance()->delete_excluded_member_discounts_products_cache();
 	}
 
 

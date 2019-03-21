@@ -17,8 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Templates
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -83,6 +82,27 @@ defined( 'ABSPATH' ) or exit;
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+
+		<?php if ( $team->can_add_seats() ) : ?>
+
+			<form id="team-seat-update-form" method="post">
+				<?php wp_nonce_field( 'update-team-seats-' . $team->get_id(), '_team_seats_nonce' ); ?>
+				<input type="hidden" name="update_team_seats" value="<?php echo esc_attr( $team->get_id() ); ?>" />
+				<input type="hidden" name="seat_change_mode" value="<?php echo esc_attr( $team->get_seat_change_mode() ); ?>" />
+				<p id="team-seat-form-instructions"><?php echo wp_kses( $team_seat_details['instructions'], array( 'strong' => array() ) ); ?></p>
+				<input type="number"
+				       class="input-text"
+				       name="team_seats"
+				       id="team-seats-field"
+				       min="<?php echo esc_attr( $team_seat_details['field_min'] ); ?>"
+				       max="<?php echo esc_attr( $team_seat_details['field_max'] ); ?>"
+				       value="<?php echo esc_attr( $team_seat_details['field_value'] ); ?>"
+				/>
+				<button type="submit" id="submit-seats-form"><?php esc_html_e( 'Submit', 'woocommerce-memberships-for-teams' ); ?></button>
+				<p id="seat-change-message"></p>
+			</form>
+
+		<?php endif; ?>
 
 	<?php endif; ?>
 

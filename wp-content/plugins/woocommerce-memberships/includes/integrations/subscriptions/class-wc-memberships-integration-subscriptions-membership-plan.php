@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -126,6 +125,22 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plan extends \WC_Membe
 	public function has_subscription() {
 
 		return count( $this->get_subscription_products() ) > 0;
+	}
+
+
+	/**
+	 * Checks if the plan has only subscription products that can grant access.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return bool
+	 */
+	public function is_subscription_only() {
+
+		$total_products      = count( $this->get_products( true ) );
+		$total_subscriptions = count( $this->get_subscription_products() );
+
+		return $total_products === $total_subscriptions && $total_subscriptions > 0;
 	}
 
 

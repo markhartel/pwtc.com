@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,6 +29,9 @@ defined( 'ABSPATH' ) or exit;
  * Abstract class for handling jobs in Memberships.
  *
  * @since 1.10.0
+ *
+ * @method get_jobs( $args = array() ) \stdClass[]
+ * @method process_job( \stdClass $job, $items_par_batch = null ) \stdClass
  */
 abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job_Handler {
 
@@ -98,19 +100,6 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 
 
 	/**
-	 * Returns an array of jobs.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param array $args optional arguments
-	 * @return \stdClass[] array of objects
-	 */
-	public function get_jobs( $args = array() ) {
-		return parent::get_jobs( $args );
-	}
-
-
-	/**
 	 * Processes a single item from the background job.
 	 *
 	 * Child classes should override this method.
@@ -123,22 +112,6 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 	 */
 	public function process_item( $item, $job ) {
 		return parent::process_item( $item, $job );
-	}
-
-
-	/**
-	 * Processes a job batch.
-	 *
-	 * Child classes should override this method.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param \stdClass $job related job instance
-	 * @param null|int $items_per_batch number of items to process per batch (optional)
-	 * @return \stdClass the $job, processed
-	 */
-	public function process_job( $job, $items_per_batch = null ) {
-		return parent::process_job( $job, $items_per_batch );
 	}
 
 

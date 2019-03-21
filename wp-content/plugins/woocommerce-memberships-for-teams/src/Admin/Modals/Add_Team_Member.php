@@ -17,17 +17,18 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin\Modals;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Add Team Memmber modal class.
+ * Add Team Member modal class.
  *
  * @since 1.0.0
  */

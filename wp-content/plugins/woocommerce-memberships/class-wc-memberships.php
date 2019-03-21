@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -37,7 +36,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 
 	/** plugin version number */
-	const VERSION = '1.11.2';
+	const VERSION = '1.12.4';
 
 	/** @var \WC_Memberships single instance of this plugin */
 	protected static $instance;
@@ -162,6 +161,8 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	 *
 	 * This is done before init as WooCommerce registers webhooks early.
 	 *
+	 * @internal
+	 *
 	 * @since 1.11.0
 	 */
 	public function init_rest_api() {
@@ -253,6 +254,9 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			include_once $this->get_plugin_path() . '/includes/class-wc-memberships-cli.php';
 		}
+
+		// System Status Report static handler
+		require_once( $this->get_plugin_path() . '/includes/class-wc-memberships-system-status-report.php' );
 	}
 
 
@@ -927,7 +931,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 		switch ( $method ) {
 
-			/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+			/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 			case 'get_query_instance' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;

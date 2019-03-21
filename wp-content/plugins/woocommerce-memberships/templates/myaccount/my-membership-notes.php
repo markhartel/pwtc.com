@@ -16,15 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
-
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 /**
  * Renders the product discounts available from the membership in the my account area.
@@ -34,12 +31,13 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
  * @type string $timezone the timezone abbreviation for the site's timezone
  * @type int $user_id The current user ID
  *
- * @version 1.10.3
+ * @version 1.12.0
  * @since 1.4.0
  */
-?>
 
-<?php do_action( 'wc_memberships_before_members_area', 'my-memberships-notes', $customer_membership ); ?>
+do_action( 'wc_memberships_before_members_area', 'my-memberships-notes', $customer_membership );
+
+?>
 
 <?php if ( empty ( $customer_notes ) ) : ?>
 
@@ -122,4 +120,6 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 <?php endif; ?>
 
-<?php do_action( 'wc_memberships_after_members_area', 'my-memberships-notes', $customer_membership );
+<?php
+
+do_action( 'wc_memberships_after_members_area', 'my-memberships-notes', $customer_membership );

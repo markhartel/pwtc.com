@@ -17,14 +17,17 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Integrations;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 use SkyVerge\WooCommerce\Memberships\Teams\Product;
+use SkyVerge\WooCommerce\Memberships\Teams\Seat_Manager;
+use SkyVerge\WooCommerce\Memberships\Teams\Team;
+use SkyVerge\WooCommerce\Memberships\Teams\Team_Member;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -34,7 +37,6 @@ defined( 'ABSPATH' ) or exit;
  * @since 1.0.0
  */
 class Subscriptions {
-
 
 
 	/**
@@ -58,7 +60,25 @@ class Subscriptions {
 		add_action( 'woocommerce_checkout_subscription_created',       array( $this, 'update_team_subscription_on_resubscribe' ), 20, 2 );
 		add_action( 'woocommerce_subscription_item_switched',          array( $this, 'update_team_subscription_on_switch' ), 10, 4 );
 
+		// team management
+		add_filter( 'wc_memberships_for_teams_team_can_add_member',    array( $this, 'maybe_allow_adding_new_member' ), 10, 3 );
+		add_filter( 'wc_memberships_for_teams_team_can_remove_member', array( $this, 'maybe_allow_removing_existing_member' ), 10, 3 );
 		add_filter( 'wc_memberships_for_teams_team_management_status', array( $this, 'adjust_team_management_status' ), 10, 2 );
+
+		// seat changes
+		add_filter( 'wc_memberships_for_teams_team_can_add_seats',               array( $this, 'maybe_disable_team_seat_addition' ), 10, 2 );
+		add_filter( 'wc_memberships_for_teams_team_can_remove_seats',            array( $this, 'maybe_enable_team_seat_removal' ), 10, 2 );
+		add_filter( 'woocommerce_add_cart_item_data',                            array( $this, 'add_subscription_data_to_seat_changes' ), 10, 3 );
+		add_filter( 'woocommerce_subscriptions_can_item_be_switched',            array( $this, 'maybe_allow_team_subscription_to_be_switched' ), 10, 3 );
+		add_filter( 'wc_memberships_for_teams_get_seat_change_product_quantity', array( $this, 'adjust_per_team_seat_change_product_quantity' ), 10, 2 );
+		add_filter( 'wc_memberships_for_teams_should_prorate_seat_change',       array( $this, 'enable_seat_change_proration_for_subscriptions' ), 10, 3 );
+		add_action( 'woocommerce_before_calculate_totals',                       array( $this, 'set_subscriptions_settings_for_seat_change' ), 10, 1 );
+		add_filter( 'wc_memberships_for_teams_seat_change_notice_message',       array( $this, 'set_subscription_seat_change_notice_message' ), 10, 4 );
+		add_action( 'woocommerce_subscriptions_switched_item',                   array( $this, 'disable_default_memberships_switch_handling' ), 5, 3 );
+		add_filter( 'wcs_switch_proration_old_price_per_day',                    array( $this, 'maybe_correct_old_price_per_day' ), 10, 5 );
+
+		// this needs to hook after \WC_Subscriptions_Switcher::calculate_prorated_totals() which hooks at priority 99
+		add_action( 'woocommerce_before_calculate_totals', array( $this, 'correct_seat_change_sign_up_fees' ), 100, 1 );
 
 		// frontend
 		add_filter( 'woocommerce_order_again_cart_item_data', array( $this, 'remove_raw_cart_item_team_data'), 20, 2 );
@@ -98,16 +118,16 @@ class Subscriptions {
 		if ( $screen && 'wc_memberships_team' === $screen->post_type ) {
 
 			// viewing the Edit Team screen
-			if ( 'post' === $screen->base && 'edit' === \SV_WC_Helper::get_request( 'action' ) ) {
+			if ( 'post' === $screen->base && 'edit' === Framework\SV_WC_Helper::get_request( 'action' ) ) {
 
 				// sanity check to ensure the object being edited is a valid team
-				if ( $team = wc_memberships_for_teams_get_team( \SV_WC_Helper::get_request( 'post' ) ) ) {
+				if ( $team = wc_memberships_for_teams_get_team( Framework\SV_WC_Helper::get_request( 'post' ) ) ) {
 
-					$subscription_id  = get_post_meta( $team->get_id(), '_subscription_id', true );
-					$switched_team_id = get_post_meta( $team->get_id(), '_subscription_switched_team_id', true );
+					$subscription_id  = (int) get_post_meta( $team->get_id(), '_subscription_id', true );
+					$switched_team_id = (int) get_post_meta( $team->get_id(), '_subscription_switched_team_id', true );
 
 					// display a notice if the subscription was switch and this team is no longer linked
-					if ( ! $subscription_id && $switched_team_id && $switched_team = wc_memberships_for_teams_get_team( $switched_team_id ) ) {
+					if ( ! $subscription_id && $switched_team_id && $switched_team_id !== $team->get_id() && $switched_team = wc_memberships_for_teams_get_team( $switched_team_id ) ) {
 
 						$message = sprintf(
 							/* translators: Placeholders: %1$s - opening <a> tag, %2$s - closing </a> tag */
@@ -258,13 +278,13 @@ class Subscriptions {
 	private function get_edit_subscription_input( $team, $subscription = null ) {
 
 		if ( $subscription && $subscription instanceof \WC_Subscription ) {
-			$subscription_id   = \SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
+			$subscription_id   = Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
 			$subscription_url  = get_edit_post_link( $subscription_id );
 			$subscription_link = '<a href="' . esc_url( $subscription_url ) . '">' . esc_html( $subscription_id ) . '</a>';
 			$selected          = array( $subscription_id => $this->get_core_integration()->get_formatted_subscription_id_holder_name( $subscription ) );
 		} else {
-			$selected        = array();
-			$subscription_id = '';
+			$selected          = array();
+			$subscription_id   = '';
 			$subscription_link = esc_html__( 'Team not linked to a Subscription', 'woocommerce-memberships-for-teams' );
 		}
 
@@ -279,43 +299,22 @@ class Subscriptions {
 
 		?><br>
 		<span class="wc-memberships-edit-subscription-link-field">
-
-			<?php if ( \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) : ?>
-
-				<select
-					class="sv-wc-enhanced-search"
-					id="_subscription_id"
-					name="_subscription_id"
-					data-action="wc_memberships_edit_membership_subscription_link"
-					data-nonce="<?php echo wp_create_nonce( 'edit-membership-subscription-link' ); ?>"
-					data-placeholder="<?php esc_attr_e( 'Link to a Subscription or keep empty to leave unlinked', 'woocommerce-memberships-for-teams' ); ?>"
-					data-allow_clear="true">
-					<?php if ( $subscription instanceof \WC_Subscription ) : ?>
-						<option value="<?php echo $subscription_id; ?>"><?php echo $subscription_id; ?></option>
-					<?php endif; ?>
-				</select>
-
-			<?php else : ?>
-
-				<input
-					type="hidden"
-					class="sv-wc-enhanced-search"
-					id="_subscription_id"
-					name="_subscription_id"
-					data-action="wc_memberships_edit_membership_subscription_link"
-					data-nonce="<?php echo wp_create_nonce( 'edit-membership-subscription-link' ); ?>"
-					data-placeholder="<?php esc_attr_e( 'Link to a Subscription or keep empty to leave unlinked', 'woocommerce-memberships-for-teams' ); ?>"
-					data-allow_clear="true"
-					data-selected="<?php echo esc_html( current( $selected ) ); ?>"
-					value="<?php echo esc_attr( $subscription_id ); ?>"
-				/>
-
-			<?php endif; ?>
-
+			<select
+				class="sv-wc-enhanced-search"
+				id="_subscription_id"
+				name="_subscription_id"
+				data-action="wc_memberships_edit_membership_subscription_link"
+				data-nonce="<?php echo wp_create_nonce( 'edit-membership-subscription-link' ); ?>"
+				data-placeholder="<?php esc_attr_e( 'Link to a Subscription or keep empty to leave unlinked', 'woocommerce-memberships-for-teams' ); ?>"
+				data-allow_clear="true">
+				<?php if ( $subscription instanceof \WC_Subscription ) : ?>
+					<option value="<?php echo $subscription_id; ?>"><?php echo $subscription_id; ?></option>
+				<?php endif; ?>
+			</select>
 		</span>
 		<?php
 
-		\SV_WC_Helper::render_select2_ajax();
+		Framework\SV_WC_Helper::render_select2_ajax();
 
 		$input .= ob_get_clean();
 
@@ -479,7 +478,7 @@ class Subscriptions {
 
 					if ( $list_subscription_product ) :
 
-						$product_name = sprintf( '%1$s (#%2$s)', \SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ? $product->get_name() : $product->get_title(), $product->get_id() );
+						$product_name = sprintf( '%1$s (#%2$s)', $product->get_name(), $product->get_id() );
 
 						$items[] = '<a href="' . get_edit_post_link( $product->get_id() ) . '">' . $product_name . '</a>';
 
@@ -514,6 +513,62 @@ class Subscriptions {
 
 
 	/**
+	 * Allows adding a new member to the team if they have an existing user membership.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.3
+	 *
+	 * @param bool $allow whether to allow or not
+	 * @param int $user_id user identifier
+	 * @param Team $team team object
+	 * @return bool
+	 */
+	public function maybe_allow_adding_new_member( $allow, $user_id, $team ) {
+
+		if ( ! $allow && $user_id ) {
+
+			$existing_user_membership = $team->get_existing_user_membership( $user_id );
+
+			if ( $existing_user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership && $existing_user_membership->get_subscription_id() > 0 ) {
+
+				$member = wc_memberships_for_teams_get_team_member( $team, $existing_user_membership->get_user_id() );
+				$allow  = $team->can_remove_member( $member ) || (bool) wc_memberships_for_teams_get_user_membership_team( $existing_user_membership->get_id() );
+			}
+		}
+
+		return $allow;
+	}
+
+
+	/**
+	 * Allows removal of team members from a subscription based team.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.3
+	 *
+	 * @param bool $allow whether to allow the team member removal
+	 * @param Team_Member $member team member object
+	 * @param Team $team team object
+	 * @return bool
+	 */
+	public function maybe_allow_removing_existing_member( $allow, $member, $team ) {
+
+		if ( ! $allow && $member ) {
+
+			$existing_user_membership = $team->get_existing_user_membership( $member->get_id() );
+
+			if ( $this->has_team_subscription( $team ) || ( $existing_user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership && $existing_user_membership->get_subscription_id() > 0 ) ) {
+				$allow = true;
+			}
+		}
+
+		return $allow;
+	}
+
+
+	/**
 	 * Adjusts the team management status.
 	 *
 	 * Prevents managing the team if the related subscription is cancelled, expired or trashed.
@@ -528,12 +583,13 @@ class Subscriptions {
 	 */
 	public function adjust_team_management_status( $status, $team ) {
 
-		if ( $status['can_be_managed'] && $subscription = $this->get_team_subscription( $team ) ) {
+		if ( $status['can_be_managed'] && ( $subscription = $this->get_team_subscription( $team ) ) ) {
 
 			$integration         = $this->get_core_integration();
 			$subscription_status = $integration->get_subscription_status( $subscription );
 
 			if ( in_array( $subscription_status, array( 'expired', 'trash', 'cancelled' ), true ) ) {
+
 				$status['can_be_managed'] = false;
 				$status['message']        = array(
 					'general'       => __( 'Team subscription has been cancelled or expired.', 'woocommerce-memberships-for-teams' ),
@@ -549,6 +605,491 @@ class Subscriptions {
 
 
 	/**
+	 * Disables seat addition for sites that have an incompatible version of Subscriptions.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $allow_addition whether to allow seats to be added
+	 * @param Team $team the team in question
+	 * @return bool
+	 */
+	public function maybe_disable_team_seat_addition( $allow_addition, $team ) {
+
+		// only perform check on teams with a subscription
+		if ( (bool) $this->get_team_subscription( $team ) ) {
+
+			// disallow seat addition for subscriptions versions that don't support it
+			$allow_addition = $this->subscriptions_version_can_seat_change();
+		}
+
+		return $allow_addition;
+	}
+
+
+	/**
+	 * Enables seat removal for teams that are on a valid subscription.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $allow_removal whether to allow seats to be removed
+	 * @param Team $team the team in question
+	 * @return bool
+	 */
+	public function maybe_enable_team_seat_removal( $allow_removal, $team ) {
+
+		$has_subscription = (bool) $this->get_team_subscription( $team );
+
+		if ( $has_subscription ) {
+
+			$can_seat_change  = $this->subscriptions_version_can_seat_change();
+			$product          = $team->get_product();
+			$is_per_member    = $product ? Product::has_per_member_pricing( $product ) : null;
+
+			$allow_removal = $can_seat_change && $is_per_member && $team->can_be_managed() && ! $team->is_membership_expired();
+		}
+
+		return $allow_removal;
+	}
+
+
+	/**
+	 * Checks if the currently-installed version of Subscriptions is compatible
+	 * with seat changes on teams.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	protected function subscriptions_version_can_seat_change() {
+
+		$can_seat_change = false;
+
+		if ( class_exists( 'WC_Subscriptions' ) && ! empty( \WC_Subscriptions::$version ) ) {
+
+			$subscriptions_version = \WC_Subscriptions::$version;
+			$can_seat_change       = version_compare( $subscriptions_version, '2.4.2', '>=' );
+		}
+
+		return $can_seat_change;
+	}
+
+
+	/**
+	 * Adds subscription data for seat changes involving team membership subscriptions.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $cart_item_data the cart item data
+	 * @param int $product_id the product id
+	 * @param int $variation_id the variation id
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function add_subscription_data_to_seat_changes( $cart_item_data, $product_id, $variation_id ) {
+
+		$seat_change  = isset( $cart_item_data['team_meta_data']['_wc_memberships_for_teams_team_seat_change'] ) ? $cart_item_data['team_meta_data']['_wc_memberships_for_teams_team_seat_change'] : null;
+		$team         = $this->get_subscription_team_from_cart_item_data( $cart_item_data );
+		$subscription = $team ? $this->get_team_subscription( $team ) : null;
+
+		if ( $seat_change && $team && $subscription ) {
+
+			$next_payment_timestamp = $subscription->get_time( 'next_payment' );
+
+			// if there are no payments left, calculate based on the end date of the subscription
+			$next_payment_timestamp = $next_payment_timestamp ? $next_payment_timestamp : $subscription->get_time( 'end' );
+
+			$cart_item_data['subscription_switch'] = array(
+				'subscription_id'         => $subscription->get_id(),
+				'item_id'                 => $this->get_subscription_item_id( $team ),
+				'next_payment_timestamp'  => $next_payment_timestamp,
+				'upgraded_or_downgraded'  => '',
+			);
+		}
+
+		return $cart_item_data;
+	}
+
+
+	/**
+	 * Maybe allows a subscription item to be switched.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $can_be_switched whether the item can be switched
+	 * @param \WC_Order_Item|array $item Order Item object or array representing an order item
+	 * @param \WC_Subscription $subscription subscription object
+	 * @return bool
+	 */
+	public function maybe_allow_team_subscription_to_be_switched( $can_be_switched, $item, $subscription ) {
+
+		if ( is_array( $item ) ) {
+
+			$item_team_id = isset( $item['_wc_memberships_for_teams_team_id'] ) ? (int) $item['_wc_memberships_for_teams_team_id'] : null;
+
+		} else {
+
+			$item_team_id = (int) $item->get_meta( '_wc_memberships_for_teams_team_id', true );
+		}
+
+		$teams = $this->get_teams_from_subscription( $subscription );
+
+		foreach( $teams as $team_id => $team ) {
+
+			if ( $item_team_id === $team_id ) {
+
+				$can_be_switched = current_user_can( 'wc_memberships_for_teams_update_team_seats', $team_id );
+				break;
+			}
+		}
+
+		return $can_be_switched;
+	}
+
+
+	/**
+	 * Adjusts the seat change product quantity for per-team subscription memberships.
+	 *
+	 * Per-team membership seat changes have a change value based on the number of
+	 * blocks of seats to add to the team. We need to convert that to an overall
+	 * total quantity of seat blocks so that subscriptions can prorate it correctly.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $change_value the seat change value passed from the seat change form
+	 * @param Team $team the team object
+	 * @return int cart quantity
+	 * @throws \Exception
+	 */
+	public function adjust_per_team_seat_change_product_quantity( $change_value, $team ) {
+
+		$quantity = (int) $change_value;
+
+		if ( $team && $team instanceof Team ) {
+
+			$product      = $team->get_product();
+			$per_team     = ! Product::has_per_member_pricing( $product );
+			$subscription = $this->get_team_subscription( $team );
+
+			if ( $subscription && $per_team && $change_value ) {
+
+				$order_item = wcs_get_order_item( $this->get_subscription_item_id( $team ), $subscription );
+				$quantity  += (int) $order_item->get_quantity();
+			}
+		}
+
+		return $quantity;
+	}
+
+
+	/**
+	 * Turns on proration for seat changes on teams tied to subscription length.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $enable_proration whether to enable proration for seat changes
+	 * @param Team $team the team object
+	 * @param int $change_value the change value, based on the team's seat change mode
+	 * @return bool
+	 */
+	public function enable_seat_change_proration_for_subscriptions( $enable_proration, $team, $change_value ) {
+
+		if ( $team && $team instanceof Team && ( $plan = $team->get_plan() ) && 'subscription' === $plan->get_access_length_type() ) {
+			$enable_proration = true;
+		}
+
+		return $enable_proration;
+	}
+
+
+	/**
+	 * Sets the correct settings for calculating prorated payments on team seat changes.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WC_Cart $cart the cart object
+	 */
+	public function set_subscriptions_settings_for_seat_change( $cart ) {
+
+		if ( \WC_Subscriptions_Switcher::cart_contains_switches() ) {
+
+			// loop over the items for safety, though we should only have one cart
+			// item, since we clear the cart out before adding the seat change item.
+			foreach( $cart->get_cart() as $cart_item_key => $cart_item ) {
+
+				if ( ! isset( $cart_item['subscription_switch']['subscription_id'],
+					$cart_item['team_meta_data']['_wc_memberships_for_teams_team_seat_change'],
+					$cart_item['team_meta_data']['_wc_memberships_for_teams_team_id'] ) ) {
+					continue;
+				}
+
+				$team         = wc_memberships_for_teams_get_team( $cart_item['team_meta_data']['_wc_memberships_for_teams_team_id'] );
+				$seat_change  = $cart_item['team_meta_data']['_wc_memberships_for_teams_team_seat_change'];
+				$subscription = wcs_get_subscription( $cart_item['subscription_switch']['subscription_id'] );
+
+				if ( $team && $team instanceof Team && $subscription && $subscription instanceof \WC_Subscription ) {
+
+					// filter the setting to prorate subscription price during switching
+					add_filter( 'option_woocommerce_subscriptions_apportion_recurring_price', function( $value, $option_name ) use ( $team, $seat_change ) {
+
+						return Seat_Manager::should_prorate_seat_change( $team, $seat_change ) ? 'yes-upgrade' : $value;
+					}, 10, 2 );
+
+					// disable sign up fees on all switches -- we have to handle this on our own
+					add_filter( 'option_woocommerce_subscriptions_apportion_sign_up_fee', function( $value, $option_name ) { return 'no'; }, 10, 2 );
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Adds subscriptions-specific information to the seat change message.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $seat_change_message seat change notice message
+	 * @param \WC_Order $order the order object
+	 * @param \WC_Order_Item $order_item the order item object
+	 * @param Team $team the team object
+	 * @return string
+	 */
+	public function set_subscription_seat_change_notice_message( $seat_change_message, $order, $order_item, $team ) {
+
+		if ( $subscription = $this->get_team_subscription( $team ) ) {
+
+			$next_payment_timestamp    = $subscription->get_time( 'next_payment' );
+			$formatted_recurring_total = $subscription->get_formatted_order_total();
+			$subscription_status_text  = 0 === $next_payment_timestamp ? __( 'subscription will end', 'woocommerce-memberships-for-teams' ) : __( 'next payment is', 'woocommerce-memberships-for-teams' );
+			$date_timestamp            = 0 === $next_payment_timestamp ? $subscription->get_time( 'end' ) : $next_payment_timestamp;
+
+			$seat_change_message .= sprintf(
+				/* translators: Placeholders: %1$s - new recurring total, %2$s - subscription status text, %3$s - next payment date */
+				__( ' Your new recurring total is %1$s, and your %2$s on %3$s.', 'woocommerce-memberships-for-teams' ),
+				$formatted_recurring_total,
+				$subscription_status_text,
+				date( 'F j, Y', $date_timestamp )
+			);
+		}
+
+		return $seat_change_message;
+	}
+
+
+	/**
+	 * Disables the default subscription switching handling of Memberships if we
+	 * are performing a seat change.
+	 *
+	 * Default Memberships behavior is to cancel the membership if a
+	 * subscription switch is detected.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WC_Subscription $subscription the subscription object
+	 * @param array|\WC_Order_Item_Product $new_order_item the new order item (switching to)
+	 * @param array $old_order_item the old order item (switching from)
+	 */
+	public function disable_default_memberships_switch_handling( $subscription, $new_order_item, $old_order_item ) {
+
+		$seat_change_count = $new_order_item->get_meta( '_wc_memberships_for_teams_team_seat_change', true );
+
+		if ( $seat_change_count && 0 < $seat_change_count ) {
+
+			$memberships_subscriptions_integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+
+			remove_action( 'woocommerce_subscriptions_switched_item', array( $memberships_subscriptions_integration, 'handle_subscription_switches' ), 10 );
+		}
+	}
+
+
+	/**
+	 * Maybe corrects the old price per day calculated during a seat change.
+	 *
+	 * When multiple subscription switches take place within the same billing
+	 * period, Subscriptions always pulls the previous pricing from the
+	 * renewal or purchase rather than the latest switch, to guard against
+	 * 'not yet paid amounts'. We need to get the last full price taking the
+	 * most recent switching into account, so we override that value here if this
+	 * isn't the first subscription to take place during this billing cycle.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param float $old_price_per_day price per day from most recent order or renewal
+	 * @param \WC_Subscription $subscription
+	 * @param array $cart_item subscription cart item array
+	 * @param string $old_recurring_total recurring total from the most recent order or renewal
+	 * @param int $days_in_old_cycle number of days in the current billing cycle
+	 * @return float
+	 */
+	public function maybe_correct_old_price_per_day( $old_price_per_day, $subscription, $cart_item, $old_recurring_total, $days_in_old_cycle ) {
+
+		$last_order_id = $subscription->get_last_order( 'ids', 'any' );
+		$last_switch   = $subscription->get_last_order( 'all', 'switch' );
+
+		if ( $last_switch instanceof \WC_Order && $last_order_id === $last_switch->get_id() ) {
+
+			$product_id = isset( $cart_item['product_id'] ) ? $cart_item['product_id'] : null;
+			$product_id = isset( $cart_item['variation_id'] ) && ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $product_id;
+
+			foreach ( $last_switch->get_items() as $last_order_item ) {
+
+				if ( wcs_get_canonical_product_id( $last_order_item ) === $product_id ) {
+
+					$old_recurring_total = $subscription->get_total( 'edit' );
+					break;
+				}
+			}
+
+			$old_price_per_day = $days_in_old_cycle > 0 ? $old_recurring_total / $days_in_old_cycle : $old_recurring_total;
+		}
+
+		return $old_price_per_day;
+	}
+
+
+	/**
+	 * Adjusts the sign up fee for a subscription for a seat change, if needed.
+	 *
+	 * The \WC_Subscriptions_Switcher class takes care of most of the proration calculations needed,
+	 * but does not offer a solution to a few scenarios which we need to account for here:
+	 *
+	 *   - Fixed-length/date plans should not prorate new seats that are added - we still want to use the
+	 *     Subscriptions Switcher class to adjust the ongoing subscription billing, but we should override
+	 *     the fees to correctly apply the full price of the additional seats here.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WC_Cart $cart the WooCommerce cart instance
+	 */
+	public function correct_seat_change_sign_up_fees( \WC_Cart $cart ) {
+
+		if ( ! \WC_Subscriptions_Switcher::cart_contains_switches() ) {
+			return;
+		}
+
+		foreach ( $cart->cart_contents as $cart_item_key => $cart_item ) {
+
+			if ( ! isset( $cart_item['subscription_switch']['subscription_id'],
+				$cart_item['team_meta_data']['_wc_memberships_for_teams_team_seat_change'],
+				$cart_item['team_meta_data']['_wc_memberships_for_teams_team_id'] ) ) {
+				continue;
+			}
+
+			$team = wc_memberships_for_teams_get_team( $cart_item['team_meta_data']['_wc_memberships_for_teams_team_id'] );
+
+			if ( $team && $team instanceof Team && ( $plan = $team->get_plan() ) && in_array( $plan->get_access_length_type(), array( 'fixed', 'specific' ), true ) ) {
+
+				$product_id = wcs_get_canonical_product_id( $cart_item );
+
+				// look the product up rather than use the cart or subscription data, in case fees or prices have changed
+				$product             = wc_get_product( $product_id );
+				$product_price       = \WC_Subscriptions_Product::get_price( $product );
+				$product_sign_up_fee = \WC_Subscriptions_Product::get_sign_up_fee( $product );
+
+				$subscription      = wcs_get_subscription( $cart_item['subscription_switch']['subscription_id'] );
+				$existing_item     = wcs_get_order_item( $cart_item['subscription_switch']['item_id'], $subscription );
+				$existing_quantity = $existing_item['qty'];
+				$new_quantity      = $cart_item['quantity'];
+				$new_item_count    = $new_quantity - $existing_quantity;
+
+				// no need to apply fees if we aren't adding any items
+				if ( 1 > $new_item_count ) {
+					continue;
+				}
+
+				// total amount to charge for new items added in this seat change
+				$new_item_price = $new_item_count * $product_price;
+
+				// total fees to add for new items added in this seat change
+				$new_item_fees  = $new_item_count * $product_sign_up_fee;
+
+				// all charges, item cost and fees, are represented as a single fee using
+				// subscription switcher -- get that total here
+				$fee_total = $new_item_price + $new_item_fees;
+
+				// subscriptions will multiply this fee value by the new total
+				// quantity for this item rather than the quantity of new additions
+				// made in this seat change, and there doesn't seem to be a way
+				// to change/disable this behavior, so we divide by the same value
+				// in anticipation of the upcoming unnecessary multiplication
+				$fee = (float) $fee_total / $new_quantity;
+
+				wcs_set_objects_property( WC()->cart->cart_contents[ $cart_item_key ]['data'], 'subscription_sign_up_fee', $fee, 'set_prop_only' );
+			}
+		}
+	}
+
+
+	/**
+	 * Returns the most recent order item ID that created this team subscription.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param Team $team the team object
+	 * @return int|null
+	 * @throws \Exception
+	 */
+	public function get_subscription_item_id( $team ) {
+
+		$item_id = null;
+
+		if ( $team && $subscription = $this->get_team_subscription( $team ) ) {
+
+			foreach( $subscription->get_items() as $line_item_id => $line_item ) {
+
+				if ( $team->get_id() === (int) wc_get_order_item_meta( $line_item_id, '_wc_memberships_for_teams_team_id', true ) ) {
+					$item_id = $line_item_id;
+					break;
+				}
+			}
+		}
+
+		return $item_id;
+	}
+
+
+	/**
+	 * Returns a team from cart item data if it is valid and has a valid subscription.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $cart_item_data cart item data
+	 * @return Team|null team object if a valid team with a subscription is found, null otherwise
+	 */
+	private function get_subscription_team_from_cart_item_data( $cart_item_data ) {
+
+		$team_id = isset( $cart_item_data['team_meta_data']['_wc_memberships_for_teams_team_id'] ) ? $cart_item_data['team_meta_data']['_wc_memberships_for_teams_team_id'] : null;
+
+		if ( $team_id && ( $team = wc_memberships_for_teams_get_team( $team_id ) ) && $team instanceof Team && $this->has_team_subscription( $team ) ) {
+			return $team;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * Saves related subscription data when a team is created via a purchase.
 	 *
 	 * @internal
@@ -557,6 +1098,7 @@ class Subscriptions {
 	 *
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team the team instance
 	 * @param array $args
+	 * @throws \Exception
 	 */
 	public function save_subscription_data( $team, $args ) {
 
@@ -570,7 +1112,7 @@ class Subscriptions {
 			if ( $subscription ) {
 
 				$previous_subscription_id = (int) $this->get_team_subscription_id( $team );
-				$subscription_id          = (int) \SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
+				$subscription_id          = (int) Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
 
 				update_post_meta( $team->get_id(), '_subscription_id', $subscription_id );
 
@@ -610,8 +1152,8 @@ class Subscriptions {
 	 */
 	public function update_team_subscription_on_resubscribe( $new_subscription, $resubscribe_order ) {
 
-		$new_order_id        = \SV_WC_Order_Compatibility::get_prop( $resubscribe_order, 'id' );
-		$new_subscription_id = \SV_WC_Order_Compatibility::get_prop( $new_subscription, 'id' );
+		$new_order_id        = Framework\SV_WC_Order_Compatibility::get_prop( $resubscribe_order, 'id' );
+		$new_subscription_id = Framework\SV_WC_Order_Compatibility::get_prop( $new_subscription, 'id' );
 		$old_subscription_id = $new_subscription_id > 0 ? get_post_meta( $new_subscription_id, '_subscription_resubscribe', true ) : 0;
 		$old_subscription    = $old_subscription_id > 0 ? wcs_get_subscription( $old_subscription_id ) : null;
 
@@ -657,6 +1199,7 @@ class Subscriptions {
 	 * @param \WC_Subscription $subscription subscription object
 	 * @param int|string $new_line_item_id line item ID for the subscription being switched to
 	 * @param int|string $old_line_item_id line item ID for the subscription being switched from
+	 * @throws \Exception
 	 */
 	public function update_team_subscription_on_switch( $order, $subscription, $new_line_item_id, $old_line_item_id ) {
 
@@ -678,9 +1221,10 @@ class Subscriptions {
 			}
 		}
 
-		$old_team_id = wc_get_order_item_meta( $old_line_item_id, '_wc_memberships_for_teams_team_id' );
+		$new_team_id = $new_team ? $new_team->get_id() : null;
+		$old_team_id = (int) wc_get_order_item_meta( $old_line_item_id, '_wc_memberships_for_teams_team_id' );
 
-		if ( $old_team = wc_memberships_for_teams_get_team( $old_team_id ) ) {
+		if ( $new_team_id !== $old_team_id && $old_team = wc_memberships_for_teams_get_team( $old_team_id ) ) {
 
 			// unlink the old team from the subscription being switched
 			delete_post_meta( $old_team->get_id(), '_subscription_id' );
@@ -711,9 +1255,9 @@ class Subscriptions {
 
 				// set the membership's subscription ID
 				$subscription_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
-				$subscription_membership->set_subscription_id( \SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) );
+				$subscription_membership->set_subscription_id( Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) );
 
-				$order_id = $order instanceof \WC_Order ? \SV_WC_Order_Compatibility::get_prop( $order, 'id' ) : null;
+				$order_id = $order instanceof \WC_Order ? Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' ) : null;
 
 				// if associated with an order
 				if ( $order_id ) {
@@ -777,9 +1321,10 @@ class Subscriptions {
 
 		$subscription = $this->get_team_subscription( $team_member->get_team_id() );
 
+		// handle subscription data when adding a new member to a subscription based team
 		if ( $subscription ) {
 
-			$subscription_id = \SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
+			$subscription_id = Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
 			$user_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
 
 			$user_membership->set_subscription_id( $subscription_id );
@@ -829,6 +1374,18 @@ class Subscriptions {
 			// end date has changed
 			if ( strtotime( $end_date ) !== $user_membership->get_end_date( 'timestamp' ) ) {
 				$user_membership->set_end_date( $end_date );
+			}
+
+		// If the team the user is being added to has no subscription, check if the member being added has instead an existing membership tied to a subscription from another team:
+		// this may be a niche occurrence when an admin wants to move a member of an expired subscription-tied team to a new manually-created team.
+		} elseif ( $user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership && $user_membership->has_subscription() ) {
+
+			// unlink the membership
+			$this->get_core_integration()->unlink_membership( $user_membership, $user_membership->get_subscription_id() );
+
+			// move to active status
+			if ( $user_membership->is_expired() || $user_membership->is_cancelled() ) {
+				$user_membership->update_status( 'active' );
 			}
 		}
 	}
@@ -910,7 +1467,8 @@ class Subscriptions {
 	 * @return array
 	 */
 	public function add_next_bill_column( $columns ) {
-		return \SV_WC_Helper::array_insert_after( $columns, 'team-created-date', array( 'team-next-bill-on' => __( 'Next Bill On', 'woocommerce-memberships-for-teams' ) ) );
+
+		return Framework\SV_WC_Helper::array_insert_after( $columns, 'team-created-date', array( 'team-next-bill-on' => __( 'Next Bill On', 'woocommerce-memberships-for-teams' ) ) );
 	}
 
 
@@ -929,7 +1487,7 @@ class Subscriptions {
 
 		if ( $subscription = $this->get_team_subscription( $team ) ) {
 
-			$team_details = \SV_WC_Helper::array_insert_after(
+			$team_details = Framework\SV_WC_Helper::array_insert_after(
 				$team_details,
 				'created-date',
 				array( 'next-bill-date' => array(
@@ -1122,7 +1680,7 @@ class Subscriptions {
 		if ( is_numeric( $subscription ) ) {
 			$subscription_id = (int) $subscription;
 		} elseif ( is_object( $subscription ) ) {
-			$subscription_id = (int) \SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
+			$subscription_id = (int) Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
 		}
 
 		if ( ! empty( $subscription_id ) ) {
@@ -1191,19 +1749,21 @@ class Subscriptions {
 	/**
 	 * Separates regular team products from subscription-based team products in edit plan screen.
 	 *
+	 * TODO remove this method by version 2.0.0 or by December 2019 {FN 2018-06-28}
+	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @deprecated since 1.0.4
-	 *
-	 * TODO remove this method by version 1.3.0 {FN 2018-06-28}
 	 *
 	 * @param \WC_Product[] $products array of team products
 	 * @param int $plan_id membership plan id
 	 * @return \WC_Product[]
 	 */
 	public function adjust_membership_plan_team_products( $products, $plan_id ) {
+
 		_deprecated_function( 'SkyVerge\WooCommerce\Memberships\Teams\Integrations\Subscriptions::adjust_membership_plan_team_products()', '1.10.4' );
+
 		return $products;
 	}
 

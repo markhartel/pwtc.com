@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -174,7 +173,7 @@ class WC_Memberships_User_Messages {
 			'member_login_message'                                    => '',
 		);
 
-		/** TODO remove this filter deprecation notice by version 1.12.0 {FN 2017-08-03} */
+		/** TODO remove this filter deprecation notice by version 1.13.0 {FN 2017-08-03} */
 		if ( has_filter( 'wc_memberships_valid_restriction_message_types' ) ) {
 			_deprecated_function( 'the filter "wc_memberships_valid_restriction_message_types"', '1.9.0', '"wc_memberships_default_messages" filter' );
 		}
@@ -304,17 +303,15 @@ class WC_Memberships_User_Messages {
 		// determine if there's a custom message override
 		if ( $the_post = ! $the_post instanceof \WP_Post ? $post : $the_post ) {
 
-			/* TODO remove traces of legacy key handling in the following block of code inside this if statement by version 1.12.0 {FN 2017-12-18} */
 			$use_override_key     = null;
 			$message_override_key = null;
-			$legacy_use_override  = 'product' !== $the_post->post_type && 'yes' === wc_memberships_get_content_meta( $the_post->ID, '_wc_memberships_use_custom_content_restricted_message' );
 
 			// no_products messages aren't saved as custom messages, so look for a plain custom message first...
 			if ( Framework\SV_WC_Helper::str_ends_with( $message_code, 'no_products' ) ) {
 
 				$use_override_key = substr( "_wc_memberships_use_custom_{$message_code}", 0, -12 );
 
-				if ( $legacy_use_override || 'yes' === wc_memberships_get_content_meta( $the_post->ID, $use_override_key ) ) {
+				if ( 'yes' === wc_memberships_get_content_meta( $the_post->ID, $use_override_key ) ) {
 
 					$message_override_key = substr( "_wc_memberships_{$message_code}", 0, -12 );
 					$message_override     = wc_memberships_get_content_meta( $the_post->ID, $message_override_key );
@@ -326,35 +323,11 @@ class WC_Memberships_User_Messages {
 
 				$use_override_key = "_wc_memberships_use_custom_{$message_code}";
 
-				if ( $legacy_use_override || 'yes' === wc_memberships_get_content_meta( $the_post->ID, $use_override_key ) ) {
+				if ( 'yes' === wc_memberships_get_content_meta( $the_post->ID, $use_override_key ) ) {
 
 					$message_override_key = "_wc_memberships_{$message_code}";
 					$message_override     = wc_memberships_get_content_meta( $the_post->ID, $message_override_key );
 				}
-			}
-
-			// legacy meta handling
-			if ( $legacy_use_override ) {
-
-				// sanity check: has a new message override been using the new meta key yet?
-				if ( empty( $message_override ) ) {
-
-					// if not, then use the legacy message override
-					$legacy_override = wc_memberships_get_content_meta( $the_post->ID, '_wc_memberships_content_restricted_message' );
-
-					if ( is_string( $legacy_override ) ) {
-
-						$message_override = $legacy_override;
-
-						// if a legacy message override is found, move its contents to the new post meta introduced in v1.9.0
-						wc_memberships_set_content_meta( $the_post->ID, Framework\SV_WC_Helper::str_ends_with( $message_code, 'no_products' ) ? substr( "_wc_memberships_{$message_code}", 0, -12 ) : "_wc_memberships_{$message_code}", $message_override );
-						wc_memberships_delete_content_meta( $the_post->ID, '_wc_memberships_content_restricted_message' );
-					}
-				}
-
-				// move use custom message flag to new post meta introduced in v1.9.0
-				wc_memberships_set_content_meta( $the_post->ID, Framework\SV_WC_Helper::str_ends_with( $message_code, 'no_products' ) ? substr( "_wc_memberships_use_custom_{$message_code}", 0, -12 ) : "_wc_memberships_use_custom_{$message_code}", 'yes' );
-				wc_memberships_delete_content_meta( $the_post->ID, '_wc_memberships_use_custom_content_restricted_message' );
 			}
 		}
 
@@ -395,59 +368,6 @@ class WC_Memberships_User_Messages {
 
 
 	/**
-	 * Returns a restricted content notice for admins.
-	 *
-	 * Message intended for admins to tell them they are viewing restricted content non-members wouldn't have access to.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @return string HTML
-	 */
-	public static function get_admin_message_html() {
-
-		$message = '';
-
-		if ( self::show_admin_message() ) {
-
-			/* translators: Placeholders: %1$s - <strong>, %2$s - </strong> */
-			$text = sprintf( __( '%1$sHeads up!%2$s Restricted content is visible to you as an administrator, but will be restricted for guests and non-members.', 'woocommerce-memberships' ),
-				'<strong>', '</strong>'
-			);
-
-			$message = '<div class="woocommerce wc-memberships admin-restricted-content-notice">' . wp_kses_post( $text ) . ' <a href="#" class="dismiss-link">' . __( 'Dismiss', 'woocommerce-memberships' ) . '</a></div>';
-		}
-
-		return $message;
-	}
-
-
-	/**
-	 * Determines if we should be showing an admin message for this user.
-	 *
-	 * @since 1.10.4
-	 *
-	 * @return bool true if we should show the notice to the current user
-	 */
-	public static function show_admin_message() {
-
-		$current_user    = wp_get_current_user();
-		$display_message = 'yes' === get_option( 'wc_memberships_admin_restricted_content_notice' )
-						   && $current_user->ID > 0
-						   && 'no' !== get_user_meta( $current_user->ID, '_wc_memberships_show_admin_restricted_content_notice', true )
-						   && current_user_can( 'wc_memberships_access_all_restricted_content' );
-
-		/**
-		 * Toggles whether to display an admin notice when an admin is browsing content restricted to non-members.
-		 *
-		 * @since 1.10.1
-		 *
-		 * @param bool $display_message true for users who have not yet seen this on new installations
-		 */
-		return (bool) apply_filters( 'wc_memberships_display_restricted_content_admin_notice', $display_message );
-	}
-
-
-	/**
 	 * Returns a final restriction message in HTML format.
 	 *
 	 * Note: a message code in shorthand form must be passed to this method.
@@ -463,11 +383,24 @@ class WC_Memberships_User_Messages {
 	 * @return string HTML
 	 */
 	public static function get_message_html( $code_shorthand, $args = array() ) {
-		global $post;
 
 		$args     = self::parse_message_args( $code_shorthand, $args );
 		$the_post = self::parse_post_from_message_args( $args );
 		$the_term = self::parse_term_from_message_args( $args );
+
+		/**
+		 * Filters whether restricted messages of this type should be shown at all.
+		 *
+		 * This allows others to override certain message types entirely.
+		 *
+		 * @since 1.12.3
+		 *
+		 * @param bool $display whether to display the messages
+		 * @param array $args the message args, if any
+		 */
+		if ( false === apply_filters( "wc_memberships_display_{$code_shorthand}_messages", true, $args ) ) {
+			return 'content' === $args['context'] && self::should_get_content_excerpt( $the_post, $code_shorthand ) ? self::get_restricted_content_excerpt( $the_post, $code_shorthand ) : '';
+		}
 
 		if ( empty( $args['rule_type'] ) ) {
 			$rule_type = false !== strpos( $code_shorthand, 'discount' ) ? 'purchasing_discount'  : '';
@@ -494,43 +427,21 @@ class WC_Memberships_User_Messages {
 		// find message by code key
 		$message_code = empty( $products ) && ! in_array( $code_shorthand, array( 'cart_sole_item_discount', 'cart_item_discount', 'cart_items_discount', 'member_login' ), false ) && ! Framework\SV_WC_Helper::str_ends_with( $code_shorthand, 'delayed' ) ? $code_shorthand . '_message_no_products' : $code_shorthand . '_message';
 		$message      = do_shortcode( self::get_message( $message_code, $message_args ) );
+		// TODO remove deprecated filters handling by version 1.13.0 {FN 2018-11-07}
 		$message      = self::handle_deprecated_filters( $message, $message_code, $message_args );
 		// handle merge tags
 		$message      = self::parse_message_merge_tags( $message, $message_args );
 		// parse allowed HTML
 		$html_message = wp_kses( $message, self::get_message_allowed_html( $message_code ) );
-
 		// get HTML classes
 		$classes      = self::get_message_classes( $message_code, $message_args );
 
 		if ( 'content' === $message_args['context'] ) {
 
-			// maybe prepend an excerpt if settings say so and we're not in the restricted content redirect page
-			$excerpt      = '';
-			$restrictions = wc_memberships()->get_restrictions_instance();
+			$excerpt = '';
 
-			// show excerpt only if option is enabled and the restriction mode is not redirect (redirection content restricted page is always fully visible)
-			if ( $the_post && $restrictions->showing_excerpts() ) {
-
-				$is_redirect = $restrictions->is_restriction_mode( 'redirect' );
-
-				if ( ! $is_redirect ) {
-
-					$show_excerpt = true;
-
-				} else {
-
-					$redirected_page_id          = $restrictions->get_restricted_content_redirect_page_id();
-					$is_post_redirected_page     = $post && $post->ID === $redirected_page_id;
-					$is_the_post_redirected_page = $the_post->ID === $redirected_page_id;
-
-					$show_excerpt = $redirected_page_id > 0 && ! $is_post_redirected_page && ! $is_the_post_redirected_page;
-				}
-
-				// do not display excerpts for taxonomy archives (in future we might support taxonomy descriptions though)
-				if ( $show_excerpt && ! Framework\SV_WC_Helper::str_exists( $message_code, 'category' ) ) {
-					$excerpt = self::get_restricted_content_excerpt( $the_post, $message_code );
-				}
+			if ( self::should_get_content_excerpt( $the_post, $message_code ) ) {
+				$excerpt = self::get_restricted_content_excerpt( $the_post, $message_code );
 			}
 
 			$html_message = $excerpt . ( ! empty( $html_message ) ? '<div class="woocommerce"><div class="' . implode( ' ', $classes ) . '">'. $html_message . '</div></div>' : '' );
@@ -590,12 +501,55 @@ class WC_Memberships_User_Messages {
 
 
 	/**
+	 * Determines if an excerpt should be used based on the given content object and message code.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @param \WP_Post $the_post post object being restricted
+	 * @param string $message_code message code or code shorthand
+	 * @return bool
+	 */
+	private static function should_get_content_excerpt( $the_post, $message_code ) {
+		global $post;
+
+		$should_get_excerpt = false;
+
+		// maybe define the excerpt to prepend to the message HTML
+		if ( $the_post && ! Framework\SV_WC_Helper::str_exists( $message_code, 'category' ) ) {
+
+			$restrictions = wc_memberships()->get_restrictions_instance();
+
+			// show excerpt only if option is enabled and the restriction mode is not redirect (redirection content restricted page is always fully visible)
+			if ( $restrictions->showing_excerpts() ) {
+
+				$is_redirect = $restrictions->is_restriction_mode( 'redirect' );
+
+				if ( ! $is_redirect ) {
+
+					$should_get_excerpt = true;
+
+				} else {
+
+					$redirected_page_id          = $restrictions->get_restricted_content_redirect_page_id();
+					$is_post_redirected_page     = $post && $post->ID === $redirected_page_id;
+					$is_the_post_redirected_page = $the_post->ID === $redirected_page_id;
+
+					$should_get_excerpt = $redirected_page_id > 0 && ! $is_post_redirected_page && ! $is_the_post_redirected_page;
+				}
+			}
+		}
+
+		return $should_get_excerpt;
+	}
+
+
+	/**
 	 * Returns the restricted content excerpt.
 	 *
 	 * @since 1.10.1
 	 *
 	 * @param \WP_Post $post the post object being restricted
-	 * @param string $message_code the message code being parsed
+	 * @param string $message_code the message code being parsed: this may be the full message code or code shorthand
 	 * @return string the restricted content excerpt
 	 */
 	private static function get_restricted_content_excerpt( $post, $message_code = '' ) {
@@ -605,8 +559,8 @@ class WC_Memberships_User_Messages {
 		// for products, use WooCommerce template instead of WordPress standard excerpt
 		if ( in_array( get_post_type( $post ), array( 'product', 'product_variation' ), true ) ) {
 
-			if (    in_array( $message_code, array( 'product_viewing_restricted_message', 'product_viewing_restricted_message_no_products' ), false )
-				 || ( 'product_access_delayed_message' === $message_code && ( ! current_user_can( 'wc_memberships_view_delayed_product', $post->ID ) || ! current_user_can( 'wc_memberships_view_restricted_product', $post->ID ) ) ) ) {
+			if ( Framework\SV_WC_Helper::str_exists( $message_code, 'product_viewing_restricted' )
+				 || ( Framework\SV_WC_Helper::str_exists( $message_code, 'product_access_delayed' ) && ( ! current_user_can( 'wc_memberships_view_delayed_product', $post->ID ) || ! current_user_can( 'wc_memberships_view_restricted_product', $post->ID ) ) ) ) {
 
 				ob_start();
 
@@ -765,6 +719,7 @@ class WC_Memberships_User_Messages {
 
 						/* @see \WC_Memberships_User_Messages::get_message_html() */
 						$message = do_shortcode( self::get_message( $message_code, $args ) );
+						// TODO remove deprecated filters handling by version 1.13.0 {FN 2018-11-07}
 						$message = self::handle_deprecated_filters( $message, $message_code, $args );
 					}
 				}
@@ -783,6 +738,20 @@ class WC_Memberships_User_Messages {
 			$products_merge_tag = (string) apply_filters( 'wc_memberships_message_products_merge_tag_replacement', $products_merge_tag, $products, $message, $args );
 
 			$message = str_replace( '{products}', '<span class="wc-memberships-products-grant-access">' . $products_merge_tag . '</span>', $message );
+		}
+
+		// replace {discount} tags
+		if ( ! empty( $args['post_id'] ) ) {
+
+			// discounts up to...
+			if ( false !== strpos( $message, '{discount_max}' ) || false !== strpos( $message, '{discount}' ) ) {
+				$message = str_replace( array( '{discount}', '{discount_max}' ), wc_memberships()->get_member_discounts_instance()->get_product_discount_html( (int) $args['post_id'], 'max' ), $message );
+			}
+
+			// discounts starting from...
+			if ( false !== strpos( $message, '{discount_min}' ) ) {
+				$message = str_replace( '{discount_min}', wc_memberships()->get_member_discounts_instance()->get_product_discount_html( (int) $args['post_id'], 'min' ), $message );
+			}
 		}
 
 		// replace {date}
@@ -809,7 +778,9 @@ class WC_Memberships_User_Messages {
 	/**
 	 * Handle messages deprecated filters for backwards compatibility.
 	 *
-	 * TODO remove this method by version 1.12.0 - do not open to public {FN 2017-07-04}
+	 * TODO remove this method by version 1.13.0 - do not open to public {FN 2017-07-04}
+	 * @see \WC_Memberships_User_Messages::parse_message_merge_tags()
+	 * @see \WC_Memberships_User_Messages::get_message_html()
 	 *
 	 * @since 1.9.0
 	 *
@@ -829,7 +800,7 @@ class WC_Memberships_User_Messages {
 			/**
 			 * Filter the delayed content message.
 			 *
-			 * TODO this filter will be removed by version 1.12.0 {FN 2017-07-03}
+			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
 			 *
 			 * @deprecated since 1.9.0
 			 * @since 1.0.0
@@ -847,7 +818,7 @@ class WC_Memberships_User_Messages {
 			/**
 			 * Filter the product member discount message
 			 *
-			 * TODO this filter will be removed by version 1.12.0 {FN 2017-07-03}
+			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
 			 *
 			 * @deprecated since 1.9.0
 			 * @since 1.0.0
@@ -865,7 +836,7 @@ class WC_Memberships_User_Messages {
 			/**
 			 * Filter the product term viewing restricted message.
 			 *
-			 * TODO this filter will be removed by version 1.12.0 {FN 2017-07-03}
+			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
 			 *
 			 * @deprecated since 1.9.0
 			 * @since 1.4.0
@@ -1184,8 +1155,19 @@ class WC_Memberships_User_Messages {
 			$excerpt = strip_shortcodes( $excerpt );
 		}
 
-		/** This filter is documented in wp-includes/post-template.php */
-		$excerpt = apply_filters( 'the_content', $excerpt );
+		/**
+		 * Filters whether to apply `the_content` filter on excerpts.
+		 *
+		 * @since 1.12.3
+		 *
+		 * @param bool $apply_the_content_filter determines whether to apply `the_content` filter. Defaults to true
+		 */
+		if ( true === (bool) apply_filters( 'wc_memberships_message_excerpt_apply_the_content_filter', true ) ) {
+
+			/** This filter is documented in wp-includes/post-template.php */
+			$excerpt = apply_filters( 'the_content', $excerpt );
+		}
+
 		$excerpt = str_replace( ']]>', ']]&gt;', $excerpt );
 
 		/** This filter is documented in wp-includes/formatting.php */
@@ -1214,6 +1196,59 @@ class WC_Memberships_User_Messages {
 		$excerpt_more = (string) apply_filters( 'wc_memberships_restricted_excerpt_more', $excerpt_more );
 
 		return wp_trim_words( $excerpt, $excerpt_length, $excerpt_more );
+	}
+
+
+	/**
+	 * Returns a restricted content notice for admins.
+	 *
+	 * Message intended for admins to tell them they are viewing restricted content non-members wouldn't have access to.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return string HTML
+	 */
+	public static function get_admin_message_html() {
+
+		$message = '';
+
+		if ( self::show_admin_message() ) {
+
+			/* translators: Placeholders: %1$s - <strong>, %2$s - </strong> */
+			$text = sprintf( __( '%1$sHeads up!%2$s Restricted content is visible to you as an administrator, but will be restricted for guests and non-members.', 'woocommerce-memberships' ),
+				'<strong>', '</strong>'
+			);
+
+			$message = '<div class="woocommerce wc-memberships admin-restricted-content-notice">' . wp_kses_post( $text ) . ' <a href="#" class="dismiss-link">' . __( 'Dismiss', 'woocommerce-memberships' ) . '</a></div>';
+		}
+
+		return $message;
+	}
+
+
+	/**
+	 * Determines if we should be showing an admin message for this user.
+	 *
+	 * @since 1.10.4
+	 *
+	 * @return bool true if we should show the notice to the current user
+	 */
+	public static function show_admin_message() {
+
+		$current_user    = wp_get_current_user();
+		$display_message =    'yes' === get_option( 'wc_memberships_admin_restricted_content_notice' )
+		                   && $current_user->ID > 0
+		                   && 'no' !== get_user_meta( $current_user->ID, '_wc_memberships_show_admin_restricted_content_notice', true )
+		                   && current_user_can( 'wc_memberships_access_all_restricted_content' );
+
+		/**
+		 * Toggles whether to display an admin notice when an admin is browsing content restricted to non-members.
+		 *
+		 * @since 1.10.1
+		 *
+		 * @param bool $display_message true for users who have not yet seen this on new installations
+		 */
+		return (bool) apply_filters( 'wc_memberships_display_restricted_content_admin_notice', $display_message );
 	}
 
 

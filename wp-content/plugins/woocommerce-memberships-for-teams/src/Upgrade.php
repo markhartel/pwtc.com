@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,18 +31,62 @@ defined( 'ABSPATH' ) or exit;
  * Upgrade class. Handles version upgrades.
  *
  * @since 1.0.2
+ *
+ * @method Plugin get_plugin()
  */
-class Upgrade {
+class Upgrade extends Framework\Plugin\Lifecycle {
+
+
+	/**
+	 * Handles plugin activation.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 */
+	public function activate() {
+
+		$this->get_plugin()->add_rewrite_endpoints();
+	}
+
+
+	/**
+	 * Handles plugin deactivation.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 */
+	public function deactivate() {
+
+		flush_rewrite_rules();
+	}
 
 
 	/**
 	 * Runs updates.
 	 *
+	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes first {FN 2018-01-14}
+	 *
 	 * @since 1.0.2
+	 * @deprecated since 1.1.2
 	 *
 	 * @param string $installed_version semver
 	 */
 	public static function run_update_scripts( $installed_version ) {
+
+		_deprecated_function( 'SkyVerge\WooCommerce\Memberships\Teams\Upgrade::run_update_scripts()', '1.1.1' );
+	}
+
+
+	/**
+	 * Runs plugin upgrade scripts.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param string $installed_version semver
+	 */
+	protected function upgrade( $installed_version ) {
 
 		if ( ! empty( $installed_version ) ) {
 
@@ -53,10 +98,14 @@ class Upgrade {
 
 				if ( version_compare ( $installed_version, $update_to_version, '<' ) ) {
 
-					self::$update_script();
+					$this->$update_script();
+
+					$this->get_plugin()->log( sprintf( 'Updated to version %s', $update_to_version ) );
 				}
 			}
 		}
+
+		$this->get_plugin()->add_rewrite_endpoints();
 	}
 
 
@@ -65,7 +114,7 @@ class Upgrade {
 	 *
 	 * @since 1.0.2
 	 */
-	private static function update_to_1_0_2() {
+	private function update_to_1_0_2() {
 		global $wpdb;
 
 		// Before 1.0.1, team subscription items were missing the purchased team id, which caused a duplicate team
@@ -97,5 +146,6 @@ class Upgrade {
 			wc_update_order_item_meta( $order_item->id, '_wc_memberships_for_teams_team_id', $order_item->team_id );
 		}
 	}
+
 
 }

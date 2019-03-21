@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -104,6 +103,7 @@ class WC_Memberships_Emails {
 			'WC_Memberships_User_Membership_Ending_Soon_Email'      => '/includes/emails/class-wc-memberships-user-membership-ending-soon-email.php',
 			'WC_Memberships_User_Membership_Ended_Email'            => '/includes/emails/class-wc-memberships-user-membership-ended-email.php',
 			'WC_Memberships_User_Membership_Renewal_Reminder_Email' => '/includes/emails/class-wc-memberships-user-membership-renewal-reminder-email.php',
+			'WC_Memberships_User_Membership_Activated_Email'        => '/includes/emails/class-wc-memberships-user-membership-activated-email.php',
 		);
 
 		return true !== $include_paths ? array_keys( $email_classes ) : $email_classes;
@@ -213,6 +213,19 @@ class WC_Memberships_Emails {
 
 
 	/**
+	 * Returns the activated delayed membership email handler instance.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Renewal_Reminder_Email
+	 */
+	public function get_user_membership_activated_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Activated_Email' );
+	}
+
+
+	/**
 	 * Returns a membership email's default content.
 	 *
 	 * @since 1.7.0
@@ -254,6 +267,21 @@ class WC_Memberships_Emails {
 		}
 
 		$emails[ $email ]->trigger( $args );
+	}
+
+
+	/**
+	 * Sends a membership activated email for a user membership.
+	 *
+	 * @see \WC_Memberships_User_Membership_Activated_Email
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int $user_membership_id ID of the activated membership
+	 */
+	public function send_membership_activated_email( $user_membership_id ) {
+
+		$this->send_email( 'WC_Memberships_User_Membership_Activated_Email', $user_membership_id );
 	}
 
 
@@ -352,6 +380,9 @@ class WC_Memberships_Emails {
 			/* translators: Placeholder: %s - merge tag */
 			sprintf( __( '%s inserts the time difference between now and the date when the membership expires or has expired (e.g. "2 days", or "1 week", etc.).', 'woocommerce-memberships' ),
 				'<strong><code>{membership_expiry_time_diff}</code></strong>' ),
+			/* translators: Placeholder: %s - merge tag */
+			sprintf( __( '%s inserts a plain URL to the members area to view the membership.', 'woocommerce-memberships' ),
+				'<strong><code>{membership_view_url}</code></strong>' ),
 			/* translators: Placeholder: %s - merge tag */
 			sprintf( __( '%s inserts a plain membership renewal URL.', 'woocommerce-memberships' ),
 				'<strong><code>{membership_renewal_url}</code></strong>' ),

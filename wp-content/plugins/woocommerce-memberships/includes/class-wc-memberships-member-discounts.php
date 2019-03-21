@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -41,6 +40,9 @@ class WC_Memberships_Member_Discounts {
 
 	/** @var array lazy loading for member product discount information. */
 	private $member_has_product_discount = array();
+
+	/** @var string transient key to store cached IDs of products excluded from member discounts */
+	private $products_excluded_from_discounts_transient_key = 'wc_memberships_products_excluded_from_discounts';
 
 	/** @var array memoization for product discounts exclusion. */
 	private $product_excluded_from_discounts = array();
@@ -322,6 +324,162 @@ class WC_Memberships_Member_Discounts {
 
 
 	/**
+	 * Gets a list of products marked to be excluded from member discounts from any plan rule.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param bool $use_cache optional, whether to look or skip cached values in transient
+	 * @return int[] product IDs
+	 */
+	public function get_products_excluded_from_member_discounts( $use_cache = true ) {
+		global $wpdb;
+
+		if ( true === $use_cache ) {
+
+			$products = get_transient( $this->products_excluded_from_discounts_transient_key );
+
+			// transient has expired, must query posts again and update cache
+			if ( ! is_array( $products ) ) {
+				$products = $this->get_products_excluded_from_member_discounts( false );
+			}
+
+		} else {
+
+			$products = array_map( 'absint', $wpdb->get_col( "
+				SELECT p.ID FROM $wpdb->posts p
+				LEFT JOIN $wpdb->postmeta pm
+				ON p.ID = pm.post_id
+				WHERE p.post_type = 'product'
+				AND pm.meta_key = '_wc_memberships_exclude_discounts'
+				AND pm.meta_value = 'yes'
+			" ) );
+
+			if ( ! empty( $products ) ) {
+
+				// account for variations of variable products
+				$parents  = '(' . implode( ',', $products ) . ')';
+				$products = array_merge( $products, array_map( 'absint', $wpdb->get_col( "
+					SELECT ID FROM $wpdb->posts 
+					WHERE post_parent IN $parents
+				" ) ) );
+
+				$this->update_excluded_member_discounts_products_cache( array_unique( $products ) );
+			}
+		}
+
+		return $products;
+	}
+
+
+	/**
+	 * Sets a product's member discounts exclusion status (helper method).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|int|\WP_Product|\WP_Post $product product's object, post, ID - or array of either
+	 * @param string $exclusion either 'yes' or 'no'
+	 * @return int number of processed products (0 for failure)
+	 */
+	private function set_product_discounts_exclusion( $product, $exclusion ) {
+
+		$success = 0;
+
+		if ( in_array( $exclusion, array( 'yes', 'no' ), true ) ) {
+
+			$items = is_array( $product ) ? $product : array( $product );
+
+			foreach ( $items as $item ) {
+				if ( wc_memberships_set_content_meta( $item, '_wc_memberships_exclude_discounts', $exclusion ) ) {
+					$success++;
+				}
+			}
+		}
+
+		if ( $success > 0 ) {
+			$this->update_excluded_member_discounts_products_cache();
+		}
+
+		return $success;
+	}
+
+
+	/**
+	 * Marks a product as excluded from member discounts, when applicable.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WC_Product|\WP_Post|int $product product's ID, post or object - or array of either
+	 * @return int number of processed products (0 for failure)
+	 */
+	public function set_product_excluded_from_member_discounts( $product ) {
+
+		return $this->set_product_discounts_exclusion( $product, 'yes' );
+	}
+
+
+	/**
+	 * Marks a product as affected by member discounts, if applicable.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WC_Product|\WP_Post|int $product product ID or object, or array of
+	 * @return int number of processed products (0 for failure)
+	 */
+	public function unset_product_excluded_from_member_discounts( $product ) {
+
+		return $this->set_product_discounts_exclusion( $product, 'no' );
+	}
+
+
+	/**
+	 * Updates the discount-excluded products cache.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array associative array of product IDs and excluded status (boolean)
+	 * @return bool
+	 */
+	public function update_excluded_member_discounts_products_cache( $product_ids = array() ) {
+
+		/**
+		 * Adjusts the expiration time for excluded discounts products cache.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param int $expiration time in seconds (default uses WEEK_IN_SECONDS constant)
+		 */
+		$expiration = absint( apply_filters( 'wc_memberships_excluded_member_discounts_products_cache_expiration', WEEK_IN_SECONDS ) );
+
+		if ( $expiration > 0 ) {
+			$success = set_transient( $this->products_excluded_from_discounts_transient_key, ! empty( $product_ids ) ? $product_ids : $this->get_products_excluded_from_member_discounts( false ), max( MINUTE_IN_SECONDS, $expiration ) );
+		} else {
+			$success = $this->delete_excluded_member_discounts_products_cache();
+		}
+
+		// flush object cache
+		$this->product_excluded_from_discounts = array();
+
+		return $success;
+	}
+
+
+	/**
+	 * Deletes the discount-excluded products cache.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return bool
+	 */
+	public function delete_excluded_member_discounts_products_cache() {
+
+		// flush object cache
+		$this->product_excluded_from_discounts = array();
+
+		return delete_transient( $this->products_excluded_from_discounts_transient_key );
+	}
+
+
+	/**
 	 * Checks if a product is to be excluded from discount rules.
 	 *
 	 * Note: even if not excluded, discount rules may or may not still apply.
@@ -333,53 +491,40 @@ class WC_Memberships_Member_Discounts {
 	 */
 	public function is_product_excluded_from_member_discounts( $product ) {
 
+		$excluded = false;
+
 		if ( $product instanceof \WP_Post ) {
+			$product_id = $product->ID;
+		} elseif ( $product instanceof \WC_Product ) {
+			$product_id = $product->get_id();
+		} else {
+			$product_id = $product;
+		}
 
-			$product = wc_get_product( $product );
+		if ( is_numeric( $product_id ) && $product_id > 0 ) {
 
-		} elseif ( is_numeric( $product ) ) {
+			if ( ! isset( $this->product_excluded_from_discounts[ $product_id ] ) ) {
 
-			if ( isset( $this->product_excluded_from_discounts[ $product ] ) ) {
+				// exclude if product-level setting is enabled to exclude this product
+				$exclude_product = in_array( $product_id, $this->get_products_excluded_from_member_discounts(), false );
+				// exclude if on sale and global-level setting is enabled to exclude all products on sale
+				$exclude_on_sale = ! $exclude_product ? $this->excluding_on_sale_products_from_member_discounts() && $this->product_is_on_sale_before_discount( $product ) : false;
 
-				// bail early if we are passing a product ID and the memoized entry was already set before
-				return $this->product_excluded_from_discounts[ $product ];
+				$this->product_excluded_from_discounts[ $product_id ] = $exclude_product || $exclude_on_sale;
 			}
 
-			$product = wc_get_product( $product );
-		}
-
-		if ( ! $product instanceof \WC_Product ) {
-			return false;
-		}
-
-		$product_id = $product->get_id();
-
-		// use memoization to speed up checks
-		if ( isset( $this->product_excluded_from_discounts[ $product_id ] ) ) {
-
-			$exclude = $this->product_excluded_from_discounts[ $product_id ];
-
-		} else {
-
-			// exclude if product-level setting is enabled to exclude this product
-			$exclude_product = 'yes' === wc_memberships_get_content_meta( $product, '_wc_memberships_exclude_discounts', true );
-			// exclude if on sale and global-level setting is enabled to exclude all products on sale
-			$exclude_on_sale = ! $exclude_product ? $this->excluding_on_sale_products_from_member_discounts() && $this->product_is_on_sale_before_discount( $product ) : false;
-
 			/**
-			 * Filter product from having discount rules applied.
+			 * Filters a product from having discount rules applied.
 			 *
 			 * @since 1.7.0
 			 *
-			 * @param bool $exclude whether the product is excluded from discount rules
-			 * @param \WC_Product $product the product object
+			 * @param bool $excluded whether the product is excluded from discount rules
+			 * @param int|\WC_Product|\WP_Post $product the product object, ID or related post object
 			 */
-			$exclude = (bool) apply_filters( 'wc_memberships_exclude_product_from_member_discounts', $exclude_product || $exclude_on_sale, $product );
-
-			$this->product_excluded_from_discounts[ $product_id ] = $exclude;
+			$excluded = (bool) apply_filters( 'wc_memberships_exclude_product_from_member_discounts', $this->product_excluded_from_discounts[ $product_id ], $product );
 		}
 
-		return $exclude;
+		return $excluded;
 	}
 
 
@@ -635,7 +780,7 @@ class WC_Memberships_Member_Discounts {
 
 			$html_after_discount = $product->get_price_html();
 
-			remove_filter( 'woocommerce_get_price_suffix', array( $this, 'get_variable_price_html_suffix' ), 999, 2 );
+			remove_filter( 'woocommerce_get_price_suffix', array( $this, 'get_variable_price_html_suffix' ), 999 );
 
 		} else {
 
@@ -751,55 +896,57 @@ class WC_Memberships_Member_Discounts {
 	 */
 	public function product_is_on_sale_before_discount( $product ) {
 
-		if ( is_numeric( $product ) ) {
+		$on_sale_before = false;
 
-			if ( isset( $this->product_is_on_sale_before_discount[ $product ] ) ) {
+		if ( is_numeric( $product ) && isset( $this->product_is_on_sale_before_discount[ $product ] ) ) {
 
-				// bail early if we are passing a product ID and the memoized entry was already set
-				return $this->product_is_on_sale_before_discount[ $product ];
+			// bail early if we are passing a product ID and the memoized entry was already set
+			$on_sale_before = $this->product_is_on_sale_before_discount[ $product ];
+
+		} else {
+
+			$product = ! $product instanceof \WC_Product ? wc_get_product( $product ) : $product;
+
+			if ( $product instanceof \WC_Product ) {
+
+				$product_id = $product->get_id();
+
+				if ( ! array_key_exists( $product_id, $this->product_is_on_sale_before_discount ) ) {
+
+					// handles both new WC 3.0+ and older filters
+					$excluded_filters = array(
+						'woocommerce_product_is_on_sale',
+						'woocommerce_product_get_sale_price',
+						'woocommerce_product_variation_get_sale_price',
+						'woocommerce_product_get_price',
+						'woocommerce_product_variation_get_price',
+						'woocommerce_product_get_regular_price',
+						'woocommerce_get_variation_prices_hash',
+						'woocommerce_get_sale_price',
+						'woocommerce_get_variation_sale_price',
+						'woocommerce_product_variation_get_regular_price',
+						'woocommerce_variation_prices_sale_price',
+						'woocommerce_variation_prices_price',
+						'woocommerce_variation_prices_regular_price',
+						'woocommerce_subscriptions_product_sale_price',
+					);
+
+					// Bail out if any of the following conditions applies:
+					// - no member user is logged in
+					// - current user has no discounts for the product
+					// - one of the above filters is being passed, which could lead to infinite loops
+					if ( ( $this->member_is_logged_in && $this->user_has_member_discount( $product ) ) || in_array( current_filter(), $excluded_filters, true ) ) {
+						$this->product_is_on_sale_before_discount[ $product_id ] = $this->get_product_unfiltered_sale_status( $product );
+					} else {
+						$this->product_is_on_sale_before_discount[ $product_id ] = $product->is_on_sale();
+					}
+				}
+
+				$on_sale_before = $this->product_is_on_sale_before_discount[ $product_id ];
 			}
-
-			$product = wc_get_product( (int) $product );
 		}
 
-		if ( ! $product instanceof \WC_Product ) {
-			return false;
-		}
-
-		$product_id = $product->get_id();
-
-		if ( ! array_key_exists( $product_id, $this->product_is_on_sale_before_discount ) ) {
-
-			// handles both new WC 3.0+ and older filters
-			$excluded_filters = array(
-				'woocommerce_product_is_on_sale',
-				'woocommerce_product_get_sale_price',
-				'woocommerce_product_variation_get_sale_price',
-				'woocommerce_product_get_price',
-				'woocommerce_product_variation_get_price',
-				'woocommerce_product_get_regular_price',
-				'woocommerce_get_variation_prices_hash',
-				'woocommerce_get_sale_price',
-				'woocommerce_get_variation_sale_price',
-				'woocommerce_product_variation_get_regular_price',
-				'woocommerce_variation_prices_sale_price',
-				'woocommerce_variation_prices_price',
-				'woocommerce_variation_prices_regular_price',
-				'woocommerce_subscriptions_product_sale_price',
-			);
-
-			// Bail out if any of the following conditions applies:
-			// - no member user is logged in
-			// - current user has no discounts for the product
-			// - one of the above filters is being passed, which could lead to infinite loops
-			if ( ( $this->member_is_logged_in && $this->user_has_member_discount( $product ) ) || in_array( current_filter(), $excluded_filters, true ) ) {
-				$this->product_is_on_sale_before_discount[ $product_id ] = $this->get_product_unfiltered_sale_status( $product );
-			} else {
-				$this->product_is_on_sale_before_discount[ $product_id ] = $product->is_on_sale();
-			}
-		}
-
-		return $this->product_is_on_sale_before_discount[ $product_id ];
+		return $on_sale_before;
 	}
 
 
@@ -1025,7 +1172,7 @@ class WC_Memberships_Member_Discounts {
 			 * @param \WP_Post $post the product post object
 			 * @param \WC_Product_Variation $variation the product variation
 			 */
-			$badge = apply_filters( 'wc_memberships_member_discount_badge', $badge, $the_post, $product );
+			$badge = (string) apply_filters( 'wc_memberships_member_discount_badge', $badge, $the_post, $product );
 
 		} else {
 
@@ -1304,6 +1451,201 @@ class WC_Memberships_Member_Discounts {
 
 
 	/**
+	 * Returns the possible discount amounts for a given product for any plan.
+	 *
+	 * @see \WC_Memberships_Member_Discounts::get_product_discount()
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int $product_id discounted product ID
+	 * @param int|float $product_price the normal product price
+	 * @param null|int|int[] $plan_id optional membership plan ID or array of IDs, to query only discounts of a specific plan
+	 * @return float[] array of amounts
+	 */
+	private function get_product_discounts( $product_id, $product_price = 0, $plan_id = null ) {
+
+		$discount_amounts = array();
+		$discount_rules   = wc_memberships()->get_rules_instance()->get_product_purchasing_discount_rules( $product_id );
+
+		if ( ! empty( $discount_rules ) ) {
+
+			foreach ( $discount_rules as $discount_rule ) {
+
+				// skip if discount is not applying
+				if ( ! $discount_rule->is_active() ) {
+					continue;
+				}
+
+				// skip if specified plan ID to get discount for does not match
+				if ( null !== $plan_id ) {
+
+					if ( is_numeric( $plan_id ) && (int) $plan_id !== (int) $discount_rule->get_membership_plan_id() ) {
+						continue;
+					}
+
+					if ( is_array( $plan_id ) && ! in_array( $discount_rule->get_membership_plan_id(), $plan_id, false ) ) {
+						continue;
+					}
+				}
+
+				switch ( $discount_rule->get_discount_type() ) {
+
+					case 'amount' :
+
+						$discount_amount = max( 0, (float) $discount_rule->get_discount_amount() );
+
+						if ( $discount_amount > 0 ) {
+							$discount_amounts[] = $discount_amount > $product_price ? $product_price : $discount_amount;
+						}
+
+					break;
+
+					case 'percentage' :
+
+						$discount_percentage = max( 0, (float) $discount_rule->get_discount_amount() );
+
+						if ( $discount_percentage === (float) 100 ) {
+							$discount_amounts[] = $product_price;
+						} elseif ( $discount_percentage > 0 ) {
+							$discount_amounts[] = max( 0, ( $discount_percentage * (float) $product_price ) / 100 );
+						}
+
+					break;
+				}
+			}
+		}
+
+		return $discount_amounts;
+	}
+
+
+	/**
+	 * Returns the amount of a discount for a given product.
+	 *
+	 * For variable products it will return the largest discounted amount calculated from all the discounted variations.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param \WP_Post|\WC_Product|\WC_Product_Variable|\WC_Product_Variation|int $the_product product object, post or ID
+	 * @param string $return_value either 'min', 'max' (default) or 'average' to return the corresponding discount value among all possible discounts
+	 * @param null|\WC_Memberships_Membership_Plan|int|int[] optional plan object or ID (or array of IDs), if unspecified will grab the lowest discount attainable
+	 * @return float discount amount as a number
+	 */
+	public function get_product_discount( $the_product, $return_value = 'max', $the_plan = null ) {
+
+		$amounts = array();
+		$product = is_numeric( $the_product ) || $the_product instanceof \WP_Post ? wc_get_product( $the_product ) : $the_product;
+
+		if ( $product instanceof \WC_Product && ! $this->is_product_excluded_from_member_discounts( $product ) ) {
+
+			if ( $this->applying_discounts ) {
+				do_action( 'wc_memberships_discounts_disable_price_adjustments' );
+			}
+
+			$plan_id    = null;
+			$product_id = $product->get_id();
+
+			if ( $the_plan instanceof \WC_Memberships_Membership_Plan ) {
+				$plan_id = $the_plan->get_id();
+			} elseif ( is_numeric( $the_plan ) ) {
+				$plan_id = (int) $the_plan;
+			} elseif ( is_array( $the_plan ) ) {
+				$plan_id = $the_plan;
+			}
+
+			if ( $product->is_type( 'variable' ) ) {
+				$product_price = max( 0, (float) $product->get_variation_price( 'max' ) );
+			} else {
+				$product_price = max( 0, (float) $product->get_price() );
+			}
+
+			$amounts = $this->get_product_discounts( $product_id, $product_price, $plan_id );
+
+			// if the product is a variation, add discounts applying for the parent variable too
+			if ( $product->is_type( 'variation' ) ) {
+
+				$parent_product = Framework\SV_WC_Product_Compatibility::get_parent( $product );
+
+				if ( $parent_product && ! $this->is_product_excluded_from_member_discounts( $parent_product ) ) {
+
+					$amounts = array_merge( $amounts, $this->get_product_discounts( $parent_product->get_id(), $product_price, $plan_id ) );
+				}
+			}
+
+			if ( $this->applying_discounts ) {
+				do_action( 'wc_memberships_discounts_enable_price_adjustments' );
+			}
+		}
+
+		$values = ! empty( $amounts ) ? array_map( 'floatval', $amounts ) : array( 0 );
+
+		switch ( $return_value ) {
+			case 'min' :
+				$discount = min( $values );
+			break;
+			case 'max' :
+				$discount = max( $values );
+			break;
+			default : // average
+				$discount = array_sum( $values ) / max( 1, count( $values ) );
+			break;
+		}
+
+		return max( 0, $discount );
+	}
+
+
+	/**
+	 * Returns the formatted discount HTML for a given product.
+	 *
+	 * This method is intended for showing a formatted discount amount to non members.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param \WP_Post|\WC_Product|int $product product object, post or ID
+	 * @param string $discount_value either 'min', 'max' (default) or 'average' to return the corresponding discount value among all possible discounts
+	 * @param string $format either 'amount' (default) or 'percentage' of the normal product price
+	 * @param null|\WC_Memberships_Membership_Plan|int optional plan object or ID, if unspecified will grab the lowest discount attainable
+	 * @return string discount as an HTML price
+	 */
+	public function get_product_discount_html( $product, $discount_value = 'max', $format = 'amount', $plan = null ) {
+
+		$discount = $this->get_product_discount( $product, $discount_value, $plan );
+
+		switch ( $format ) {
+
+			case 'percentage' :
+			case 'percent' :
+			case '%' :
+
+				$product = is_numeric( $product ) || $product instanceof \WP_Post ? wc_get_product( $product ) : $product;
+				$price   = $product instanceof \WC_Product ? (float) $product->get_price() : 0;
+
+				if ( $discount <= 0 || $price <= 0 ) {
+					$percentage = 0;
+				} elseif ( $discount < 1 ) {
+					$percentage = $price / ( 100 / $discount ) * $discount;
+				} else {
+					$percentage = ( 100 / $price ) * $discount;
+				}
+
+				$output = Framework\SV_WC_Helper::number_format( max( 0, $percentage ) ) . '%';
+
+			break;
+
+			case 'amount' :
+			default :
+
+				$output = wc_price( $discount );
+
+			break;
+		}
+
+		return $output;
+	}
+
+
+	/**
 	 * Refreshes cart fragments upon member login.
 	 *
 	 * This is useful if a non-logged in member added items to cart, which should have otherwise membership discounts applied.
@@ -1488,16 +1830,16 @@ class WC_Memberships_Member_Discounts {
 	public function disable_price_html_adjustments() {
 
 		// adjust environment for calculating discounted price html strings
-		remove_filter( 'woocommerce_get_price_html', array( $this, 'get_member_price_html' ), 999, 2 );
+		remove_filter( 'woocommerce_get_price_html', array( $this, 'get_member_price_html' ), 999 );
 
 		if ( Framework\SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) {
-			remove_filter( 'woocommerce_product_variation_get_price_html', array( $this, 'get_member_price_html' ), 999, 2 );
+			remove_filter( 'woocommerce_product_variation_get_price_html', array( $this, 'get_member_price_html' ), 999 );
 		} else {
-			remove_filter( 'woocommerce_get_variation_price_html',         array( $this, 'get_member_price_html' ), 999, 2 );
+			remove_filter( 'woocommerce_get_variation_price_html',         array( $this, 'get_member_price_html' ), 999 );
 		}
 
 		// make sure that by default, 'is_on_sale' is based on prices before member discounts
-		remove_filter( 'woocommerce_product_is_on_sale', array( $this, 'product_is_on_sale' ), 999, 2 );
+		remove_filter( 'woocommerce_product_is_on_sale', array( $this, 'product_is_on_sale' ), 999 );
 	}
 
 

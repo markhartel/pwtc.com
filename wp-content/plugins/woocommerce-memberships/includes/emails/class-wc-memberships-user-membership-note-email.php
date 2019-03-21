@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -117,7 +116,7 @@ class WC_Memberships_User_Membership_Note_Email extends \WC_Memberships_User_Mem
 			// adds a subject merge tag hint in field description
 			$form_fields['subject']['desc_tip']    = $form_fields['subject']['description'];
 			/* translators: Placeholder: %s - merge tag */
-			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_name}</code></strong>' );
+			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_title}</code></strong>' );
 		}
 
 		if ( isset( $form_fields['heading'] ) ) {
@@ -134,48 +133,23 @@ class WC_Memberships_User_Membership_Note_Email extends \WC_Memberships_User_Mem
 
 
 	/**
-	 * Returns the email HTML content.
+	 * Returns the arguments that should be passed to an email template.
 	 *
-	 * @since 1.0.0
+	 * @since 1.12.0
 	 *
-	 * @return string HTML
+	 * @param array $args default args
+	 * @return array associative array
 	 */
-	public function get_content_html() {
+	protected function get_template_args( $args = array() ) {
 
-		ob_start();
-
-		wc_get_template( $this->template_html, array(
+		return array(
 			'user_membership' => $this->object,
-			'email_heading'   => $this->get_heading(),
 			'membership_note' => $this->membership_note,
-			'sent_to_admin'   => false,
-			'plain_text'      => false
-		) );
-
-		return ob_get_clean();
-	}
-
-
-	/**
-	 * Returns the email plain text content.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string plain text
-	 */
-	public function get_content_plain() {
-
-		ob_start();
-
-		wc_get_template( $this->template_plain, array(
-			'user_membership' => $this->object,
+			'email'           => $this,
 			'email_heading'   => $this->get_heading(),
-			'membership_note' => $this->membership_note,
-			'sent_to_admin'   => false,
-			'plain_text'      => true
-		) );
-
-		return ob_get_clean();
+			'email_body'      => $this->get_body(),
+			'sent_to_admin'   => $this->sent_to_admin,
+		);
 	}
 
 

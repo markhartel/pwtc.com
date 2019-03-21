@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Frontend
  * @author    SkyVerge
- * @category  Frontend
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -539,15 +537,17 @@ class WC_Memberships_Frontend {
 
 				$memberships_classes = $this->membership_content_classes[ $post_id ];
 
-			} elseif ( ! wc_memberships_is_members_area() ) {
+			} else {
+
+				$is_user_logged_in = is_user_logged_in();
 
 				if ( 'product' === get_post_type( $post ) ) {
 
-					if ( wc_memberships_is_product_viewing_restricted( $post_id ) ) {
+					if ( wc_memberships_is_product_viewing_restricted( $post ) ) {
 
 						$memberships_classes[] = 'membership-content';
 
-						if ( current_user_can( 'wc_memberships_view_restricted_product', $post_id ) ) {
+						if ( $is_user_logged_in && current_user_can( 'wc_memberships_view_restricted_product', $post_id ) ) {
 							if ( ! current_user_can( 'wc_memberships_view_delayed_product', $post_id ) ) {
 								$memberships_classes[] = 'access-delayed';
 							} else {
@@ -558,11 +558,11 @@ class WC_Memberships_Frontend {
 						}
 					}
 
-					if ( wc_memberships_is_product_purchasing_restricted( $post_id ) ) {
+					if ( wc_memberships_is_product_purchasing_restricted( $post ) ) {
 
 						$memberships_classes[] = 'membership-content';
 
-						if ( current_user_can( 'wc_memberships_purchase_restricted_product', $post_id ) ) {
+						if ( $is_user_logged_in && current_user_can( 'wc_memberships_purchase_restricted_product', $post_id ) ) {
 							if ( ! current_user_can( 'wc_memberships_purchase_delayed_product', $post_id ) ) {
 								$memberships_classes[] = 'purchase-delayed';
 							} else {
@@ -573,22 +573,22 @@ class WC_Memberships_Frontend {
 						}
 					}
 
-					if ( wc_memberships_product_has_member_discount( $post_id ) ) {
+					if ( wc_memberships_product_has_member_discount( $post ) ) {
 
 						$memberships_classes[] = 'member-discount';
 
-						if ( wc_memberships_user_has_member_discount( $post_id ) ) {
+						if ( $is_user_logged_in && wc_memberships_user_has_member_discount( $post ) ) {
 							$memberships_classes[] = 'discount-granted';
 						} else {
 							$memberships_classes[] = 'discount-restricted';
 						}
 					}
 
-				} elseif ( wc_memberships_is_post_content_restricted( $post_id ) ) {
+				} elseif ( wc_memberships_is_post_content_restricted( $post ) ) {
 
 					$memberships_classes[] = 'membership-content';
 
-					if ( current_user_can( 'wc_memberships_view_restricted_post_content', $post_id ) ) {
+					if ( $is_user_logged_in && current_user_can( 'wc_memberships_view_restricted_post_content', $post_id ) ) {
 						if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id ) ) {
 							$memberships_classes[] = 'access-delayed';
 						} else {
@@ -622,56 +622,28 @@ class WC_Memberships_Frontend {
 
 		if ( is_array( $classes ) ) {
 
+			$current_user_id     = get_current_user_id();
 			$memberships_classes = array();
+			$is_member           = $current_user_id > 0 && current_user_can( 'wc_memberships_access_all_restricted_content' );
+
+			if ( ! $is_member && $current_user_id > 0 ) {
+				$user_memberships = wc_memberships_get_user_memberships( $current_user_id, array( 'fields' => 'ids' ) );
+				$is_member        = ! empty( $user_memberships );
+			}
 
 			if ( is_singular() ) {
-
-				if ( wc_memberships_is_members_area() ) {
+				if ( $is_members_area = wc_memberships_is_members_area() ) {
 					$memberships_classes = array( 'members-area' );
-				} else {
+				} elseif ( $post instanceof \WP_Post ) {
 					$memberships_classes = $this->get_membership_content_classes( $post );
-				}
-
-				if ( ! empty( $memberships_classes ) ) {
-
-					$is_member = current_user_can( 'wc_memberships_access_all_restricted_content' );
-
-					if ( ! $is_member ) {
-
-						if ( wc_memberships_is_members_area() ) {
-
-							$is_member = wc_memberships_is_user_member();
-
-						} elseif ( 'product' === get_post_type( $post ) ) {
-
-							if ( wc_memberships_is_product_viewing_restricted() ) {
-								$is_member = current_user_can( 'wc_memberships_view_restricted_product', $post->ID );
-							}
-
-							if ( wc_memberships_is_product_purchasing_restricted() ) {
-								$is_member = current_user_can( 'wc_memberships_purchase_restricted_product', $post->ID );
-							}
-
-						} else {
-
-							$is_member = current_user_can( 'wc_memberships_view_restricted_post_content', $post->ID );
-						}
-					}
-
-					if ( $is_member ) {
-						$memberships_classes[] = 'member-logged-in';
-					}
 				}
 			}
 
-			if (    empty( $memberships_classes )
-			     && wc_memberships_is_user_active_member()
-			     && ( is_archive() || get_queried_object_id() === (int) get_option( 'page_on_front' ) ) ) {
-
+			if ( $is_member ) {
 				$memberships_classes[] = 'member-logged-in';
 			}
 
-			$classes = array_merge( $classes, $memberships_classes );
+			$classes = array_unique( array_merge( $classes, $memberships_classes ) );
 		}
 
 		return $classes;
@@ -698,6 +670,8 @@ class WC_Memberships_Frontend {
 	/**
 	 * Handles deprecated methods.
 	 *
+	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2018-11-07}
+	 *
 	 * @since 1.9.0
 	 *
 	 * @param string $method method invoked
@@ -710,89 +684,84 @@ class WC_Memberships_Frontend {
 
 		switch ( $method ) {
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_content_delayed_message' :
 				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_User_Messages::get_message_html()' );
-
 				$user_id     = ! empty( $args[0] ) ? $args[0] : get_current_user_id();
 				$access_type = isset( $args[2] )   ? $args[2] : '';
-
 				if ( empty( $args[1] ) ) {
 					global $post;
 					$post_id = $post ? $post->ID : 0;
 				} else {
 					$post_id = $args[1];
 				}
-
 				$args = array(
 					'post_id'     => $post_id,
 					'access_time' => wc_memberships()->get_capabilities_instance()->get_user_access_start_time_for_post( $user_id, $post_id, $access_type ),
 					'context'     => 'notice',
 				);
-
 				switch ( get_post_type( $post_id ) ) {
 					case 'product':
 					case 'product_variation':
 						$message_code = 'product_access_delayed';
-					break;
+						break;
 					case 'page':
 						$message_code = 'page_content_delayed';
-					break;
+						break;
 					case 'post':
 						$message_code = 'post_content_delayed';
-					break;
+						break;
 					default:
 						$message_code = 'content_delayed';
-					break;
+						break;
 				}
-
 				return \WC_Memberships_User_Messages::get_message_html( $message_code, $args );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_content_restricted_message' :
 				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_User_Messages::get_message_html()' );
 				$args = isset( $args[0] ) ? array( 'post_id' => $args[0] ) : array( 'post_id' => $args );
 				return \WC_Memberships_User_Messages::get_message_html( 'content_restricted', $args );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_member_discount_message' :
 				_deprecated_function( $deprecated, '1.9.0', "WC_Memberships_User_Messages::get_message_html( 'product_discount' )" );
 				$args = isset( $args[0] ) ? array( 'post_id' => $args[0] ) : array( 'post_id' => $args );
 				return \WC_Memberships_User_Messages::get_message_html( 'product_discount', $args );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_product_purchasing_restricted_message' :
 				_deprecated_function( $deprecated, '1.9.0', "WC_Memberships_User_Messages::get_message_html( 'product_purchasing_restricted' )" );
 				$args = isset( $args[0] ) ? array( 'post_id' => $args[0] ) : array( 'post_id' => $args );
 				return \WC_Memberships_User_Messages::get_message_html( 'product_purchasing_restricted', $args );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_product_viewing_restricted_message' :
 				_deprecated_function( $deprecated, '1.9.0', "WC_Memberships_User_Messages::get_message_html( 'product_viewing_restricted' )" );
 				$args = isset( $args[0] ) ? array( 'post_id' => $args[0] ) : array( 'post_id' => $args );
 				return \WC_Memberships_User_Messages::get_message_html( 'product_viewing_restricted', $args );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_product_taxonomy_term_delayed_message' :
 				_deprecated_function( $deprecated, '1.9.0', "WC_Memberships_User_Messages::get_message_html( 'product_category_viewing_delayed' )" );
 				return \WC_Memberships_User_Messages::get_message_html( 'product_category_viewing_delayed' );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_product_taxonomy_term_viewing_restricted_message';
 				_deprecated_function( $deprecated, '1.9.0', "WC_Memberships_User_Messages::get_message_html( 'product_category_viewing_restricted' )" );
 				return \WC_Memberships_User_Messages::get_message_html( 'product_category_viewing_restricted' );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_restrictions_instance' :
 				_deprecated_function( 'wc_memberships()->get_frontend_instance()->get_restrictions_instance()', '1.9.0', 'wc_memberships()->get_restrictions_instance()' );
 				return wc_memberships()->get_restrictions_instance();
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'get_valid_restriction_message_types' :
 				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_User_Messages::get_default_messages( false )' );
 				return \WC_Memberships_User_Messages::get_default_messages( false );
 
-			/* @deprecated since 1.9.0 - remove this by 1.12.0 or higher */
+			/* @deprecated since 1.9.0 - remove this by 1.13.0 or higher */
 			case 'restricted_content_redirect' :
 				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_Posts_Restrictions::redirect_to_member_content_upon_login()' );
 				return wc_memberships()->get_restrictions_instance()->get_posts_restrictions_instance()->redirect_to_member_content_upon_login( isset( $args[0] ) ? $args[0] : $args );
@@ -803,6 +772,7 @@ class WC_Memberships_Frontend {
 				return null;
 		}
 	}
+
 
 
 }

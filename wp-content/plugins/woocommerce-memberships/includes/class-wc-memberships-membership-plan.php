@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1363,7 +1362,7 @@ class WC_Memberships_Membership_Plan {
 	private function get_restricted( $type, $paged = 1, $custom_query_args = array() ) {
 
 		$query    = null;
-		$post_ids = array();
+		$post_ids = array( array() );
 		$rules    = $this->get_rules( $type, false );
 
 		// sanity check
@@ -1378,7 +1377,7 @@ class WC_Memberships_Membership_Plan {
 				if ( $rule->has_objects() ) {
 
 					// specific posts are restricted for this rule
-					$post_ids = array_merge( $post_ids, $rule->get_object_ids() );
+					$post_ids[] = $rule->get_object_ids();
 
 				} else {
 
@@ -1389,7 +1388,9 @@ class WC_Memberships_Membership_Plan {
 						'post_type' => $rule->get_content_type_name(),
 					) );
 
-					$post_ids = ! empty( $post_ids_query->posts ) ? array_merge( $post_ids, array_map( 'intval', $post_ids_query->posts ) ) : $post_ids;
+					if ( ! empty( $post_ids_query->posts ) ) {
+						$post_ids[] = $post_ids_query->posts;
+					}
 				}
 
 			} elseif ( $rule->is_content_type( 'taxonomy' ) ) {
@@ -1406,7 +1407,7 @@ class WC_Memberships_Membership_Plan {
 						$terms = $rule->get_object_ids();
 					}
 
-					$taxonomy = new \WP_Query( array(
+					$taxonomy_post_ids_query = new \WP_Query( array(
 						'fields'    => 'ids',
 						'nopaging'  => true,
 						'tax_query' => array(
@@ -1418,17 +1419,32 @@ class WC_Memberships_Membership_Plan {
 						),
 					) );
 
-					$post_ids = ! empty( $taxonomy->posts ) ? array_merge( $post_ids, array_map( 'intval', $taxonomy->posts ) ) : $post_ids;
+					if ( ! empty( $taxonomy_post_ids_query->posts ) ) {
+						$post_ids[] = $taxonomy_post_ids_query->posts;
+					}
+				}
+			}
+		}
+
+		$post_ids = array_unique( array_map( 'absint', call_user_func_array( 'array_merge', $post_ids ) ) );
+
+		// remove from found results items that are forced public for everyone
+		if ( ! empty( $post_ids ) ) {
+
+			foreach ( $post_ids as $index => $post_id ) {
+
+				if ( 'purchasing_discount' === $type && wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $post_id ) ) {
+					unset( $post_ids[ $index ] );
+				} elseif ( ( 'content_restriction' === $type || 'product_restriction' === $type ) && wc_memberships()->get_restrictions_instance()->is_post_public( $post_id ) ) {
+					unset( $post_ids[ $index ] );
 				}
 			}
 		}
 
 		if ( ! empty( $post_ids ) ) {
 
-			$post_ids = array_unique( $post_ids );
-
 			// special handling for products
-			if ( in_array( $type, array( 'product_restriction', 'purchasing_discount' ), true ) ) {
+			if ( 'purchasing_discount' === $type || 'product_restriction' === $type ) {
 
 				// ensure that for variations we list parent variable products
 				$post_types = array( 'product' );
@@ -1483,9 +1499,9 @@ class WC_Memberships_Membership_Plan {
 
 				$post_ids = array_unique( $parent_ids );
 
-				// remove product ids that are marked to ignore member discounts
+				// remove product ids that should be ignored for discount
 				if ( 'purchasing_discount' === $type && ! empty( $post_ids ) ) {
-					$post_ids = $this->filter_products_excluding_member_discounts( $post_ids );
+					$post_ids = $this->filter_sale_products_excluded_from_member_discounts( $post_ids );
 				}
 
 			} else {
@@ -1536,31 +1552,14 @@ class WC_Memberships_Membership_Plan {
 
 
 	/**
-	 * Filters out from an array of products IDs the products that are marked to ignore member discounts.
+	 * Filters out from an array of products IDs products on sale that should be excluded from discounts.
 	 *
 	 * @since 1.7.0
 	 *
 	 * @param int[] $product_ids array of WC_Product post IDs
 	 * @return int[] array of product IDs
 	 */
-	private function filter_products_excluding_member_discounts( array $product_ids ) {
-
-		// get products that are individually marked to be excluded from member discounts
-		$excluded_product_ids = get_posts( array(
-			'post_type' => 'product',
-			'post__in'  => $product_ids,
-			'nopaging'  => true,
-			'fields'    => 'ids',
-			'meta_query' => array(
-				array(
-					'key'     => '_wc_memberships_exclude_discounts',
-					'value'   => 'yes',
-				),
-			),
-		) );
-
-		// subtract products marked as excluded from member discounts from array of product ids
-		$product_ids = array_diff( $product_ids, (array) $excluded_product_ids );
+	private function filter_sale_products_excluded_from_member_discounts( array $product_ids ) {
 
 		// If we are excluding products on sale from member discounts,
 		// we must also check if any of the remainder products are on sale.
@@ -1671,7 +1670,7 @@ class WC_Memberships_Membership_Plan {
 			}
 		}
 
-		return ! empty( $member_discount ) ? $member_discount : '';
+		return ! empty( $member_discount ) && ! wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $product ) ? $member_discount : '';
 	}
 
 
@@ -1695,7 +1694,7 @@ class WC_Memberships_Membership_Plan {
 			// check if the variations have direct discounts.
 			$child_discounts               = array();
 			$children_fixed_discounts      = array();
-			$children_percentage_discounts = array();					;
+			$children_percentage_discounts = array();
 
 			foreach ( $child_products as $child_product_id ) {
 

@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -249,7 +248,9 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 
 							// check if the user purchasing is already member of a plan
 							// but the membership is cancelled or pending cancellation
-							if ( wc_memberships_is_user_member( $user_id, $plan ) && $user_membership->has_status( array( 'pending', 'cancelled' ) ) ) {
+							if (    $user_membership
+							     && $user_membership->has_status( array( 'pending', 'cancelled' ) )
+							     && wc_memberships_is_user_member( $user_id, $plan ) ) {
 
 								$order_id                = Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' );
 								$subscription_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
@@ -263,6 +264,7 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 								$subscription_membership->activate_membership( $note );
 
 								$subscription = wc_memberships_get_order_subscription( Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' ), $product->get_id() );
+
 								$subscription_membership->set_subscription_id( Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) );
 							}
 						}
@@ -276,11 +278,12 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 
 
 	/**
-	 * Only grants access from existing subscription if it's active
+	 * Only grants access from existing subscription if it's active.
 	 *
 	 * @internal
 	 *
 	 * @since 1.8.0
+	 *
 	 * @param bool $grant_access
 	 * @param array $args
 	 * @return bool
@@ -411,7 +414,9 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 												) );
 
 												// tie membership to subscription
-												if ( $user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership ) {
+												if ( $user_membership instanceof \WC_Memberships_User_Membership ) {
+
+													$user_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->get_id() );
 
 													$user_membership->set_subscription_id( $subscription_id );
 
@@ -487,6 +492,7 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 	/**
 	 * Saves related subscription data when a membership access is granted via a purchase.
 	 *
+	 * Sets the start date if it has an installment plan.
 	 * Sets the end date to match subscription end date.
 	 *
 	 * @internal
@@ -496,7 +502,7 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 	 * @param WC_Memberships_Membership_Plan $plan
 	 * @param array $args
 	 */
-	public function save_subscription_data( WC_Memberships_Membership_Plan $plan, $args ) {
+	public function save_subscription_data( \WC_Memberships_Membership_Plan $plan, $args ) {
 
 		$product     = wc_get_product( $args['product_id'] );
 		$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
@@ -516,20 +522,27 @@ class WC_Memberships_Integration_Subscriptions_Membership_Plans {
 				$subscription_membership->set_subscription_id( Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) );
 
 				$subscription_plan  = new \WC_Memberships_Integration_Subscriptions_Membership_Plan( $subscription_membership->get_plan_id() );
-				$access_length_type = $subscription_plan->get_access_length_type();
 
-				if ( 'subscription' === $access_length_type && $this->grant_access_while_subscription_active( $plan ) ) {
+				// adjust the start date for installment plans (might not be now for fixed date plans)
+				if ( $subscription_membership->has_installment_plan() ) {
+					$subscription_membership->set_start_date( $subscription_plan->get_access_start_date( 'mysql' ) );
+				}
+
+				// end date: subscription length (unlimited or fixed by the subscription product)
+				if ( 'subscription' === $subscription_plan->get_access_length_type() && $this->grant_access_while_subscription_active( $plan ) ) {
 					$membership_end_date = $integration->get_subscription_event_date( $subscription, 'end' );
+				// end date: likely an installment plan, so it could be relative to the start date or be on a fixed date
 				} else {
 					$membership_end_date = $subscription_plan->get_expiration_date( current_time( 'mysql', true ), $args );
 				}
+
+				// set the determined end date for the subscription membership
+				$subscription_membership->set_end_date( $membership_end_date );
 
 				// maybe update the trial end date
 				if ( $trial_end_date = $integration->get_subscription_event_date( $subscription, 'trial_end' ) ) {
 					$subscription_membership->set_free_trial_end_date( $trial_end_date );
 				}
-
-				$subscription_membership->set_end_date( $membership_end_date );
 			}
 		}
 	}

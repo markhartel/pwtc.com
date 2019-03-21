@@ -1,5 +1,55 @@
 *** WooCommerce Memberships Changelog ***
 
+2019.01.24 - version 1.12.4
+ * Fix - Ensure products from all plans are shown when listing products that grant access to content in the restriction notices
+ * Fix - Do not restrict from access product categories that are only targeted by product purchase restriction rules
+ * Fix - Have `woocommerce_email_header` and `woocommerce_email_footer` action hooks pass the email object as hook parameter
+ * Fix - Always show public LearnDash content
+ * Fix - Address a JavaScript issue in the Setup Wizard screens
+
+2019.01.09 - version 1.12.3
+ * Tweak - Allow merging existing user memberships in CSV imports without specifying a user membership ID if the user ID, login name or email address is provided in combination with the plan ID or slug
+ * Tweak - Ensure LearnDash course overview and status are hidden when restricted
+ * Tweak - Improve performance when generating restriction or discount notices that include products
+ * Tweak - Allow removing an installment plan flag on subscription-tied user memberships on CSV imports through an `installment_plan` column
+ * Fix - Ensure that if a variable product is excluded from receiving member discounts, all its variations are consistently excluded from discounts as well
+ * Fix - Ensure that the `customer` query var in User Memberships REST API requests to get user memberships by customer works consistently
+ * Fix - Pass the correct return type for the `display_post_states` filter callback
+ * Dev - Add WooCommerce debug logging when starting new user memberships CSV import jobs
+
+2018.11.09 - version 1.12.2
+ * Fix - Ensure that the `wcm_restrict` shortcode can correctly parse optional attributes
+
+2018.11.08 - version 1.12.1
+ * Tweak - Display the Order Number instead of the Order ID in the Memberships admin list, for compatibility with plugins like Sequential Order Numbers Pro
+ * Fix - Fix a bug which prevented content and some discounts from appearing in the Members Area of the My Account page
+
+2018.11.08 - version 1.12.0
+ * Feature - Allow to set an option to let hierarchical post types such as pages apply their restriction rules to their children
+ * Feature - Add a System Status Report block and send additional System Status Report data in WooCommerce API Status responses
+ * Feature - Add `wcm_product_discount` and `wcm_discounted_product` shortcodes to display member discounts for a given product to non-members
+ * Feature - Add user membership activated member emails triggered when delayed user memberships become active
+ * Tweak - Add the {membership_view_url} merge tag to member emails
+ * Tweak - Add {discount} merge tags for use in purchasing discount messages to inform non-members about available member discounts for a given product
+ * Tweak - Start delayed memberships automatically via cron job, besides delayed member login
+ * Tweak - Improve the performance of post restriction overrides when forcing posts and products public, excluding them from restriction rules
+ * Tweak - Improve the performance of product discount overrides when forcing products to be excluded from member discount rules
+ * Tweak - Add bulk actions to products and other restrictable post types to force content public or exclude products from member discounts, or to revert them to normal memberships handling
+ * Tweak - Do not display a "Pause" membership row action in the user memberships edit screen if the membership is cancelled
+ * Fix - If a customer tries to resubscribe to a subscription pending cancellation that is tied to a membership, ensure that the membership goes back to active status as well
+ * Fix - Link memberships created via "Grant access" action to manually-created subscriptions
+ * Fix - Ensure that shortcode attributes pass the shortcode name while running through the WordPress core filter in `shortcode_atts()`
+ * Fix - When a member resubscribes a cancelled subscription that is tied to a membership, make sure the cancelled period is added to the inactive interval of the membership, to ensure accuracy of content dripping
+ * Misc - Add support for WooCommerce REST API v3 routes
+ * Misc - Deliver webhook payloads according to the selected API version
+ * Misc - Ensure compatibility with WordPress 5.0 and the Gutenberg editor
+ * Misc - Update Action Scheduler library to version 2.1.1
+ * Dev - Add discount methods to retrieve the possible member discount amounts for a given product, based on any plan rule
+ * Dev - Remove SkyVerge Framework methods from template files and replace with template functions for better backwards compatibility
+
+2018.10.31 - version 1.11.3
+ * Fix - If a user membership is tied to a subscription with an installment plan with fixed dates, make sure the membership start date is set to the date entered in the membership plan
+
 2018.10.17 - version 1.11.2
  * Misc - Add support for WooCommerce 3.5
 

@@ -2,7 +2,7 @@
 Author: skyverge
 Tags: woocommerce
 Requires at least: 4.4
-Tested up to: 4.9.8
+Tested up to: 5.0.3
 Requires PHP: 5.3
 
 See https://docs.woocommerce.com/document/woocommerce-memberships/ for full documentation.

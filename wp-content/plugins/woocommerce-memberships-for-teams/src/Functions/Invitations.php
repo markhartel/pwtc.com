@@ -17,10 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -37,10 +38,11 @@ defined( 'ABSPATH' ) or exit;
  *     @type int $sender_id (optional) sender user id, defaults to current user id
  *     @type string $role (optional) the role to assign to the invited user, defaults to 'member'
  * }
- * @throws \SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
  * @return \SkyVerge\WooCommerce\Memberships\Teams\Invitation instance
+ * @throws Framework\SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
  */
 function wc_memberships_for_teams_create_invitation( $args = array() ) {
+
 	return wc_memberships_for_teams()->get_invitations_instance()->create_invitation( $args );
 }
 
@@ -54,7 +56,7 @@ function wc_memberships_for_teams_create_invitation( $args = array() ) {
  *
  * @param string|int|\WP_Post|\SkyVerge\WooCommerce\Memberships\Teams\Invitation|\SkyVerge\WooCommerce\Memberships\Teams\Team $id invitation token, id or instance, or team id or instance
  * @param string $email (optional) invitation recipient email, required if $id is a team id or instance
- * @return \SkyVerge\WooCommerce\Memberships\Teams\Inviitation|false invitation instance or false on failure
+ * @return false|\SkyVerge\WooCommerce\Memberships\Teams\Invitation invitation instance or false on failure
  */
 function wc_memberships_for_teams_get_invitation( $id, $email = null ) {
 	return wc_memberships_for_teams()->get_invitations_instance()->get_invitation( $id, $email );
@@ -68,7 +70,7 @@ function wc_memberships_for_teams_get_invitation( $id, $email = null ) {
  *
  * @since 1.0.0
  *
- * @param int $team_id team id to get the invitations for
+ * @param int|\SkyVerge\WooCommerce\Memberships\Teams\Team $team_id team id to get the invitations for
  * @param array $args {
  *     (optional) an array of arguments to pass to \WP_Query - additionally, a few special arguments can be passed:
  *

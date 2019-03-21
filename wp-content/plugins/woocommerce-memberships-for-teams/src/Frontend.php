@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -79,6 +80,10 @@ class Frontend {
 		add_action( 'template_redirect', array( $this, 'join_team' ) );
 		add_action( 'template_redirect', array( $this, 'leave_team' ) );
 		add_action( 'template_redirect', array( $this, 'renew_team_membership' ) );
+		add_action( 'template_redirect', array( $this, 'update_team_seats' ) );
+
+		// joins a team member upon successful registration by following a registration link
+		add_filter( 'woocommerce_registration_redirect', array( $this, 'join_team_upon_registration' ) );
 
 		// show join team form
 		add_filter( 'wc_get_template',            array( $this, 'get_join_team_template' ), 1, 2 );
@@ -87,9 +92,6 @@ class Frontend {
 
 		// save additional team data
 		add_action( 'woocommerce_created_customer', array( $this, 'save_team_member_name' ) );
-
-		// redirect back to join page after registration
-		add_filter( 'woocommerce_registration_redirect', array( $this, 'adjust_join_team_page_registration_redirect' ) );
 
 		// show team name on membership details page on members area
 		add_filter( 'wc_memberships_members_area_my_membership_details', array( $this, 'add_my_membership_team_details' ), 10, 2 );
@@ -110,7 +112,12 @@ class Frontend {
 	public function enqueue_scripts() {
 
 		if ( is_account_page() ) {
-			wp_enqueue_style( 'woocommerce-memberships-for-teams-frontend', wc_memberships_for_teams()->get_plugin_url() . '/assets/css/frontend/wc-memberships-for-teams.min.css', array( 'wc-memberships-frontend', 'dashicons' ), wc_memberships_for_teams()->get_version() );
+			wp_enqueue_style( 'woocommerce-memberships-for-teams-frontend', wc_memberships_for_teams()->get_plugin_url() . '/assets/css/frontend/wc-memberships-for-teams.min.css', array( 'wc-memberships-frontend', 'dashicons' ), Plugin::VERSION );
+		}
+
+		if ( $this->get_teams_area_instance()->is_teams_area_section( 'settings' ) ) {
+			wp_enqueue_script(  'woocommerce-memberships-for-teams-team-settings', wc_memberships_for_teams()->get_plugin_url() . '/assets/js/frontend/wc-memberships-for-teams-team-settings.min.js', array( 'jquery' ), Plugin::VERSION );
+			wp_localize_script( 'woocommerce-memberships-for-teams-team-settings', 'wc_memberships_teams_area_team_settings', $this->get_teams_area_instance()->get_team_settings_l10n() );
 		}
 	}
 
@@ -142,26 +149,22 @@ class Frontend {
 			$notice_message = __( 'Please provide a name for this team.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
 
+		} elseif (    isset( $_POST['_team_settings_nonce'] )
+			       && current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team_id )
+			       && wp_verify_nonce( $_POST['_team_settings_nonce'], 'update-team-name-' . $team_id ) ) {
+
+			wp_update_post( array(
+				'ID'         => $team_id,
+				'post_title' => $name,
+			) );
+
+			$notice_message =  __( 'Team name was updated.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'notice';
+
 		} else {
 
-			if (     current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team_id )
-				  && isset( $_POST['_team_settings_nonce'] )
-				  && wp_verify_nonce( $_POST['_team_settings_nonce'], 'update-team-name-' . $team_id ) ) {
-
-				wp_update_post( array(
-					'ID'         => $team_id,
-					'post_title' => $name,
-				) );
-
-				$notice_message =  __( 'Team name was updated.', 'woocommerce-memberships-for-teams' );
-				$notice_type    = 'notice';
-
-			} else {
-
-				$notice_message = __( 'Cannot update name for this team.', 'woocommerce-memberships-for-teams' );
-				$notice_type    = 'error';
-			}
-
+			$notice_message = __( 'Cannot update name for this team.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'error';
 		}
 
 		if ( isset( $notice_message, $notice_type ) ) {
@@ -196,9 +199,9 @@ class Frontend {
 
 		} else {
 
-			if (     current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team_id )
-				  && isset( $_POST['_team_link_nonce'] )
-				  && wp_verify_nonce( $_POST['_team_link_nonce'], 'regenerate-team-registration-link-' . $team_id ) ) {
+			if (    isset( $_POST['_team_link_nonce'] )
+			     && current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team_id )
+			     && wp_verify_nonce( $_POST['_team_link_nonce'], 'regenerate-team-registration-link-' . $team_id ) ) {
 
 				$team->generate_registration_key();
 
@@ -245,54 +248,84 @@ class Frontend {
 			$notice_message = __( 'Invalid team.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
 
-		} else {
+		} elseif (    isset( $_POST['_team_add_member_nonce'] )
+		           && current_user_can( 'wc_memberships_for_teams_manage_team_members', $team_id )
+		           && wp_verify_nonce( $_POST['_team_add_member_nonce'], 'add-team-member-' . $team_id ) ) {
 
-			if (     current_user_can( 'wc_memberships_for_teams_manage_team_members', $team_id )
-				  && isset( $_POST['_team_add_member_nonce'] )
-				  && wp_verify_nonce( $_POST['_team_add_member_nonce'], 'add-team-member-' . $team_id ) ) {
+			try {
 
-				try {
+				$current_user = wc_memberships_for_teams_get_team_member( $team, get_current_user_id() );
 
-					// invite memeber to join the team
-					$invitation = $team->invite( $email, $role );
+				if (    'manager' === $role
+				     && $current_user
+				     && $current_user->has_role( 'manager' )
+				     && 'yes' !== get_option( 'wc_memberships_for_teams_managers_may_manage_managers', 'yes' ) ) {
 
-					/* translators: %s - email */
-					$notice_message =  sprintf( __( '%s was invited to join the team.', 'woocommerce-memberships-for-teams' ), $email );
-					$notice_type    = 'notice';
-
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-
-					// already invited - offer to re-send invitation
-					if ( 3 === $e->getCode() && $invitation	= $team->get_invitation( $email ) ) {
-
-						$resend_url = add_query_arg( array(
-							'action'     => 'invitation_resend',
-							'invitation' => $invitation->get_id(),
-							'_wpnonce'   => wp_create_nonce( 'team-invitation-resend-' . $invitation->get_id() ),
-						), $this->get_teams_area_instance()->get_teams_area_url( $team->get_id() ) );
-
-						$notice_message = sprintf( __( '%1$s is already invited. Do you want to %2$sre-send the invitation%3$s?', 'woocommerce-memberships-for-teams' ), $email, '<a href="' . $resend_url . '">', '</a>' );
-						$notice_type    = 'notice';
-
-					} else {
-
-						/* translators: %1$s - email, %2$s - error message */
-						$notice_message = sprintf( __( 'Cannot invite %1$s to this team: %2$s', 'woocommerce-memberships-for-teams' ), $email, $e->getMessage() );
-						$notice_type    = 'error';
-					}
-
+					throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid role.', 'woocommerce-memberships-for-teams' ) );
 				}
 
-			} else {
+				$send_invite = true;
 
-				/* translators: %s - email */
-				$notice_message = sprintf( __( 'Cannot invite %s to this team.', 'woocommerce-memberships-for-teams' ), $email );
-				$notice_type    = 'error';
+				// if skipping invitations, join the member directly
+				if ( wc_memberships_for_teams()->get_invitations_instance()->should_skip_invitations( $team, $email ) ) {
+
+					// first though we need to verify that an user with this email address exists
+					$user = is_email( $email ) ? get_user_by( 'email', $email ) : false;
+
+					if ( $user ) {
+
+						$team->add_member( $user, $role );
+
+						/* translators: Placeholder: %s - user email */
+						$notice_message = sprintf( __( '%s was added to the team.', 'woocommerce-memberships-for-teams' ), $user->display_name );
+						$notice_type    = 'success';
+						$send_invite    = false;
+					}
+				}
+
+				// otherwise invite users to join (default behavior)
+				if ( $send_invite ) {
+
+					// invite member to join the team
+					$team->invite( $email, $role );
+
+					/* translators: Placeholder: %s - user email */
+					$notice_message =  sprintf( __( '%s was invited to join the team.', 'woocommerce-memberships-for-teams' ), $email );
+					$notice_type    = 'notice';
+				}
+
+			} catch ( \Exception $e ) {
+
+				// already invited - offer to re-send invitation
+				if ( 3 === $e->getCode() && $invitation	= $team->get_invitation( $email ) ) {
+
+					$resend_url = add_query_arg( array(
+						'action'     => 'invitation_resend',
+						'invitation' => $invitation->get_id(),
+						'_wpnonce'   => wp_create_nonce( 'team-invitation-resend-' . $invitation->get_id() ),
+					), $this->get_teams_area_instance()->get_teams_area_url( $team->get_id() ) );
+
+					/* translators: Placeholders: %1$s - user email, %2$s - opening <a> HTML link tag, %3$s - closing </a> HTML link tag */
+					$notice_message = sprintf( __( '%1$s is already invited. Do you want to %2$sre-send the invitation%3$s?', 'woocommerce-memberships-for-teams' ), $email, '<a href="' . $resend_url . '">', '</a>' );
+					$notice_type    = 'notice';
+
+				} else {
+
+					/* translators: Placeholders: %1$s - user email, %2$s - error message */
+					$notice_message = sprintf( __( 'Cannot invite %1$s to this team: %2$s', 'woocommerce-memberships-for-teams' ), $email, $e->getMessage() );
+					$notice_type    = 'notice';
+				}
 			}
 
+		} else {
+
+			/* translators: Placeholder: %s - user email */
+			$notice_message = sprintf( __( 'Cannot invite %s to this team.', 'woocommerce-memberships-for-teams' ), $email );
+			$notice_type    = 'notice';
 		}
 
 		if ( isset( $notice_message, $notice_type ) ) {
+
 			wc_add_notice( $notice_message, $notice_type );
 
 			if ( 'error' !== $notice_type ) {
@@ -324,35 +357,32 @@ class Frontend {
 			$notice_message = __( 'Invalid team.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
 
-		} else {
+		} elseif (    isset( $_GET['_wpnonce'] )
+			       && $team->is_user_owner( $user_id )
+			       && wp_verify_nonce( $_GET['_wpnonce'], 'add-owner-as-team-member-' . $team->get_id() ) ) {
 
-			if (     $team->is_user_owner( $user_id )
-				  && isset( $_GET['_wpnonce'] )
-				  && wp_verify_nonce( $_GET['_wpnonce'], 'add-owner-as-team-member-' . $team->get_id() ) ) {
+			try {
 
-				try {
+				$team->add_member( $user_id ); // will default to 'owner'
 
-					$team->add_member( $user_id ); // will default to 'owner'
+				$notice_message =  __( 'You are now a member of the team.', 'woocommerce-memberships-for-teams' );
+				$notice_type    = 'notice';
 
-					$notice_message =  __( 'You are now a member of the team.', 'woocommerce-memberships-for-teams' );
-					$notice_type    = 'notice';
+			} catch ( \Exception $e ) {
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-
-					/* translators: %s - error message */
-					$notice_message = sprintf( __( 'Cannot add yourself as a member: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
-					$notice_type    = 'error';
-				}
-
-			} else {
-
-				$notice_message = __( 'Cannot add yourself as a member.', 'woocommerce-memberships-for-teams' );
+				/* translators: Placeholder: %s - error message */
+				$notice_message = sprintf( __( 'Cannot add yourself as a member: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 				$notice_type    = 'error';
 			}
 
+		} else {
+
+			$notice_message = __( 'Cannot add yourself as a member.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'error';
 		}
 
 		if ( isset( $notice_message, $notice_type ) ) {
+
 			wc_add_notice( $notice_message, $notice_type );
 
 			if ( 'notice' === $notice_type ) {
@@ -372,22 +402,35 @@ class Frontend {
 	 */
 	public function join_team() {
 
-		if ( ! $this->is_join_team_page() || empty( $_POST['join_team'] ) ) {
-			return;
-		}
+		/* @see Frontend::join_team_upon_registration() user has joined upon registration */
+		if(    ! empty( $_GET['joined_team'] )
+		    &&   is_numeric( $_GET['joined_team'] )
+		    &&   wc_memberships_is_members_area() ) {
 
-		$team         = $this->get_join_page_team();
-		$invitation   = $this->get_join_page_invitation();
-		$current_user = get_userdata( get_current_user_id() );
+			$team = wc_memberships_for_teams_get_team( absint( $_GET['joined_team'] ) );
 
-		if ( ! $team ) {
+			if ( $team ) {
 
-			$notice_message = __( 'Invalid token.', 'woocommerce-memberships-for-teams' );
-			$notice_type    = 'error';
+				/* translators: Placeholder: %s - team name */
+				$notice_message = sprintf( __( 'Success! You are now a member of %s.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
+				$notice_type    = 'success';
 
-		} else {
+				wc_add_notice( $notice_message, $notice_type );
+			}
 
-			if ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'join-team-' . $team->get_id() ) ) {
+			// normal behavior: user is joining a team by invitation
+		} elseif ( ! empty( $_POST['join_team'] ) && $this->is_join_team_page() ) {
+
+			$team         = $this->get_join_page_team();
+			$invitation   = $this->get_join_page_invitation();
+			$current_user = get_userdata( get_current_user_id() );
+
+			if ( ! $team ) {
+
+				$notice_message = __( 'Invalid token.', 'woocommerce-memberships-for-teams' );
+				$notice_type    = 'error';
+
+			} elseif ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'join-team-' . $team->get_id() ) ) {
 
 				try {
 
@@ -409,61 +452,166 @@ class Frontend {
 					 * @since 1.0.2
 					 *
 					 * @param int $user_id id of the user who joined
-					 * @param Team $team instance of teh team that was joined
+					 * @param Team $team instance of the team that was joined
 					 */
 					do_action( 'woocommerce_memberships_for_teams_joined_team', get_current_user_id(), $team );
 
-					/* translators: %s - team name */
+					/* translators: Placeholder: %s - team name */
 					$notice_message =  sprintf( __( 'Success! You are now a member of %s.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
 					$notice_type    = 'success';
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
+				} catch ( \Exception $e ) {
 
-					/* translators: %1$s - team name %2$s - error message */
+					/* translators: Placeholders: %1$s - team name %2$s - error message */
 					$notice_message = sprintf( __( 'Cannot join %1$s: %2$s', 'woocommerce-memberships-for-teams' ), $team->get_name(), $e->getMessage() );
 					$notice_type    = 'error';
 				}
 
 			} else {
 
-				/* translators: %s - team name */
+				/* translators: Placeholder: %s - team name */
 				$notice_message = sprintf( __( 'Cannot join %s.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
 				$notice_type    = 'error';
 			}
 
-		}
+			if ( isset( $notice_message, $notice_type ) ) {
 
-		if ( isset( $notice_message, $notice_type ) ) {
+				wc_add_notice( $notice_message, $notice_type );
 
-			wc_add_notice( $notice_message, $notice_type );
+				if ( 'success' === $notice_type ) {
 
-			if ( 'success' === $notice_type ) {
-
-				// redirect user to the membership plan area
-				$redirect_to = wc_memberships_get_members_area_url( $team->get_plan() );
-				$sections    = $team->get_plan()->get_members_area_sections();
-
-				// if no sections are available for the plan, redirect to my account instead
-				if ( empty( $sections ) ) {
-					$endpoint    = get_option( 'permalink_structure' ) ? get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ) : 'members_area';
-					$redirect_to = wc_get_account_endpoint_url( $endpoint );
+					wp_safe_redirect( $this->get_team_member_joined_redirect_url( $team, $invitation ) );
+					exit;
 				}
-
-				/**
-				 * Filters the URL to redirect to when a user joins a team by invitation or via link.
-				 *
-				 * @since 1.0.4
-				 *
-				 * @param string $redirect_to URL to redirect to
-				 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team the team object
-				 * @param false|\SkyVerge\WooCommerce\Memberships\Teams\Invitation $invitation the invitation object
-				 */
-				$redirect_to = (string) apply_filters( 'wc_memberships_for_teams_', $redirect_to, $team, $invitation );
-
-				wp_safe_redirect( $redirect_to );
-				exit;
 			}
 		}
+	}
+
+
+	/**
+	 * Adjusts the registration redirect URL on the join team page.
+	 *
+	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes first {FN 2019-01-18}
+	 *
+	 * @internal
+	 *
+	 * @since 1.0.0
+	 * @deprecated since 1.1.2
+	 *
+	 * @param string $redirect_to the url to redirect to
+	 * @return string
+	 */
+	public function adjust_join_team_page_registration_redirect( $redirect_to ) {
+
+		_deprecated_function( '::adjust_join_team_page_registration_redirect()', '1.1.1', '::join_team_upon_user_registration()' );
+
+		return $this->join_team_upon_registration( $redirect_to );
+	}
+
+
+	/**
+	 * Joins a member to a team automatically if they followed a registration link.
+	 *
+	 * Adjusts the registration redirect URL on the join team page.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param string $redirect_to the url to redirect to
+	 * @return string
+	 */
+	public function join_team_upon_registration( $redirect_to ) {
+
+		// note that since WooCommerce processes registrations at `wp_loaded`, no global $wp_query is available, so we cannot use $this->is_join_team_page()
+		if ( ! empty( $_POST['wc_memberships_for_teams_token'] ) ) {
+
+			$token    = $_POST['wc_memberships_for_teams_token'];
+			$new_user = wp_get_current_user();
+			$team     = $this->get_join_page_team( $token );
+
+			if ( ! $team ) {
+
+				if ( $this->is_invitation_token( $token ) && ( $invitation = $this->get_join_page_invitation( $token ) ) ) {
+					$redirect_to = $invitation->get_accept_url();
+				}
+
+			} else {
+
+				try {
+
+					$role = 'member';
+
+					// if the new user was invited and given a different role, consider that
+					if ( $invitation = wc_memberships_for_teams_get_invitation( $new_user->user_email ) ) {
+						$role = $invitation->get_member_role();
+					}
+
+					$team->add_member( $new_user->ID, $role );
+
+					/** @see Frontend::join_team() */
+					do_action( 'woocommerce_memberships_for_teams_joined_team', $new_user->ID, $team );
+
+					$redirect_to = add_query_arg(
+						array( 'joined_team' => $team->get_id() ),
+						$this->get_team_member_joined_redirect_url( $team, $invitation )
+					);
+
+				} catch ( \Exception $e ) {
+
+					if ( $this->is_invitation_token( $token ) && ( $invitation = $this->get_join_page_invitation( $token ) ) ) {
+
+						$redirect_to = $invitation->get_accept_url();
+
+					} else {
+
+						$registration_url = $team->get_registration_url();
+
+						if ( is_string( $registration_url ) ) {
+							$redirect_to = $registration_url;
+						}
+					}
+				}
+			}
+		}
+
+		return $redirect_to;
+	}
+
+
+	/**
+	 * Gets a URL to redirect a team member that just joined by invitation.
+	 *
+	 * Note: if opening this method to public, consider other placement than the current frontend handler.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team team that a member has just joined
+	 * @param false|\SkyVerge\WooCommerce\Memberships\Teams\Invitation $invitation invitation object (or false if not set)
+	 * @return string URL
+	 */
+	private function get_team_member_joined_redirect_url( $team, $invitation ) {
+
+		// redirect user to the membership plan area
+		$redirect_to = wc_memberships_get_members_area_url( $team->get_plan() );
+		$sections    = $team->get_plan()->get_members_area_sections();
+
+		// if no sections are available for the plan, redirect to my account instead
+		if ( empty( $sections ) ) {
+			$endpoint    = get_option( 'permalink_structure' ) ? get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ) : 'members_area';
+			$redirect_to = wc_get_account_endpoint_url( $endpoint );
+		}
+
+		/**
+		 * Filters the URL to redirect to when a user joins a team by invitation or via link.
+		 *
+		 * @since 1.0.4
+		 *
+		 * @param string $redirect_to URL to redirect to
+		 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team the team object
+		 * @param false|\SkyVerge\WooCommerce\Memberships\Teams\Invitation $invitation the invitation object
+		 */
+		return (string) apply_filters( 'wc_memberships_for_teams_join_team_redirect_to', $redirect_to, $team, $invitation );
 	}
 
 
@@ -526,33 +674,28 @@ class Frontend {
 			$notice_message = __( 'Invalid team.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
 
-		} else {
+		} elseif ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'leave-team-' . $team->get_id() ) ) {
 
-			if (     isset( $_GET['_wpnonce'] )
-				  && wp_verify_nonce( $_GET['_wpnonce'], 'leave-team-' . $team->get_id() ) ) {
+			try {
 
-				try {
+				$team->remove_member( $user_id );
 
-					$team->remove_member( $user_id );
+				/* translators: Placeholder: %s - team name */
+				$notice_message =  sprintf( __( 'You have left the %s team.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
+				$notice_type    = 'notice';
 
-					/* translators: %s - team name */
-					$notice_message =  sprintf( __( 'You have left the %s team.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
-					$notice_type    = 'notice';
+			} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-
-					/* translators: %1$s - team name %2$s - error message */
-					$notice_message = sprintf( __( 'Cannot leave %1$s: %2$s', 'woocommerce-memberships-for-teams' ), $team->get_name(), $e->getMessage() );
-					$notice_type    = 'error';
-				}
-
-			} else {
-
-				/* translators: %s - team name */
-				$notice_message = sprintf( __( 'Cannot leave %s.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
+				/* translators: Placeholders: %1$s - team name %2$s - error message */
+				$notice_message = sprintf( __( 'Cannot leave %1$s: %2$s', 'woocommerce-memberships-for-teams' ), $team->get_name(), $e->getMessage() );
 				$notice_type    = 'error';
 			}
 
+		} else {
+
+			/* translators: Placeholder: %s - team name */
+			$notice_message = sprintf( __( 'Cannot leave %s.', 'woocommerce-memberships-for-teams' ), $team->get_name() );
+			$notice_type    = 'error';
 		}
 
 		if ( isset( $notice_message, $notice_type ) ) {
@@ -618,7 +761,7 @@ class Frontend {
 	public function is_join_team_page() {
 		global $wp_query;
 
-		if ( get_option( 'permalink_structure' ) && $wp_query ) {
+		if ( $wp_query && get_option( 'permalink_structure' ) ) {
 			$is_endpoint_url = ! empty( $wp_query->query_vars[ $this->join_team_endpoint ] );
 		} else {
 			$is_endpoint_url = isset( $_GET[ $this->join_team_endpoint ] );
@@ -652,14 +795,17 @@ class Frontend {
 		global $wp;
 
 		if ( ! get_option( 'permalink_structure' ) ) {
+
 			if ( ! empty( $_GET[ $this->join_team_endpoint ] ) ) {
 				$key = $_GET[ $this->join_team_endpoint ];
 			}
+
 		} else {
+
 			$key = ! empty( $wp->query_vars[ $this->join_team_endpoint ] ) ? $wp->query_vars[ $this->join_team_endpoint ] : null;
 		}
 
-		return $key;
+		return ! empty( $key ) ? $key : '';
 	}
 
 
@@ -688,6 +834,7 @@ class Frontend {
 				}
 
 			} else {
+
 				$this->join_page_team = wc_memberships_for_teams_get_team( $key );
 			}
 		}
@@ -732,7 +879,8 @@ class Frontend {
 	 * @return bool true if likely an invitation token, false otherwise
 	 */
 	private function is_invitation_token( $token ) {
-		return \SV_WC_Helper::str_starts_with( $token, 'i_' );
+
+		return Framework\SV_WC_Helper::str_starts_with( $token, 'i_' );
 	}
 
 
@@ -752,7 +900,12 @@ class Frontend {
 
 			$team = $this->get_join_page_team();
 
-			$title = $team ? sprintf( __( 'Join %s', 'woocommerce-memberships-for-teams' ), $team->get_name() ) : __( 'Join Team', 'woocommerce-memberships-for-teams' );
+			if ( $team ) {
+				/* translator: Placeholder: %s - team name */
+				$title = sprintf( __( 'Join %s', 'woocommerce-memberships-for-teams' ), $team->get_name() );
+			} else {
+				$title = __( 'Join Team', 'woocommerce-memberships-for-teams' );
+			}
 
 			// remember: the removal priority must match the priority when the filter was added in constructor
 			remove_filter( 'the_title', array( $this, 'adjust_account_page_title' ), 40 );
@@ -777,8 +930,8 @@ class Frontend {
 
 		// sanity check to see if we're at the right endpoint:
 		if (    isset( $wp->query_vars[ $this->join_team_endpoint ] )
-			 && is_account_page()
-			 && ( count( $crumbs ) > 0 ) ) {
+		     && is_account_page()
+		     && ( count( $crumbs ) > 0 ) ) {
 
 			$team     = $this->get_join_page_team();
 			$crumb    = $team ? sprintf( esc_html__( 'Join %s', 'woocommerce-memberships-for-teams' ), $team->get_name() ) : __( 'Join Team', 'woocommerce-memberships-for-teams' );
@@ -826,40 +979,12 @@ class Frontend {
 
 
 	/**
-	 * Adjusts the registration redirect URL on the join team page.
-	 *
-	 * @internal
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $redirect_to the url to redirect to
-	 * @return string
-	 */
-	public function adjust_join_team_page_registration_redirect( $redirect_to ) {
-
-		// note that since WooCommerce processes registrations at `wp_loaded`, no global $wp_query is available, so we cannot use $this->is_join_team_page()
-		if ( ! empty( $_POST['wc_memberships_for_teams_token'] ) ) {
-
-			$token = $_POST['wc_memberships_for_teams_token'];
-
-			if ( $this->is_invitation_token( $token ) && $invitation = $this->get_join_page_invitation( $token ) ) {
-				$redirect_to = $invitation->get_accept_url();
-			} elseif ( $team = $this->get_join_page_team( $token ) ) {
-				$redirect_to = $team->get_registration_url();
-			}
-		}
-
-		return $redirect_to;
-	}
-
-
-	/**
 	 * Logs in a team owner.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @throws \SV_WC_Plugin_Exception
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team team instance
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	private function log_owner_in( $team ) {
 
@@ -881,7 +1006,7 @@ class Frontend {
 		/**
 		 * Fires right before logging a team member in.
 		 *
-		 * Can throw \SV_WC_Plugin_Exception to halt the login completely.
+		 * Can throw Framework\SV_WC_Plugin_Exception to halt the login completely.
 		 *
 		 * @since 1.0.0
 		 *
@@ -916,7 +1041,7 @@ class Frontend {
 
 		} else {
 
-			throw new \SV_WC_Plugin_Exception( __( 'Cannot automatically log in. Please log into your account and renew this membership manually.' , 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot automatically log in. Please log into your account and renew this membership manually.' , 'woocommerce-memberships-for-teams' ) );
 		}
 
 		/**
@@ -968,7 +1093,7 @@ class Frontend {
 			wp_safe_redirect( $redirect_url );
 			exit;
 
-		} catch ( \SV_WC_Plugin_Exception $e ) {
+		} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 
 			wc_add_notice( $e->getMessage(), 'error' );
 			return;
@@ -977,20 +1102,76 @@ class Frontend {
 
 
 	/**
+	 * Updates the seat count on a team.
+	 *
+	 * @internal
+	 *
+	 * @since 1.1.0
+	 */
+	public function update_team_seats() {
+
+		if ( ! isset( $_POST['update_team_seats'] ) ) {
+			return;
+		}
+
+		$change_value = ! empty( $_POST['team_seats'] )       ? (int) trim( $_POST['team_seats'] ) : 0;
+		$change_mode  = ! empty( $_POST['seat_change_mode'] ) ? trim( $_POST['seat_change_mode'] ) : null;
+		$team_id      = (int) $_POST['update_team_seats'];
+		$team         = wc_memberships_for_teams_get_team( $team_id );
+
+		if ( ! $team || ! $team instanceof Team ) {
+
+			$notice_message = __( 'Invalid team.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'error';
+
+		} elseif ( 1 > $change_value || ! $change_mode || $change_mode !== $team->get_seat_change_mode() ) {
+
+			$notice_message = __( 'Invalid seat value.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'error';
+
+		} elseif (    isset( $_POST['_team_seats_nonce'] )
+		           && current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team_id )
+		           && wp_verify_nonce( $_POST['_team_seats_nonce'], 'update-team-seats-' . $team_id ) ) {
+
+			try {
+
+				Seat_Manager::handle_team_seat_change( $team, $change_value );
+
+			} catch ( Framework\SV_WC_Plugin_Exception $exception ) {
+
+				$notice_message = $exception->getMessage();
+				$notice_type    = 'error';
+			}
+
+		} else {
+
+			$notice_message = __( 'Cannot update seats for this team.', 'woocommerce-memberships-for-teams' );
+			$notice_type    = 'error';
+		}
+
+		if ( isset( $notice_message, $notice_type ) ) {
+			wc_add_notice( $notice_message, $notice_type );
+		}
+
+		wp_safe_redirect( $this->teams_area->get_teams_area_url( $team, 'settings' ) );
+		exit;
+	}
+
+
+	/**
 	 * Processes team membership renewals with a valid renewal link.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @throws \SV_WC_Plugin_Exception
-	 *
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team team instance
 	 * @param string $token team membership renewal token
 	 * @return string[] updated redirect URL with a success message
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	protected function process_team_membership_renewal( $team, $token ) {
 
 		if ( ! $team instanceof Team ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid team.', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid team.', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		if ( $team->can_be_renewed() ) {
@@ -999,7 +1180,7 @@ class Frontend {
 
 			// check the token in the URL with the user membership's stored token
 			if ( ! isset( $renewal_token['token'] ) || $token !== $renewal_token['token'] ) {
-				throw new \SV_WC_Plugin_Exception( __( 'Invalid renewal token. Please log in to renew this team membership.', 'woocommerce-memberships-for-teams' ) );
+				throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid renewal token. Please log in to renew this team membership.', 'woocommerce-memberships-for-teams' ) );
 			}
 
 			if ( ! isset( $renewal_token['expires'] ) || (int) $renewal_token['expires'] < time() ) {
@@ -1007,7 +1188,7 @@ class Frontend {
 				// wipe expired renewal token meta
 				$team->delete_renewal_login_token();
 
-				throw new \SV_WC_Plugin_Exception( __( 'Cannot log in as your renewal token has expired. Please log in to renew this team membership from your account.', 'woocommerce-memberships-for-teams' ) );
+				throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot log in as your renewal token has expired. Please log in to renew this team membership from your account.', 'woocommerce-memberships-for-teams' ) );
 			}
 
 			// makes sure the member is logged in
@@ -1033,7 +1214,7 @@ class Frontend {
 					wc_empty_cart();
 
 					// set up variation data (if needed) before adding to the cart
-					$product_id           = $product->is_type( 'variation' ) ? \SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) : $product->get_id();
+					$product_id           = $product->is_type( 'variation' ) ? Framework\SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) : $product->get_id();
 					$variation_id         = $product->is_type( 'variation' ) ? $product->get_id() : 0;
 					$variation_attributes = $product->is_type( 'variation' ) ? wc_get_product_variation_attributes( $variation_id ) : array();
 
@@ -1050,15 +1231,20 @@ class Frontend {
 					$seat_count = $team->get_seat_count();
 					$quantity   = Product::has_per_member_pricing( $product ) ? $seat_count : ceil( $seat_count / Product::get_max_member_count( $product ) );
 
-					// add the product to the cart
-					WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_attributes, $cart_item_data );
+					// add the product to the cart (check for WC errors, like product not purchasable etc.)
+					try {
+						WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_attributes, $cart_item_data );
+					} catch ( \Exception $e ) {
+						/* translators: Placeholders: %s - error message */
+						throw new Framework\SV_WC_Plugin_Exception( sprintf( __( 'Cannot renew this team membership. %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
+					}
 
 					// then redirect to checkout instead of my account page
 					$redirect_url = wc_get_checkout_url();
 
 				} else {
 
-					$redirect_url = get_permalink( $product->is_type( 'variation' ) ? \SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) : $product->get_id() );
+					$redirect_url = get_permalink( $product->is_type( 'variation' ) ? Framework\SV_WC_Product_Compatibility::get_prop( $product, 'parent_id' ) : $product->get_id() );
 				}
 
 				/* translators: Placeholder: %s - a product to purchase to renew a membership */
@@ -1067,12 +1253,12 @@ class Frontend {
 
 			} else {
 
-				throw new \SV_WC_Plugin_Exception( __( 'Cannot renew this team membership. Please contact us if you need assistance.', 'woocommerce-memberships-for-teams' ) );
+				throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot renew this team membership. Please contact us if you need assistance.', 'woocommerce-memberships-for-teams' ) );
 			}
 
 		} else {
 
-			throw new \SV_WC_Plugin_Exception( __( 'This team membership cannot be renewed. Please contact us if you need assistance.', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'This team membership cannot be renewed. Please contact us if you need assistance.', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		return array( 'redirect' => $redirect_url, 'message' => $message );
@@ -1110,13 +1296,16 @@ class Frontend {
 			);
 
 			foreach ( array( 'next-payment-date', 'expires' ) as $key ) {
+
 				if ( array_key_exists( $key, $details ) ) {
-					$details = \SV_WC_Helper::array_insert_after( $details, $key, $team_details );
+
+					$details = Framework\SV_WC_Helper::array_insert_after( $details, $key, $team_details );
 					break;
 				}
 			}
 
 			if ( ! array_key_exists( 'team', $details ) ) {
+
 				$details['team'] = $team_details['team'];
 			}
 		}
@@ -1143,10 +1332,12 @@ class Frontend {
 			$team = wc_memberships_for_teams_get_team( $team_id );
 
 			$actions['leave_team'] = array(
-				'url'  => add_query_arg( array(
-					'leave_team' => $team_id,
-					'_wpnonce'   => wp_create_nonce( 'leave-team-' . $team_id ),
-					), wc_get_page_permalink( 'myaccount' )
+				'url'  => add_query_arg(
+					array(
+						'leave_team' => $team_id,
+						'_wpnonce'   => wp_create_nonce( 'leave-team-' . $team_id ),
+					),
+					wc_get_page_permalink( 'myaccount' )
 				),
 				'name' => __( 'Leave Team', 'woocommerce-memberships-for-teams' ),
 			);
@@ -1183,5 +1374,6 @@ class Frontend {
 	public function get_teams_area_instance() {
 		return $this->teams_area;
 	}
+
 
 }

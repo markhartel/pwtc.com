@@ -175,7 +175,7 @@ add_action('wp_print_scripts', function(){
 
 add_filter('wc_memberships_members_area_my-memberships_actions', function ($actions) {
     unset($actions['cancel']);
-    
+
     return $actions;
 });
 

@@ -4,22 +4,11 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit68e9b8154a8520e1b69d504c3165698e
+class ComposerStaticInit409eff1a6aee84f214993f4204f07979
 {
-    public static $prefixesPsr0 = array (
-        'C' => 
-        array (
-            'Composer\\CustomDirectoryInstaller' => 
-            array (
-                0 => __DIR__ . '/..' . '/mnsami/composer-custom-directory-installer/src',
-            ),
-        ),
-    );
-
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixesPsr0 = ComposerStaticInit68e9b8154a8520e1b69d504c3165698e::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

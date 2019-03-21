@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -173,7 +171,7 @@ class WC_Memberships_Admin_Membership_Plans {
 
 					// TODO add an ajax/javascript control to break down counters and links to members by status {FN 2016-06-06}
 
-					$view_members = admin_url( "edit.php?post_type=wc_user_membership?s&post_type=wc_user_membership&action=-1&post_parent={$post_id}" );
+					$view_members = admin_url( "edit.php?post_type=wc_user_membership&action=-1&post_parent={$post_id}" );
 
 					echo '<a href="' . esc_url( $view_members ) . '" title="' . esc_html__( 'View Members', 'woocommerce-memberships' ) . '">';
 					echo $membership_plan->get_memberships_count();

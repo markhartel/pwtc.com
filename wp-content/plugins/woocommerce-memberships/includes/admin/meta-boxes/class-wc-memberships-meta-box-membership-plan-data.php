@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -535,12 +533,26 @@ class WC_Memberships_Meta_Box_Membership_Plan_Data extends \WC_Memberships_Meta_
 			</div>
 			<?php
 
-			$public_posts = get_posts( array(
-				'post_type'   => array_keys( \WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules() ),
-				'post_status' => 'any',
-				'meta_key'    => '_wc_memberships_force_public',
-				'meta_value'  => 'yes',
-			) );
+			$post_types      = array_keys( \WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules() );
+			$public_posts    = wc_memberships()->get_restrictions_instance()->get_public_posts();
+			$public_post_ids = array( array( 0 ) );
+
+			if ( ! empty( $public_posts ) ) {
+
+				foreach( $public_posts as $post_type => $found_ids ) {
+
+					if ( 'product' !== $post_type && in_array( $post_type, $post_types, true ) ) {
+
+						$public_post_ids[] = $found_ids;
+					}
+				}
+
+				$public_posts = get_posts( array(
+					'post_type'   => $post_types,
+					'post_status' => 'any',
+					'post__in'    => call_user_func_array( 'array_merge', $public_post_ids ),
+				) );
+			}
 
 			if ( ! empty( $public_posts ) ) {
 				/* translators: Placeholder: %s - links to posts */
@@ -589,10 +601,9 @@ class WC_Memberships_Meta_Box_Membership_Plan_Data extends \WC_Memberships_Meta_
 			<?php
 
 			$public_products = get_posts( array(
-				'post_type'      => 'product',
-				'post_status'    => 'any',
-				'meta_key'       => '_wc_memberships_force_public',
-				'meta_value'     => 'yes',
+				'post_type'   => 'product',
+				'post_status' => 'any',
+				'post__in'    => array_merge( array( 0 ), wc_memberships()->get_restrictions_instance()->get_public_products() ),
 			) );
 
 			if ( ! empty( $public_products ) ) {
@@ -640,6 +651,17 @@ class WC_Memberships_Meta_Box_Membership_Plan_Data extends \WC_Memberships_Meta_
 				?>
 			</div>
 			<?php
+
+			$excluded_products = get_posts( array(
+				'post_type'   => 'product',
+				'post_status' => 'any',
+				'post__in'    => array_merge( array( 0 ), wc_memberships()->get_member_discounts_instance()->get_products_excluded_from_member_discounts() ),
+			) );
+
+			if ( ! empty( $excluded_products ) ) {
+				/* translators: Placeholder: %s - links to posts */
+				printf( '<p>' . __( 'These products are excluded from all member discount rules: %s', 'woocommerce-memberships' ) . '</p>', $this->list_post_links( $excluded_products ) );
+			}
 
 			/**
 			 * Fires after the membership plan purchasing discounts panel is displayed.
@@ -987,14 +1009,10 @@ class WC_Memberships_Meta_Box_Membership_Plan_Data extends \WC_Memberships_Meta_
 		}
 
 		// update emails content
-		if ( isset( $_POST['WC_Memberships_User_Membership_Ending_Soon_Email'] ) ) {
-			$membership_plan->set_email_content( 'WC_Memberships_User_Membership_Ending_Soon_Email', wp_kses_post( $_POST['WC_Memberships_User_Membership_Ending_Soon_Email'] ) );
-		}
-		if ( isset( $_POST['WC_Memberships_User_Membership_Ended_Email'] ) ) {
-			$membership_plan->set_email_content( 'WC_Memberships_User_Membership_Ended_Email', wp_kses_post( $_POST['WC_Memberships_User_Membership_Ended_Email'] ) );
-		}
-		if ( isset( $_POST['WC_Memberships_User_Membership_Renewal_Reminder_Email'] ) ) {
-			$membership_plan->set_email_content( 'WC_Memberships_User_Membership_Renewal_Reminder_Email', wp_kses_post( $_POST['WC_Memberships_User_Membership_Renewal_Reminder_Email'] ) );
+		foreach ( wc_memberships()->get_emails_instance()->get_email_class_names() as $email_id ) {
+			if ( isset( $_POST[ $email_id ] ) ) {
+				$membership_plan->set_email_content( $email_id, wp_kses_post( $_POST[ $email_id ] ) );
+			}
 		}
 
 		// update restriction & discount rules

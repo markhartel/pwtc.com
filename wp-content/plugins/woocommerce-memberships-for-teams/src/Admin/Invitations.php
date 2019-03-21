@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -60,9 +61,6 @@ class Invitations {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $redirect_to the redirect url
-	 * @param string $action the action being taken
-	 * @param array $invitations an array of post (invitation) ids to act on
 	 * @return string the redirect url
 	 */
 	public function handle_invitation_bulk_actions() {
@@ -100,7 +98,7 @@ class Invitations {
 						$invitation = wc_memberships_for_teams_get_invitation( $id );
 						$invitation->send();
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d invitation was re-sent.', '%d invitations were re-sent.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
@@ -116,7 +114,7 @@ class Invitations {
 						$invitation = wc_memberships_for_teams_get_invitation( $id );
 						$invitation->cancel();
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d invitation was cancelled.', '%d invitations were cancelled.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
@@ -132,7 +130,7 @@ class Invitations {
 						$invitation = wc_memberships_for_teams_get_invitation( $id );
 						$invitation->set_member_role( 'member' );
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d user was set to be a member of the team.', '%d users were set to be members of the team.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
@@ -148,7 +146,7 @@ class Invitations {
 						$invitation = wc_memberships_for_teams_get_invitation( $id );
 						$invitation->set_member_role( 'manager' );
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d user was set to be a manager of the team.', '%d users were set to be managers of the team.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
@@ -197,60 +195,73 @@ class Invitations {
 		$name = $invitation->get_name();
 
 		switch ( $action ) {
+
 			case 'resend':
+
 				try {
 
 					$invitation->send();
 
-					/* translators: %s - email address */
+					/* translators: Placeholder: %s - email address */
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( 'Invitation to %s re-sent.', 'woocommerce-memberships-for-teams' ), $name ) );
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					/* translators: %s - error message */
+				} catch ( \Exception $e ) {
+
+					/* translators:Placeholder: %s - error message */
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot send invitation: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 				}
+
 			break;
 
 			case 'cancel':
+
 				try {
 
 					$invitation->cancel();
 
-					/* translators: %s - email address */
+					/* translators: Placeholder: %s - email address */
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( 'Invitation for %s was cancelled.', 'woocommerce-memberships-for-teams' ), $name ) );
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					/* translators: %s - error message */
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
+					/* translators: Placeholder: %s - error message */
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot cancel invitation: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 				}
+
 			break;
 
 			case 'set_as_member':
+
 				try {
 
 					$invitation->set_member_role( 'member' );
 
-					/* translators: %s - email address */
+					/* translators: Placeholder: %s - email address */
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set to be a member of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					/* translators: %s - error message */
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
+					/* translators: Placeholder: %s - error message */
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 				}
+
 			break;
 
 			case 'set_as_manager':
+
 				try {
 
 					$invitation->set_member_role( 'manager' );
 
-					/* translators: %s - email address */
+					/* translators: Placeholder: %s - email address */
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set to be a manager of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					/* translators: %s - error message */
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
+					/* translators: Placeholder: %s - error message */
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 				}
+
 			break;
 		}
 

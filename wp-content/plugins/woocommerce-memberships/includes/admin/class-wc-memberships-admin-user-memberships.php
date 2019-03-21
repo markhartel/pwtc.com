@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -147,24 +145,26 @@ class WC_Memberships_Admin_User_Memberships {
 			// remove quick edit action and move to trash
 			unset( $actions['inline hide-if-no-js'], $actions['trash'] );
 
-			$post_link       = remove_query_arg( 'action', get_edit_post_link( $post->ID, '' ) );
-			$user_membership = wc_memberships_get_user_membership( $post );
+			if ( $user_membership = wc_memberships_get_user_membership( $post ) ) {
 
-			if ( $user_membership->is_paused() ) {
-				$resume_link = add_query_arg( 'action', 'resume', wp_nonce_url( $post_link, 'wc-memberships-resume-membership-' . $post->ID ) );
-				$actions['resume'] = '<a href="' . esc_url( $resume_link ) . '">' . esc_html__( 'Resume', 'woocommerce-memberships' ) . '</a>';
-			} else {
-				$pause_link = add_query_arg( 'action', 'pause', wp_nonce_url( $post_link, 'wc-memberships-pause-membership-' . $post->ID ) );
-				$actions['pause']  = '<a href="' . esc_url( $pause_link ) . '">'  . esc_html__( 'Pause', 'woocommerce-memberships' )  . '</a>';
-			}
+				$post_link = remove_query_arg( 'action', get_edit_post_link( $post->ID, '' ) );
 
-			if ( ! $user_membership->is_cancelled() ) {
-				$cancel_link = add_query_arg( 'action', 'cancel', wp_nonce_url( $post_link, 'wc-memberships-cancel-membership-' . $post->ID ) );
-				$actions['cancel'] = '<a href="' . esc_url( $cancel_link ) . '">' . esc_html__( 'Cancel', 'woocommerce-memberships' ) . '</a>';
-			}
+				if ( $user_membership->is_paused() ) {
+					$resume_link = add_query_arg( 'action', 'resume', wp_nonce_url( $post_link, 'wc-memberships-resume-membership-' . $post->ID ) );
+					$actions['resume'] = '<a href="' . esc_url( $resume_link ) . '">' . esc_html__( 'Resume', 'woocommerce-memberships' ) . '</a>';
+				} elseif ( ! $user_membership->is_cancelled() ) {
+					$pause_link = add_query_arg( 'action', 'pause', wp_nonce_url( $post_link, 'wc-memberships-pause-membership-' . $post->ID ) );
+					$actions['pause']  = '<a href="' . esc_url( $pause_link ) . '">'  . esc_html__( 'Pause', 'woocommerce-memberships' )  . '</a>';
+				}
 
-			if ( current_user_can( 'delete_post', $post->ID ) ) {
-				$actions['delete'] = "<a class='submitdelete delete-membership' title='" . esc_attr__( 'Delete this membership permanently', 'woocommerce-memberships' ) . "' href='" . esc_url( get_delete_post_link( $post->ID, '', true ) ) . "'>" . esc_html__( 'Delete', 'woocommerce-memberships' ) . "</a>";
+				if ( ! $user_membership->is_cancelled() ) {
+					$cancel_link = add_query_arg( 'action', 'cancel', wp_nonce_url( $post_link, 'wc-memberships-cancel-membership-' . $post->ID ) );
+					$actions['cancel'] = '<a href="' . esc_url( $cancel_link ) . '">' . esc_html__( 'Cancel', 'woocommerce-memberships' ) . '</a>';
+				}
+
+				if ( current_user_can( 'delete_post', $user_membership->get_id() ) ) {
+					$actions['delete'] = "<a class='submitdelete delete-membership' title='" . esc_attr__( 'Delete this membership permanently', 'woocommerce-memberships' ) . "' href='" . esc_url( get_delete_post_link( $post->ID, '', true ) ) . "'>" . esc_html__( 'Delete', 'woocommerce-memberships' ) . '</a>';
+				}
 			}
 		}
 
@@ -320,6 +320,9 @@ class WC_Memberships_Admin_User_Memberships {
 				if ( 'paused' === $status && ( $paused_date = $user_membership->get_local_paused_date( 'timestamp' ) ) ) {
 					/* translators: Placeholder: %s - date since the membership was paused */
 					printf( __( 'Paused since %s', 'woocommerce-memberships' ), date_i18n( wc_date_format(), $paused_date ) . ' ' . date_i18n( wc_time_format(), $paused_date ) );
+				} elseif ( 'cancelled' === $status && ( $cancelled_date = $user_membership->get_local_cancelled_date( 'timestamp' ) ) ) {
+					/* translators: Placeholder: %s - date on which the membership was cancelled */
+					printf( __( 'Cancelled on %s', 'woocommerce-memberships'), date_i18n( wc_date_format(), $cancelled_date ) . ' ' . date_i18n( wc_time_format(), $cancelled_date ) );
 				} elseif ( isset( $statuses[ $status_key ]['label'] ) ) {
 					echo esc_html( $statuses[ $status_key ]['label'] );
 				}
@@ -337,9 +340,12 @@ class WC_Memberships_Admin_User_Memberships {
 
 					printf( '<span class="member-since-date">%1$s %2$s</span>', $date, $time );
 
-					if ( $order_id = $user_membership->get_order_id() ) {
-						/* translators: Placeholder: %s - order ID */
-						printf( '<span class="member-since-order"><small>' . __( 'Order: %s', 'woocommerce-memberships' ) . '</small></span>', '<a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a>' );
+					$order_id = $user_membership->get_order_id();
+					$order    = $order_id ? wc_get_order( $order_id ) : null;
+
+					if ( $order_id && $order ) {
+						/* translators: Placeholder: %s - order number */
+						printf( '<span class="member-since-order"><small>' . __( 'Order: %s', 'woocommerce-memberships' ) . '</small></span>', '<a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order->get_order_number() ) . '</a>' );
 					}
 				}
 
@@ -578,10 +584,10 @@ class WC_Memberships_Admin_User_Memberships {
 	 * @param int $post_id Post ID
 	 * @return string Modified title
 	 */
-	public function user_membership_title( $title, $post_id ) {
+	public function user_membership_title( $title, $post_id = null ) {
 		global $pagenow;
 
-		if ( 'wc_user_membership' === get_post_type( $post_id ) ) {
+		if ( $post_id && 'wc_user_membership' === get_post_type( $post_id ) ) {
 
 			$user_membership = wc_memberships_get_user_membership( $post_id );
 
@@ -613,7 +619,7 @@ class WC_Memberships_Admin_User_Memberships {
 	 * @return string
 	 */
 	public function remove_post_states( $states ) {
-		return '';
+		return array();
 	}
 
 
@@ -882,7 +888,7 @@ class WC_Memberships_Admin_User_Memberships {
 	public function validate_user_membership( $maybe_empty, $postarr ) {
 
 		// bail out if not user membership
-		if ( $postarr['post_type'] != 'wc_user_membership' ) {
+		if ( $postarr['post_type'] !== 'wc_user_membership' ) {
 			return $maybe_empty;
 		}
 

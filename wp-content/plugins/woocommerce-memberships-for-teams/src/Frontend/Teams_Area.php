@@ -17,12 +17,15 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Frontend;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\Memberships\Teams\Product;
+use SkyVerge\WooCommerce\Memberships\Teams\Team;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -50,6 +53,7 @@ class Teams_Area {
 
 	/** @var bool whether tiptip has been enqueued or not */
 	private $tiptip_enqueued = false;
+
 
 	/**
 	 * Sets up the Teams Area.
@@ -82,6 +86,62 @@ class Teams_Area {
 		add_action( 'template_redirect', array( $this, 'handle_team_access' ), 5 );
 		add_action( 'template_redirect', array( $this, 'handle_member_actions' ) );
 		add_action( 'template_redirect', array( $this, 'handle_invitation_actions' ) );
+	}
+
+
+	/**
+	 * Gets the localization array for the teams area team settings script.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array
+	 */
+	public function get_team_settings_l10n() {
+
+		$l10n = array();
+
+		if ( $team = $this->get_teams_area_team() ) {
+
+			$team_product = $team->get_product();
+			$l10n         = array(
+				'team' => array(
+					'seat_change_mode' => $team->get_seat_change_mode(),
+					'is_per_member'    => $team_product ? Product::has_per_member_pricing( $team_product ) : null,
+					'max_seats'        => $team_product ? Product::get_max_member_count( $team_product ) : null,
+					'min_seats'        => $team_product ? Product::get_min_member_count( $team_product ) : null,
+					'current_seats'    => $team->get_seat_count(),
+					'used_seats'       => $team->get_used_seat_count(),
+				),
+				'seat_change_message' => array(
+					'template' => sprintf(
+						/* translators: Placeholders: %1$s - <strong>, %2$s - </strong> */
+						__( 'This action will %1$s{action} {count} {seat_n}%2$s, resulting in a total of %1$s{total_count} {total_seat_n}%2$s.', 'woocommerce-memberships-for-teams' ),
+						'<strong>',
+						'</strong>'
+					),
+					'actions' => array(
+						'add'    => _x( 'add', 'Membership seat change action', 'woocommerce-memberships-for-teams' ),
+						'remove' => _x( 'remove', 'Membership seat change action', 'woocommerce-memberships-for-teams' ),
+					),
+					'seat_n' => array(
+						'singular' => __( 'seat', 'woocommerce-memberships-for-teams' ),
+						'plural'   => __( 'seats', 'woocommerce-memberships-for-teams' ),
+					),
+				),
+				'validation_errors' => array(
+					'empty'                 => __( 'Please enter a valid seat value', 'woocommerce-memberships-for-teams' ),
+					'no_change'             => __( 'Seat count unchanged', 'woocommerce-memberships-for-teams' ),
+					'not_enough_free_seats' => __( 'This team does not have enough unoccupied seats to remove this many seats.', 'woocommerce-memberships-for-teams' ),
+					'add_only'              => __( 'This team only allows adding seats, not removing', 'woocommerce-memberships-for-teams' ),
+					                           /* translators: Placeholder: %1$d - number of seats */
+					'below_min'             => $team_product ? sprintf( __( 'This team requires a minimum of %1$d seats.', 'woocommerce-memberships-for-teams' ), Product::get_min_member_count( $team_product ) ) : null,
+					                           /* translators: Placeholder: %1$d - number of seats */
+					'above_max'             => $team_product ? sprintf( _n( 'This team allows a maximum of %1$d seat.', 'This team allows a maximum of %1$d seats.', Product::get_max_member_count( $team_product ), 'woocommerce-memberships-for-teams' ), Product::get_max_member_count( $team_product ) ) : null,
+				)
+			);
+		}
+
+		return $l10n;
 	}
 
 
@@ -347,7 +407,7 @@ class Teams_Area {
 		$endpoint_title = __( 'Teams', 'woocommerce-memberships-for-teams' );
 
 		// perhaps display the current team name
-		if ( $team instanceof \SkyVerge\WooCommerce\Memberships\Teams\Team ) {
+		if ( $team instanceof Team ) {
 			if ( is_rtl() ) {
 				$endpoint_title  = $team->get_name() . ' &laquo; ' . $endpoint_title;
 			} else {
@@ -439,8 +499,11 @@ class Teams_Area {
 
 		} else {
 
-			// display new endpoint if there is at least 1 team teh current user can manage
-			$teams = wc_memberships_for_teams_get_teams( get_current_user_id(), array( 'per_page' => 1 ) );
+			// display new endpoint if there is at least 1 team the current user can manage
+			$teams = wc_memberships_for_teams_get_teams( get_current_user_id(), array(
+				'per_page' => 1,
+				'role'     => array( 'owner', 'manager' ),
+			) );
 
 			if ( ! empty( $teams ) ) {
 
@@ -448,7 +511,7 @@ class Teams_Area {
 				$endpoint_path  = $this->get_teams_area_teams_endpoint_path();
 
 				if ( array_key_exists( 'orders', $items ) ) {
-					$items = \SV_WC_Helper::array_insert_after( $items, 'orders', array( $endpoint_path => $endpoint_title ) );
+					$items = Framework\SV_WC_Helper::array_insert_after( $items, 'orders', array( $endpoint_path => $endpoint_title ) );
 				} else {
 					$items[ $endpoint_path ] = $endpoint_title;
 				}
@@ -638,7 +701,12 @@ class Teams_Area {
 		$args['teams_area'] = $this;
 
 		if ( 'settings' === $section ) {
-			$args['team_details'] = $this->get_teams_area_team_details( $args['team'] );
+			$args['team_details']      = $this->get_teams_area_team_details( $args['team'] );
+			$args['team_seat_details'] = $this->get_teams_area_seat_details( $args['team'] );
+
+			if ( empty( $args['team_seat_details'] ) ) {
+				unset( $args['team_seat_details'] );
+			}
 		}
 
 		if ( is_readable( $located ) ) {
@@ -922,6 +990,71 @@ class Teams_Area {
 
 
 	/**
+	 * Returns an array of seat details for use in the team seat change form.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param Team $team
+	 * @return array $team_seat_details
+	 */
+	private function get_teams_area_seat_details( Team $team ) {
+
+		$product           = $team->get_product();
+
+		if ( ! $product || ! $product instanceof \WC_Product ) {
+			return array();
+		}
+
+		$max_seats         = Product::get_max_member_count( $product );
+		$team_seat_details = array();
+
+		switch( $team->get_seat_change_mode() ) {
+
+			case 'update_seats':
+
+				$team_seat_details = array(
+					'instructions' => __( 'Enter the new seat count to reduce seats or to go to checkout to purchase additional seats.', 'woocommerce-memberships-for-teams' ),
+					'field_value'  => $team->get_seat_count(),
+					'field_max'    => 0 < $max_seats ? $max_seats : '',
+					'field_min'    => max( Product::get_min_member_count( $product ), 1 ),
+				);
+
+			break;
+
+			case 'add_seats':
+
+				$team_seat_details = array(
+					'instructions' => __( 'Enter the number of seats you would like to add to this team.', 'woocommerce-memberships-for-teams' ),
+					'field_value'  => 1,
+					'field_min'    => 1,
+					'field_max'    => 0 < $max_seats ? $max_seats - $team->get_seat_count() : '',
+				);
+
+			break;
+
+			case 'add_seat_blocks':
+
+				$instructions = sprintf(
+					/* translators: Placeholder: %1$d - number of seats */
+					__( 'This team is sold in blocks of <strong>%1$d seats</strong>. How many blocks would you like to add?', 'woocommerce-memberships-for-teams' ),
+					Product::get_max_member_count( $team->get_product() )
+				);
+
+				$team_seat_details = array(
+					'instructions' => $instructions,
+					'field_value' => 1,
+					'field_min'   => 1,
+					'field_max'   => '',
+				);
+
+			break;
+		}
+
+		return $team_seat_details;
+	}
+
+
+	/**
 	 * Returns the Teams Area action links HTML.
 	 *
 	 * @since 1.0.0
@@ -931,7 +1064,7 @@ class Teams_Area {
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team_Member|object $object an object to pass to a filter hook (optional)
 	 * @return string action links HTML
 	 */
-	function get_action_links( $section, $team, $object = null ) {
+	public function get_action_links( $section, $team, $object = null ) {
 
 		$default_actions = array();
 		$object_id       = 0;
@@ -965,6 +1098,14 @@ class Teams_Area {
 					$default_actions['view'] = array(
 						'url'  => $this->get_teams_area_url( $team ),
 						'name' => __( 'View', 'woocommerce-memberships-for-teams' ),
+					);
+				}
+
+				if ( 'settings' === $section && $team->is_user_owner( $user_id ) && $team->can_add_seats() ) {
+
+					$default_actions['update_seats'] = array(
+						'url'  => '#',
+						'name' => $team->can_remove_seats() ? __( 'Change Seats', 'woocommerce-memberships-for-teams' ) : __( 'Add Seats', 'woocommerce-memberships-for-teams' ),
 					);
 				}
 
@@ -1011,7 +1152,7 @@ class Teams_Area {
 
 						$role = $member->get_role();
 
-						if ( 'member' === $role ) {
+						if ( 'member' === $role && 'yes' === get_option( 'wc_memberships_for_teams_managers_may_manage_managers', 'yes' ) ) {
 							$default_actions['set_as_manager'] = array(
 								'url' => add_query_arg( array(
 									'action'   => 'set_as_manager',
@@ -1111,7 +1252,7 @@ class Teams_Area {
 		if ( ! empty( $actions ) ) {
 			foreach ( $actions as $key => $action ) {
 
-				$tag  = ! empty( $action['url'] ) ? 'a' : 'span';
+				$tag  = ! empty( $action['url'] ) ? 'a' : 'span disabled';
 				$href = ! empty( $action['url'] ) ? ' href="' . esc_url( $action['url'] ) . '"' : '';
 				$tip  = ! empty( $action['tip'] ) ? ' title="' . esc_attr( $action['tip'] ) . '"' : '';
 
@@ -1255,7 +1396,9 @@ class Teams_Area {
 
 
 	/**
-	 * Handles teams area access - prevents non-managers from accessing team endpoint.
+	 * Handles teams area access.
+	 *
+	 * Prevents non-managers from accessing a team endpoint.
 	 *
 	 * @internal
 	 *
@@ -1265,34 +1408,30 @@ class Teams_Area {
 
 		if ( $this->is_teams_area() ) {
 
-			$user_id = get_current_user_id();
-			$team    = $this->get_teams_area_team();
+			$team = $this->get_teams_area_team();
 
-			// check if team exists and current user can manage the team
-			if ( $team && ! current_user_can( 'wc_memberships_for_teams_manage_team', $team ) ) {
+			if ( $team ) {
 
-				// redirect to dashboard with a notice
-				$redirect_url = wc_get_page_permalink( 'myaccount' );
+				// check if the current user can manage the team altogether
+				if ( ! current_user_can( 'wc_memberships_for_teams_manage_team', $team ) ) {
 
-				wc_add_notice( __( 'You cannot manage this team.', 'woocommerce-memberships-for-teams' ), 'error' );
+					// redirect to dashboard with a notice
+					wc_add_notice( __( 'You cannot manage this team.', 'woocommerce-memberships-for-teams' ), 'error' );
+					wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
+					exit;
+				}
 
-				wp_safe_redirect( $redirect_url );
-				exit;
+				// check if the current user can manage the team settings, specifically
+				if ( 'settings' === $this->get_teams_area_section() && ! current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team ) ) {
+					wc_add_notice( __( 'You cannot manage settings for this team.', 'woocommerce-memberships-for-teams' ), 'error' );
+				}
 
-			} elseif ( $team && 'settings' === $this->get_teams_area_section() && ! current_user_can( 'wc_memberships_for_teams_manage_team_settings', $team ) ) {
-
-				wc_add_notice( __( 'You cannot manage settings for this team.', 'woocommerce-memberships-for-teams' ), 'error' );
-
-			} elseif ( ! $team && $this->get_teams_area_team_id() ) {
+			} elseif ( $this->get_teams_area_team_id() ) {
 
 				// redirect to teams area with a notice
-				$redirect_url = wc_get_account_endpoint_url( $this->endpoint );
-
 				wc_add_notice( __( 'No such team.', 'woocommerce-memberships-for-teams' ), 'error' );
-
-				wp_safe_redirect( $redirect_url );
+				wp_safe_redirect( wc_get_account_endpoint_url( $this->endpoint ) );
 				exit;
-
 			}
 		}
 	}
@@ -1323,8 +1462,7 @@ class Teams_Area {
 			$notice_message = __( 'Invalid team.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
 
-		}
-		elseif ( ! $member ) {
+		} elseif ( ! $member ) {
 
 			$notice_message = __( 'Invalid member.', 'woocommerce-memberships-for-teams' );
 			$notice_type    = 'error';
@@ -1334,51 +1472,70 @@ class Teams_Area {
 			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], $nonce_action ) ) {
 
 				switch ( $action ) {
+
 					case 'set_as_member':
+
 						try {
+
 							$member->set_role( 'member' );
+
 							$notice_message = sprintf( __( '%s was set as a member of the team.', 'woocommerce-memberships-for-teams' ), $member->get_name() );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 
 					case 'set_as_manager':
+
 						try {
+
 							$member->set_role( 'manager' );
+
 							$notice_message = sprintf( __( '%s was set as a manager of the team.', 'woocommerce-memberships-for-teams' ), $member->get_name() );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 
 					case 'remove_member':
+
 						try {
+
 							$team->remove_member( $user_id );
+
 							$notice_message = sprintf( __( '%s was removed from the team.', 'woocommerce-memberships-for-teams' ), $member->get_name() );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot remove member: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 				}
 
-
 			} else {
 
-				/* translators: %s - team name */
+				/* translators: Placeholder: %s - team name */
 				$notice_message = __( 'Cannot perform action. Please try again.', 'woocommerce-memberships-for-teams' );
 				$notice_type    = 'error';
 			}
 		}
 
-
 		if ( isset( $notice_message, $notice_type ) ) {
+
 			wc_add_notice( $notice_message, $notice_type );
 
 			if ( 'notice' === $notice_type ) {
+
 				wp_safe_redirect( $this->get_teams_area_url( $team, 'members' ) );
 				exit;
 			}
@@ -1426,50 +1583,73 @@ class Teams_Area {
 				switch ( $action ) {
 
 					case 'invitation_resend':
+
 						try {
+
 							$invitation->send();
+
 							$notice_message = sprintf( __( 'Invitation to %s re-sent.', 'woocommerce-memberships-for-teams' ), $name );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot send invitation: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 
 					case 'invitation_set_as_member':
+
 						try {
+
 							$invitation->set_member_role( 'member' );
+
 							$notice_message = sprintf( __( '%s was set to be a member of the team.', 'woocommerce-memberships-for-teams' ), $name );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 
 					case 'invitation_set_as_manager':
+
 						try {
+
 							$invitation->set_member_role( 'manager' );
+
 							$notice_message = sprintf( __( '%s was set to be a manager of the team.', 'woocommerce-memberships-for-teams' ), $name );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 
 					case 'invitation_cancel':
+
 						try {
+
 							$invitation->cancel();
+
 							$notice_message = sprintf( __( 'Invitation for %s was cancelled.', 'woocommerce-memberships-for-teams' ), $name );
-						} catch ( \SV_WC_Plugin_Exception $e ) {
+
+						} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
 							$notice_message = sprintf( __( 'Cannot cancel invitation: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() );
 							$notice_type    = 'error';
 						}
+
 					break;
 				}
 
-
 			} else {
 
-				/* translators: %s - team name */
+				/* translators: Placeholder: %s - team name */
 				$notice_message = __( 'Cannot perform action. Please try again.', 'woocommerce-memberships-for-teams' );
 				$notice_type    = 'error';
 			}

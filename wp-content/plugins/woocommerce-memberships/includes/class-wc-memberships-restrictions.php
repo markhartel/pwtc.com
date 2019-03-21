@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Frontend/Checkout
  * @author    SkyVerge
- * @category  Frontend
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -61,6 +59,18 @@ class WC_Memberships_Restrictions {
 	/** @var bool whether we are showing excerpts on restricted content, based on setting. */
 	private $showing_excerpts;
 
+	/** @var string inherit restriction rules option key */
+	private $inherit_restrictions_option = 'wc_memberships_inherit_restrictions';
+
+	/** @var bool whether hierarchical post types should apply restrictions rules from parent to children */
+	private $inherit_restrictions;
+
+	/** @var array collection of post IDs that are forced public, grouped by post type */
+	private $public_posts;
+
+	/** @var string transient key to store cached IDs of posts forced public */
+	private $public_posts_transient_key = 'wc_memberships_public_content';
+
 	/** @var \WC_Memberships_Posts_Restrictions instance of general content restrictions handler */
 	private $posts_restrictions;
 
@@ -82,6 +92,7 @@ class WC_Memberships_Restrictions {
 		$this->restriction_mode           = $this->get_restriction_mode();
 		$this->hiding_restricted_products = $this->hiding_restricted_products();
 		$this->showing_excerpts           = $this->showing_excerpts();
+		$this->inherit_restrictions       = $this->inherit_restriction_rules();
 
 		// load restriction handlers
 		if ( ! is_admin() ) {
@@ -206,7 +217,7 @@ class WC_Memberships_Restrictions {
 	 */
 	public function get_restricted_content_redirect_page_id() {
 
-		if ( null === $this->redirect_page_id || ! $this->redirect_page_id > 0 ) {
+		if ( null === $this->redirect_page_id || ! ( $this->redirect_page_id > 0 ) ) {
 
 			$this->redirect_page_id = (int) get_option( $this->redirect_page_id_option );
 		}
@@ -418,6 +429,349 @@ class WC_Memberships_Restrictions {
 
 
 	/**
+	 * Checks whether an option is set to let hierarchical post types to apply restriction rules to their children.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return bool
+	 */
+	public function inherit_restriction_rules() {
+
+		if ( null === $this->inherit_restrictions ) {
+
+			$this->inherit_restrictions = 'yes' === get_option( $this->inherit_restrictions_option );
+		}
+
+		return $this->inherit_restrictions;
+	}
+
+
+	/**
+	 * Enables inheritance for restriction rules.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @return bool
+	 */
+	public function enable_restriction_rules_inheritance() {
+
+		if ( $success = update_option( $this->inherit_restrictions_option, 'yes' ) ) {
+
+			$this->inherit_restrictions = true;
+		}
+
+		return $success;
+	}
+
+
+	/**
+	 * Disables inheritance for restriction rules.
+	 *
+	 * @since 1.12.3
+	 *
+	 * @return bool
+	 */
+	public function disable_restriction_rules_inheritance() {
+
+		if ( $success = update_option( $this->inherit_restrictions_option, 'no' ) ) {
+
+			$this->inherit_restrictions = false;
+		}
+
+		return $success;
+	}
+
+
+	/**
+	 * Gets posts that have been marked for public access and ignore normal restriction rules.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param string|string[] $which_post_type get public posts by post type or all (default: any, all)
+	 * @param bool $use_cache whether to look in a cached transient for results or update results via direct SQL query
+	 * @return array|int[] array of post IDs or associative array of post IDs grouped by post type
+	 */
+	public function get_public_posts( $which_post_type = 'any', $use_cache = true ) {
+		global $wpdb;
+
+		if ( false === $use_cache || ! is_array( $this->public_posts ) ) {
+
+			$posts = array();
+
+			if ( true === $use_cache ) {
+
+				$posts = get_transient( $this->public_posts_transient_key );
+
+				// transient has expired, must query posts again and update cache
+				if ( ! is_array( $posts ) ) {
+					$posts = $this->get_public_posts( $which_post_type, false );
+				}
+
+			} else {
+
+				$found_items = $wpdb->get_results( "
+					SELECT p.ID, p.post_type FROM $wpdb->posts p
+					LEFT JOIN $wpdb->postmeta pm
+					ON p.ID = pm.post_id
+					WHERE pm.meta_key = '_wc_memberships_force_public'
+					AND pm.meta_value = 'yes'
+				" );
+
+				foreach ( $found_items as $item ) {
+
+					if ( isset( $item->post_type, $item->ID ) && is_string( $item->post_type ) && is_numeric( $item->ID ) && $item->ID > 0 ) {
+
+						$posts[ $item->post_type ][] = (int) $item->ID;
+					}
+				}
+
+				if ( ! empty( $posts ) ) {
+					$this->update_public_content_cache( array( 'posts' => $posts ) );
+				}
+			}
+
+			$this->public_posts = $posts;
+		}
+
+		if ( is_array( $which_post_type ) ) {
+			$results = ! empty( $this->public_posts ) && ! empty( $which_post_type ) ? array_intersect_key( $this->public_posts, array_combine( $which_post_type, $which_post_type ) ) : array();
+		} elseif ( in_array( $which_post_type, array( null, 'any', 'all' ), true ) ) {
+			$results = $this->public_posts;
+		}  else {
+			$results = isset( $this->public_posts[ $which_post_type ] ) ? $this->public_posts[ $which_post_type ] : array();
+		}
+
+		return $results;
+	}
+
+
+	/**
+	 * Gets product that have been marked for public access and ignore any restriction rule.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param bool $use_cache whether to look in a cached transient for results or update results via direct SQL query
+	 * @return int[]
+	 */
+	public function get_public_products( $use_cache = true ) {
+
+		return $this->get_public_posts( 'product', $use_cache );
+	}
+
+
+	/**
+	 * Checks whether a post content is forced public.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int|\WP_Post $post ID or post object
+	 * @param null|string $post_type optional post type
+	 * @return bool
+	 */
+	public function is_post_public( $post, $post_type = null ) {
+
+		$is_post_public = false;
+
+		if ( $post instanceof \WP_Post ) {
+			$post_id = $post->ID;
+		} else {
+			$post_id = $post;
+		}
+
+		if ( is_numeric( $post_id ) ) {
+
+			$public_posts = $this->get_public_posts();
+
+			if ( in_array( $post_type, array( null, 'any', 'all' ), true ) ) {
+
+				foreach ( $public_posts as $post_ids_for_post_type ) {
+
+					if ( in_array( $post_id, $post_ids_for_post_type, false ) ) {
+
+						$is_post_public = true;
+						break;
+					}
+				}
+
+			} elseif ( ! empty( $public_posts[ $post_type ] ) && is_array( $public_posts[ $post_type ] ) ) {
+
+				$is_post_public = in_array( $post_id, $public_posts[ $post_type ], false );
+			}
+		}
+
+		/**
+		 * Filters whether a post should be public (ie. not subject to any restriction for the current user or anonymous guest).
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param bool $is_public whether the post is public (default false unless explicitly marked as public by an admin)
+		 * @param int $post_id the ID of the post being evaluated
+		 * @param null|string $post_type optional post type passed in method arguments
+		 */
+		$is_post_public = (bool) apply_filters( 'wc_memberships_is_post_public', $is_post_public, $post_id, $post_type );
+
+		// if using redirect mode, the redirect page must be made public regardless
+		if ( ! $is_post_public && $this->is_restriction_mode( 'redirect' ) && 'page' === get_post_type( $post ) ) {
+			$is_post_public = (int) $post_id === $this->get_restricted_content_redirect_page_id();
+		}
+
+		return $is_post_public;
+	}
+
+
+	/**
+	 * Checks whether a product is forced public.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int|\WC_Product|\WP_Post $product product object, ID or associated post
+	 * @return bool
+	 */
+	public function is_product_public( $product ) {
+
+		if ( $product instanceof \WP_Post ) {
+			$product_id = $product->ID;
+		} elseif ( $product instanceof \WC_Product ) {
+			$product_id = $product->get_id();
+		} else {
+			$product_id = $product;
+		}
+
+		return is_numeric( $product_id ) && $this->is_post_public( $product_id, 'product' );
+	}
+
+
+	/**
+	 * Sets a piece of content to be forced public, or not.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WC_Product|\WP_Post|int $object post, product or ID, or array of
+	 * @param string $force_public either 'yes' or 'no'
+	 * @return int number of items set (0 for failure)
+	 */
+	private function set_content_forced_public( $object, $force_public ) {
+
+		$success = 0;
+
+		if ( in_array( $force_public, array( 'yes', 'no' ), true ) ) {
+
+			$items = is_array( $object ) ? $object : array( $object );
+
+			foreach ( $items as $item ) {
+				if ( wc_memberships_set_content_meta( $item, '_wc_memberships_force_public', $force_public ) ) {
+					$success++;
+				}
+			}
+		}
+
+		if ( $success > 0 ) {
+			$this->update_public_content_cache();
+		}
+
+		return $success;
+	}
+
+
+	/**
+	 * Sets a post to be forced public (anyone will have access, regardless of rules).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WP_Post|int $post ID or object, or array of
+	 * @return int number of items set (0 for failure)
+	 */
+	public function set_content_public( $post ) {
+
+		return $this->set_content_forced_public( $post, 'yes' );
+	}
+
+
+	/**
+	 * Sets a product to be forced public (anyone will have access, regardless of rules).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WC_Product|\WP_Post|int $product ID or object, or array of
+	 * @return int number of items set (0 for failure)
+	 */
+	public function set_product_public( $product ) {
+
+		return $this->set_content_public( $product );
+	}
+
+
+	/**
+	 * Sets a post not to be forced public (normal restriction rules will apply).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WP_Post|int $post ID or object, or array of
+	 * @return int number of items set (0 for failure)
+	 */
+	public function unset_content_public( $post ) {
+
+		return $this->set_content_forced_public( $post, 'no' );
+	}
+
+
+	/**
+	 * Sets a product not to be forced public (normal restriction rules will apply).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array|\WC_Product|\WP_Post|int $product ID or object
+	 * @return int number of items set (0 for failure)
+	 */
+	public function unset_product_public( $product ) {
+
+		return $this->unset_content_public( $product );
+	}
+
+
+	/**
+	 * Updates the public content cache.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array $data optional data to store in cache
+	 * @return bool success
+	 */
+	public function update_public_content_cache( $data = array() ) {
+
+		/**
+		 * Adjusts the expiration time for public content cache.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param int $expiration time in seconds (default uses WEEK_IN_SECONDS constant)
+		 */
+		$expiration = absint( apply_filters( 'wc_memberships_public_content_cache_expiration', WEEK_IN_SECONDS ) );
+
+		if ( $expiration > 0 ) {
+			$success = set_transient( $this->public_posts_transient_key, ! empty( $data['posts'] ) ? $data['posts'] : $this->get_public_posts( 'any', false ), max( MINUTE_IN_SECONDS, $expiration ) );
+		} else {
+			$success = $this->delete_public_content_cache();
+		}
+
+		return $success;
+	}
+
+
+	/**
+	 * Deletes the public content cache.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return bool
+	 */
+	public function delete_public_content_cache() {
+
+		return delete_transient( $this->public_posts_transient_key );
+	}
+
+
+	/**
 	 * Returns content access conditions for the current user.
 	 *
 	 * Note: third party code should refrain from using or extending this method.
@@ -427,7 +781,6 @@ class WC_Memberships_Restrictions {
 	 * @return array an associative array of restricted and granted content based on the content and product restriction rules
 	 */
 	public function get_user_content_access_conditions() {
-		global $wpdb;
 
 		if ( empty( $this->user_content_access_conditions ) ) {
 
@@ -503,16 +856,28 @@ class WC_Memberships_Restrictions {
 
 							if ( $rule->has_objects() ) {
 
+								$rule_type  = $rule->get_rule_type();
 								$post_type  = $rule->get_content_type_name();
-								$post_ids   = array();
 								$object_ids = $rule->get_object_ids();
+								$post_ids   = array();
 
-								// leave out posts that have restrictions disabled
-								if ( is_array( $object_ids ) ) {
-									foreach ( $rule->get_object_ids() as $post_id ) {
-										if ( 'yes' !== wc_memberships_get_content_meta( $post_id, '_wc_memberships_force_public', true ) ) {
-											$post_ids[] = $post_id;
+								// maybe add children and leave out posts that have restrictions disabled
+								foreach ( $object_ids as $post_id ) {
+
+									if ( $this->inherit_restrictions && 'content_restriction' === $rule_type ) {
+
+										$children = $rule->get_object_children_ids();
+
+										foreach ( $children as $child_id ) {
+
+											if ( ! $this->is_post_public( $child_id ) ) {
+												$post_ids[] = (int) $child_id;
+											}
 										}
+									}
+
+									if ( ! $this->is_post_public( $post_id ) ) {
+										$post_ids[] = (int) $post_id;
 									}
 								}
 
@@ -544,7 +909,7 @@ class WC_Memberships_Restrictions {
 									$conditions[ $condition ]['terms'][ $taxonomy ] = array();
 								}
 
-								$object_ids = array();
+								$object_ids = array( array() );
 
 								// ensure child terms inherit any restriction from their ancestors
 								foreach ( $rule->get_object_ids() as $object_id ) {
@@ -552,11 +917,13 @@ class WC_Memberships_Restrictions {
 									$child_object_ids = get_term_children( $object_id, $taxonomy );
 
 									if ( is_array( $child_object_ids ) ) {
-										$object_ids = array_merge( $object_ids, $child_object_ids );
+										$object_ids[] = $child_object_ids;
 									}
 
-									$object_ids[] = $object_id;
+									$object_ids[] = array( $object_id );
 								}
+
+								$object_ids = call_user_func_array( 'array_merge', $object_ids );
 
 								$conditions[ $condition ]['terms'][ $taxonomy ] = array_unique( array_merge( $conditions[ $condition ]['terms'][ $taxonomy ], $object_ids ) );
 
@@ -649,22 +1016,15 @@ class WC_Memberships_Restrictions {
 				}
 
 				// grant access to posts that have restrictions disabled
-				$public_posts = $wpdb->get_results( "
-					SELECT p.ID, p.post_type FROM $wpdb->posts p
-					LEFT JOIN $wpdb->postmeta pm
-					ON p.ID = pm.post_id
-					WHERE pm.meta_key = '_wc_memberships_force_public'
-					AND pm.meta_value = 'yes'
-				" );
+				foreach ( $this->get_public_posts() as $post_type => $post_ids ) {
 
-				if ( ! empty( $public_posts ) ) {
-					foreach ( $public_posts as $post ) {
+					if ( is_array( $post_ids ) && ! empty( $post_ids ) ) {
 
-						if ( ! isset( $conditions['granted']['posts'][ $post->post_type ] ) ) {
-							$conditions['granted']['posts'][ $post->post_type ] = array();
+						if ( ! isset( $conditions['granted']['posts'][ $post_type ] ) ) {
+							$conditions['granted']['posts'][ $post_type ] = array();
 						}
 
-						$conditions['granted']['posts'][ $post->post_type ][] = $post->ID;
+						$conditions['granted']['posts'][ $post_type ] = array_unique( array_merge( $conditions['granted']['posts'][ $post_type ], array_map( 'absint', $post_ids ) ) );
 					}
 				}
 			}
@@ -936,41 +1296,41 @@ class WC_Memberships_Restrictions {
 
 		switch ( $method ) {
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
 			case 'exclude_restricted_comments' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				global $wp_query;
 				return $this->get_posts_restrictions_instance()->exclude_restricted_content_comments( array(), $wp_query );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'exclude_restricted_recent_comments' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return $this->get_posts_restrictions_instance()->exclude_restricted_content_recent_comments( isset( $args[0] ) ? $args[0] : $args );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'exclude_restricted_posts' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_posts_restrictions_instance()->exclude_restricted_posts( isset( $args[0] ) ? $args[0] : $args );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'exclude_restricted_pages' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'get_restricted_product_category_excluded_tree' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'get_terms_args' :
 				_deprecated_function( $deprecated, '1.9.0', "{$posts_restrictions}::get_term_args()" );
 				$arguments  = isset( $args[0] ) ? $args[0] : array();
 				$taxonomies = isset( $args[1] ) ? $args[1] : array();
 				return $this->get_posts_restrictions_instance()->handle_get_terms_args( $arguments, $taxonomies );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'hide_invisible_variations' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$is_visible = isset( $args[0] ) ? $args[0] : null;
@@ -978,57 +1338,58 @@ class WC_Memberships_Restrictions {
 				$variation  = isset( $args[2] ) ? $args[2] : null;
 				return $this->get_products_restrictions_instance()->hide_invisible_variations( $is_visible, $product_id, $variation );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'hide_restricted_content_comments' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'hide_restricted_product_price' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$price   = isset( $args[0] ) ? $args[0] : '';
 				$product = isset( $args[1] ) ? $args[1] : null;
 				return $this->get_products_restrictions_instance()->hide_restricted_product_price( $price , $product );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'hide_widget_product_categories' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return $this->get_products_restrictions_instance()->hide_widget_product_categories( isset( $args[0] ) ? $args[0] : $args );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'hide_widget_product_dropdown_categories' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return $this->get_products_restrictions_instance()->hide_widget_product_categories( isset( $args[0] ) ? $args[0] : $args );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'maybe_close_comments' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'maybe_password_protect_product' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->password_protect_restricted_product();
 				return null;
 
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'maybe_render_product_category_restricted_message' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'maybe_remove_product_thumbnail' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->remove_product_thumbnail();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'posts_clauses' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$pieces = isset( $args[0] ) ? $args[0] : '';
 				$query  = isset( $args[1] ) ? $args[1] : null;
 				return $this->get_posts_restrictions_instance()->handle_posts_clauses( $pieces, $query );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'product_is_purchasable' :
 				_deprecated_function( $deprecated, '1.9.0', "{$products_restrictions}::product_is_purchasable()" );
 				$purchasable  = isset( $args[0] ) ? $args[0] : null;
@@ -1036,7 +1397,7 @@ class WC_Memberships_Restrictions {
 				$restrictions = $this->get_products_restrictions_instance();
 				return $restrictions && $restrictions->product_is_purchasable( $purchasable, $product );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'product_is_visible' :
 				_deprecated_function( $deprecated, '1.9.0', "{$products_restrictions}::product_is_visible()" );
 				$visible      = isset( $args[0] ) ? $args[0] : null;
@@ -1044,53 +1405,53 @@ class WC_Memberships_Restrictions {
 				$restrictions = $this->get_products_restrictions_instance();
 				return $restrictions && $restrictions->product_is_visible( $visible, $product_id );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'redirect_restricted_content' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'restore_product_thumbnail' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->restore_product_thumbnail();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'restrict_content' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				global $post;
 				$this->get_posts_restrictions_instance()->restrict_post( $post );
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'restrict_product_content' :
 				_deprecated_function( $deprecated, '1.9.0' );
-				return $this->get_products_restrictions_instance()->restrict_product_content( isset( $args[0] ) ? $args[0] : $args );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+				return $this->get_products_restrictions_instance()->restrict_product_content( isset( $args[0] ) ? $args[0] : $args );
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'single_product_member_discount_message' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->display_product_purchasing_discount_message();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'single_product_purchasing_restricted_message' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->display_product_purchasing_restricted_message();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'terms_clauses' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				return $this->get_posts_restrictions_instance()->handle_terms_clauses( isset( $args[0] ) ? $args[0] : $args );
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'template_loop_product_thumbnail_placeholder' :
 				_deprecated_function( $deprecated, '1.9.0' );
 				$this->get_products_restrictions_instance()->template_loop_product_thumbnail_placeholder();
 				return null;
 
-			/** @deprecated since 1.9.0 - remove by 1.12.0 or higher  */
+			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher  */
 			case 'variation_is_visible' :
 				_deprecated_function( $deprecated, '1.9.0', "{$products_restrictions}::variation_is_visible()" );
 				$is_visible   = isset( $args[0] ) ? $args[0] : null;

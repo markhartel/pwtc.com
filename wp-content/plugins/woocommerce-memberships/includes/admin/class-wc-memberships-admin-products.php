@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -48,6 +46,12 @@ class WC_Memberships_Admin_Products {
 		} else {
 			add_action( 'woocommerce_duplicate_product', array( $this, 'duplicate_product_memberships_data' ), 10, 2 );
 		}
+
+		// add additional bulk actions to bulk exclude products from restriction rules or member discounts
+		// TODO when WordPress 4.7 is the minimum required version, this may be updated to use new hooks {FN 2018-11-05}
+		add_action( 'admin_footer-edit.php', array( $this, 'add_membership_bulk_actions' ), 100 );
+		add_action( 'load-edit.php',         array( $this, 'process_membership_bulk_actions' ), 100 );
+		add_action( 'admin_notices',         array( $this, 'display_membership_bulk_actions_notices' ), 100 );
 	}
 
 
@@ -103,6 +107,7 @@ class WC_Memberships_Admin_Products {
 
 			$all_rules = get_option( 'wc_memberships_rules' );
 
+			/* @type $product_rules \WC_Memberships_Membership_Plan_Rule[] */
 			foreach ( $product_rules as $rule ) {
 
 				$new_rule               = $rule->get_raw_data();
@@ -139,9 +144,201 @@ class WC_Memberships_Admin_Products {
 			}
 		}
 
-		// duplicate other settings
-		wc_memberships_set_content_meta( $new_product, '_wc_memberships_force_public',      wc_memberships_get_content_meta( $old_product, '_wc_memberships_force_public', true      ) );
-		wc_memberships_set_content_meta( $new_product, '_wc_memberships_exclude_discounts', wc_memberships_get_content_meta( $old_product, '_wc_memberships_exclude_discounts', true ) );
+		// duplicate restrictions exclusion setting
+		if ( wc_memberships()->get_restrictions_instance()->is_product_public( $old_product ) ) {
+			wc_memberships()->get_restrictions_instance()->set_product_public( $new_product );
+		}
+
+		// duplicate member discount exclusion setting
+		if ( in_array( $old_product_id, wc_memberships()->get_member_discounts_instance()->get_products_excluded_from_member_discounts(), false ) ) {
+			wc_memberships()->get_member_discounts_instance()->set_product_excluded_from_member_discounts( $new_product );
+		}
+	}
+
+
+	/**
+	 * Gets a list of membership-related bulk actions applicable to products.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param bool $with_labels whether to return only ID keys (false) or include labels (true)
+	 * @return string[]|array list of IDs or associative array of IDs and labels
+	 */
+	private function get_membership_bulk_actions( $with_labels = false ) {
+
+		$bulk_actions = array(
+			'wc_memberships_force_product_public'        => __( 'Disallow restrictions rules', 'woocommerce-memberships' ),
+			'wc_memberships_dont_force_product_public'   => __( 'Allow restriction rules', 'woocommerce-memberships' ),
+			'wc_memberships_exclude_from_discounts'      => __( 'Disallow member discounts', 'woocommerce-memberships' ),
+			'wc_memberships_dont_exclude_from_discounts' => __( 'Allow member discounts', 'woocommerce-memberships' ),
+		);
+
+		return true === $with_labels ? $bulk_actions : array_keys( $bulk_actions );
+	}
+
+
+	/**
+	 * Adds membership-related bulk actions to products edit screen.
+	 *
+	 * TODO update this deprecated handling when WordPress 4.7 is the minimum required version {FN 2018-11-05}
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function add_membership_bulk_actions() {
+		global $post_type;
+
+		if ( 'product' === $post_type && current_user_can( 'manage_woocommerce' ) ) :
+
+			?>
+			<script type="text/javascript">
+				jQuery( document ).ready( function( $ ) {
+					<?php foreach ( $this->get_membership_bulk_actions( true ) as $id => $label ) : ?>
+						$( '<option>' ).val( '<?php echo esc_js( $id ); ?>' ).text( '<?php echo esc_js( $label ); ?>' ).appendTo( 'select[name="action"]' );
+						$( '<option>' ).val( '<?php echo esc_js( $id ); ?>' ).text( '<?php echo esc_js( $label ); ?>' ).appendTo( 'select[name="action2"]' );
+					<?php endforeach; ?>
+				} );
+			</script>
+			<?php
+
+		endif;
+	}
+
+
+	/**
+	 * Processes membership-related product bulk actions.
+	 *
+	 * TODO update this deprecated handling when WordPress 4.7 is the minimum required version {FN 2018-11-05}
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function process_membership_bulk_actions() {
+
+		if ( $wp_list_table = _get_list_table( 'WP_Posts_List_Table' ) ) {
+
+			$action       = $wp_list_table->current_action();
+			$bulk_actions = $this->get_membership_bulk_actions();
+
+			if ( current_user_can( 'manage_woocommerce' ) && in_array( $action, $bulk_actions, true ) ) {
+
+				$product_ids = isset( $_REQUEST['post'] ) ? array_map( 'intval', (array) $_REQUEST['post'] ) : array();
+				$handled     = true;
+
+				switch ( $action ) {
+					case 'wc_memberships_force_product_public' :
+						$processed = wc_memberships()->get_restrictions_instance()->set_product_public( $product_ids );
+					break;
+					case 'wc_memberships_dont_force_product_public' :
+						$processed = wc_memberships()->get_restrictions_instance()->unset_product_public( $product_ids );
+					break;
+					case 'wc_memberships_exclude_from_discounts' :
+						$processed = wc_memberships()->get_member_discounts_instance()->set_product_excluded_from_member_discounts( $product_ids );
+					break;
+					case 'wc_memberships_dont_exclude_from_discounts' :
+						$processed = wc_memberships()->get_member_discounts_instance()->unset_product_excluded_from_member_discounts( $product_ids );
+					break;
+					default :
+						$processed = 0;
+						$handled   = false;
+					break;
+				}
+
+				if ( $handled ) {
+
+					// remove bulk actions set on the request URL
+					$clean_original_url = remove_query_arg( array_merge( $bulk_actions, array( 'untrashed', 'deleted', 'ids', 'action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status',  'post', 'bulk_edit', 'post_view' ) ), wp_get_referer() );
+					$processed_url      = ! $clean_original_url ? admin_url( 'edit.php?post_type=product' ) : $clean_original_url;
+
+					if ( $processed_url ) {
+
+						// re-add the processed bulk action and pagination information
+						$redirect_url = add_query_arg( array(
+							$action => $processed,
+							'paged' => $wp_list_table->get_pagenum(),
+						), $processed_url );
+
+						// redirect to the products edit screen carrying bulk action results
+						wp_redirect( $redirect_url );
+						exit;
+					}
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Displays an admin notice after a membership-related bulk action has been processed.
+	 *
+	 * TODO update this deprecated handling when WordPress 4.7 is the minimum required version {FN 2018-11-05}
+	 *
+	 * @internal
+	 *
+	 * @since 1.12.0
+	 */
+	public function display_membership_bulk_actions_notices() {
+		global $post_type, $pagenow;
+
+		if ( 'edit.php' === $pagenow && 'product' === $post_type ) {
+
+			$message      = '';
+			$bulk_actions = $this->get_membership_bulk_actions();
+
+			foreach ( $bulk_actions as $bulk_action ) {
+
+				if ( isset( $_GET[ $bulk_action ] ) ) {
+
+					$processed = is_numeric( $_GET[ $bulk_action ] ) ? max( 0, $_GET[ $bulk_action ] ) : 0;
+
+					if ( 0 === $processed ) {
+
+						switch ( $bulk_action ) {
+							case 'wc_memberships_force_product_public' :
+								$message .= __( 'No Products have been marked as public.', 'woocommerce-memberships' );
+							break;
+							case 'wc_memberships_dont_force_product_public' :
+								$message .= __( 'No Products have been unmarked as public.', 'woocommerce-memberships' );
+							break;
+							case 'wc_memberships_exclude_from_discounts' :
+								$message .= __( 'No Products have been excluded from member discounts.', 'woocommerce-memberships' );
+							break;
+							case 'wc_memberships_dont_exclude_from_discounts' :
+								$message .= __( 'No Products have been marked to be eligible for member discounts from applicable membership plan rules.', 'woocommerce-memberships' );
+							break;
+						}
+
+					} else {
+
+						switch ( $bulk_action ) {
+							case 'wc_memberships_force_product_public' :
+								/* translators: Placeholder: %d - product count (number) */
+								$message .= sprintf( _n( '%d Product has been marked as public and excluded from memberships restriction rules.', '%d Products have been marked as public and excluded from memberships restriction rules.', $processed, 'woocommerce-memberships' ), $processed );
+							break;
+							case 'wc_memberships_dont_force_product_public' :
+								/* translators: Placeholder: %d - product count (number) */
+								$message .= sprintf( _n( '%d Product has been unmarked as public and will now follow any membership plan rules that may affect it.', '%d Products have been unmarked as public and will now follow any membership plan rules that may affect them.', $processed, 'woocommerce-memberships' ), $processed );
+							break;
+							case 'wc_memberships_exclude_from_discounts' :
+								/* translators: Placeholder: %d - product count (number) */
+								$message .= sprintf( _n( '%d Product has been excluded from member discounts.', '%d Products have been excluded from member discounts.', $processed, 'woocommerce-memberships' ), $processed );
+							break;
+							case 'wc_memberships_dont_exclude_from_discounts' :
+								/* translators: Placeholder: %d - product count (number) */
+								$message .= sprintf( _n( '%d Product has been marked to be eligible for member discounts from applicable membership plan rules.', '%d Product have been marked to be eligible for member discounts from applicable membership plan rules.', $processed, 'woocommerce-memberships' ), $processed );
+							break;
+						}
+					}
+				}
+			}
+
+			if ( '' !== $message ) {
+				// duplicate %1$s is intended, to have notice-warning to work properly
+				printf( '<div class="notice notice-%1$s %1$s"><p>%2$s</p></div>', ! empty( $processed ) ? 'updated' : 'warning', esc_html( $message ) );
+			}
+		}
 	}
 
 

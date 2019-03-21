@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -98,7 +99,7 @@ class Team {
 	 * @since 1.0.0
 	 *
 	 * @param int|\WP_Post $id team id or related post object
-	 * @throws \SV_WC_Plugin_Exception when post object isn't set
+	 * @throws Framework\SV_WC_Plugin_Exception when post object isn't set
 	 */
 	public function __construct( $id ) {
 
@@ -109,7 +110,7 @@ class Team {
 		}
 
 		if ( ! $this->post || 'wc_memberships_team' !== $this->post->post_type ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid id or post', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid id or post', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// load in post data...
@@ -168,18 +169,18 @@ class Team {
 	 * @since 1.0.0
 	 *
 	 * @param int $plan_id membership plan ID
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function set_plan_id( $plan_id ) {
 
 		$plan_id = is_numeric( $plan_id ) ? (int) $plan_id : 0;
 
 		if ( ! $plan_id || ! wc_memberships_get_membership_plan( $plan_id ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid membership plan', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid membership plan', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		if ( $this->has_active_members() ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Cannot change plan while team has active members', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot change plan while team has active members', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		wp_update_post( array(
@@ -267,6 +268,34 @@ class Team {
 	 */
 	public function get_name() {
 		return $this->name;
+	}
+
+
+	/**
+	 * Gets the team name with its ID.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @return string
+	 */
+	public function get_formatted_name() {
+
+		return sprintf( '%1$s (#%2$s)', $this->get_name(), $this->get_id() );
+	}
+
+
+	/**
+	 * Gets the team slug.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @return string
+	 */
+	public function get_slug() {
+
+		$post_name = $this->post ? $this->post->post_name : '';
+
+		return empty( $post_name ) ? sanitize_title( $this->get_name() ) : $post_name;
 	}
 
 
@@ -509,7 +538,7 @@ class Team {
 		);
 
 		if ( 'pending' !== $status ) {
-			$args['post_status'] = \SV_WC_Helper::str_starts_with( $status, 'wcmti-' ) ? $status : 'wcmti-' . $status;
+			$args['post_status'] = Framework\SV_WC_Helper::str_starts_with( $status, 'wcmti-' ) ? $status : 'wcmti-' . $status;
 		}
 
 		// we use get_posts instead of a direct SQL query to benefit from WP's internal caching
@@ -579,7 +608,7 @@ class Team {
 	 * @since 1.0.0
 	 *
 	 * @param int $order_id \WC_Order ID
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function set_order_id( $order_id ) {
 
@@ -587,7 +616,7 @@ class Team {
 
 		// check that the id belongs to an actual product
 		if ( ! $order_id || ! wc_get_order( $order_id ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid order', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid order', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		update_post_meta( $this->id, $this->order_id_meta, $order_id );
@@ -687,7 +716,7 @@ class Team {
 	 * @since 1.0.0
 	 *
 	 * @param int $product_id \WC_Product ID
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function set_product_id( $product_id ) {
 
@@ -695,7 +724,7 @@ class Team {
 
 		// check that the id belongs to an actual product
 		if ( ! $product_id || ! wc_get_product( $product_id ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid product', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid product', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		update_post_meta( $this->id, $this->product_id_meta, $product_id );
@@ -791,16 +820,18 @@ class Team {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $user_id the user id to add as a member
-	 * @param string $role (optional) user's role in team, either `member` or `manager`, defaults to `member`, if adding the owner, role will me set to 'owner' automatically and cannot be overriden
-	 * @throws \SV_WC_Plugin_Exception
+	 * @param int|\WP_User $user_id the user to add as a member
+	 * @param string $role (optional) user's role in team, either `member` or `manager`, defaults to `member`, if adding the owner, role will me set to 'owner' automatically and cannot be overridden
 	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Team_Member the team member instance
+	 * @throws Framework\SV_WC_Plugin_Exception|\Exception
 	 */
 	public function add_member( $user_id, $role = 'member' ) {
 
+		$user_id = $user_id instanceof \WP_User ? $user_id->ID : $user_id;
+
 		// sanity check - can't add the same user twice
 		if ( $this->is_user_member( $user_id ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'User is already a member of the team', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'User is already a member of the team', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// if a falsy value was provided for role, default to 'member'
@@ -809,7 +840,7 @@ class Team {
 		}
 
 		if ( ! wc_memberships_for_teams_is_valid_team_member_role( $role ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$seat_count      = $this->get_seat_count();
@@ -830,13 +861,15 @@ class Team {
 
 		// ensure there's a free seat available for the member
 		if ( $seat_count > 0 && $used_seat_count >= $seat_count ) {
-			throw new \SV_WC_Plugin_Exception( __( 'No more seats left', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'No more seats left', 'woocommerce-memberships-for-teams' ) );
 		}
-
-		$this->validate_management_status();
 
 		if ( $this->is_user_owner( $user_id ) ) {
 			$role = 'owner';
+		}
+
+		if ( ! $this->can_add_member( $user_id, $role ) ) {
+			throw new Framework\SV_WC_Plugin_Exception( $this->get_management_decline_reason() );
 		}
 
 		/**
@@ -881,10 +914,10 @@ class Team {
 
 			// add a note about the membership transition
 			if ( $previous_team ) {
-				/* translators: %1$s - previous team name, %2$s - new team name */
+				/* translators: Placeholders: %1$s - previous team name, %2$s - new team name */
 				$note = sprintf( __( 'Team membership moved from %1$s to %2$s.', 'woocommerce-memberships-for-teams' ), $previous_team->get_name(), $this->get_name() );
 			} else {
-				/* translators: %s team name */
+				/* translators: Placeholder: %s team name */
 				$note = sprintf( __( 'Individual membership converted to %s team membership.', 'woocommerce-memberships-for-teams' ), $this->get_name() );
 			}
 
@@ -939,23 +972,26 @@ class Team {
 	 * @param int|string $user_id the user id to remove, or an email if cancelling an invitation
 	 * @param bool $keep_user_memberships (optional) set to true to keep user memberships as a standalone memberships outside the team, defaults to false
 	 * @param bool $add_note (optional) whether to add a note to the membership if keeping it, defaults to true
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function remove_member( $user_id, $keep_user_memberships = false, $add_note = true ) {
 
 		// cancel invitation in case an email was provided
 		if ( is_email( $user_id ) ) {
-			return $this->cancel_invitation( $user_id );
+			$this->cancel_invitation( $user_id );
+			return;
 		}
 
 		// sanity check - don't try remove someone who's not a member
 		if ( ! $this->is_user_member( $user_id ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'User is not a member of the team', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'User is not a member of the team', 'woocommerce-memberships-for-teams' ) );
 		}
 
-		$this->validate_management_status();
-
 		$member = wc_memberships_for_teams_get_team_member( $this, $user_id );
+
+		if ( ! $this->can_remove_member( $member ) ) {
+			throw new Framework\SV_WC_Plugin_Exception( $this->get_management_decline_reason() );
+		}
 
 		// sanity check in case of deleted memberships
 		$user_membership_ids = is_callable( array( $member, 'get_user_memberships' ) ) ? $member->get_user_memberships( 'ids' ) : array();
@@ -990,7 +1026,7 @@ class Team {
 						$user_membership = wc_memberships_get_user_membership( $user_membership_id );
 
 						if ( $user_membership ) {
-							/* translators: %s - team name */
+							/* translators: Placeholder: %s - team name */
 							$user_membership->add_note( sprintf( __( 'Member removed from %s team.', 'woocommerce-memberships-for-teams' ), $this->get_name() ) );
 						}
 					}
@@ -1050,13 +1086,13 @@ class Team {
 	 *
 	 * @param string $email email to invite
 	 * @param string $role (optional) role to assign to the member, defaults to 'member'
-	 * @throws \SV_WC_Plugin_Exception
 	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Invitation invitation instance
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function invite( $email, $role = 'member' ) {
 
 		if ( ! is_email( $email ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid email', 'woocommerce-memberships-for-teams' ), 1 );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid email', 'woocommerce-memberships-for-teams' ), 1 );
 		}
 
 		// if a falsy value was provided for role, default to 'member'
@@ -1065,31 +1101,33 @@ class Team {
 		}
 
 		if ( ! wc_memberships_for_teams_is_valid_team_member_role( $role ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ), 2 );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ), 2 );
 		}
 
 		// only one invitation per email, no +1's ;)
 		$existing_invitation = $this->get_invitation( $email );
 
 		if ( $existing_invitation && $existing_invitation->has_status( 'pending' ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Already invited', 'woocommerce-memberships-for-teams' ), 3 );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Already invited', 'woocommerce-memberships-for-teams' ), 3 );
 		}
 
 		$user = get_user_by( 'email', $email );
 
 		// sanity check - can't invite someone who is already a member
 		if ( $user && $this->is_user_member( $user->ID ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'User is already a member of the team', 'woocommerce-memberships-for-teams' ), 4 );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'User is already a member of the team', 'woocommerce-memberships-for-teams' ), 4 );
 		}
 
 		$seat_count      = $this->get_seat_count();
 		$used_seat_count = $this->get_used_seat_count();
 
 		if ( $seat_count > 0 && $used_seat_count >= $seat_count ) {
-			throw new \SV_WC_Plugin_Exception( __( 'No more seats left', 'woocommerce-memberships-for-teams' ), 5 );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'No more seats left', 'woocommerce-memberships-for-teams' ), 5 );
 		}
 
-		$this->validate_management_status();
+		if ( ! $this->can_invite_user( $user, $role ) ) {
+			throw new Framework\SV_WC_Plugin_Exception( $this->get_management_decline_reason() );
+		}
 
 		/**
 		 * Fires before someone is invited to a team.
@@ -1134,7 +1172,7 @@ class Team {
 	 * @since 1.0.0
 	 *
 	 * @param string $email recipient's email
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function cancel_invitation( $email ) {
 
@@ -1142,7 +1180,7 @@ class Team {
 
 		// sanity check - don't try to cancel an invite if there isn't one
 		if ( ! $invitation ) {
-			throw new \SV_WC_Plugin_Exception( __( 'No invitation found', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'No invitation found', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$invitation->cancel();
@@ -1352,18 +1390,18 @@ class Team {
 		}
 
 		// unschedule any previous expiry hooks
-		if ( wc_next_scheduled_action( 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams'  ) ) {
-			wc_unschedule_action( 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams' );
+		if ( as_next_scheduled_action( 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams'  ) ) {
+			as_unschedule_action( 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams' );
 		}
 
 		// unschedule any previous expiring soon hooks
-		if ( wc_next_scheduled_action( 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' ) ) {
-			wc_unschedule_action( 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
+		if ( as_next_scheduled_action( 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' ) ) {
+			as_unschedule_action( 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
 		}
 
 		// unschedule any previous renewal reminder hooks
-		if ( wc_next_scheduled_action( 'wc_memberships_for_teams_team_membership_renewal_reminder', $hook_args, 'woocommerce-memberships-for-teams' ) ) {
-			wc_unschedule_action( 'wc_memberships_for_teams_team_membership_renewal_reminder', $hook_args, 'woocommerce-memberships-for-teams' );
+		if ( as_next_scheduled_action( 'wc_memberships_for_teams_team_membership_renewal_reminder', $hook_args, 'woocommerce-memberships-for-teams' ) ) {
+			as_unschedule_action( 'wc_memberships_for_teams_team_membership_renewal_reminder', $hook_args, 'woocommerce-memberships-for-teams' );
 		}
 
 		// remove the lock
@@ -1402,7 +1440,7 @@ class Team {
 			$hook_args = array( 'team_id' => $this->id );
 
 			// Schedule the membership expiration event:
-			wc_schedule_single_action( $end_timestamp, 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams' );
+			as_schedule_single_action( $end_timestamp, 'wc_memberships_for_teams_team_membership_expiry', $hook_args, 'woocommerce-memberships-for-teams' );
 
 			// Schedule the membership ending soon event:
 			$days_before_expiry = $this->get_expiring_soon_time_before( $end_timestamp );
@@ -1411,10 +1449,10 @@ class Team {
 
 				if ( $days_before_expiry > $now ) {
 					// if there's at least one day before the expiry date, use the email setting (days before)
-					wc_schedule_single_action( $days_before_expiry, 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
+					as_schedule_single_action( $days_before_expiry, 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
 				} elseif ( $end_timestamp > $now && $median_time = absint( ( $now + $end_timestamp ) / 2 ) ) {
 					// if it's less than one day, schedule as a median time between now and the effective end date (in the course of the last remaining day)
-					wc_schedule_single_action( $median_time, 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
+					as_schedule_single_action( $median_time, 'wc_memberships_for_teams_team_membership_expiring_soon', $hook_args, 'woocommerce-memberships-for-teams' );
 				}
 			}
 		}
@@ -1645,6 +1683,223 @@ class Team {
 
 
 	/**
+	 * Checks whether a member can be added to the team.
+	 *
+	 * @since 1.1.3
+	 *
+	 * @param int|\WP_User $user_id user ID or object
+	 * @param string $role member role (defaults to regular 'member')
+	 * @return bool
+	 */
+	public function can_add_member( $user_id, $role = 'member' ) {
+
+		/**
+		 * Filters whether a user can be added as team member.
+		 *
+		 * @since 1.1.3
+		 *
+		 * @param bool $can_be_added true if team can be managed
+		 * @param int $user_id ID of the user to add as a member
+		 * @param Team $team the team object
+		 * @param string $role invited member role
+		 */
+		return (bool) apply_filters( 'wc_memberships_for_teams_team_can_add_member', $this->can_be_managed(), $user_id, $this, $role );
+	}
+
+
+	/**
+	 * Checks whether a member can be removed from the team.
+	 *
+	 * @since 1.1.3
+	 *
+	 * @param Team_Member $member team member
+	 * @return bool
+	 */
+	public function can_remove_member( $member ) {
+
+		/**
+		 * Filters whether a member can be removed from a team.
+		 *
+		 * @since 1.1.3
+		 *
+		 * @param bool $can_be_removed true if the team can be managed
+		 * @param Team_Member $member the member to be removed
+		 * @param Team $team the team object
+		 */
+		return (bool) apply_filters( 'wc_memberships_for_teams_team_can_remove_member', $this->can_be_managed(), $member, $this );
+	}
+
+
+	/**
+	 * Checks whether a user can be invited to join the team.
+	 *
+	 * @since 1.1.3
+	 *
+	 * @param \WP_User $user a user object
+	 * @param string $role member role (defaults to regular 'member')
+	 * @return bool
+	 */
+	public function can_invite_user( $user, $role = 'member' ) {
+
+		/**
+		 * Filters whether a member can be invited to a team.
+		 *
+		 * @since 1.1.3
+		 *
+		 * @param bool $can_be_invited true if the team can be managed
+		 * @param \WP_User $user a user object
+		 * @param Team $team the team object
+		 * @param string $role invited member role
+		 */
+		return (bool) apply_filters( 'wc_memberships_for_teams_team_can_invite_user', $this->can_be_managed(), $user, $this, $role );
+	}
+
+
+	/**
+	 * Determines whether the team can have seats added or not.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public function can_add_seats() {
+
+		$product = $this->get_product();
+
+		// bail and skip the filter if there's no product associated with the team
+		if ( ! $product || ! $product instanceof \WC_Product ) {
+			return false;
+		}
+
+		$can_add_seats      = $product && $this->can_be_managed() && ! $this->is_membership_expired();
+		$max_member_count   = Product::get_max_member_count( $product );
+		$per_member_pricing = Product::has_per_member_pricing( $product );
+
+		// if per-member pricing and we are at max seats, we can't add more
+		if ( $per_member_pricing && 0 < $max_member_count && $max_member_count === $this->get_seat_count() ) {
+			$can_add_seats = false;
+		}
+
+		// if per-team pricing and no max member, there are unlimited seats, so we can't add seats
+		if ( ! $per_member_pricing && 1 > $max_member_count ) {
+			$can_add_seats = false;
+		}
+
+		/**
+		 * Filters whether seats can be added to this team or not.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param bool $can_add_seats whether seats can be added
+		 * @param Team $this the Team object
+		 */
+		return apply_filters( 'wc_memberships_for_teams_team_can_add_seats', $can_add_seats, $this );
+	}
+
+
+	/**
+	 * Determines whether the team can have seats removed or not.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public function can_remove_seats() {
+
+		/**
+		 * Filters whether seats can be removed from this team or not.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param bool $can_remove_seats whether seats can be removed
+		 * @param Team $this the Team object
+		 */
+		return apply_filters( 'wc_memberships_for_teams_team_can_remove_seats', false, $this );
+	}
+
+
+	/**
+	 * Gets the seat change mode that should be used for this team.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string seat change mode
+	 */
+	public function get_seat_change_mode() {
+
+		$team_product = $this->get_product();
+
+		if ( ! $team_product ) {
+
+			$mode = 'none';
+
+		} elseif ( $this->can_remove_seats() ) {
+
+			$mode = 'update_seats';
+
+		} elseif ( Product::has_per_member_pricing( $team_product ) ) {
+
+			$mode = 'add_seats';
+
+		} else {
+
+			$mode = 'add_seat_blocks';
+		}
+
+		/**
+		 * Filters the seat change mode for the current team.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param string $mode the seat change mode
+		 * @param Team $this the Team object
+		 */
+		return apply_filters( 'wc_memberships_for_teams_team_seat_change_mode', $mode, $this );
+	}
+
+
+	/**
+	 * Gets the new seat total for this team based on the seat change mode.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $change_amount change value
+	 * @return int new seat total
+	 */
+	public function get_seat_change_total( $change_amount ) {
+
+		$change_amount  = (int) $change_amount;
+		$new_seat_total = $this->get_seat_count();
+
+		switch( $this->get_seat_change_mode() ) {
+
+			case 'update_seats':
+				$new_seat_total = $change_amount;
+			break;
+
+			case 'add_seats':
+				$new_seat_total += $change_amount;
+			break;
+
+			case 'add_seat_blocks':
+				$new_seat_total += ( $change_amount * Product::get_max_member_count( $this->get_product() ) );
+			break;
+		}
+
+		/**
+		 * Filters the seat change total for the current team.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param int $new_seat_total the new seat total
+		 * @param Team $this the Team object
+		 * @param int $change_amount the change value passed in
+		 */
+		return apply_filters( 'wc_memberships_for_teams_team_seat_change_total', $new_seat_total, $this, $change_amount );
+	}
+
+
+	/**
 	 * Returns the reason why team management is not permitted.
 	 *
 	 * @since 1.0.0
@@ -1672,17 +1927,15 @@ class Team {
 
 
 	/**
-	 * Validates team management status, throwing if management not permitted.
+	 * Validates team management status.
+	 *
+	 * TODO remove this deprecated method by version 2.0.0 or by March 2020, whichever comes first {FN 2019-03-13}
 	 *
 	 * @since 1.0.0
-	 *
-	 * @throws \SV_WC_Plugin_Exception
+	 * @deprecated since 1.1.3
 	 */
 	public function validate_management_status() {
-
-		if ( ! $this->can_be_managed() ) {
-			throw new \SV_WC_Plugin_Exception( $this->get_management_decline_reason() );
-		}
+		_deprecated_function( __METHOD__, '1.1.3' );
 	}
 
 

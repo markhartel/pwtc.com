@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -66,7 +67,7 @@ class Team_Members {
 
 		try {
 			$team_member = new Team_Member( $team_id, $user_id );
-		} catch( \SV_WC_Plugin_Exception $e ) {
+		} catch( Framework\SV_WC_Plugin_Exception $e ) {
 			return false;
 		}
 
@@ -228,9 +229,7 @@ class Team_Members {
 	 */
 	public function remove_deleted_user_from_team( $user_id ) {
 
-		$teams = wc_memberships_for_teams_get_teams( $user_id, array(
-			'role' => 'owner,manager,member'
-		) );
+		$teams = wc_memberships_for_teams_get_teams( $user_id );
 
 		if ( ! empty( $teams ) ) {
 
@@ -238,7 +237,7 @@ class Team_Members {
 
 				try {
 					$team->remove_member( $user_id );
-				} catch ( \SV_WC_Plugin_Exception $e ) {}
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 			}
 		}
 	}
@@ -251,6 +250,8 @@ class Team_Members {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Team $team team object
+	 * @param string $base_url base URL
 	 * @return array
 	 */
 	public static function get_table_views( $team, $base_url ) {

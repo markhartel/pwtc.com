@@ -16,13 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -49,7 +48,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	/** @var string the rule type: e.g. `content_restriction`, `product_restriction`, `purchasing_discount` */
 	private $rule_type = '';
 
-	/** @var string the content type the rule applies to */
+	/** @var string the content type the rule applies to (normally: `post_type` or `taxonomy`) */
 	private $content_type = '';
 
 	/** @var string the name of the content type the rule applies to */
@@ -57,6 +56,9 @@ class WC_Memberships_Membership_Plan_Rule {
 
 	/** @var int[] array of object ids (e.g. posts, products, terms) the rule applies to */
 	private $object_ids = array();
+
+	/** @var int[] memoized array of children ids which aren't directly included in the rule data but gathered hierarchically */
+	private $children_ids = array();
 
 	/** @var string discount type ('percentage' or 'amount') */
 	private $discount_type = '';
@@ -401,6 +403,52 @@ class WC_Memberships_Membership_Plan_Rule {
 
 
 	/**
+	 * Gets the rule content type object.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return null|\WP_Post_Type|\WP_Taxonomy
+	 */
+	public function get_content_type_object() {
+
+		$object = null;
+
+		if ( $this->is_content_type( 'taxonomy' ) ) {
+			$object = get_taxonomy( $this->content_type_name );
+		} elseif ( $this->is_content_type( 'post_type' ) ) {
+			$object = get_post_type_object( $this->content_type_name );
+		}
+
+		return is_object( $object ) ? $object : null;
+	}
+
+
+	/**
+	 * Gets the rule content type labels.
+	 *
+	 * @see get_post_type_labels()
+	 * @see get_taxonomy_labels()
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return \stdClass
+	 */
+	public function get_content_type_labels() {
+
+		$labels = null;
+		$object = $this->get_content_type_object();
+
+		if ( $object instanceof \WP_Post_Type ) {
+			$labels = get_post_type_labels( $object );
+		} elseif ( $object instanceof \WP_Taxonomy ) {
+			$labels = get_taxonomy_labels( $object );
+		}
+
+		return is_object( $labels ) ? $labels : null;
+	}
+
+
+	/**
 	 * Returns the content type name targeted by the rule (e.g. 'post').
 	 *
 	 * @since 1.9.0
@@ -509,6 +557,88 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function delete_object_ids() {
 
 		$this->set_object_ids( array() );
+	}
+
+
+	/**
+	 * Gets any children IDs of the rule object IDs.
+	 *
+	 * Only works if the object is hierarchical (like a taxonomy or the page post type).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return int[] array of post IDs or term IDs
+	 */
+	public function get_object_children_ids() {
+
+		if ( empty( $this->children_ids ) && $this->has_object_ids() ) {
+
+			$children = array( array() );
+
+			switch ( $this->get_content_type() ) {
+
+				case 'post_type' :
+
+					foreach ( $this->get_object_ids() as $post_id ) {
+						$children[] = $this->get_grandchildren( $post_id );
+					}
+
+				break;
+
+				case 'taxonomy' :
+
+					foreach ( $this->get_object_ids() as $term_id ) {
+
+						$children_ids = get_term_children( $term_id, $this->get_content_type_name() );
+
+						if ( is_array( $children_ids ) ) {
+							$children[] = $children_ids;
+						}
+					}
+
+				break;
+			}
+
+			$this->children_ids = array_unique( array_map( 'absint', call_user_func_array( 'array_merge', $children ) ) );
+		}
+
+		return $this->children_ids;
+	}
+
+
+	/**
+	 * Gets all grandchildren of a given post.
+	 *
+	 * Helper method, do not open to public:
+	 * @see \get_children() only retrieves direct children, but we want the whole line of descendants.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int $ancestor_id ancestor post ID
+	 * @return int[] array of descendant post IDs (won't include the ancestor ID)
+	 */
+	private function get_grandchildren( $ancestor_id ) {
+
+		$descendants = array( array() );
+		$children    = get_posts( array(
+			'nopaging'    => true,
+			'fields'      => 'ids',
+			'post_status' => 'publish',
+			'post_type'   => $this->get_content_type_name(),
+			'post_parent' => $ancestor_id,
+		) );
+
+		foreach ( $children as $child_id ) {
+
+			// recursion to catch all grandchildren
+			$grandchildren = $this->get_grandchildren( $child_id );
+
+			if ( ! empty( $grandchildren ) ) {
+				$descendants[] = $grandchildren;
+			}
+		}
+
+		return array_unique( array_merge( $children, call_user_func_array( 'array_merge', $descendants ) ) );
 	}
 
 
@@ -883,7 +1013,7 @@ class WC_Memberships_Membership_Plan_Rule {
 		$object_ids   = $this->get_object_ids();
 		$content_type = $this->get_content_type();
 
-		if ( 'post_type' === $content_type && ! empty( $object_ids ) ) {
+		if ( 'post_type' === $content_type ) {
 			$priority = ! empty( $object_ids ) ? 40 : 10;
 		} elseif ( 'taxonomy' === $content_type ) {
 			$priority = ! empty( $object_ids ) ? 30 : 20;
@@ -985,7 +1115,7 @@ class WC_Memberships_Membership_Plan_Rule {
 			case 'object_id':
 			case 'object_ids':
 				$object_ids = $this->get_object_ids();
-				$applies    = in_array( $value, empty( $object_ids ) ? array() : (array) $object_ids, false );
+				$applies    = in_array( $value, $object_ids, false );
 			break;
 
 			default:
@@ -1037,16 +1167,30 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function current_context_allows_editing() {
 		global $post;
 
-		$object_ids = $this->get_object_ids();
+		$allow_edit = false;
 
-		return $post ? $this->get_membership_plan_id() === (int) $post->ID || ( is_array( $object_ids ) && count( $object_ids ) === 1 && ( ! $post || $post && $this->applies_to( 'object_id', $post->ID ) ) ) : false;
+		if ( $post ) {
+
+			$allow_edit = $this->get_membership_plan_id() === (int) $post->ID;
+
+			if ( ! $allow_edit ) {
+
+				$object_ids = $this->get_object_ids();
+				$allow_edit = is_array( $object_ids )
+				              && count( $object_ids ) === 1
+				              && $this->applies_to( 'object_id', $post->ID );
+			}
+		}
+
+		return $allow_edit;
 	}
+
 
 
 	/**
 	 * Handler of deprecated methods.
 	 *
-	 * TODO remove magic overrides by version 1.12.0 or higher {FN 2017-06-06}
+	 * TODO remove magic overrides by version 1.13.0 or higher {FN 2017-06-06}
 	 *
 	 * Originally (version 1.0.0) this was used to perform CRUD operations on the rule object.
 	 * In version 1.9.0 these have been refactored into explicit methods and the override turned into a deprecated methods handler.
@@ -1060,7 +1204,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	 */
 	public function __call( $method, $args ) {
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		if ( 0 === strpos( $method, 'get_' ) ) {
 
 			if ( 'get_access_schedule_exclude_trial' === $method ) {
@@ -1082,10 +1226,10 @@ class WC_Memberships_Membership_Plan_Rule {
 				}
 			}
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( isset( $args[0] ) && 0 === strpos( $method, 'set_' ) ) {
 
-			$key  = str_replace( 'set_', '', $method );
+			$key = str_replace( 'set_', '', $method );
 
 			if ( property_exists( $this, $key ) ) {
 
@@ -1096,7 +1240,7 @@ class WC_Memberships_Membership_Plan_Rule {
 				return null;
 			}
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 0 === strpos( $method, 'has_' ) ) {
 
 			$data = $this->get_raw_data();
@@ -1109,7 +1253,7 @@ class WC_Memberships_Membership_Plan_Rule {
 				return ! empty( $data[ $key ] );
 			}
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 'applies_to_multiple_objects' === $method ) {
 
 			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0' );
@@ -1118,7 +1262,7 @@ class WC_Memberships_Membership_Plan_Rule {
 
 			return is_array( $object_ids ) && count( $object_ids ) > 1;
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 'applies_to_single_object' === $method ) {
 
 			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0' );
@@ -1128,13 +1272,14 @@ class WC_Memberships_Membership_Plan_Rule {
 
 			return is_array( $object_ids ) && count( $object_ids ) === 1 && ( $object_id ? $this->applies_to( 'object_id', $object_id ) : true );
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 'content_type_exists' === $method ) {
 
 			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Rules::rule_content_type_exists()' );
 
 			return wc_memberships()->get_rules_instance()->rule_content_type_exists( $this );
 
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 'get_object_label' === $method ) {
 
 			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label()' );
@@ -1143,16 +1288,15 @@ class WC_Memberships_Membership_Plan_Rule {
 			$admin = wc_memberships()->get_admin_instance();
 
 			if ( $admin && class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ) {
-				$label = WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label( $this, isset( $args[0] ) ? $args[0] : $args );
+				$label = \WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label( $this, isset( $args[0] ) ? $args[0] : $args );
 			}
 
 			return $label;
 
-		/** @deprecated since 1.9.0 - remove by version 1.12.0 */
+		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
 		} elseif ( 'get_object_search_action_name' === $method ) {
 
 			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_search_action()' );
-
 			$name  = '';
 			$admin = wc_memberships()->get_admin_instance();
 

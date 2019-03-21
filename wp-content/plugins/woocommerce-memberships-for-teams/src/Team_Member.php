@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -63,15 +64,15 @@ class Team_Member {
 	 *
 	 * @param int|\WP_Post|\SkyVerge\WooCommerce\Memberships\Teams\Team $team_id team id, post object or instance
 	 * @param int|string|\WP_User $user_id user id, email or user instance
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function __construct( $team_id, $user_id ) {
 
 		// load the team
 		$this->team = wc_memberships_for_teams_get_team( $team_id );
 
-		if ( ! ( $this->team instanceof \SkyVerge\WooCommerce\Memberships\Teams\Team ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
+		if ( ! ( $this->team instanceof Team ) ) {
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// load the user
@@ -84,12 +85,12 @@ class Team_Member {
 		}
 
 		if ( ! ( $this->user instanceof \WP_User ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid user', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid user', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// ensure that the user is actually a member of the team
 		if ( ! $this->team->is_user_member( $this->user->ID ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'User is not a member of this team', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'User is not a member of this team', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// load in user data...
@@ -161,9 +162,10 @@ class Team_Member {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param bool true if user is the owner of the team, false otherwise
+	 * @return bool
 	 */
 	public function is_team_owner() {
+
 		return $this->team->is_user_owner( $this->id );
 	}
 
@@ -192,7 +194,7 @@ class Team_Member {
 	public function get_role( $return = null ) {
 
 		// short-circuit for owners
-		if ( $this->is_team_owner( $this->get_id() ) ) {
+		if ( $this->is_team_owner() ) {
 			return 'label' === $return ? __( 'Owner', 'woocommerce-memberships-for-teams' ) : 'owner';
 		}
 
@@ -213,7 +215,7 @@ class Team_Member {
 	 * @since 1.0.0
 	 *
 	 * @param string $role user's role in team, either `member` or `manager`, defaults to `member`
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function set_role( $role = 'member' ) {
 
@@ -223,12 +225,12 @@ class Team_Member {
 		}
 
 		if ( ! wc_memberships_for_teams_is_valid_team_member_role( $role ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		// do not allow changing owner's role
 		if ( $this->is_team_owner() ) {
-			throw new \SV_WC_Plugin_Exception( __( "Changing owner's role is not allowed", 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( "Changing owner's role is not allowed", 'woocommerce-memberships-for-teams' ) );
 		}
 
 		update_user_meta( $this->get_id(), $this->team_role_meta, $role );

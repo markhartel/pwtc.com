@@ -16,15 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
-
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 /**
  * Renders the products restricted to the membership in the my account area.
@@ -33,12 +30,13 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
  * @type \WP_Query $restricted_products Query results of products post objects for all products restricted to the membership
  * @type int $user_id The current user ID
  *
- * @version 1.11.0
+ * @version 1.12.0
  * @since 1.4.0
  */
-?>
 
-<?php do_action( 'wc_memberships_before_members_area', 'my-membership-products', $customer_membership ); ?>
+do_action( 'wc_memberships_before_members_area', 'my-membership-products', $customer_membership );
+
+?>
 
 <?php if ( empty ( $restricted_products->posts ) ) : ?>
 
@@ -88,7 +86,7 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 				}
 
 				if ( $product->is_type( 'variation' ) ) {
-					$parent     = Framework\SV_WC_Product_Compatibility::get_parent( $product );
+					$parent     = wc_memberships_get_product_parent( $product );
 					$product_id = $parent->get_id();
 				} else {
 					$product_id = $product->get_id();
@@ -192,4 +190,6 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 <?php endif; ?>
 
-<?php do_action( 'wc_memberships_after_members_area', 'my-membership-products', $customer_membership );
+<?php
+
+do_action( 'wc_memberships_after_members_area', 'my-membership-products', $customer_membership );

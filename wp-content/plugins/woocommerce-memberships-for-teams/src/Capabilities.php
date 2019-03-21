@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -66,19 +67,9 @@ class Capabilities {
 
 				switch ( $cap ) {
 
-					// only owners can renew team memberships
+					// only owners can adjust seats on teams, renew team memberships, or manage team settings:
+					case 'wc_memberships_for_teams_update_team_seats':
 					case 'wc_memberships_for_teams_renew_team_membership':
-
-						$user_id = (int) $args[1];
-						$team    = $this->get_team_from_args( $args );
-
-						if ( $user_id && $team && $team->is_user_owner( $user_id ) ) {
-							$all_caps[ $cap ] = true;
-						}
-
-					break;
-
-					// only owners can manage team settings
 					case 'wc_memberships_for_teams_manage_team_settings':
 
 						$user_id = (int) $args[1];
@@ -112,12 +103,18 @@ class Capabilities {
 						$team            = $this->get_team_from_args( $args );
 						$member          = wc_memberships_for_teams_get_team_member( $team, $user_id );
 						$other_member_id = (int) $args[3];
+						$other_member    = $other_member_id ? wc_memberships_for_teams_get_team_member( $team, $other_member_id ) : null;
 
 						// only owners and managers can manage team members
 						if ( $user_id && $other_member_id && $team && ( $team->is_user_owner( $user_id ) || ( $member && $member->has_role( 'manager' ) ) ) ) {
 
 							// users cannot manage themselves, though
 							if ( $user_id === $other_member_id ) {
+								break;
+							}
+
+							// check if able to manage another manager
+							if ( $other_member && $other_member->has_role( 'manager' ) && 'yes' !== get_option( 'wc_memberships_for_teams_managers_may_manage_managers', 'yes' ) ) {
 								break;
 							}
 
@@ -143,6 +140,7 @@ class Capabilities {
 						$team            = $this->get_team_from_args( $args );
 						$member          = wc_memberships_for_teams_get_team_member( $team, $user_id );
 						$other_member_id = (int) $args[3];
+						$other_member    = $other_member_id ? wc_memberships_for_teams_get_team_member( $team, $other_member_id ) : null;
 						$is_owner        = $team->is_user_owner( $user_id );
 
 						// only owners and managers can remove team members
@@ -150,6 +148,11 @@ class Capabilities {
 
 							// users cannot remove themselves, though, unless an owner and they don't need to take up a seat
 							if ( $user_id === $other_member_id && ( ! $is_owner || ( $is_owner && 'yes' === get_option( 'wc_memberships_for_teams_owners_must_take_seat' ) ) ) ) {
+								break;
+							}
+
+							// check if able to manage another manager
+							if ( $other_member && $other_member->has_role( 'manager' ) && 'yes' !== get_option( 'wc_memberships_for_teams_managers_may_manage_managers', 'yes' ) ) {
 								break;
 							}
 

@@ -16,15 +16,14 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 
 /**
@@ -60,14 +59,15 @@ function wc_memberships_list_items( $items, $conjunction = '' ) {
  */
 function wc_memberships_get_content_type_name( $post ) {
 
+	$content_type_name = '';
+
 	// sanity check
-	if ( ! $post instanceof \WP_Post || ! isset( $post->post_type ) ) {
-		return '';
+	if ( $post instanceof \WP_Post && ( $post_type_object = get_post_type_object( $post->post_type ) ) ) {
+
+		$content_type_name = ucwords( $post_type_object->labels->singular_name );
 	}
 
-	$post_type_object = get_post_type_object( $post->post_type );
-
-	return ucwords( $post_type_object->labels->singular_name );
+	return $content_type_name;
 }
 
 
@@ -130,12 +130,14 @@ function wc_memberships_get_content_meta( $object, $meta, $single = true ) {
  * @param int|\WP_Post|\WC_Product $object
  * @param string $meta_key
  * @param array|int|string $meta_value
+ * @return bool success
  */
 function wc_memberships_set_content_meta( $object, $meta_key, $meta_value ) {
 
 	// get_post_type can accept an ID or WP_Post, but not WC_Product
 	$_object   = $object instanceof \WC_Product ? $object->get_id() : $object;
 	$post_type = get_post_type( $_object );
+	$success   = false;
 
 	if ( $object instanceof \WC_Product && in_array( $post_type, array( 'product', 'product_variation' ), true ) ) {
 
@@ -146,7 +148,7 @@ function wc_memberships_set_content_meta( $object, $meta_key, $meta_value ) {
 		}
 
 		if ( ! empty( $product_id ) ) {
-			update_post_meta( $product_id, $meta_key, $meta_value );
+			$success = (bool) update_post_meta( $product_id, $meta_key, $meta_value );
 		}
 
 	} else {
@@ -158,9 +160,11 @@ function wc_memberships_set_content_meta( $object, $meta_key, $meta_value ) {
 		}
 
 		if ( ! empty( $post_id ) ) {
-			update_post_meta( $post_id, $meta_key, $meta_value );
+			$success = (bool)  update_post_meta( $post_id, $meta_key, $meta_value );
 		}
 	}
+
+	return $success;
 }
 
 
@@ -204,4 +208,20 @@ function wc_memberships_delete_content_meta( $object, $meta_key ) {
 			delete_post_meta( $post_id, $meta_key );
 		}
 	}
+}
+
+
+/**
+ * Gets a variation product's parent, if any (compatibility template function).
+ *
+ * @since 1.12.0
+ *
+ * @param int|\WP_Post|\WC_Product|\WC_Product_Variation $product variation product ID, object or post object
+ * @return null|\WC_Product
+ */
+function wc_memberships_get_product_parent( $product ) {
+
+	$parent = Framework\SV_WC_Product_Compatibility::get_parent( $product );
+
+	return false === $parent ? null : $parent;
 }

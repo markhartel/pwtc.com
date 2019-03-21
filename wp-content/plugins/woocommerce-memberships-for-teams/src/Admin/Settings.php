@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -54,6 +55,7 @@ class Settings {
 	 * @since 1.0.0
 	 *
 	 * @param array $sections associative array of sections
+	 * @return array
 	 */
 	public function add_teams_section( $sections ) {
 
@@ -72,6 +74,7 @@ class Settings {
 	 *
 	 * @param array $settings array of the plugin settings
 	 * @param string $current_section the current section being output
+	 * @return array
 	 */
 	public function add_teams_settings( $settings, $current_section ) {
 
@@ -105,6 +108,14 @@ class Settings {
 					'name'     => __( 'Owners must be members', 'woocommerce-memberships-for-teams' ),
 					'desc'     => __( 'If enabled, team owners must take up a seat in their team.', 'woocommerce-memberships-for-teams' ),
 					'default'  => 'no',
+				),
+
+				array(
+					'type'     => 'checkbox',
+					'id'       => 'wc_memberships_for_teams_managers_may_manage_managers',
+					'name'     => __( 'Allow managers to add or remove other managers', 'woocommerce-memberships-for-teams' ),
+					'desc'     => __( 'If enabled, team managers can add/remove other managers. Otherwise, only a team owner may add or remove managers.', 'woocommerce-memberships-for-teams' ),
+					'default'  => 'yes',
 				),
 
 				array(

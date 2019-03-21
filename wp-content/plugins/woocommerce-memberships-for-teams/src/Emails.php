@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,6 +31,8 @@ defined( 'ABSPATH' ) or exit;
  * Emails handler.
  *
  * This class handles all email-related functionality in Memberships for Teams.
+ *
+ * TODO consider avoiding code duplication by using \WC_Memberships_Emails core emails handler {FN 2019-01-16}
  *
  * @since 1.0.0
  */
@@ -116,6 +119,7 @@ class Emails {
 	 * @param \SkyVerge\WooCommerce\Memberships\Teams\Invitation|int $invitation invitation instance or id
 	 */
 	public function send_invitation_email( $invitation ) {
+
 		$this->send_email( 'wc_memberships_for_teams_team_invitation', $invitation );
 	}
 
@@ -183,11 +187,12 @@ class Emails {
 
 			// if linked to a team, skip
 			if ( $user_membership && $team_id = wc_memberships_for_teams_get_user_membership_team_id( $user_membership->get_id() ) ) {
-				$enabled = false;
+				$is_enabled = false;
 			}
 		}
 
 		return $is_enabled;
 	}
+
 
 }

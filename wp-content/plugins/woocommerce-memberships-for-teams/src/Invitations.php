@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -39,6 +40,34 @@ class Invitations {
 
 
 	/**
+	 * Determines whether invitations should be skipped for registered users.
+	 *
+	 * If this is true, members are joined directly when a team manager submits an email address in the team management page.
+	 * Even if this is true, yet an email does not match a registered user, invitations would still be sent then.
+	 * @see \SkyVerge\WooCommerce\Memberships\Teams\Frontend::add_team_member()
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param null|\SkyVerge\WooCommerce\Memberships\Teams\Team $team optional: pass a team to determine if invitations should be skipped for
+	 * @param null|string|int|\WP_User optional: user being invited to join a team (by email, ID or object)
+	 * @return bool
+	 */
+	public function should_skip_invitations( $team = null, $user = null ) {
+
+		/**
+		 * Filters whether invitations should be skipped.
+		 *
+		 * @since 1.1.2
+		 *
+		 * @param bool $skip_invitations whether invitations should be skipped
+		 * @param null|\SkyVerge\WooCommerce\Memberships\Teams\Team optional argument to evaluate if invitations should be skipped for a particular team
+		 * @param null|int|string|\WP_User optional being invited to join a team (by email, ID or object)
+		 */
+		return (bool) apply_filters( 'wc_memberships_for_teams_skip_invitations', false, $team, $user );
+	}
+
+
+	/**
 	 * Creates a new invitation.
 	 *
 	 * @since 1.0.0
@@ -51,8 +80,8 @@ class Invitations {
 	 *     @type int $sender_id (optional) sender user id, defaults to current user id
 	 *     @type string $role (optional) the role to assign to the invited user, defaults to 'member'
 	 * }
-	 * @throws \SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
-	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Invitation instance
+	 * @return false|Invitation instance
+	 * @throws Framework\SV_WC_Plugin_Exception on validation errors or when wp_insert_post fails
 	 */
 	public function create_invitation( $args = array() ) {
 
@@ -65,12 +94,12 @@ class Invitations {
 
 		$team = wc_memberships_for_teams_get_team( $args['team_id'] );
 
-		if ( ! $team instanceof \SkyVerge\WooCommerce\Memberships\Teams\Team ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
+		if ( ! $team instanceof Team ) {
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid team', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		if ( empty( $args['email'] ) || ! is_email( $args['email'] ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid email', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid email', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$new_invitation_post_data = array(
@@ -102,7 +131,7 @@ class Invitations {
 		$invitation_id = wp_insert_post( $new_invitation_post_data );
 
 		if ( is_wp_error( $invitation_id ) ) {
-			throw new \SV_WC_Plugin_Exception( $invitation_id->get_error_message() );
+			throw new Framework\SV_WC_Plugin_Exception( $invitation_id->get_error_message() );
 		}
 
 		$invitation = $this->get_invitation( $invitation_id );
@@ -140,7 +169,7 @@ class Invitations {
 			// get invitation by team id + recipient email
 			$team = wc_memberships_for_teams_get_team( $id );
 
-			if ( ! is_email( $email ) || ! $team instanceof \SkyVerge\WooCommerce\Memberships\Teams\Team ) {
+			if ( ! $team instanceof Team || ! is_email( $email ) ) {
 				return false;
 			}
 
@@ -185,7 +214,7 @@ class Invitations {
 
 		try {
 			$invitation = new Invitation( $post );
-		} catch ( \SV_WC_Plugin_Exception $e ) {
+		} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 			return false;
 		}
 
@@ -208,7 +237,7 @@ class Invitations {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $team_id team id to get the invitations for
+	 * @param int|\SkyVerge\WooCommerce\Memberships\Teams\Team $team_id team id to get the invitations for
 	 * @param array $args {
 	 *     (optional) an array of arguments to pass to \WP_Query - additionally, a few special arguments can be passed:
 	 *
@@ -223,11 +252,7 @@ class Invitations {
 	 */
 	public function get_invitations( $team_id, $args = array(), $return = null, $force_refresh = false ) {
 
-		if ( ! $team_id ) {
-			return false;
-		}
-
-		$team = wc_memberships_for_teams_get_team( $team_id );
+		$team = $team_id && ! $team_id instanceof Team ? wc_memberships_for_teams_get_team( $team_id ) : $team_id;
 
 		if ( ! $team instanceof Team ) {
 			return false;
@@ -252,7 +277,7 @@ class Invitations {
 			// enforces a 'wcmti-' prefix if missing
 			foreach ( (array) $args['status'] as $status ) {
 
-				$status = \SV_WC_Helper::str_starts_with( $status, 'wcmti-' ) ? $status : 'wcmti-' . $status;
+				$status = Framework\SV_WC_Helper::str_starts_with( $status, 'wcmti-' ) ? $status : 'wcmti-' . $status;
 
 				if ( in_array( $status, $default_statuses, true ) ) {
 					$args['post_status'][] = $status;
@@ -291,7 +316,7 @@ class Invitations {
 		// unique key for memoizing the results
 		$query_key = http_build_query( $args ) . $team->get_id();
 
-		if ( ! isset( $this->invitations[ $query_key ] ) || $force_refresh ) {
+		if ( $force_refresh || ! isset( $this->invitations[ $query_key ] ) ) {
 
 			$wp_query    = new \WP_Query( $args );
 			$invitations = array();

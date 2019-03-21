@@ -17,17 +17,20 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Emails;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+
 defined( 'ABSPATH' ) or exit;
 
 /**
  * Team Membership Ending Soon Email class.
+ *
+ * TODO consider using \WC_Memberships_User_Membership_Email as the default abstract {FN 2019-01-16}
  *
  * @since 1.0.0
  */
@@ -51,7 +54,6 @@ class Membership_Ending_Soon extends Membership_Email {
 		$this->template_html  = 'emails/team-membership-ending-soon.php';
 		$this->template_plain = 'emails/plain/team-membership-ending-soon.php';
 
-		// call parent constuctor
 		parent::__construct();
 	}
 

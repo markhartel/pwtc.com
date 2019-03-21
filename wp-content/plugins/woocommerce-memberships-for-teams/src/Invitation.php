@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -74,7 +75,7 @@ class Invitation {
 	 * @since 1.0.0
 	 *
 	 * @param int|\WP_Post $id invitation id or post object
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function __construct( $id ) {
 
@@ -85,7 +86,7 @@ class Invitation {
 		}
 
 		if ( ! $this->post || 'wc_team_invitation' !== $this->post->post_type ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid id or post', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid id or post', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$this->id          = $this->post->ID;
@@ -276,15 +277,14 @@ class Invitation {
 	 * @since 1.0.0
 	 *
 	 * @param string $role the role to set
-	 * @throws \SV_WC_Plugin_Exception
 	 * @return string role
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function set_member_role( $role = 'member' ) {
 
 		if ( ! wc_memberships_for_teams_is_valid_team_member_role( $role ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid role', 'woocommerce-memberships-for-teams' ) );
 		}
-
 
 		wp_update_post( array(
 			'ID'             => $this->id,
@@ -308,7 +308,7 @@ class Invitation {
 	public function get_token() {
 
 		if ( ! $this->token ) {
-			$this->token = $this->generate_invitation_token();
+			$this->token = Plugin::generate_token();
 		}
 
 		return $this->token;
@@ -407,6 +407,7 @@ class Invitation {
 	 * @since 1.0.0
 	 */
 	public function send() {
+
 		wc_memberships_for_teams()->get_emails_instance()->send_invitation_email( $this );
 	}
 
@@ -417,19 +418,19 @@ class Invitation {
 	 * @since 1.0.0
 	 *
 	 * @param int|\WP_user $user_id user id or instance
-	 * @throws \SV_WC_Plugin_Exception
 	 * @return \SkyVerge\WooCommerce\Memberships\Teams\Team_Member|false team member instance or false on failure
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function accept( $user_id ) {
 
 		if ( ! $this->has_status( 'pending' ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Cannot accept this invitation - it may have been revoked or already accepted.', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot accept this invitation - it may have been revoked or already accepted.', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$user = is_numeric( $user_id ) ? get_userdata( $user_id ) : $user_id;
 
 		if ( ! $user instanceof \WP_User ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Invalid user', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Invalid user', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$team        = $this->get_team();
@@ -450,12 +451,12 @@ class Invitation {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @throws \SV_WC_Plugin_Exception
+	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
 	public function cancel() {
 
 		if ( ! $this->has_status( 'pending' ) ) {
-			throw new \SV_WC_Plugin_Exception( __( 'Cannot cancel non-pending invitation', 'woocommerce-memberships-for-teams' ) );
+			throw new Framework\SV_WC_Plugin_Exception( __( 'Cannot cancel non-pending invitation', 'woocommerce-memberships-for-teams' ) );
 		}
 
 		$this->set_status( 'cancelled' );

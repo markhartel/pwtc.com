@@ -17,23 +17,29 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Frontend;
 
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 use SkyVerge\WooCommerce\Memberships\Teams\Product;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Teams Products helper class. Provides team product utility methods and handles aspectes of the plugin related to products.
+ * Teams Products helper class.
+ *
+ * Provides team product utility methods and handles aspects of the plugin related to products.
  *
  * @since 1.0.0
  */
 class Products {
+
+
+	/** @var bool flag to avoid adding inline scripts twice on a page */
+	private static $add_variation_switch_scripts = false;
 
 
 	/**
@@ -44,10 +50,10 @@ class Products {
 	public function __construct() {
 
 		add_filter( 'woocommerce_get_price_html',            array( $this, 'price_per_member_html' ), 10, 2 );
--		add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'render_team_options' ) );
+		add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'render_team_options' ) );
 
 		add_filter( 'woocommerce_quantity_input_args',       array( $this, 'team_quantity_input_args' ), 10, 2 );
-		add_action( 'woocommerce_available_variation',       array( $this, 'adjust_team_variation' ), 10, 3 );
+		add_filter( 'woocommerce_available_variation',       array( $this, 'adjust_team_variation' ), 10, 3 );
 	}
 
 
@@ -66,7 +72,7 @@ class Products {
 
 		if ( '' !== $price_html && Product::has_team_membership( $product ) && Product::has_per_member_pricing( $product ) ) {
 
-			/** translators: suffix for per member prices, for example: $5 per member */
+			/* translators: suffix for per member prices, for example: $5 per member */
 			$suffix = esc_html__( 'per member', 'woocommerce-memberships-for-teams' );
 			$price_html .= ' ' . $suffix;
 
@@ -82,7 +88,6 @@ class Products {
 			$price_html = apply_filters( 'wc_memberships_for_teams_get_price_html', $price_html, $product, $suffix );
 		}
 
-
 		return $price_html;
 	}
 
@@ -94,7 +99,7 @@ class Products {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $args associatiev array of input arguments
+	 * @param array $args associative array of input arguments
 	 * @param \WC_Product $product the product instance
 	 * @return array
 	 */
@@ -122,9 +127,9 @@ class Products {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $args associatiev array of input arguments
+	 * @param array $args associative array of input arguments
 	 * @param \WC_Product $product the product instance
-	 * @param \WC_Product $variationb the variation instance
+	 * @param \WC_Product $variation the variation instance
 	 * @return array
 	 */
 	public function adjust_team_variation( $args, $product, $variation ) {
@@ -156,6 +161,40 @@ class Products {
 
 		if ( Product::has_team_membership( $product ) ) {
 
+			// if the product has variations, add some inline JS to ensure the preselected number of seats does not exceed boundaries, if set
+			if ( ! self::$add_variation_switch_scripts && $product->is_type( array( 'variable', 'product_variation' ) ) ) {
+
+				// note: a small delay is necessary as other scripts need to change the input's min/max attributes first, and our script needs to pull the updated information timely
+				wc_enqueue_js( "
+					jQuery( document ).ready( function( $ ) {
+
+						var timeout; 
+
+						$( 'form.variations_form .variations select, form.variations_form .variations input' ).on( 'change', function( e ) {
+
+							clearTimeout( timeout ); 
+
+							timeout = setTimeout( function() {
+
+								qty = $( '.woocommerce-variation-add-to-cart input[name=quantity]' );
+								min = qty.length > 0 ? parseInt( $( qty ).attr( 'min' ), 10 ) : false; 
+								max = qty.length > 0 ? parseInt( $( qty ).attr( 'max' ), 10 ) : false;
+
+								if ( ! isNaN( min ) && $( qty ).val() < min ) { 
+									$( qty ).val( min ); 
+								} else if ( ! isNaN( max ) && $( qty ).val() > max ) { 
+									$( qty ).val( max ); 
+								}
+
+							}, 250 );
+
+						} ).change();
+					} );
+				" );
+
+				self::$add_variation_switch_scripts = true;
+			}
+
 			// load the template file
 			wc_get_template(
 				'single-product/product-team.php',
@@ -169,5 +208,6 @@ class Products {
 			);
 		}
 	}
+
 
 }

@@ -16,20 +16,17 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
-
 /**
  * Renders the tab sections on My Account page for a customer membership.
  *
- * @version 1.10.5
+ * @version 1.12.0
  * @since 1.9.0
  */
 
@@ -38,11 +35,7 @@ $customer_membership   = $members_area->get_members_area_user_membership();
 $membership_plan       = $customer_membership ? $customer_membership->get_plan() : null;
 $members_area_sections = $membership_plan ? $members_area->get_members_area_navigation_items( $membership_plan ) : null;
 
-?>
-
-<?php if ( ! empty( $members_area_sections ) && is_array( $members_area_sections ) ) : ?>
-
-	<?php
+if ( ! empty( $members_area_sections ) && is_array( $members_area_sections ) ) :
 
 	// reinstates WooCommerce core action
 	do_action( 'woocommerce_before_account_navigation' );
@@ -92,6 +85,4 @@ $members_area_sections = $membership_plan ? $members_area->get_members_area_navi
 	// reinstates WooCommerce core action
 	do_action( 'woocommerce_after_account_navigation' );
 
-	?>
-
-<?php endif; ?>
+endif;

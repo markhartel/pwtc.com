@@ -16,15 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
-
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 /**
  * Displays information on the current memberships viewed in Members Area.
@@ -32,12 +29,13 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
  * @type \WC_Memberships_User_Membership $customer_membership the current user membership being displayed
  * @type array $membership_details associative array of settings data
  *
- * @version 1.10.3
+ * @version 1.12.0
  * @since 1.9.0
  */
-?>
 
-<?php do_action( 'wc_memberships_before_members_area', 'my-membership-details', $customer_membership ); ?>
+do_action( 'wc_memberships_before_members_area', 'my-membership-details', $customer_membership );
+
+?>
 
 <?php if ( ! empty( $membership_details ) && is_array( $membership_details ) ) : ?>
 
@@ -59,7 +57,8 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
 
 <?php endif; ?>
 
-<?php do_action( 'wc_memberships_after_members_area', 'my-membership-details', $customer_membership ); ?>
-
 <?php
+
+do_action( 'wc_memberships_after_members_area', 'my-membership-details', $customer_membership );
+
 

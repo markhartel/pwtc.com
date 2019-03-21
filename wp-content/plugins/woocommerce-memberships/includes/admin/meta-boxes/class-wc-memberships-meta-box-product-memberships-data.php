@@ -16,14 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -630,10 +628,18 @@ class WC_Memberships_Meta_Box_Product_Memberships_Data extends \WC_Memberships_M
 		$this->update_custom_message( $post_id, array( 'product_viewing_restricted', 'product_purchasing_restricted' ) );
 
 		// maybe force product public
-		wc_memberships_set_content_meta( $post, '_wc_memberships_force_public', isset( $_POST[ '_wc_memberships_force_public' ] ) ? 'yes' : 'no' );
+		if ( ! empty( $_POST['_wc_memberships_force_public'] ) ) {
+			wc_memberships()->get_restrictions_instance()->set_product_public( $post );
+		} else {
+			wc_memberships()->get_restrictions_instance()->unset_product_public( $post );
+		}
 
 		// maybe exclude product from member discounts
-		wc_memberships_set_content_meta( $post, '_wc_memberships_exclude_discounts', isset( $_POST[ '_wc_memberships_exclude_discounts' ] ) ? 'yes' : 'no' );
+		if ( ! empty( $_POST['_wc_memberships_exclude_discounts'] ) ) {
+			wc_memberships()->get_member_discounts_instance()->set_product_excluded_from_member_discounts( $post );
+		} else {
+			wc_memberships()->get_member_discounts_instance()->unset_product_excluded_from_member_discounts( $post );
+		}
 
 		// update membership plans that this product grants access to
 		$plan_ids        = $this->get_product_membership_plans( $post->ID, 'id' );

@@ -17,12 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/teams-woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2017-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2017-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Teams\Admin;
+
+use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -51,6 +52,7 @@ class Team_Members {
 		add_action( 'admin_action_team_set_as_manager', array( $this, 'handle_member_action' ) );
 	}
 
+
 	/**
 	 * Handles team members list table bulk actions.
 	 *
@@ -58,9 +60,6 @@ class Team_Members {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $redirect_to the redirect url
-	 * @param string $action the action being taken
-	 * @param array $users an array of user (member) ids to act on
 	 * @return string the redirect url
 	 */
 	public function handle_member_bulk_actions() {
@@ -88,6 +87,7 @@ class Team_Members {
 		}
 
 		switch ( $action ) {
+
 			case 'bulk_remove_members':
 
 				$num = 0;
@@ -97,10 +97,11 @@ class Team_Members {
 					try {
 						$team->remove_member( $user_id, ! empty( $_REQUEST['keep_user_memberships'] ) );
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d member was removed from the team.', '%d members were removed from the team.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
+
 			break;
 
 			case 'bulk_set_as_members':
@@ -113,10 +114,11 @@ class Team_Members {
 						$member = wc_memberships_for_teams_get_team_member( $team, $user_id );
 						$member->set_role( 'member' );
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d user was set as a member of the team.', '%d users were set as members of the team.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
+
 			break;
 
 			case 'bulk_set_as_managers':
@@ -129,10 +131,11 @@ class Team_Members {
 						$member = wc_memberships_for_teams_get_team_member( $team, $user_id );
 						$member->set_role( 'manager' );
 						$num++;
-					} catch ( \SV_WC_Plugin_Exception $e ) {}
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {}
 				}
 
 				wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( _n( '%d user was set as a manager of the team.', '%d users were set as managers of the team.', $num, 'woocommerce-memberships-for-teams' ), $num ) );
+
 			break;
 		}
 
@@ -169,26 +172,35 @@ class Team_Members {
 		check_admin_referer( $nonce_action );
 
 		if ( 'add_member' === $action ) {
-			$user = is_numeric( $user_id ) ? get_userdata( $user_id ) : get_user_by( $user_id, 'email' );
-			$name = $user->display_name;
+			$user   = is_numeric( $user_id ) ? get_userdata( $user_id ) : get_user_by( $user_id, 'email' );
+			$name   = $user->display_name;
+			$member = null;
 		} else {
 			$member = wc_memberships_for_teams_get_team_member( $team, $user_id );
-			$name   = $member->get_name();
+			$name   = $member ? $member->get_name() : '';
 		}
 
 		// the following gettext messages are documented in Admin/Teams.php
 
 		switch ( $action ) {
+
 			case 'add_member':
+
 				try {
+
 					$team->add_member( $user_id );
+
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was added to team as a member.', 'woocommerce-memberships-for-teams' ), $name ) );
-				} catch ( \SV_WC_Plugin_Exception $e ) {
+
+				} catch ( \Exception $e ) {
+
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot add member: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
 				}
+
 			break;
 
 			case 'remove_member':
+
 				try {
 
 					$team->remove_member( $user_id, ! empty( $_REQUEST['keep_user_memberships'] ) );
@@ -197,30 +209,49 @@ class Team_Members {
 
 					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( $message, $name ) );
 
-				} catch ( \SV_WC_Plugin_Exception $e ) {
+				} catch ( Framework\SV_WC_Plugin_Exception $e ) {
 
 					$message = is_numeric( $user_id ) ? __( 'Cannot remove member: %s', 'woocommerce-memberships-for-teams' ) : __( 'Cannot cancel invittation for %s.', 'woocommerce-memberships-for-teams' );
 
 					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( $message, $e->getMessage() ) );
 				}
+
 			break;
 
 			case 'set_as_member':
-				try {
-					$member->set_role( 'member' );
-					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set as a member of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
+
+				if ( $member ) {
+
+					try {
+
+						$member->set_role( 'member' );
+
+						wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set as a member of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
+
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
+						wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
+					}
 				}
+
 			break;
 
 			case 'set_as_manager':
-				try {
-					$member->set_role( 'manager' );
-					wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set as a manager of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
-				} catch ( \SV_WC_Plugin_Exception $e ) {
-					wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
+
+				if ( $member ) {
+
+					try {
+
+						$member->set_role( 'manager' );
+
+						wc_memberships_for_teams()->get_message_handler()->add_message( sprintf( __( '%s was set as a manager of the team.', 'woocommerce-memberships-for-teams' ), $name ) );
+
+					} catch ( Framework\SV_WC_Plugin_Exception $e ) {
+
+						wc_memberships_for_teams()->get_message_handler()->add_error( sprintf( __( 'Cannot set role in team: %s', 'woocommerce-memberships-for-teams' ), $e->getMessage() ) );
+					}
 				}
+
 			break;
 		}
 
