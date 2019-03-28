@@ -40,3 +40,4 @@ require_once __DIR__.'/includes/shortcodes.php';
 require_once __DIR__.'/includes/widgets.php';
 require_once __DIR__.'/includes/widgets.php';
 require_once __DIR__.'/includes/woocommerce.php';
+require_once __DIR__.'/includes/newsletters.php';

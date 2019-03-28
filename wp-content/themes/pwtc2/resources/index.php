@@ -21,7 +21,6 @@ if(is_singular())
             if(get_row_layout() == "news") {
                 $context['news'] = Timber::get_posts([
                     'posts_per_page' => 8,
-                    'cat' => '-40',
                     'orderby' => array(
                         'date' => 'DESC'
                     )
@@ -80,6 +79,13 @@ if(is_singular())
             $template = 'two-column.html.twig';
         }
     }
+}
+elseif(get_post_type() == 'newsletter')
+{
+    $template = 'pages/archive.html.twig';
+    $context['title'] = get_the_archive_title();
+    if($context['title'] == "Archives") { $context['title'] = "Newsletters"; }
+    $context['posts'] = new PostQuery();
 }
 else
 {
