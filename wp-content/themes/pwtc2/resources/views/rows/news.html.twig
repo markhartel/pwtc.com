@@ -10,6 +10,6 @@
         {% endfor %}
     </div>
     <div class="row column text-center">
-        <a href="{{ blog_url }}" class="large primary button">Read More</a>
+        <a href="{{ function('get_post_type_archive_link', 'post') }}" class="large primary button">Read More</a>
     </div>
 </section>
