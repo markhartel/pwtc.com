@@ -1,12 +1,13 @@
 <?php
 add_action('login_enqueue_scripts', function () {
-    $logo = get_theme_mod('login_page_background_image', get_stylesheet_directory_uri().'/web/vectors/stellar-logo.svg');
-    $bg_color = get_theme_mod('login_page_background_color', '#242121');
-    $box_color = get_theme_mod('login_page_box_color', '#f1f1f1');
-    $text_color = get_theme_mod('login_font_color', '#242121');
+    $logo = get_theme_mod('login_page_background_image', get_stylesheet_directory_uri().'/dist/images/logo.png');
+    $bg_color = get_theme_mod('login_page_background_color', '#BA383B');
+    $box_color = get_theme_mod('login_page_box_color', '#353535');
+    $text_color = get_theme_mod('login_font_color', '#f1f1f1');
+    $input_color = get_theme_mod('login_font_color', '#353535');
     $button_color = get_theme_mod('login_button_font_color', '#f1f1f1');
-    $button_background_color = get_theme_mod('login_button_background_color', '#d7df23');
-    $link_color = get_theme_mod('login_link_color', '#d7df23');
+    $button_background_color = get_theme_mod('login_button_background_color', '#BA383B');
+    $link_color = get_theme_mod('login_link_color', '#f1f1f1');
     echo <<<HTML
 
 <style>
@@ -26,8 +27,8 @@ add_action('login_enqueue_scripts', function () {
     body.login div#login form#loginform p { color: $text_color; }
     body.login div#login form#loginform p label { color: $text_color; }
     body.login div#login form#loginform input { color: $box_color; }
-    body.login div#login form#loginform input#user_login { color: $text_color; }
-    body.login div#login form#loginform input#user_pass { color: $text_color; }
+    body.login div#login form#loginform input#user_login { color: $input_color; }
+    body.login div#login form#loginform input#user_pass { color: $input_color; }
     body.login div#login form#loginform p.forgetmenot {}
     body.login div#login form#loginform p.forgetmenot input#rememberme {}
     body.login div#login form#loginform p.submit {}
