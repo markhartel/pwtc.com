@@ -54,17 +54,17 @@ add_action('init', function() {
                 'placeholder'       => _x( 'Confirm Password', 'placeholder', 'woocommerce' )
             ];
 
-            $fields['account']['account_directory'] = [
-                'type'              => 'checkbox',
-                'label'             => __( 'Exclude member from the Membership Directory listing.', 'woocommerce' ),
-                'required'          => false,
-            ];
-
-            $fields['account']['account_release'] = [
-                'type'              => 'checkbox',
-                'label'             => __( 'Legal release statement has been accepted by member.', 'woocommerce' ),
-                'required'          => true,
-            ];
+//            $fields['account']['account_directory'] = [
+//                'type'              => 'checkbox',
+//                'label'             => __( 'Exclude member from the Membership Directory listing.', 'woocommerce' ),
+//                'required'          => false,
+//            ];
+//
+//            $fields['account']['account_release'] = [
+//                'type'              => 'checkbox',
+//                'label'             => __( 'Legal release statement has been accepted by member.', 'woocommerce' ),
+//                'required'          => true,
+//            ];
 
             return $fields;
         }
