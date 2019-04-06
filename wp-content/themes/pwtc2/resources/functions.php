@@ -2,6 +2,11 @@
 require_once __DIR__.'/../app/bootstrap.php';
 require_once __DIR__.'/customizer.php';
 
+add_action('admin_enqueue_scripts', function () {
+    wp_register_script('custom_wp_admin_css', get_template_directory_uri() . '/assets/scripts/admin.js', ['jquery']);
+    wp_enqueue_script('custom_wp_admin_css');
+});
+
 add_filter('timber/context', function($context) {
     // the plugin doesnt load the avatar correctly with timber so we are defning it globably
     $context['avatar'] = get_avatar(get_current_user_id(), 32);
