@@ -132,6 +132,7 @@ let webpackConfig = {
   },
   externals: {
     jquery: 'jQuery',
+    google: 'google',
   },
   plugins: [
     new CleanPlugin([config.paths.dist], {
@@ -157,6 +158,7 @@ let webpackConfig = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
+      google: 'google',
       Popper: 'popper.js/dist/umd/popper.js',
     }),
     new webpack.LoaderOptionsPlugin({

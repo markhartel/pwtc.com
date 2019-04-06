@@ -1,5 +1,6 @@
 // import external dependencies
 import 'jquery';
+import 'google';
 import '@fancyapps/fancybox'
 import 'slick-carousel'
 import 'foundation-sites';
