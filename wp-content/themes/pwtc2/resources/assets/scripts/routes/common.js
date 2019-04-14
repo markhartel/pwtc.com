@@ -20,6 +20,29 @@ export default {
               dots: true,
           });
 
+          // scroll to contact
+          jQuery('.scroll-to-contact').click(function(e){
+              e.preventDefault();
+              jQuery('html, body').animate({
+                  scrollTop: jQuery('.footer form').offset().top,
+              }, 2000, function() {
+                  jQuery('.footer form [type="email"]').focus();
+              });
+          });
+
+          // prev days toggle
+          var is_prev_days_shown = false;
+          jQuery('.toggle-previous-days').click(function(){
+              jQuery('.day.previous').toggle();
+              is_prev_days_shown = !is_prev_days_shown;
+
+              if(is_prev_days_shown) {
+                  jQuery(this).html('Hide previous days');
+              } else {
+                  jQuery(this).html('Show hidden days');
+              }
+          });
+
           // scroll to top
           jQuery('.scroll-top').on('click', e => {
               jQuery('html, body').animate({ scrollTop: 0 }, 'slow');
