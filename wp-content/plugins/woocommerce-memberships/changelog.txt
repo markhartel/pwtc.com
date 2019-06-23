@@ -1,5 +1,16 @@
 *** WooCommerce Memberships Changelog ***
 
+2019.04.17 - version 1.13.0
+ * Feature - Add REST API endpoints support to full CRUD operations for user membership objects, including batches
+ * Tweak - Improve the restrictions performance in some installations when "Hide Completely" is the chosen restriction mode
+ * Fix - Make sure that a user membership can have its plan changed when specifying a new plan from the WP CLI with a member update request
+ * Fix - When the My Account page is set as the front page in WordPress, ensure that the Members Area does not return 404 when accessed
+ * Dev - Update Members Area templates and move before/after actions to methods outputting templates
+ * Misc - Deprecate the legacy WP CLI implementation in favor of WP REST CLI commands based on the WC REST API handling
+ * Misc - Update Action Scheduler library to version 2.2.4
+ * Misc - Add support to WooCommerce 3.6
+ * Misc - Require PHP 5.4+
+
 2019.01.24 - version 1.12.4
  * Fix - Ensure products from all plans are shown when listing products that grant access to content in the restriction notices
  * Fix - Do not restrict from access product categories that are only targeted by product purchase restriction rules

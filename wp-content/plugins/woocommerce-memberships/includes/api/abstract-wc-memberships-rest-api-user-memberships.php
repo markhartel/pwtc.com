@@ -24,7 +24,7 @@
 namespace SkyVerge\WooCommerce\Memberships\API\Controller;
 
 use SkyVerge\WooCommerce\Memberships\API\Controller;
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -45,8 +45,25 @@ class User_Memberships extends Controller {
 
 		parent::__construct();
 
-		$this->rest_base = 'members';
-		$this->post_type = 'wc_user_membership';
+		$this->rest_base   = 'members';
+		$this->post_type   = 'wc_user_membership';
+		$this->object_name = __( 'User Membership', 'woocommerce-memberships' );
+	}
+
+
+	/**
+	 * Gets a user membership from a valid identifier.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param string|int|\WP_Post $id membership identifier
+	 * @return \WC_Memberships_User_Membership
+	 */
+	protected function get_object( $id ) {
+
+		$membership = wc_memberships_get_user_membership( $id );
+
+		return $membership instanceof \WC_Memberships_User_Membership ? $membership : null;
 	}
 
 
@@ -59,40 +76,453 @@ class User_Memberships extends Controller {
 	 */
 	public function register_routes() {
 
-		// endpoint: 'wc/v2/memberships/members/' => list all user memberships
+		// endpoint: 'wc/v<n>/memberships/members/'
 		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
+			// GET all user memberships
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
+				/* @see Controller::get_items() */
 				'callback'            => array( $this, 'get_items' ),
+				/* @see Controller::get_items_permissions_check() */
 				'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				'args'                => $this->get_collection_params(),
+			),
+			// POST a user membership
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				/** @see User_Memberships::create_item() */
+				'callback'            => array( $this, 'create_item' ),
+				/** @see Controller::create_item_permissions_check() */
+				'permission_callback' => array( $this, 'create_item_permissions_check' ),
+				'args'                => $this->get_endpoint_args_for_item_schema( \WP_REST_Server::CREATABLE ),
 			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		), true );
 
-		// endpoint: 'wc/v2/memberships/members/<id>' => get a specific user membership
+		// endpoint: 'wc/v<n>/memberships/members/<id>'
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)', array(
 			'args'   => array(
 				'id' => array(
-					'description' => __( 'Unique identifier for the resource.', 'woocommerce-memberships' ),
+					'description' => __( 'Unique identifier of a user membership.', 'woocommerce-memberships' ),
 					'type'        => 'integer',
 				),
 			),
+			// GET a user membership
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
+				/** @see Controller::get_item() */
 				'callback'            => array( $this, 'get_item' ),
+				/** @see Controller::get_item_permissions_check() */
 				'permission_callback' => array( $this, 'get_item_permissions_check' ),
 				'args'                => array(
 					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 				),
 			),
+			// UPDATE a user membership
+			array(
+				'methods'             => \WP_REST_Server::EDITABLE,
+				/** @see User_Memberships::update_item() */
+				'callback'            => array( $this, 'update_item' ),
+				/** @see Controller::update_item_permissions_check() */
+				'permission_callback' => array( $this, 'update_item_permissions_check' ),
+				'args'                => $this->get_endpoint_args_for_item_schema( \WP_REST_Server::EDITABLE ),
+			),
+			// DELETE a user membership
+			array(
+				'methods'             => \WP_REST_Server::DELETABLE,
+				/** @see Controller::delete_item() */
+				'callback'            => array( $this, 'delete_item' ),
+				/** @see Controller::delete_item_permissions_check() */
+				'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+				'args'                => array(),
+			),
+			/** @see User_Memberships::get_item_schema() */
 			'schema' => array( $this, 'get_public_item_schema' ),
 		), true );
+
+		// endpoint: 'wc/v<n>/memberships/members/batch'
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/batch', array(
+			array(
+				'methods'             => \WP_REST_Server::EDITABLE,
+				/** @see Controller::batch_items() */
+				'callback'            => array( $this, 'batch_items' ),
+				/** @see Controller::batch_items_permissions_check() */
+				'permission_callback' => array( $this, 'batch_items_permissions_check' ),
+				'args'                => $this->get_endpoint_args_for_item_schema( \WP_REST_Server::EDITABLE ),
+			),
+			/** @see User_Memberships::get_public_batch_schema() */
+			'schema' => array( $this, 'get_public_batch_schema' ),
+		) );
 	}
 
 
 	/**
-	 * Returns the available query parameters for collections.
+	 * Creates a user membership via REST API.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_REST_Request $request request object
+	 * @return \WP_Error|\WP_REST_Response response object or error object
+	 */
+	public function create_item( $request ) {
+
+		$existing_membership = null;
+
+		try {
+
+			$request->set_param( 'context', 'edit' );
+
+			/**
+			 * Filters the request before handling it for a user membership creation via REST API.
+			 *
+			 * @since 1.13.0
+			 *
+			 * @param \WP_REST_Request $request request object
+			 */
+			$request = apply_filters( 'wc_memberships_rest_api_create_user_membership_request', $request );
+
+			// sanity check in case the filter above changes the request object to an invalid type
+			if ( ! $request instanceof \WP_REST_Request ) {
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_request", __( 'Invalid request.', 'woocommerce-memberships' ), 500 );
+			}
+
+			// a user and a plan are required parameters in a CREATE request, so an exception may be thrown here
+			foreach ( array( 'customer_id', 'plan_id' ) as $required_param ) {
+				if ( ! isset( $request[ $required_param ] ) ) {
+					throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_missing_{$required_param}", sprintf( __( 'Required %s is missing.', 'woocommerce-memberships' ), $required_param ), 400 );
+				}
+			}
+
+			// at this point we're sure a user and a plan are in the request, but we need to verify if they exist
+			$customer        = $this->get_request_customer_user( $request );
+			$membership_plan = $this->get_request_membership_plan( $request );
+
+			// also cannot create a new membership if user already has one for the same plan
+			if ( $customer && $membership_plan && ( $existing_membership = wc_memberships_get_user_membership( $customer->ID, $membership_plan ) ) ) {
+				/* translators: Placeholders: %1$s - customer ID, %2$s - membership plan ID */
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_exists", sprintf( __( 'A membership already exists for user %1$s and plan %2$s.', 'woocommerce-memberships' ), $existing_membership->get_user_id(), $existing_membership->get_plan_id() ), 400 );
+			}
+
+			// so far we're good: try to create the membership
+			try {
+				$user_membership = wc_memberships_create_user_membership( array( 'plan_id' => $membership_plan->get_id(), 'user_id' => $customer->ID ) );
+			} catch( \Exception $e ) {
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_create_error", $e->getMessage(), 500 );
+			}
+
+			// then, set all its accessory properties
+			$user_membership = $this->set_user_membership_data( $user_membership, $request );
+
+			/**
+			 * Fires after a user membership is created or updated via the REST API.
+			 *
+			 * @since 1.13.0
+			 *
+			 * @param \WC_Memberships_User_Membership $user_membership the membership object
+			 * @param \WP_REST_Request $request the request object
+			 * @param bool $creating true when creating a new user membership, false when updating
+			 */
+			do_action( "woocommerce_rest_insert_{$this->post_type}_object", $user_membership, $request, true );
+
+			$response = $this->prepare_item_for_response( $user_membership, $request );
+
+		}  catch ( \WC_REST_Exception $e ) {
+
+			// if an exception occurs after a new membership has been created in database, we should probably delete that as the object is likely not what the API user expected it to be
+			if ( ! $existing_membership && isset( $user_membership ) && $user_membership instanceof \WC_Memberships_User_Membership ) {
+				wp_delete_post( $user_membership->get_id(), true );
+			}
+
+			$response = new \WP_Error( $e->getErrorCode(), $e->getMessage(), $e->getErrorData() );
+		}
+
+		return rest_ensure_response( $response );
+	}
+
+
+	/**
+	 * Updates a user membership via REST API.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_REST_Request $request request object
+	 * @return \WP_Error|\WP_REST_Response response object or error object
+	 */
+	public function update_item( $request ) {
+
+		$post = $this->get_post_object( (int) $request['id'] );
+
+		if ( ! $post ) {
+
+			$response = $this->get_invalid_id_error_response( $post );
+
+		} else {
+
+			try {
+
+				$request->set_param( 'context', 'edit' );
+
+				/**
+				 * Filters the request before handling it for a user membership update via REST API.
+				 *
+				 * @since 1.13.0
+				 *
+				 * @param \WP_REST_Request $request request object
+				 * @param \WP_Post|null $post normally this is expected to be the related membership post object
+				 */
+				$request = apply_filters( 'wc_memberships_rest_api_update_user_membership_request', $request, $post );
+
+				// sanity check in case the filter above changes the request object to an invalid type
+				if ( ! $request instanceof \WP_REST_Request ) {
+					throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_request", __( 'Invalid request.', 'woocommerce-memberships' ), 500 );
+				}
+
+				$user_membership = wc_memberships_get_user_membership( $post );
+
+				// first check if the membership to update exists
+				if ( ! $user_membership instanceof \WC_Memberships_User_Membership ) {
+					/* translators: Placeholder: %s - user membership identifier (may be empty) */
+					throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_not_found", sprintf( __( 'User Membership%s invalid or not found.', 'woocommerce-memberships' ), $post instanceof \WP_Post ? ' ' . $post->ID . ' ' : ''  ), 404 );
+				}
+
+				// a user and a plan are optional in UPDATE requests
+				$customer_user   = $this->get_request_customer_user( $request );
+				$membership_plan = $this->get_request_membership_plan( $request );
+
+				// if a customer is specified while an UPDATE request is processed, transfer the membership to the a new customer, if they differ
+				if ( $customer_user instanceof \WP_User && (int) $customer_user->ID > 0 && (int) $customer_user->ID !== $user_membership->get_user_id() ) {
+
+					try {
+						$user_membership->transfer_ownership( $customer_user );
+					} catch( \Exception $e ) {
+						throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_update_error", $e->getMessage(), 500 );
+					}
+				}
+
+				// if a plan is specified while an UPDATE request is processed, change the plan with any new one that does not match the existing
+				if ( $membership_plan instanceof \WC_Memberships_Membership_Plan && $membership_plan->get_id() !== $user_membership->get_plan_id() ) {
+
+					$success = wp_update_post( array(
+						'ID'          => $user_membership->get_id(),
+						'post_parent' => $membership_plan->get_id(),
+					) );
+
+					if ( ! $success || $success instanceof \WP_Error ) {
+						throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_update_error", sprintf( __( 'Could not change the membership plan of this user membership. %s', 'woocommerce-memberships' ), $success ? $success->get_error_message() : '', 500 ) );
+					}
+
+					// makes sure the new plan ID will be returned in the final response later
+					$user_membership->plan_id = $membership_plan->get_id();
+				}
+
+				// update other user membership details
+				$user_membership = $this->set_user_membership_data( $user_membership, $request );
+
+				/** @see User_Memberships::create_item() except the $creating param is false when updating */
+				do_action( "woocommerce_rest_insert_{$this->post_type}_object", $user_membership, $request, false );
+
+				$response = $this->prepare_item_for_response( $user_membership, $request );
+
+			} catch ( \WC_REST_Exception $e ) {
+
+				$response = new \WP_Error( $e->getErrorCode(), $e->getMessage(), $e->getErrorData() );
+			}
+		}
+
+		return rest_ensure_response( $response );
+	}
+
+
+	/**
+	 * Gets a membership plan object from a request.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_REST_Request $request request object
+	 * @return \WC_Memberships_Membership_Plan|null a plan object, if requested
+	 * @throws \WC_REST_Exception if the plan is requested but not found
+	 */
+	private function get_request_membership_plan( $request ) {
+
+		$plan    = null;
+		$plan_id = isset( $request['plan_id'] ) ? $request['plan_id'] : null;
+
+		if ( $plan_id ) {
+
+			$plan = wc_memberships_get_membership_plan( $request['plan_id'] );
+
+			if ( ! $plan instanceof \WC_Memberships_Membership_Plan ) {
+				/* translators: Placeholder: %s - customer identifier (may be empty) */
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_plan_not_found", sprintf( __( 'Membership Plan%s invalid or not found.', 'woocommerce-memberships' ), is_string( $plan_id ) || is_numeric( $plan_id ) ? ' ' . $plan_id : '' ), 404 );
+			}
+		}
+
+		return $plan;
+	}
+
+
+	/**
+	 * Gets a customer user object from a request.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_REST_Request $request request object
+	 * @return \WP_User|null a customer user object, if requested
+	 * @throws \WC_REST_Exception if the customer is requested but not found
+	 */
+	private function get_request_customer_user( $request ) {
+
+		$user    = null;
+		$user_id = isset( $request['customer_id'] ) ? $request['customer_id'] : null;
+
+		if ( $user_id ) {
+
+			$user = $this->get_customer_user( $user_id );
+
+			if ( ! $user ) {
+				/* translators: Placeholder: %s - customer identifier (may be empty) */
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_customer_id", sprintf( __( 'Customer%s invalid or not found.', 'woocommerce-memberships' ), is_string( $user_id ) || is_numeric( $user_id ) ? ' ' . $user_id : '' ), 404 );
+			}
+		}
+
+		return $user;
+	}
+
+
+	/**
+	 * Parses an API request to create or update a user membership.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WC_Memberships_User_Membership $user_membership the user membership object to set properties for
+	 * @param \WP_REST_Request|array $request request object (accessible as an array)
+	 * @return \WC_Memberships_User_Membership the updated user membership
+	 * @throws \WC_REST_Exception on errors
+	 */
+	private function set_user_membership_data( $user_membership, $request ) {
+
+		// set membership dates (by default newly created memberships start 'now')
+		$dates = array(
+			/** @see \WC_Memberships_User_Membership::set_start_date() */
+			'start_date_gmt',
+			/** @see \WC_Memberships_User_Membership::set_end_date() */
+			'end_date_gmt',
+			/** @see \WC_Memberships_User_Membership::set_cancelled_date() */
+			'cancelled_date_gmt',
+			/** @see \WC_Memberships_User_Membership::set_paused_date() */
+			'paused_date_gmt',
+		);
+
+		foreach ( $dates as $date_id ) {
+
+			if ( isset( $request[ $date_id ] ) ) {
+
+				$date_value = '' !== $request[ $date_id ] ? wc_memberships_parse_date( $request[ $date_id ] ) : '';
+				$set_date   = 'set_' . str_replace( '_gmt', '', $date_id );
+
+				if ( is_string( $date_value ) && is_callable( array( $user_membership, $set_date ) ) ) {
+					$user_membership->$set_date( $date_value );
+				} else {
+					/* translators: Placeholder: %s - date string name */
+					throw new \WC_REST_Exception( "woocommerce_rest_invalid_{$this->post_type}_{$date_id}", sprintf( __( 'Invalid %s date value.', 'woocommerce-memberships' ), $date_id ), 400 );
+				}
+			}
+		}
+
+		if ( $product_id = isset( $request['product_id'] ) ? $request['product_id'] : null ) {
+
+			$product = is_numeric( $product_id ) ? wc_get_product( $product_id ) : null;
+
+			if ( $product instanceof \WC_Product ) {
+				$user_membership->set_product_id( $product->get_id() );
+			} else {
+				/* translators: Placeholder: %s - product identifier (may be empty) */
+				throw new \WC_REST_Exception( "woocommerce_rest_invalid_{$this->post_type}_product_id", sprintf( __( 'Product%s invalid or not found.', 'woocommerce-memberships' ), is_numeric( $product ) ? ' ' . $product : '' ), 404 );
+			}
+		}
+
+		if ( $order_id = isset( $request['order_id'] ) ? $request['order_id'] : null ) {
+
+			$order = is_numeric( $order_id ) ? wc_get_order( $order_id ) : null;
+
+			if ( $order instanceof \WC_Order || $order instanceof \WC_Order_Refund ) {
+				$user_membership->set_order_id( Framework\SV_WC_Order_Compatibility::get_prop( $order, 'id' ) );
+			} else {
+				/* translators: Placeholder: %s - order identifier (may be empty) */
+				throw new \WC_REST_Exception( "woocommerce_rest_invalid_{$this->post_type}_order_id", sprintf( __( 'Order %s invalid or not found.', 'woocommerce-memberships' ), is_numeric( $order ) ? $order : '' ), 404 );
+			}
+		}
+
+		if ( isset( $request['status'] ) ) {
+
+			$status = is_string( $request['status'] ) ? trim( $request['status'] ) : null;
+
+			if ( $status && wc_memberships()->get_user_memberships_instance()->is_user_membership_status( $status ) ) {
+				$user_membership->update_status( $status );
+			} else {
+				throw new \WC_REST_Exception( "woocommerce_rest_invalid_{$this->post_type}_status", sprintf( __( 'Invalid user membership status: "%s".', 'woocommerce-memberships' ), is_string( $status ) ? $status : '' ), 400 );
+			}
+		}
+
+		if ( ! empty( $request['meta_data'] ) ) {
+
+			if ( is_object( $request['meta_data'] ) ) {
+				$meta_data = (array) $request['meta_data'];
+			} else {
+				$meta_data = $request['meta_data'];
+			}
+
+			if ( ! is_array( $meta_data ) ) {
+				throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_meta_data", __( 'Invalid meta data.', 'woocommerce-memberships' ), 400 );
+			}
+
+			foreach ( $meta_data as $meta ) {
+
+				$meta_key   = isset( $meta['key'] )   ? $meta['key']   : null;
+				$meta_value = isset( $meta['value'] ) ? $meta['value'] : null;
+
+				if ( ! is_string( $meta_key ) || '' === trim( $meta_key ) ) {
+					throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_meta_data", __( 'Invalid meta data key.', 'woocommerce-memberships' ), 404 );
+				}
+
+				// accept values: null, bool, string, number, array
+				if ( null !== $meta_value && ! is_bool( $meta_value ) && ! is_string( $meta_value ) && ! is_numeric( $meta_value ) && ! is_array( $meta_value ) ) {
+					throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_invalid_meta_data", __( 'Invalid meta data value.', 'woocommerce-memberships' ), 404 );
+				}
+
+				update_post_meta( $user_membership->get_id(), $meta_key, $meta_value );
+			}
+		}
+
+		$user_membership_id = $user_membership->get_id();
+
+		/**
+		 * Filters the membership after setting its properties.
+		 *
+		 * @since 1.13.0
+		 *
+		 * @param \WC_Memberships_User_Membership $user_membership the membership object
+		 * @param \WP_REST_Request $request the related request object
+		 */
+		$user_membership = apply_filters( 'wc_memberships_rest_api_user_membership_set_data', $user_membership, $request );
+
+		// sanity check in case the filter above changes the intended type of the membership
+		if ( ! $user_membership instanceof \WC_Memberships_User_Membership ) {
+			throw new \WC_REST_Exception( "woocommerce_rest_{$this->post_type}_error", sprintf( __( 'An error occurred while setting properties for the user membership %s.', 'woocommerce-memberships' ), $user_membership_id ), 500 );
+		}
+
+		return $user_membership;
+	}
+
+
+	/**
+	 * Gets the available query parameters for collections.
+	 *
+	 * @internal
 	 *
 	 * @since 1.11.0
 	 *
@@ -206,24 +636,14 @@ class User_Memberships extends Controller {
 		// filter by customer
 		if ( isset( $request['customer'] ) ) {
 
-			$customer_id = 0;
-
 			if ( is_numeric( $request['customer'] ) ) {
-
-				$customer_id = $request['customer'];
-
-			} elseif ( is_string( $request['customer'] ) ) {
-
-				if ( is_email( $request['customer'] ) ) {
-					$customer = get_user_by( 'email', $request['customer'] );
-				} else {
-					$customer = get_user_by( 'login', $request['customer'] );
-				}
-
-				$customer_id = $customer instanceof \WP_User ? $customer->ID : 0;
+				$customer_id = max( 0, (int) $request['customer'] );
+			} else {
+				$customer    = $this->get_customer_user( $request['customer'] );
+				$customer_id = $customer ? $customer->ID : 0;
 			}
 
-			$query_args['author'] = (int) $customer_id;
+			$query_args['author'] = $customer_id;
 
 			// enforces empty array on results if the author is undetermined
 			if ( 0 === $customer_id ) {
@@ -283,13 +703,14 @@ class User_Memberships extends Controller {
 		 * @param array $args associative array of query args
 		 * @param \WP_REST_Request $request request object
 		 */
-		return (array) apply_filters( 'woocommerce_rest_wc_user_memberships_query_args', $query_args, $request );
+		return (array) apply_filters( "woocommerce_rest_{$this->post_type}s_query_args", $query_args, $request );
 	}
 
 
 	/**
 	 * Gets a collection of User Membership items.
 	 *
+	 * @internal
 	 * @see \WC_REST_Posts_Controller::get_items()
 	 *
 	 * @since 1.11.0
@@ -404,10 +825,8 @@ class User_Memberships extends Controller {
 			$user_membership = wc_memberships_get_user_membership( $user_membership );
 		}
 
-		// build the response
 		$response = rest_ensure_response( $this->get_formatted_item_data( $user_membership, $request ) );
 
-		// add additional links to the response
 		$response->add_links( $this->prepare_links( $user_membership, $request ) );
 
 		/**
@@ -422,7 +841,7 @@ class User_Memberships extends Controller {
 		 * @param null|\WP_Post $post the user membership post object
 		 * @param \WP_REST_Request $request the request object
 		 */
-		return apply_filters( 'woocommerce_rest_prepare_wc_membership_plan', $response, $user_membership ? $user_membership->post : null, $request );
+		return apply_filters( "woocommerce_rest_prepare_{$this->post_type}", $response, $user_membership ? $user_membership->post : null, $request );
 	}
 
 
@@ -478,7 +897,9 @@ class User_Memberships extends Controller {
 
 
 	/**
-	 * Returns the user membership REST API schema.
+	 * Gets the user membership REST API schema.
+	 *
+	 * @internal
 	 *
 	 * @since 1.11.0
 	 *
@@ -495,7 +916,7 @@ class User_Memberships extends Controller {
 		 */
 		$schema = (array) apply_filters( 'wc_memberships_rest_api_user_membership_schema', array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => $this->post_type,
+			'title'      => 'user_membership', // this will be used as the base for WP REST CLI commands
 			'type'       => 'object',
 			'properties' => array(
 				'id'                 => array(
@@ -518,44 +939,49 @@ class User_Memberships extends Controller {
 					'description' => __( 'User membership status.', 'woocommerce-membership' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
+					'enum'        => wc_memberships_get_user_membership_statuses( false, false ),
 				),
 				'order_id'           => array(
-					'description' => __( 'Unique identifier of the Order that granted the user membership (optional).', 'woocommerce-memberships' ),
+					'description' => __( 'Unique identifier of the order that grants access.', 'woocommerce-memberships' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'product_id'         => array(
-					'description' => __( 'Unique identifier of the purchased Product, or its Variation, that granted access.', 'woocommerce-memberships' ),
+					'description' => __( 'Unique identifier of the purchased product, or its variation, that grants access.', 'woocommerce-memberships' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'date_created'       => array(
-					'description' => __( 'The date when the user membership was created, in the site timezone.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership is created, in the site timezone.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'date_created_gmt'   => array(
-					'description' => __( 'The date when the user membership was created, in UTC.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership is created, in UTC.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'start_date'         => array(
-					'description' => __( 'The date when the user membership started being active, in the site timezone.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership starts being active, in the site timezone.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'start_date_gmt'     => array(
-					'description' => __( 'The date when the user membership started being active, in UTC.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership starts being active, in UTC.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'end_date'           => array(
-					'description' => __( 'The date when the user membership ended, in the site timezone.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership ends, in the site timezone.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'end_date_gmt'       => array(
-					'description' => __( 'The date when the user membership ended, in UTC.', 'woocommerce-memberships' ),
+					'description' => __( 'The date when the user membership ends, in UTC.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
@@ -563,6 +989,7 @@ class User_Memberships extends Controller {
 					'description' => __( 'The date when the user membership was last paused, in the site timezone.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'paused_date_gmt'    => array(
 					'description' => __( 'The date when the user membership was last paused, in UTC.', 'woocommerce-memberships' ),
@@ -573,6 +1000,7 @@ class User_Memberships extends Controller {
 					'description' => __( 'The date when the user membership was cancelled, in the site timezone.', 'woocommerce-memberships' ),
 					'type'        => 'date-time',
 					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'cancelled_date_gmt' => array(
 					'description' => __( 'The date when the user membership was cancelled, in UTC.', 'woocommerce-memberships' ),
@@ -582,7 +1010,8 @@ class User_Memberships extends Controller {
 				'view_url'           => array(
 					'description' => __( 'The URL pointing to the Members Area to view the membership.', 'woocommerce-memberships' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'meta_data'          => array(
 					'description' => __( 'User membership additional meta data.', 'woocommerce-memberships' ),
@@ -614,6 +1043,78 @@ class User_Memberships extends Controller {
 		) );
 
 		return $this->add_additional_fields_schema( $schema );
+	}
+
+
+	/**
+	 * Gets an array of endpoint arguments from the item schema for the controller.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0-dev,1
+	 *
+	 * @param string $method HTTP method of the request
+	 * @return array associative array of arguments
+	 */
+	public function get_endpoint_args_for_item_schema( $method = \WP_REST_Server::CREATABLE ) {
+
+		$endpoint_args = parent::get_endpoint_args_for_item_schema( $method );
+
+		if ( in_array( $method, array( \WP_REST_Server::CREATABLE, \WP_REST_Server::EDITABLE ), true ) ) {
+
+			foreach ( array_keys( $endpoint_args ) as $property ) {
+
+				// a customer and a plan are required when creating a new membership, but optional when editing an existing one
+				if ( in_array( $property, array( 'customer_id', 'plan_id' ), true ) ) {
+					$endpoint_args[ $property ]['required'] = $method === \WP_REST_Server::CREATABLE;
+				} else {
+					$endpoint_args[ $property ]['required'] = false;
+				}
+			}
+		}
+
+		/**
+		 * Filters user memberships endpoint arguments.
+		 *
+		 * @since 1.13.0
+		 *
+		 * @param array $endpoint_args associative array of arguments
+		 * @param string $method HTTP method of the request
+		 */
+		return (array) apply_filters( 'wc_memberships_rest_api_user_membership_endpoint_args', $endpoint_args, $method );
+	}
+
+
+	/**
+	 * Gets the public batch REST API schema.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 *
+	 * @return array associative array
+	 */
+	public function get_public_batch_schema() {
+
+		$schema = parent::get_public_batch_schema();
+
+		// have the schema return something more descriptive
+		if ( isset( $schema['properties'] ) ) {
+
+			if ( isset( $schema['properties']['create']['description'] ) ) {
+				$schema['properties']['create']['description'] = __( 'List of user memberships created.', 'woocommerce-memberships' );
+			}
+
+			if ( isset( $schema['properties']['update']['description'] ) ) {
+				$schema['properties']['update']['description'] = __( 'List of updated user memberships.', 'woocommerce-memberships' );
+			}
+
+			if ( isset( $schema['properties']['delete']['description'] ) ) {
+				$schema['properties']['delete']['description'] = __( 'List of deleted user memberships.', 'woocommerce-memberships' );
+			}
+		}
+
+		return $schema;
 	}
 
 

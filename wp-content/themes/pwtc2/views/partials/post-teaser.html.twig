@@ -1,0 +1,18 @@
+<div class="blog-teaser">
+    <div class="grid-x grid-padding-x align-center">
+        {% if post.thumbnail.src is defined and post.get_field('featured_image_position') != 'none' %}
+            <div class="small-12 medium-4 {% if post.get_field('featured_image_position') == 'right' %}medium-order-2{% endif %} cell">
+                <a href="{{ post.link }}" title="{{ post.post_title }}" class="thumbnail">
+                    <img src="{{ post.thumbnail.src('medium') }}" alt="Image for {{ post.title }}" />
+                </a>
+            </div>
+        {% endif %}
+        <div class="small-12 medium-8 {% if post.get_field('featured_image_position') == 'right' %}medium-order-1{% endif %} cell">
+            <div class="date text-center">{{ post.date }}</div>
+            <h2 class="text-center"><a href="{{ post.link }}" title="{{ post.post_title }}">{{ post.post_title }}</a></h2>
+            <div class="excerpt">
+                {{ post.preview  }}
+            </div>
+        </div>
+    </div>
+</div>

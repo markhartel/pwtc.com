@@ -24,7 +24,7 @@
 namespace SkyVerge\WooCommerce\Memberships\API\v3;
 
 use SkyVerge\WooCommerce\Memberships\API\Controller\Membership_Plans as Membership_Plans_Controller;
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 

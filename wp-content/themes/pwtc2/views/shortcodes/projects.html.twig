@@ -1,0 +1,29 @@
+<section class="projects">
+    <div class="grid-container clearfix">
+        <div class="grid-x grid-padding-x align-center iso-filters">
+            <div class="shrink cell">
+                <a href="#" class="large hollow button" data-filter="*">All</a>
+            </div>
+            {% for term in project_cats %}
+                <div class="shrink cell">
+                    <a href="#" class="large button" data-filter=".{{ term.slug }}">{{ term.name }}</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="grid-x grid-padding-x small-up-1 medium-up-3 large-up-4 text-center iso">
+            {% for project in projects %}
+                <div class="cell {% for term in project.terms %}{{ term.slug }} {% endfor %}">
+                    {% for image in project.get_field('gallery') %}
+                        <a href="{{ TimberImage(image) }}" data-fancybox="project-{{ project.id }}" class="{% if not loop.first %}hide{% endif %}">
+                            <img src="{{ TimberImage(image)|resize(400, 275) }}" />
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert callout" style="width: 100%;">
+                    No projects
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -23,7 +23,7 @@
 
 namespace SkyVerge\WooCommerce\Memberships\API;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -38,6 +38,9 @@ abstract class Controller extends \WC_REST_Posts_Controller {
 	/** @var string REST API version supported by the controller, e.g. v1, v2... */
 	protected $version = 'v1';
 
+	/** @var string REST API object name (e.g. Membership Plan or User Membership) */
+	protected $object_name;
+
 
 	/**
 	 * Memberships object REST API controller constructor.
@@ -46,7 +49,8 @@ abstract class Controller extends \WC_REST_Posts_Controller {
 	 */
 	public function __construct() {
 
-		$this->public = false;
+		$this->public      = false;
+		$this->object_name = __( 'Memberships object', 'woocommerce-memberships' );
 	}
 
 
@@ -112,6 +116,59 @@ abstract class Controller extends \WC_REST_Posts_Controller {
 	public function get_post_type() {
 
 		return $this->post_type;
+	}
+
+
+	/**
+	 * Gets a controller's related post object matching the current post type given an object identifier.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param int $id post ID
+	 * @return \WP_Post|null
+	 */
+	protected function get_post_object( $id ) {
+
+		$post = $id ? get_post( $id ) : null;
+
+		return $post instanceof \WP_Post && $post->post_type === $this->post_type ? $post : null;
+	}
+
+
+	/**
+	 * Gets a controller's related object given an identifier.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param mixed $id object identifier
+	 * @return null|object
+	 */
+	abstract protected function get_object( $id );
+
+
+	/**
+	 * Gets a customer user by a common identifier.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param int|string|\WP_User $id user ID, email, login or object
+	 * @return \WP_User|null
+	 */
+	protected function get_customer_user( $id ) {
+
+		$customer = $id;
+
+		if ( is_numeric( $id ) ) {
+			$customer = get_user_by( 'id', (int) $id  );
+		} elseif ( is_string( $id ) ) {
+			if ( is_email( $id ) ) {
+				$customer = get_user_by( 'email', $id );
+			} else {
+				$customer = get_user_by( 'login', $id );
+			}
+		}
+
+		return $customer instanceof \WP_User ? $customer : null;
 	}
 
 
@@ -182,6 +239,28 @@ abstract class Controller extends \WC_REST_Posts_Controller {
 
 
 	/**
+	 * Gets an error response for requests containing an invalid ID.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_Post|int|mixed $post post object of the unexpected type
+	 * @return \WP_Error
+	 */
+	protected function get_invalid_id_error_response( $post ) {
+
+		if ( $post instanceof \WP_Post ) {
+			/* translators: Placeholders: %1$s - post ID, %2$s - membership object name (e.g. Membership Plan or User Membership) */
+			$error_message = sprintf( __( 'Object with ID %1$s is not a valid %2$s.', 'woocommerce-memberships' ), (int) $post->ID, $this->object_name );
+		} else {
+			/* translators: Placeholder: %s - membership object name (e.g. Membership Plan or User Membership) */
+			$error_message = sprintf( __( '%s invalid or not found.', 'woocommerce-memberships' ), $this->object_name );
+		}
+
+		return new \WP_Error( "woocommerce_rest_invalid_{$this->post_type}_id", $error_message, array( 'status' => 404 ) );
+	}
+
+
+	/**
 	 * Gets a memberships response item for REST API consumption.
 	 *
 	 * @see \WC_REST_Posts_Controller::get_item()
@@ -189,30 +268,74 @@ abstract class Controller extends \WC_REST_Posts_Controller {
 	 * @since 1.11.0
 	 *
 	 * @param \WP_REST_Request $request request object
-	 * @return array|\WP_Error|\WP_REST_Response response object
+	 * @return array|\WP_Error|\WP_REST_Response response object or error object
 	 */
 	public function get_item( $request ) {
 
-		$id   = (int) $request['id'];
-		$post = get_post( $id );
+		$post = $this->get_post_object( (int) $request['id'] );
 
-		if ( ! $post || $this->post_type !== $post->post_type ) {
-
-			if ( false === $post->post_type ) {
-				$error_message = __( 'Invalid ID.', 'woocommerce-memberships' );
-			} else {
-				/* translators: Placeholder: %d - post ID */
-				$error_message = sprintf( __( 'Object with ID %d is not a valid memberships object.', 'woocommerce-memberships' ), (int) $post->ID );
-			}
-
-			$response = new \WP_Error( "woocommerce_rest_invalid_{$this->post_type}_id", $error_message, array( 'status' => 404 ) );
-
+		if ( ! $post ) {
+			$response = $this->get_invalid_id_error_response( $post );
 		} else {
-
 			$response = $this->prepare_item_for_response( $post, $request );
 		}
 
-		return $response;
+		return rest_ensure_response( $response );
+	}
+
+
+	/**
+	 * Deletes a memberships item upon REST API request.
+	 *
+	 * @see \WC_REST_Posts_Controller::delete_item()
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WP_REST_Request $request request object
+	 * @return \WP_Error|\WP_REST_Response response object or error object
+	 */
+	public function delete_item( $request ) {
+
+		$post = $this->get_post_object( (int) $request['id'] );
+
+		if ( ! $post ) {
+
+			$response = $this->get_invalid_id_error_response( $post );
+
+		} else {
+
+			$request->set_param( 'context', 'edit' );
+
+			$object   = $this->get_object( $post->ID );
+			$previous = $this->prepare_item_for_response( $post, $request );
+			$success  = (bool) wp_delete_post( $post->ID, true );
+
+			if ( $success ) {
+
+				$response = new \WP_REST_Response( array(
+					'deleted'  => $success,
+					'previous' => $previous->get_data(),
+				) );
+
+				/**
+				 * Fires after a membership object is deleted via the REST API.
+				 *
+				 * @since 1.13.0
+				 *
+				 * @param \WP_Post|object $post the related object or post object
+				 * @param \WP_REST_Response $response the response data
+				 * @param \WP_REST_Request $request the request sent to the API
+				 */
+				do_action( "woocommerce_rest_delete_{$this->post_type}_object", null !== $object ? $object : $post, $response, $request );
+
+			} else {
+
+				/* translators: Placeholder: %s - object name (e.g. "User Membership") */
+				$response = new \WP_Error( "woocommerce_api_cannot_delete_{$this->post_type}", sprintf( __( 'This %s cannot be deleted.', 'woocommerce-memberships' ), $this->object_name ), array( 'status' => 500 ) );
+			}
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 

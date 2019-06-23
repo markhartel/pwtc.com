@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -63,9 +63,11 @@ class WC_Memberships_Integration_Subscriptions_User_Memberships {
 		add_filter( 'wc_memberships_rest_api_user_membership_excluded_meta_keys', array( $this, 'exclude_user_membership_api_item_meta_keys' ), 1, 2 );
 		add_filter( 'wc_memberships_rest_api_user_membership_data',               array( $this, 'add_user_membership_api_item_data_subscription_id' ), 1, 2 );
 		add_filter( 'wc_memberships_rest_api_user_membership_links',              array( $this, 'add_user_membership_api_item_data_subscription_link' ), 1, 2 );
+		add_filter( 'wc_memberships_rest_api_user_membership_endpoint_args',      array( $this, 'add_user_membership_api_endpoint_args' ), 1, 2 );
 		add_filter( 'wc_memberships_rest_api_user_membership_schema',             array( $this, 'handle_user_membership_api_schema' ), 1 );
+		add_filter( 'wc_memberships_rest_api_user_membership_set_data',           array( $this, 'handle_user_membership_api_write_request' ), 1, 2 );
 
-		// extends Memberships WP REST API queries with more filters
+		// extend Memberships WP REST API queries with more filters
 		add_filter( 'woocommerce_rest_wc_user_memberships_query_args',            array( $this, 'rest_api_query_user_memberships_by_subscription' ), 1, 2 );
 		add_filter( 'wc_memberships_rest_api_user_memberships_collection_params', array( $this, 'rest_api_user_memberships_collection_params' ), 1, 2 );
 	}
@@ -499,12 +501,146 @@ class WC_Memberships_Integration_Subscriptions_User_Memberships {
 	public function handle_user_membership_api_schema( $schema ) {
 
 		$schema['properties']['subscription_id'] = array(
-			'description' => __( 'Unique identifier of a subscription the membership is tied to.', 'woocommerce-memberships' ),
+			'description' => __( 'Unique identifier of a subscription the user membership is tied to.', 'woocommerce-memberships' ),
 			'type'        => 'integer',
 			'context'     => array( 'view', 'edit' ),
 		);
 
 		return $schema;
+	}
+
+
+	/**
+	 * Extends the user membership API endpoint arguments with subscription arguments.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param array $args associative array of arguments
+	 * @param string $method the HTTP REST request method
+	 * @return array
+	 */
+	public function add_user_membership_api_endpoint_args( $args, $method ) {
+
+		if ( in_array( $method, array( \WP_REST_Server::CREATABLE, \WP_REST_Server::EDITABLE ), true ) ) {
+
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				$insert_after     = 'order';
+				$subscription_key = 'subscription';
+			} else {
+				$insert_after     = 'order_id';
+				$subscription_key = 'subscription_id';
+			}
+
+			$subscription_args = array(
+				$subscription_key  => array(
+					'required'          => false,
+					'type'              => 'integer',
+					'description'       => __( 'Unique identifier of a subscription the user membership is tied to.', 'woocommerce-memberships' ),
+					'sanitize_callback' => 'rest_sanitize_request_arg',
+					'validate_callback' => 'rest_validate_request_arg',
+				),
+				'installment_plan' => array(
+					'required'          => false,
+					'type'              => 'boolean',
+					'description'       => __( 'Flag whether the user membership is using a subscription for installments.', 'woocommerce-memberships' ),
+					'sanitize_callback' => 'rest_sanitize_request_arg',
+					'validate_callback' => 'rest_validate_request_arg',
+				),
+			);
+
+
+			if ( isset( $args[ $insert_after ] ) ) {
+				$args = Framework\SV_WC_Helper::array_insert_after( $args, $insert_after, $subscription_args );
+			} else {
+				$args = array_merge( $args, $subscription_args );
+			}
+		}
+
+		return $args;
+	}
+
+
+	/**
+	 * Adds Subscriptions data to a user membership created or edited via the REST API.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param \WC_Memberships_User_Membership|\WC_Memberships_Integration_Subscriptions_User_Membership $user_membership membership object
+	 * @param \WP_REST_Request request HTTP request object
+	 * @return \WC_Memberships_User_Membership|\WC_Memberships_Integration_Subscriptions_User_Membership
+	 * @throws \WC_REST_Exception upon errors
+	 */
+	public function handle_user_membership_api_write_request( $user_membership, $request ) {
+
+		$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+
+		if ( $integration && $user_membership instanceof \WC_Memberships_User_Membership ) {
+
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				$subscription_param = 'subscription';
+			} else {
+				$subscription_param = 'subscription_id';
+			}
+
+			$post_type        = get_post_type( $user_membership->post );
+			$subscription_id  = isset( $request[ $subscription_param ] ) ? $request[ $subscription_param ] : null;
+			$installment_plan = isset( $request['installment_plan'] )    ? $request['installment_plan']    : null;
+
+			if ( null !== $subscription_id ) {
+
+				// unlink the subscription from the membership
+				if ( empty( $subscription_id ) ) {
+
+					if ( ! empty( $installment_plan ) ) {
+						throw new \WC_REST_Exception( "woocommerce_rest_{$post_type}_invalid_subscription_data", __( 'Cannot unlink a subscription from a membership and keep an installment plan flag at the same time.', 'woocommerce-memberships' ), 400 );
+					}
+
+					// assume the original object is the expected child type
+					$subscription_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
+
+					$subscription_membership->delete_subscription_id();
+					$subscription_membership->remove_installment_plan();
+
+					// ensure to return a standard membership object
+					$user_membership = new \WC_Memberships_User_Membership( $subscription_membership->post );
+
+				// link the membership to a subscription
+				} else {
+
+					$subscription = wcs_get_subscription( $request[ $subscription_param ] );
+
+					if ( ! $subscription ) {
+						/* translator: Placeholder: %s - subscription identifier (may be empty) */
+						throw new \WC_REST_Exception( "woocommerce_rest_{$post_type}_invalid_subscription_data", sprintf( __( 'Subscription%s invalid or not found.', 'woocommerce-memberships' ), is_numeric( $request[ $subscription_param ] ) ? ' ' . $request[ $subscription_param ] : '' ), 404 );
+					}
+
+					$subscription_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
+
+					$subscription_membership->set_subscription_id( Framework\SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) );
+
+					if ( null !== $installment_plan ) {
+
+						if ( true === $installment_plan ) {
+							$subscription_membership->maybe_set_installment_plan();
+						} elseif ( false === $installment_plan ) {
+							$subscription_membership->remove_installment_plan();
+						} else {
+							throw new \WC_REST_Exception( "woocommerce_rest_{$post_type}_invalid_subscription_data", __( 'Invalid installment plan flag value.', 'woocommerce-memberships' ), 400 );
+						}
+					}
+				}
+
+			}  elseif ( null !== $installment_plan && ! $integration->get_user_membership_subscription_id( $user_membership->get_id() ) ) {
+
+				throw new \WC_REST_Exception( "woocommerce_rest_{$post_type}_invalid_subscription_data", __( 'Cannot set an installment plan flag for a membership that is not linked to a subscription.', 'woocommerce-memberships' ), 400 );
+			}
+		}
+
+		return $user_membership;
 	}
 
 

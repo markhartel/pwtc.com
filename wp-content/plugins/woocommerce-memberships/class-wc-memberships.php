@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -36,7 +36,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 
 	/** plugin version number */
-	const VERSION = '1.12.4';
+	const VERSION = '1.13.0';
 
 	/** @var \WC_Memberships single instance of this plugin */
 	protected static $instance;
@@ -107,11 +107,19 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 			)
 		);
 
+		add_action( 'init', array( $this, 'init_post_types' ) );
+
 		// initializes the REST API handler
-		add_action( 'before_woocommerce_init', array( $this, 'init_rest_api' ) );
+		if ( Framework\SV_WC_Plugin_Compatibility::is_wc_version_gte( '3.6.0' ) ) {
+			add_action( 'init',                    array( $this, 'init_rest_api' ) );
+		} else {
+			add_action( 'before_woocommerce_init', array( $this, 'init_rest_api' ) );
+		}
 
 		// add query vars for rewrite endpoints
-		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
+		add_action( 'init',                       array( $this, 'add_rewrite_endpoints' ), 0 );
+		add_filter( 'query_vars',                 array( $this, 'add_query_vars' ), 0 );
+		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_query_vars' ), 0 );
 
 		// make sure template files are searched for in our plugin
 		add_filter( 'woocommerce_locate_template',      array( $this, 'locate_template' ), 20, 3 );
@@ -132,8 +140,6 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	 * @since 1.11.0
 	 */
 	public function init_plugin() {
-
-		add_action( 'init', array( $this, 'init_post_types' ) );
 
 		$this->includes();
 
@@ -196,8 +202,6 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	public function init_post_types() {
 
 		\WC_Memberships_Post_Types::initialize();
-
-		$this->add_rewrite_endpoints();
 	}
 
 
@@ -651,6 +655,8 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	/**
 	 * Adds rewrite rules endpoints.
 	 *
+	 * @see \WC_Memberships_Members_Area
+	 * @see \WC_Memberships_Upgrade we refresh permalinks on activation and plugin update
 	 * @see \WC_Query::get_query_vars()
 	 * @see \WC_Query::add_endpoints()
 	 *
@@ -658,14 +664,32 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	 */
 	public function add_rewrite_endpoints() {
 
-		// add Members Area endpoint
-		add_rewrite_endpoint( get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ), EP_PAGES );
+		$endpoint = wc_memberships_get_members_area_endpoint();
+
+		if ( ! empty( $endpoint ) ) {
+
+			$ep_mask = EP_PAGES;
+
+			if ( 'page' === get_option( 'show_on_front' ) ) {
+
+				$page_on_front_id   = (int) get_option( 'page_on_front', 0 );
+				$my_account_page_id = (int) wc_get_page_id( 'myaccount' );
+
+				if ( $page_on_front_id > 0 && $my_account_page_id > 0 && $page_on_front_id === $my_account_page_id ) {
+					$ep_mask = EP_ROOT | EP_PAGES;
+				}
+			}
+
+			// add Members Area endpoint
+			add_rewrite_endpoint( $endpoint, $ep_mask );
+		}
 	}
 
 
 	/**
 	 * Handles query vars for endpoints.
 	 *
+	 * @see \WC_Memberships_Members_Area
 	 * @see \WC_Query::get_query_vars()
 	 * @see \WC_Query::add_endpoints()
 	 *
@@ -678,7 +702,11 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 	 */
 	public function add_query_vars( $query_vars ) {
 
-		$query_vars[] = get_option( 'using_permalinks' ) ? get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ) : 'members_area';
+		$query_var = wc_memberships_get_members_area_query_var();
+
+		if ( ! isset( $query_vars[ $query_var ] ) ) {
+			$query_vars[ $query_var ] = wc_memberships_get_members_area_endpoint();
+		}
 
 		return $query_vars;
 	}
@@ -931,10 +959,6 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 		switch ( $method ) {
 
-			/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-			case 'get_query_instance' :
-				_deprecated_function( $deprecated, '1.9.0' );
-				return null;
 			/** @deprecated since 1.11.0 - remove by version 1.14.0 */
 			case 'init' :
 			case 'maybe_activate' :

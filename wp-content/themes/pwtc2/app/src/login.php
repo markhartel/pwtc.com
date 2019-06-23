@@ -42,8 +42,9 @@ add_action('login_enqueue_scripts', function () {
         font-weight: bold;
     }
     
-    body.login div#login p#nav {}
+    body.login div#login p#nav { font-size: 0; }
     body.login div#login p#nav a { color: $link_color; }
+    body.login div#login p#nav a:last-of-type { font-size: 12px; }
     body.login div#login p#backtoblog {}
     body.login div#login p#backtoblog a { color: $link_color; }
 </style>

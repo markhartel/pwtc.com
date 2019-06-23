@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    {{ fn('the_post') }}
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="small-12 cell">
+                {% do action('woocommerce_before_main_content') %}
+                {% do action('woocommerce_before_single_product') %}
+                <div itemscope itemtype="http://schema.org/Product" class="single-product-details {{ post.class }}">
+                    {% do action('woocommerce_before_single_product_summary') %}
+                    <div class="summary entry-summary">
+                        {% do action('woocommerce_single_product_summary') %}
+                    </div>
+                    {% do action('woocommerce_after_single_product_summary') %}
+                    <meta itemprop="url" content="{{ post.link }}" />
+                </div>
+                {% do action('woocommerce_after_single_product') %}
+                {% do action('woocommerce_after_main_content') %}
+            </div>
+        </div>
+    </div>
+{% endblock  %}

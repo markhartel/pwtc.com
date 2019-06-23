@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -300,23 +300,6 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 		}
 
 		return $sign_up_fee;
-	}
-
-
-	/**
-	 * Filters the subscription product cart price to address some discrepancies with the real product subtotal.
-	 *
-	 * @since 1.8.8
-	 * @deprecated 1.9.1
-	 *
-	 * @param string $cart_price HTML price
-	 * @param \WC_Product_Subscription $subscription_product
-	 * @return string HTML
-	 */
-	public function maybe_adjust_cart_product_sign_up_fee( $cart_price, $subscription_product ) {
-
-		_deprecated_function( 'WC_Memberships_Integration_Subscriptions_Discounts::maybe_adjust_cart_product_sign_up_fee()', '1.9.1' );
-		return $cart_price;
 	}
 
 

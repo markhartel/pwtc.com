@@ -23,7 +23,7 @@
 
 namespace SkyVerge\WooCommerce\Memberships;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -61,16 +61,32 @@ class REST_API extends Framework\REST_API {
 
 		parent::__construct( $plugin );
 
-		// controller abstracts
-		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-controller.php' );
-		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-membership-plans.php' );
-		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-user-memberships.php' );
+		if ( Framework\SV_WC_Plugin_Compatibility::is_wc_version_lt( '3.6.0' ) ) {
+			$this->includes();
+		} else {
+			add_action( 'rest_api_init', array( $this, 'includes' ), 5 );
+		}
 
 		$this->webhooks = $this->get_plugin()->load_class( '/includes/api/class-wc-memberships-webhooks.php', '\SkyVerge\WooCommerce\Memberships\API\Webhooks' );
 		$this->supports = array(
 			'v2',
 			'v3',
 		);
+	}
+
+
+	/**
+	 * Loads handlers.
+	 *
+	 * @internal
+	 *
+	 * @since 1.13.0
+	 */
+	public function includes() {
+
+		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-controller.php' );
+		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-membership-plans.php' );
+		require_once( $this->get_plugin()->get_plugin_path() . '/includes/api/abstract-wc-memberships-rest-api-user-memberships.php' );
 	}
 
 
@@ -139,7 +155,9 @@ class REST_API extends Framework\REST_API {
 		$instance  = null;
 		$namespace = null === $version ? array_pop( $this->supports ) : strtolower( $version );
 
-		if ( $namespace && in_array( $namespace, $this->supports, true ) ) {
+		if (    $namespace
+		     && in_array( $namespace, $this->supports, true )
+		     && class_exists( 'WC_REST_Posts_Controller' ) ) {
 
 			if ( 'user_memberships' === $which ) {
 

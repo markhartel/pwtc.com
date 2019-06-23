@@ -30,22 +30,22 @@ class Sharethis extends \WP_Widget {
         echo <<<HTML
             <span st_processed="yes" class="st_twitter_large" displaytext="Tweet">
                 <span class="stButton" style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;">
-                    <span style="background-image: url(&quot;http://w.sharethis.com/images/twitter_32.png&quot;);" class="stLarge"></span>
+                    <span style="background-image: url('https://ws.sharethis.com/images/twitter_32.png');" class="stLarge"></span>
                 </span>
             </span>
             <span st_processed="yes" class="st_facebook_large" displaytext="Facebook">
                 <span class="stButton" style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;">
-                    <span style="background-image: url(&quot;http://w.sharethis.com/images/facebook_32.png&quot;);" class="stLarge"></span>
+                    <span style="background-image: url('https://ws.sharethis.com/images/facebook_32.png');" class="stLarge"></span>
                 </span>
             </span>
             <span st_processed="yes" class="st_reddit_large" displaytext="Reddit">
                 <span class="stButton" style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;">
-                    <span style="background-image: url(&quot;http://w.sharethis.com/images/reddit_32.png&quot;);" class="stLarge"></span>
+                    <span style="background-image: url('https://ws.sharethis.com/images/reddit_32.png');" class="stLarge"></span>
                 </span>
             </span>
             <span st_processed="yes" class="st_sharethis_large" displaytext="ShareThis">
                 <span class="stButton" style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;">
-                    <span style="background-image: url(&quot;http://w.sharethis.com/images/sharethis_32.png&quot;);" class="stLarge"></span>
+                    <span style="background-image: url('http://w.sharethis.com/images/sharethis_32.png');" class="stLarge"></span>
                 </span>
             </span>
 HTML;

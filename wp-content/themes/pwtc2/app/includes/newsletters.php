@@ -7,5 +7,11 @@ add_action('init', function(){
         'menu_position' => 5,
         'capability_type' => 'newsletter',
         'map_meta_cap' => true,
+        'supports' => [
+            'title',
+            'editor',
+            'thumbnail',
+            'excerpt',
+        ]
     ]);
 });

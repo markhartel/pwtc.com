@@ -53,9 +53,9 @@
                     <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
                     {% if user_can_cancel %}
                         {% if post.get_field('is_canceled') %}
-                            <a href="{{ current_url }}?canceled=0" class="success button"><i class="fa fa-calendar-check-o"></i> Allow Ride</a>
+                            <a href="{{ current_url }}?canceled=0" class="success button"><i class="far fa-calendar-check"></i> Allow Ride</a>
                         {% else %}
-                            <a href="{{ current_url }}?canceled=1" class="alert button"><i class="fa fa-calendar-times-o"></i> Cancel Ride</a>
+                            <a href="{{ current_url }}?canceled=1" class="alert button"><i class="far fa-calendar-times"></i> Cancel Ride</a>
                         {% endif %}
                     {% endif %}
                 </div>

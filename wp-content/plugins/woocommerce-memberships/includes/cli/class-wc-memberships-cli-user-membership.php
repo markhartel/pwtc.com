@@ -27,6 +27,7 @@ use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
  * Manage User Memberships from WP CLI.
  *
  * @since 1.7.0
+ * @deprecated since 1.13.0
  */
 class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 
@@ -63,11 +64,14 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
 	public function create( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc user_membership create' ) );
 
 		try {
 
@@ -224,11 +228,14 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
 	public function update( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc user_membership update' ) );
 
 		try {
 
@@ -426,11 +433,14 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param int[] $args either only the user membership ID or a combination of user ID and plan ID, colon separated
 	 * @param array $assoc_args formatting arguments
 	 */
 	public function get( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc user_membership get' ) );
 
 		try {
 
@@ -469,6 +479,7 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 * Get default format fields that will be used in `list` and `get` subcommands.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @return string
 	 */
@@ -502,6 +513,7 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 * Get User Membership data.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WC_Memberships_User_Membership $user_membership
 	 * @return array
@@ -607,11 +619,14 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 * @subcommand list
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
 	public function list_( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc user_membership list' ) );
 
 		$query_args = $this->get_list_query_args( $assoc_args );
 		$formatter  = $this->get_formatter( $assoc_args );
@@ -637,6 +652,7 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 * @see WC_Memberships_CLI_User_Membership::list__()
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args arguments from command line
 	 * @return array
@@ -766,6 +782,7 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 * Format posts from WP_Query result to items.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WP_Post[] $posts array of post objects
 	 * @return array items
@@ -805,11 +822,14 @@ class WC_Memberships_CLI_User_Membership extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param int|int[] $args
 	 * @param array $assoc_args
 	 */
 	public function delete( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc user_membership delete' ) );
 
 		$exit_code = 0;
 		$args      = is_array( $args ) ? $args : (array) $args;

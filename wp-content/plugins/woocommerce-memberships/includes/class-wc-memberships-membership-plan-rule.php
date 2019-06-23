@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1183,133 +1183,6 @@ class WC_Memberships_Membership_Plan_Rule {
 		}
 
 		return $allow_edit;
-	}
-
-
-
-	/**
-	 * Handler of deprecated methods.
-	 *
-	 * TODO remove magic overrides by version 1.13.0 or higher {FN 2017-06-06}
-	 *
-	 * Originally (version 1.0.0) this was used to perform CRUD operations on the rule object.
-	 * In version 1.9.0 these have been refactored into explicit methods and the override turned into a deprecated methods handler.
-	 *
-	 * @since 1.0.0
-	 * @deprecated since 1.9.0
-	 *
-	 * @param string $method called method
-	 * @param string|array $args method arguments
-	 * @return mixed
-	 */
-	public function __call( $method, $args ) {
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		if ( 0 === strpos( $method, 'get_' ) ) {
-
-			if ( 'get_access_schedule_exclude_trial' === $method ) {
-
-				_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Membership_Plan_Rule::is_access_schedule_excluding_trial()' );
-
-				return $this->is_access_schedule_excluding_trial();
-
-			} else {
-
-				$data = $this->get_raw_data();
-				$key  = str_replace( 'get_', '', $method );
-
-				if ( isset( $data[ $key ] ) ) {
-
-					_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}", '1.9.0', 'get_active' === $method ? 'WC_Memberships_Membership_Plan_Rule::is_active()' : null );
-
-					return $data[ $key ];
-				}
-			}
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( isset( $args[0] ) && 0 === strpos( $method, 'set_' ) ) {
-
-			$key = str_replace( 'set_', '', $method );
-
-			if ( property_exists( $this, $key ) ) {
-
-				_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}", '1.9.0' );
-
-				$this->$key = $args[0];
-
-				return null;
-			}
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 0 === strpos( $method, 'has_' ) ) {
-
-			$data = $this->get_raw_data();
-			$key  = str_replace( 'has_', '', $method );
-
-			if ( isset( $data[ $key ] ) ) {
-
-				_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0' );
-
-				return ! empty( $data[ $key ] );
-			}
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 'applies_to_multiple_objects' === $method ) {
-
-			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0' );
-
-			$object_ids = $this->get_object_ids();
-
-			return is_array( $object_ids ) && count( $object_ids ) > 1;
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 'applies_to_single_object' === $method ) {
-
-			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0' );
-
-			$object_id  = isset( $args[0] ) ? $args[0] : $args;
-			$object_ids = $this->get_object_ids();
-
-			return is_array( $object_ids ) && count( $object_ids ) === 1 && ( $object_id ? $this->applies_to( 'object_id', $object_id ) : true );
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 'content_type_exists' === $method ) {
-
-			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Rules::rule_content_type_exists()' );
-
-			return wc_memberships()->get_rules_instance()->rule_content_type_exists( $this );
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 'get_object_label' === $method ) {
-
-			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label()' );
-
-			$label = null;
-			$admin = wc_memberships()->get_admin_instance();
-
-			if ( $admin && class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ) {
-				$label = \WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label( $this, isset( $args[0] ) ? $args[0] : $args );
-			}
-
-			return $label;
-
-		/** @deprecated since 1.9.0 - remove by version 1.13.0 */
-		} elseif ( 'get_object_search_action_name' === $method ) {
-
-			_deprecated_function( "WC_Memberships_Membership_Plan_Rule::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_search_action()' );
-			$name  = '';
-			$admin = wc_memberships()->get_admin_instance();
-
-			if ( $admin && class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ) {
-				$name = \WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_search_action( $this );
-			}
-
-			return $name;
-		}
-
-		// you're probably doing it wrong
-		trigger_error( 'Call to undefined method ' . __CLASS__ . '::' . $method . '()', E_USER_ERROR );
-		return null;
 	}
 
 

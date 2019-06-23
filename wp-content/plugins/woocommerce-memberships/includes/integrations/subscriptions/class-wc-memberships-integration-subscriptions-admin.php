@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -848,86 +848,6 @@ class WC_Memberships_Integration_Subscriptions_Admin {
 		}
 
 		return $data;
-	}
-
-
-	/**
-	 * Backwards compatibility handler for deprecated methods.
-	 *
-	 * TODO remove deprecated methods when they are at least minor versions older (as in x.Y.z semantic versioning) {FN 2018-04-13}
-	 *
-	 * @since 1.10.1
-	 *
-	 * @param string $method method called
-	 * @param void|string|array|mixed $args optional argument(s)
-	 * @return null|void|mixed
-	 */
-	public function __call( $method, $args ) {
-
-		$deprecated = "WC_Memberships_Integration_Subscriptions_Admin::{$method}()";
-
-		switch ( $method ) {
-
-			/* @deprecated since 1.10.1 -- remove by 1.13.0 {FN 2018-04-13} */
-			case 'export_user_membership_headers_add_subscription_id' :
-
-				_deprecated_function( $deprecated, '1.10.1', 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()->get_utilities_instance()->export_user_membership_headers_add_subscription_id()' );
-
-				$subscriptions = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-
-				if ( $subscriptions && ( $utilities = $subscriptions->get_utilities_instance() ) ) {
-
-					return $utilities->add_user_memberships_export_subscription_headers( $args );
-				}
-
-				return is_array( $args ) ? $args : array();
-
-			/* @deprecated since 1.10.1 -- remove by 1.13.0 {FN 2018-04-13} */
-			case 'export_user_membership_subscription_id' :
-
-				_deprecated_function( $deprecated, '1.10.1', 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()->get_utilities_instance()->export_user_membership_subscription_id()' );
-
-				$subscriptions = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-
-				if ( $subscriptions && isset( $args[0], $args[1], $args[2] ) && ( $utilities = $subscriptions->get_utilities_instance() ) ) {
-
-					return $utilities->export_user_membership_subscription_id( $args[0], $args[1], $args[2] );
-				}
-
-				return '';
-
-			/* @deprecated since 1.10.1 -- remove by 1.13.0 {FN 2018-04-13} */
-			case 'import_user_membership_data' :
-
-				_deprecated_function( $deprecated, '1.10.1', 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()->get_utilities_instance()->import_user_membership_data()' );
-
-				$subscriptions = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-
-				if ( $subscriptions  && isset( $args[0], $args[1], $args[2], $args[3] ) && ( $utilities = $subscriptions->get_utilities_instance() ) ) {
-
-					return $utilities->parse_user_membership_subscription_import_data( $args[0], $args[1], $args[2], $args[3] );
-				}
-
-				return is_array( $args ) ? $args : array();
-
-			/* @deprecated since 1.10.1 -- remove by 1.13.0 {FN 2018-04-13} */
-			case 'import_user_membership_subscription_id' :
-
-				_deprecated_function( $deprecated, '1.10.1', 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()->get_utilities_instance()->import_user_membership_subscription_id()' );
-
-				$subscriptions = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-
-				if ( $subscriptions  && isset( $args[0], $args[1], $args[2], $args[3] ) && ( $utilities = $subscriptions->get_utilities_instance() ) ) {
-					$utilities->import_user_membership_subscription_data( $args[0], $args[1], $args[2], $args[3] );
-				}
-
-				return null;
-
-			default :
-				// you're probably doing it wrong
-				trigger_error( "Call to undefined method {$deprecated}", E_USER_ERROR );
-				return null;
-		}
 	}
 
 

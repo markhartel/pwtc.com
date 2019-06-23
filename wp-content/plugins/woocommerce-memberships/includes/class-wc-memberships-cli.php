@@ -28,6 +28,7 @@
  * @see WC_CLI
  *
  * @since 1.7.0
+ * @deprecated since 1.13.0
  */
 
 // Sanity check
@@ -36,7 +37,7 @@ if ( ! class_exists( 'WP_CLI_Command' ) ) {
 }
 
 // WooCommerce v3.0 CLI implementation is different
-if ( SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_CLI_Command' ) ) {
+if ( SkyVerge\WooCommerce\PluginFramework\v5_4_0\SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_CLI_Command' ) ) {
 
 	/**
 	 * Re-introduce WooCommerce WC_CLI_Command for compatibility.
@@ -485,7 +486,13 @@ if ( SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin_Compatibility::is_
 	}
 }
 
-class WC_Memberships_CLI extends \WP_CLI_Command {}
+/**
+ * Memberships CLI handler.
+ *
+ * @since 1.7.0
+ * @deprecated since 1.13.0
+ */
+class WC_Memberships_CLI {}
 
 include_once __DIR__ . '/cli/class-wc-memberships-cli-command.php';
 include_once __DIR__ . '/cli/class-wc-memberships-cli-membership-plan.php';

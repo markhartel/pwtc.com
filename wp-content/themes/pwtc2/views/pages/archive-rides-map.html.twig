@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <section class="main-section">
+        <div class="row column">
+
+            <h1 class="text-center">Rides - {{ day_pretty }}</h1>
+
+            <div class="clearfix">
+                <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day_previous_val }}" class="button float-left">
+                    <i class="fa fa-chevron-left"></i> {{ day_previous }}
+                </a>
+                <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day_next_val }}" class="button float-right">
+                    {{ day_next }}
+                    <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+
+            {% if locations %}
+            <div>There {{ ride_msg }} scheduled for today. Click on a map pointer to see the rides leaving from that location.</div>
+            <div class="acf-map">
+                {% for location in locations %}
+                    <div class="marker" data-lat="{{ location.lat }}" data-lng="{{ location.lng }}">
+                        <div style="max-width: 200px; background-color: lightgray; padding: 4px">{{ location.address }}</div>
+                        {% for event in location.events %}
+                            <div style="max-width: 200px; margin-top: 5px; padding: 4px"><div>{{ event.time | date('g:i') }}<sup>{{ event.time | date('a') }}</sup></div><div><a href="{{ event.link }}" target="_blank" {% if event.is_canceled %}style="color: red; text-decoration: line-through"{% endif %}>{{ event.title }}</a></div></div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p><strong>There are no rides scheduled for today.</strong></p>
+            {% endif %}
+
+            <div class="clearfix">
+                <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_val }}" class="button float-left"><i class="fa fa-chevron-left"></i> Back to {{ month_name }}</a>           
+            </div>
+
+        </div>
+    </section>
+{% endblock %}
+            

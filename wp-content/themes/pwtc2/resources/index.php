@@ -83,7 +83,7 @@ if(is_singular())
 elseif(get_post_type() == 'newsletter')
 {
     $template = 'pages/archive.html.twig';
-    $context['title'] = get_the_archive_title();
+    $context['title'] = 'Newsletter Articles';
     if($context['title'] == "Archives") { $context['title'] = "Newsletters"; }
     $context['posts'] = new PostQuery();
 }

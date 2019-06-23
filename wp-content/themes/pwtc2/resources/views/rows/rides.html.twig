@@ -30,7 +30,7 @@
     {% endfor %}
     {% if rides %}
         <div class="row column text-center">
-            <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}" class="large dark button">More Rides</a>
+            <a href="{{ function('get_post_type_archive_link', 'scheduled_rides') }}" class="large dark button">More Rides</a>
         </div>
     {% endif %}
 </section>

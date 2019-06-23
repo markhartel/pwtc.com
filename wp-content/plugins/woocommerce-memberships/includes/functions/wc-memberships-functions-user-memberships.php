@@ -23,7 +23,7 @@
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 
 /**
@@ -196,7 +196,7 @@ function wc_memberships_user_can( $user_id, $action, $target, $when = '' ) {
  *
  * @param array $args array of arguments
  * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
- * @throws \SkyVerge\WooCommerce\PluginFramework\v5_3_1\SV_WC_Plugin_Exception may create an exception on errors
+ * @throws \SkyVerge\WooCommerce\PluginFramework\v5_4_0\SV_WC_Plugin_Exception may create an exception on errors
  * @return \WC_Memberships_User_Membership
  */
 function wc_memberships_create_user_membership( $args = array(), $action = 'create' ) {

@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -55,7 +55,6 @@ class WC_Memberships_Admin_Membership_Plans {
 
 		// custom admin plan actions
 		add_action( 'admin_action_duplicate_plan', array( $this, 'duplicate_membership_plan' ) );
-		add_action( 'admin_action_grant_access',   array( $this, 'grant_access_to_membership' ) );
 
 		// add/edit plan screen hooks
 		add_action( 'post_submitbox_misc_actions', array( $this, 'post_submitbox_misc_actions' ) );
@@ -635,7 +634,7 @@ class WC_Memberships_Admin_Membership_Plans {
 	/**
 	 * Grants access to a membership plan.
 	 *
-	 * TODO remove this method by version 1.13.0 {FN 2018-02-13}
+	 * TODO remove this method by version 2.0.0 or by October 2019 {FN 2018-02-13}
 	 *
 	 * @internal
 	 *
@@ -651,7 +650,7 @@ class WC_Memberships_Admin_Membership_Plans {
 	/**
 	 * Shows the duplicate plan link in admin edit screen.
 	 *
-	 * TODO remove this method by version 1.13.0 {FN 2018-02-13}
+	 * TODO remove this method by version 2.0.0 or by October 2019 {FN 2018-02-13}
 	 *
 	 * @internal
 	 *

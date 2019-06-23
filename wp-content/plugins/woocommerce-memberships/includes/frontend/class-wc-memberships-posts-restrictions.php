@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -55,13 +55,8 @@ class WC_Memberships_Posts_Restrictions {
 	 */
 	public function __construct() {
 
-		// decide whether attempting to access restricted content has to be redirected
+		// handle content restriction according to the chosen restriction mode
 		add_action( 'wp', array( $this, 'handle_restriction_modes' ) );
-
-		// restrict the post by filtering the post object and replacing the content with a message and maybe excerpt
-		add_action( 'the_post', array( $this, 'restrict_post' ), 0 );
-		// ensure the restricted post content data is persisted even when third parties try to filter it
-		add_filter( 'the_content', array( $this, 'handle_restricted_post_content_filtering' ), 999 );
 
 		// adjust queries to account for restricted content
 		add_filter( 'posts_clauses',  array( $this, 'handle_posts_clauses' ), 999, 2 );
@@ -96,34 +91,36 @@ class WC_Memberships_Posts_Restrictions {
 	public function handle_restriction_modes() {
 		global $post, $wp_query;
 
-		if ( $restrictions = wc_memberships()->get_restrictions_instance() ) {
+		$restriction_mode = wc_memberships()->get_restrictions_instance()->get_restriction_mode();
 
-			switch ( $restrictions->get_restriction_mode() ) {
+		if ( 'hide' !== $restriction_mode ) {
 
-				case 'hide_content' :
+			// restrict the post by filtering the post object and replacing the content with a message and maybe excerpt
+			add_action( 'the_post', array( $this, 'restrict_post' ), 0 );
 
-					// maybe display a restricted notice for a taxonomy term
-					add_action( 'loop_start', array( $this, 'display_restricted_taxonomy_term_notice' ), 1 );
+			// ensure the restricted post content data is persisted even when third parties try to filter it
+			add_filter( 'the_content', array( $this, 'handle_restricted_post_content_filtering' ), 999 );
+		}
 
-					// ensure that RSS enclosures are restricted to avoid leaking of restricted embeds, etc.
-					add_filter( 'rss_enclosure', array( $this, 'hide_restricted_content_feed_enclosures' ), 999 );
+		if ( 'hide_content' === $restriction_mode ) {
 
-					// restrict content comments
-					$this->hide_restricted_content_comments();
+			// maybe display a restricted notice for a taxonomy term
+			add_action( 'loop_start', array( $this, 'display_restricted_taxonomy_term_notice' ), 1 );
 
-				break;
+			// ensure that RSS enclosures are restricted to avoid leaking of restricted embeds, etc.
+			add_filter( 'rss_enclosure', array( $this, 'hide_restricted_content_feed_enclosures' ), 999 );
 
-				case 'redirect' :
+			// restrict content comments
+			$this->hide_restricted_content_comments();
 
-					$term = $wp_query && ( $wp_query->is_tax() || $wp_query->is_category() || $wp_query->is_tag() ) ? get_queried_object() : null;
+		} elseif ( 'redirect' === $restriction_mode ) {
 
-					if ( $term instanceof \WP_Term ) {
-						$this->redirect_restricted_content( $term->term_id, 'taxonomy', $term->taxonomy );
-					} elseif ( $post instanceof \WP_Post ) {
-						$this->redirect_restricted_content( $post->ID, 'post_type', $post->post_type );
-					}
+			$term = $wp_query && ( $wp_query->is_tax() || $wp_query->is_category() || $wp_query->is_tag() ) ? get_queried_object() : null;
 
-				break;
+			if ( $term instanceof \WP_Term ) {
+				$this->redirect_restricted_content( $term->term_id, 'taxonomy', $term->taxonomy );
+			} elseif ( $post instanceof \WP_Post ) {
+				$this->redirect_restricted_content( $post->ID, 'post_type', $post->post_type );
 			}
 		}
 	}

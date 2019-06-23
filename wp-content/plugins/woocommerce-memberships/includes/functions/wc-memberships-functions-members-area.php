@@ -32,6 +32,7 @@ defined( 'ABSPATH' ) or exit;
  * @return bool
  */
 function wc_memberships_is_members_area() {
+
 	return wc_memberships()->get_frontend_instance()->get_members_area_instance()->is_members_area();
 }
 
@@ -45,7 +46,51 @@ function wc_memberships_is_members_area() {
  * @return bool
  */
 function wc_memberships_is_members_area_section( $section = null ) {
+
 	return wc_memberships()->get_frontend_instance()->get_members_area_instance()->is_members_area_section( $section );
+}
+
+
+/**
+ * Gets the Members Area query var.
+ *
+ * TODO by version 2.0.0 we could allow for customizing the query var like we do for the endpoint so it would be the same regardless of rewrite structure used {FN 2017-09-06}
+ *
+ * @since 1.13.0
+ *
+ * @return string
+ */
+function wc_memberships_get_members_area_query_var() {
+
+	return 'members_area';
+}
+
+
+/**
+ * Gets the Members Area endpoint, filtered.
+ *
+ * @since 1.13.0
+ *
+ * @return string
+ */
+function wc_memberships_get_members_area_endpoint() {
+
+	if ( get_option( 'permalink_structure' ) ) {
+		$endpoint = (string) get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' );
+	} else {
+		$endpoint = wc_memberships_get_members_area_query_var();
+	}
+
+	/**
+	 * Filters the members area endpoint for the account.
+	 *
+	 * @since 1.11.1
+	 *
+	 * @param string $endpoint the members area endpoint, which may be filtered by third parties
+	 * @param \WC_Memberships_User_Membership[] $user_memberships the user memberships (kept for backwards compatibility reasons)
+	 * @param string $endpoint the original endpoint used by the Members Area
+	 */
+	return (string) apply_filters( 'wc_memberships_members_area_endpoint', $endpoint, wc_memberships_get_user_memberships(), $endpoint );
 }
 
 
@@ -56,7 +101,7 @@ function wc_memberships_is_members_area_section( $section = null ) {
  *
  * @since 1.4.0
  *
- * @param null|int|\WC_Memberships_Membership_Plan $membership_plan optional plan object or id
+ * @param null|false|int|\WC_Memberships_Membership_Plan $membership_plan optional plan object or id
  * @param string $members_area_section optional, which section of the members area to point to
  * @param int|string $paged optional, for paged sections
  * @return string unescaped URL
@@ -83,7 +128,7 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 		$url_pieces     = parse_url( $my_account_url );
 		$query_strings  = ! empty( $url_pieces['query'] ) && is_string( $url_pieces['query'] ) ? explode( '&', $url_pieces['query'] ) : array();
 		$my_account_url = preg_replace( '/\?.*/', '', $my_account_url );
-		$endpoint       = $using_permalinks ? get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ) : 'members_area';
+		$endpoint       = wc_memberships_get_members_area_endpoint();
 
 		if ( $using_permalinks ) {
 
@@ -105,7 +150,7 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 		}
 
 		// grab optional members area section and paged requests
-		if ( $membership_plan_id > 0 ) {
+		if ( is_numeric( $membership_plan_id ) && $membership_plan_id > 0 ) {
 
 			if ( $using_permalinks ) {
 
@@ -128,13 +173,15 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 			// if unspecified, will get the first tab as set in membership plan in admin
 			if ( empty( $members_area_section ) ) {
 
-				$membership_plan = is_numeric( $membership_plan ) ? wc_memberships_get_membership_plan( $membership_plan_id ) : $membership_plan;
+				if ( is_numeric( $membership_plan ) ) {
+					$membership_plan = wc_memberships_get_membership_plan( $membership_plan_id );
+				}
 
 				if ( $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 
 					$plan_sections        = (array) $membership_plan->get_members_area_sections();
 					$available_sections   = array_intersect_key( wc_memberships_get_members_area_sections(), array_flip( $plan_sections ) );
-					$members_area_section = key( $available_sections );
+					$members_area_section = (string) key( $available_sections );
 				}
 			}
 
@@ -208,8 +255,8 @@ function wc_memberships_get_members_area_action_links( $section, $user_membershi
 
 			// Renew: Show only for expired memberships that can be renewed
 			if (    $user_membership->is_expired()
-			        && $user_membership->can_be_renewed()
-			        && current_user_can( 'wc_memberships_renew_membership', $user_membership->get_id() ) ) {
+			     && $user_membership->can_be_renewed()
+			     && current_user_can( 'wc_memberships_renew_membership', $user_membership->get_id() ) ) {
 
 				$default_actions['renew'] = array(
 					'url'  => $user_membership->get_renew_membership_url(),

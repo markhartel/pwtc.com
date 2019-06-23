@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1251,112 +1251,18 @@ class WC_Memberships_Admin {
 
 
 	/**
-	 * Backwards compatibility handler for deprecated methods.
+	 * Processes the legacy import export form.
 	 *
-	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-23-06}
+	 * TODO remove this deprecated method by version 2.0.0 or by October 2019, whichever comes first {FN 2019-01-28}
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
-	 *
-	 * @param string $method method called
-	 * @param void|string|array|mixed $args optional argument(s)
-	 * @return null|void|mixed
+	 * @deprecated since 1.10.0
 	 */
-	public function __call( $method, $args ) {
+	public function process_import_export_form() {
 
-		$deprecated = "WC_Memberships_Admin::{$method}()";
-
-		switch ( $method ) {
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'get_valid_post_types_for_content_restriction' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules()' );
-				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules() : null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'get_valid_taxonomies_for_rule_type' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules class methods' );
-				switch ( isset( $args[0] ) ? $args[0] : $args ) {
-					case 'content_restriction' :
-						return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules() : null;
-					case 'product_restriction' :
-						return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_product_restriction_rules() : null;
-					case 'purchasing_discount' :
-						return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_purchasing_discounts_rules() : null;
-					default :
-						return null;
-				}
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'get_valid_taxonomies_for_content_restriction' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules()' );
-				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules() : null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'get_valid_taxonomies_for_product_restriction' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_product_restriction_rules()' );
-				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_product_restriction_rules() : null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'get_valid_taxonomies_for_purchasing_discounts' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_purchasing_discounts_rules()' );
-				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_purchasing_discounts_rules() : null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'update_rules' :
-				_deprecated_function( "WC_Memberships_Admin::{$method}()", '1.9.0', 'WC_Memberships_Admin_Membership_Plan_Rules::save_rules()' );
-				$post_id    = isset( $args[0] ) ? $args[0] : 0;
-				$rule_types = isset( $args[1] ) ? $args[1] : array();
-				$target     = isset( $args[2] ) ? $args[2] : 'plan';
-				return class_exists( 'WC_Memberships_Admin_Membership_Plan_Rules' ) ? WC_Memberships_Admin_Membership_Plan_Rules::save_rules( $_POST, $post_id, $rule_types, $target ) : null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'load_meta_boxes' :
-				_deprecated_function( $deprecated, '1.9.0' );
-				$this->init_meta_boxes();
-				return null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'render_order_data' :
-				_deprecated_function( $deprecated, '1.9.0', 'wc_memberships()->get_admin_instance()->get_orders_instance()->render_memberships_order_data()' );
-				wc_memberships()->get_admin_instance()->get_orders_instance()->render_memberships_order_data( isset( $args[0] ) ? $args[0] : $args );
-				return null;
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'set_current_tab' :
-				_deprecated_function( $deprecated, '1.9.0', 'wc_memberships()->get_admin_instance()->get_current_tab()' );
-				return $this->get_current_tab( '' );
-
-			/** @deprecated since 1.9.0 - remove by 1.13.0 or higher */
-			case 'update_custom_message' :
-				_deprecated_function( $deprecated, '1.9.0', 'WC_Memberships_User_Messages::set_message()' );
-				$post_id  = isset( $args[0] ) ? $args[0] : 0;
-				$messages = isset( $args[1] ) ? $args[1] : array();
-				foreach ( $messages as $message_type ) {
-					$message      = '';
-					$message_code = "{$message_type}_message";
-					$use_custom   = 'no';
-					if ( ! empty( $_POST["_wc_memberships_{$message_code}"] ) ) {
-						$message    = wp_unslash( sanitize_post_field( 'post_content', $_POST["_wc_memberships_{$message_type}_message"], 0, 'db' ) );
-					}
-					if ( isset( $_POST["_wc_memberships_use_custom_{$message_code}"] ) && 'yes' === $_POST["_wc_memberships_use_custom_{$message_type}_message"] ) {
-						$use_custom = 'yes';
-					}
-					// save the message
-					\WC_Memberships_User_Messages::set_message( $message_code, $message );
-					// set the flag to use a custom message (for admin UI)
-					wc_memberships_set_content_meta( $post_id, "_wc_memberships_use_custom_{$message_code}", $use_custom );
-				}
-				return null;
-
-			/** @deprecated since 1.10.0 - remove by 1.13.0 or higher */
-			case 'process_import_export_form' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-		}
-
-		// you're probably doing it wrong
-		trigger_error( "Call to undefined method {$deprecated}", E_USER_ERROR );
-		return null;
+		_deprecated_function( '', '1.10.0' );
 	}
 
 

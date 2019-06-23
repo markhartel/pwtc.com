@@ -18,4 +18,7 @@
     {% endif %}
 </a>
 <h5><a href="{{ post.link }}">{{ post.title }}</a></h5>
+{% if post.post_type == 'newsletter' %}
+    <h6>{{ post.date }}</h6>
+{% endif %}
 <p>{{ post.preview }}</p>

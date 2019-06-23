@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -868,76 +868,8 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 	 * @return bool
 	 */
 	public function delete_export_file( $job ) {
+
 		return parent::delete_attached_file( $job );
-	}
-
-
-	/**
-	 * Backwards compatibility handler for deprecated methods.
-	 *
-	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-23-06}
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param string $method method called
-	 * @param void|string|array|mixed $args optional argument(s)
-	 * @return null|void|mixed
-	 */
-	public function __call( $method, $args ) {
-
-		$deprecated = "WC_Memberships_CSV_Export_User_Memberships::{$method}()";
-
-		switch ( $method ) {
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'get_fields' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return array();
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'render_section' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'render_content' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'render_file_upload_field' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'render_date_range_field' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'set_admin_page_title' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return isset( $args[0] ) ? $args[0] : '';
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'set_export_ids' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'process_export' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
-			case 'download' :
-				_deprecated_function( $deprecated, '1.10.0' );
-				return null;
-		}
-
-		// you're probably doing it wrong
-		trigger_error( "Call to undefined method {$deprecated}", E_USER_ERROR );
-		return null;
 	}
 
 

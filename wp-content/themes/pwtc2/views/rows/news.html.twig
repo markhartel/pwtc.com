@@ -1,0 +1,15 @@
+<section class="news">
+    <div class="row column">
+        <h2>{% if row.title is defined %}{{ row.title }}{% else %}News{% endif %}</h2>
+    </div>
+    <div class="row small-up-1 medium-up-2 large-up-4">
+        {% for article in news %}
+            <div class="column{% if loop.index > 4 %} hide-for-small-only{% endif %}">
+                {% include 'teasers/post.html.twig' with {'post': article} only %}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row column text-center">
+        <a href="{{ function('get_post_type_archive_link', 'post') }}" class="large primary button">Read More</a>
+    </div>
+</section>
