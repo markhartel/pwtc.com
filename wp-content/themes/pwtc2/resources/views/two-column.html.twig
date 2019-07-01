@@ -6,6 +6,27 @@
             <article class="small-12 medium-8 large-9 columns content">
                 <h1>{{ post.title }}</h1>
                 {{ post.content }}
+
+                {% if comments is defined and comments %}
+                    <div class="comment-box">
+                        <!-- comments -->
+                        <div class="comments">
+                            {% if post.comments %}
+                                <h3>Comments </h3>
+                                {% for cmt in post.comments %}
+                                    {% include "partials/comment.twig" with {comment:cmt} %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        {% if post.comment_status == "closed" %}
+                            <p> comments for this post are closed </p>
+                        {% else %}
+                            <!-- comment form -->
+                            {% include "partials/comment-form.twig" %}
+                        {% endif %}
+                    </div>
+                {% endif %}
             </article>
             <div class="small-12 medium-4 large-3 columns sidebar">
                 {{ right_sidebar }}
