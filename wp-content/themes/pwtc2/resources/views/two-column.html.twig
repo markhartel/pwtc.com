@@ -7,7 +7,7 @@
                 <h1>{{ post.title }}</h1>
                 {{ post.content }}
 
-                {% if comments is defined and comments %}
+                {% if comments is defined and comments and user%}
                     <div class="comment-box">
                         <!-- comments -->
                         <div class="comments">
