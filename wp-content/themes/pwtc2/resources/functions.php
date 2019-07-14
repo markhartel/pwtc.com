@@ -67,3 +67,13 @@ add_action( 'pre_get_posts', function ( $query ) {
         $query->set( 'cat', '-40' );
     }
 });
+
+add_filter('wp_nav_menu_objects', function ($items){
+    foreach($items as $item){
+        if( $item->title == "Log Out"){
+            $item->url = $item->url . "&_wpnonce=" . wp_create_nonce( 'log-out' );
+        }
+    }
+    return $items;
+
+});
