@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -172,11 +172,6 @@ class WC_Memberships_User_Messages {
 			// member login message (blank by default)
 			'member_login_message'                                    => '',
 		);
-
-		/** TODO remove this filter deprecation notice by version 1.13.0 {FN 2017-08-03} */
-		if ( has_filter( 'wc_memberships_valid_restriction_message_types' ) ) {
-			_deprecated_function( 'the filter "wc_memberships_valid_restriction_message_types"', '1.9.0', '"wc_memberships_default_messages" filter' );
-		}
 
 		/**
 		 * Filter the default user messages.
@@ -427,8 +422,6 @@ class WC_Memberships_User_Messages {
 		// find message by code key
 		$message_code = empty( $products ) && ! in_array( $code_shorthand, array( 'cart_sole_item_discount', 'cart_item_discount', 'cart_items_discount', 'member_login' ), false ) && ! Framework\SV_WC_Helper::str_ends_with( $code_shorthand, 'delayed' ) ? $code_shorthand . '_message_no_products' : $code_shorthand . '_message';
 		$message      = do_shortcode( self::get_message( $message_code, $message_args ) );
-		// TODO remove deprecated filters handling by version 1.13.0 {FN 2018-11-07}
-		$message      = self::handle_deprecated_filters( $message, $message_code, $message_args );
 		// handle merge tags
 		$message      = self::parse_message_merge_tags( $message, $message_args );
 		// parse allowed HTML
@@ -719,8 +712,6 @@ class WC_Memberships_User_Messages {
 
 						/* @see \WC_Memberships_User_Messages::get_message_html() */
 						$message = do_shortcode( self::get_message( $message_code, $args ) );
-						// TODO remove deprecated filters handling by version 1.13.0 {FN 2018-11-07}
-						$message = self::handle_deprecated_filters( $message, $message_code, $args );
 					}
 				}
 			}
@@ -769,88 +760,6 @@ class WC_Memberships_User_Messages {
 			$message = str_replace( '{login}', sprintf( _x( '%1$slog in%2$s', 'Lowercase',   'woocommerce-memberships' ), '<a href="{login_url}">', '</a>' ), $message );
 			// replace {login_url}
 			$message = str_replace( '{login_url}', esc_url( self::get_restricted_content_redirect_url() ), $message );
-		}
-
-		return $message;
-	}
-
-
-	/**
-	 * Handle messages deprecated filters for backwards compatibility.
-	 *
-	 * TODO remove this method by version 1.13.0 - do not open to public {FN 2017-07-04}
-	 * @see \WC_Memberships_User_Messages::parse_message_merge_tags()
-	 * @see \WC_Memberships_User_Messages::get_message_html()
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param string $message may contain HTML
-	 * @param string $message_code
-	 * @param array $args associative array
-	 * @return string message (may contain HTML)
-	 */
-	private static function handle_deprecated_filters( $message, $message_code, $args ) {
-
-		$deprecated = false;
-
-		if ( ! empty( $args['access_time'] ) && has_filter( 'get_content_delayed_message' ) ) {
-
-			$deprecated = 'get_content_delayed_message';
-
-			/**
-			 * Filter the delayed content message.
-			 *
-			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
-			 *
-			 * @deprecated since 1.9.0
-			 * @since 1.0.0
-			 *
-			 * @param string $message delayed content message
-			 * @param array $args array of vars used to construct the message
-			 */
-			$message = (string) apply_filters( 'get_content_delayed_message', $message, $args['post_id'], $args['access_time'] );
-
-		} elseif ( has_filter( 'wc_memberships_member_discount_message' ) ) {
-
-			$deprecated = 'wc_memberships_member_discount_message';
-			$post_id    = ! empty( $args['post'] ) ? $args['post']->ID : 0;
-
-			/**
-			 * Filter the product member discount message
-			 *
-			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
-			 *
-			 * @deprecated since 1.9.0
-			 * @since 1.0.0
-			 *
-			 * @param string $message the discount message
-			 * @param int $product_id ID of the product that has member discounts
-			 * @param int[] $products array of product IDs that grant access to this product
-			 */
-			$message = (string) apply_filters( 'wc_memberships_member_discount_message', $message, $post_id, $args['products'] );
-
-		} elseif ( has_filter( 'wc_memberships_product_taxonomy_viewing_restricted_message' ) ) {
-
-			$deprecated = 'wc_memberships_product_taxonomy_viewing_restricted_message';
-
-			/**
-			 * Filter the product term viewing restricted message.
-			 *
-			 * TODO this filter will be removed by version 1.13.0 {FN 2017-07-03}
-			 *
-			 * @deprecated since 1.9.0
-			 * @since 1.4.0
-			 *
-			 * @param string $message the restriction message
-			 * @param string $taxonomy product taxonomy
-			 * @param int $term_id product taxonomy term id
-			 * @param array $products array of product IDs that grant access to products taxonomy
-			 */
-			$message = (string) apply_filters( 'wc_memberships_product_taxonomy_viewing_restricted_message', $message );
-		}
-
-		if ( false !== $deprecated ) {
-			_deprecated_function( "the filter {$deprecated}", '1.9.0', '"wc_memberships_' . $message_code . '_html" or "wc_memberships_' . $message_code . '" filters' );
 		}
 
 		return $message;

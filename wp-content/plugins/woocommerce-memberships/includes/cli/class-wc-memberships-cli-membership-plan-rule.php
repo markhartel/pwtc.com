@@ -21,12 +21,13 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 /**
  * Manage Membership Plan Rules from WP CLI.
  *
  * @since 1.9.0
+ * @deprecated since 1.13.0
  */
 class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Command {
 
@@ -68,6 +69,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 *
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -299,6 +301,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 *
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -516,6 +519,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 *
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param string[] $args only the first ID will be used
 	 * @param array $assoc_args Formatting arguments
@@ -545,6 +549,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 * Get default format fields that will be used in `list` and `get` subcommands
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @return string
 	 */
@@ -575,6 +580,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 * Get Membership Plan Rule data.
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WC_Memberships_Membership_Plan_Rule $rule
 	 *
@@ -658,6 +664,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 * @subcommand list
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -687,6 +694,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 * Format posts from WP_Query result to items.
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WC_Memberships_Membership_Plan_Rule[] $rules array of rule objects
 	 * @return array formatted rule items for screen display
@@ -725,6 +733,7 @@ class WC_Memberships_CLI_Membership_Plan_Rule extends \WC_Memberships_CLI_Comman
 	 *
 	 *
 	 * @since 1.9.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param int|int[] $args
 	 * @param array $assoc_args

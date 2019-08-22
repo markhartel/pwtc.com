@@ -181,6 +181,11 @@ function wc_box_office_get_ticket_description( $ticket_id = 0, $formatter = 'fla
  */
 function wc_box_office_ticket_description_flat_formatter( $ticket_id, $ticket_fields ) {
 	$ticket_description = '';
+
+	if ( empty( $ticket_fields ) ) {
+		return $ticket_description;
+	}
+
 	foreach ( $ticket_fields as $field_key => $field ) {
 		$ticket_meta = get_post_meta( $ticket_id, $field_key, true );
 

@@ -1,0 +1,13 @@
+<section class="reviews">
+    <div class="slick">
+        {% for review in reviews %}
+            <div class="text-center">
+                <h3 class="font-kreon">{{ review.title }}</h3>
+                <div class="content">
+                    {{ review.get_field('review') }}
+                </div>
+                <div class="name font-kreon">{{ review.get_field('name') }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</section>

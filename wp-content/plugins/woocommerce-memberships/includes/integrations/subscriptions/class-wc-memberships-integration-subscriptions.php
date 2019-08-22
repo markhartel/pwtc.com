@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1092,26 +1092,6 @@ class WC_Memberships_Integration_Subscriptions {
 	public function prune_membership_link_cache( $subscription_membership ) {
 
 		unset( $this->has_user_membership_subscription[ (int) $subscription_membership->get_id() ] );
-	}
-
-
-	/**
-	 * Removes cached value when a membership is unlinked from a subscription.
-	 *
-	 * TODO remove this method by version 1.13.0 {FN 2018-08-14}
-	 *
-	 * @internal
-	 *
-	 * @since 1.10.6
-	 * @deprecated since 1.10.7
-	 *
-	 * @param \WC_Memberships_User_Membership|\WC_Memberships_Integration_Subscriptions_User_Membership $subscription_membership membership object
-	 */
-	public function unlinked_membership( $subscription_membership ) {
-
-		_deprecated_function( 'WC_Memberships_Integration_Subscriptions::unlinked_membership()', '1.10.7', 'WC_Memberships_Integration_Subscriptions::clear_membership_link_cache()' );
-
-		$this->prune_membership_link_cache( $subscription_membership );
 	}
 
 

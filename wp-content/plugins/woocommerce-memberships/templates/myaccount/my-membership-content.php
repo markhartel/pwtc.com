@@ -30,20 +30,19 @@ defined( 'ABSPATH' ) or exit;
  * @type \WP_Query $restricted_content Query results of posts and custom post types restricted to the membership
  * @type int $user_id The current user ID
  *
- * @version 1.12.0
+ * @version 1.13.0
  * @since 1.4.0
  */
 
-do_action( 'wc_memberships_before_members_area', 'my-membership-content', $customer_membership );
+if ( empty ( $restricted_content->posts ) ) :
 
-?>
-
-<?php if ( empty ( $restricted_content->posts ) ) : ?>
-
+	?>
 	<p><?php esc_html_e( 'There is no content assigned to this membership.', 'woocommerce-memberships' ); ?></p>
+	<?php
 
-<?php else : ?>
+else :
 
+	?>
 	<table class="shop_table shop_table_responsive my_account_orders my_account_memberships my_membership_content">
 
 		<thead>
@@ -171,9 +170,6 @@ do_action( 'wc_memberships_before_members_area', 'my-membership-content', $custo
 		<?php endif; ?>
 
 	</table>
+	<?php
 
-<?php endif; ?>
-
-<?php
-
-do_action( 'wc_memberships_after_members_area', 'my-membership-content', $customer_membership );
+endif;

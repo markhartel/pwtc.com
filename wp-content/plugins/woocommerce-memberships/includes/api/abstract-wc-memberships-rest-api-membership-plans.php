@@ -24,7 +24,7 @@
 namespace SkyVerge\WooCommerce\Memberships\API\Controller;
 
 use SkyVerge\WooCommerce\Memberships\API\Controller;
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -45,8 +45,25 @@ class Membership_Plans extends Controller {
 
 		parent::__construct();
 
-		$this->rest_base = 'plans';
-		$this->post_type = 'wc_membership_plan';
+		$this->rest_base   = 'plans';
+		$this->post_type   = 'wc_membership_plan';
+		$this->object_name = __( 'Membership Plan', 'woocommerce-memberships' );
+	}
+
+
+	/**
+	 * Gets a membership plan from a valid identifier.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param string|int|\WP_Post $id membership plan ID or slug
+	 * @return \WC_Memberships_Membership_Plan
+	 */
+	protected function get_object( $id ) {
+
+		$plan = wc_memberships_get_membership_plan( $id );
+
+		return $plan instanceof \WC_Memberships_Membership_Plan ? $plan : null;
 	}
 
 
@@ -74,7 +91,7 @@ class Membership_Plans extends Controller {
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)', array(
 			'args'   => array(
 				'id' => array(
-					'description' => __( 'Unique identifier for the resource.', 'woocommerce-memberships' ),
+					'description' => __( 'Unique identifier of a membership plan.', 'woocommerce-memberships' ),
 					'type'        => 'integer',
 				),
 			),
@@ -163,7 +180,7 @@ class Membership_Plans extends Controller {
 		 * @param array $args associative array of query args
 		 * @param \WP_REST_Request $request request object
 		 */
-		return (array) apply_filters( 'woocommerce_rest_wc_membership_plans_query_args', $query_args, $request );
+		return (array) apply_filters( "woocommerce_rest_{$this->post_type}s_query_args", $query_args, $request );
 	}
 
 
@@ -303,7 +320,7 @@ class Membership_Plans extends Controller {
 		 * @param null|\WP_Post $post the membership plan post object
 		 * @param \WP_REST_Request $request the request object
 		 */
-		return apply_filters( 'woocommerce_rest_prepare_wc_membership_plan', $response, $membership_plan ? $membership_plan->post : null, $request );
+		return apply_filters( "woocommerce_rest_prepare_{$this->post_type}", $response, $membership_plan ? $membership_plan->post : null, $request );
 	}
 
 
@@ -374,7 +391,7 @@ class Membership_Plans extends Controller {
 		 */
 		$schema = (array) apply_filters( 'wc_memberships_rest_api_membership_plan_schema', array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => $this->post_type,
+			'title'      => 'membership_plan', // this will be used as the base for WP REST CLI commands
 			'type'       => 'object',
 			'properties' => array(
 				'id'                        => array(

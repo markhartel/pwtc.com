@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <article class="single">
+                    {% if post.thumbnail.src %}
+                        <img src="{{ post.thumbnail.src }}" alt="Image for {{ post.title }}" class="thumbnail"/>
+                    {% endif %}
+                    <h1>{{ post.title }}</h1>
+                    <div class="meta grid-x grid-padding-x">
+                        <div class="date shrink cell">Published on: {{ post.date }}</div>
+                        <div class="author shrink cell">By: <a href="{{ post.author.link }}">{{ post.author.name }}</a></div>
+                    </div>
+                    {{ post.content }}
+                    <div class="categories">
+                        {% for term in post.categories if term.id != 1 %}
+                            <a href="{{ term.link }}" title="{{ term.name }}" class="small hallow button">{{ term.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% include 'structured-data/article.html.twig' %}
+                </article>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -32,9 +32,6 @@ defined( 'ABSPATH' ) or exit;
  */
 class WC_Memberships_Members_Area {
 
-
-	/** @var string the endpoint query var key used by the Members Area */
-	private $query_var = 'members_area';
 
 	/** @var string the endpoint used by the Members Area */
 	private $endpoint;
@@ -56,52 +53,36 @@ class WC_Memberships_Members_Area {
 	 * Not just the User Membership needs to be passed (much like an Order ID when viewing orders) but also the Membership content to display (post content, products, discounts, membership notes are the default ones).
 	 * Since the content a plan discloses access to might be very big to display in a single page we also paginate it, and we need to pass in the URL a paged number information.
 	 *
-	 * TODO by version 2.0.0 we could allow for customizing the query var like we do for the endpoint so it would be the same regardless of rewrite structure used {FN 2017-09-06}
+	 * @see \wc_memberships_get_members_area_endpoint()
+	 * @see \wc_memberships_get_members_area_query_var()
+	 * @see \WC_Memberships::add_rewrite_endpoints()
+	 * @see \WC_Memberships::add_query_vars()
 	 *
 	 * @since 1.6.0
 	 */
 	public function __construct() {
 
 		$this->using_permalinks = get_option( 'permalink_structure' );
-		$this->endpoint         = $this->using_permalinks ? get_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' ) : $this->query_var;
-
-		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_query_var' ) );
+		$this->endpoint         = wc_memberships_get_members_area_endpoint();
 
 		// add a menu item in My Account for the Memberships endpoint
-		add_filter( 'woocommerce_account_menu_items',                 array( $this, 'add_account_members_area_menu_item' ), 999 );
-		add_filter( 'woocommerce_account_menu_item_classes',          array( $this, 'adjust_account_members_area_menu_item_classes' ), 999, 2 );
-		add_filter( 'wc_get_template',                                array( $this, 'get_members_area_navigation_template' ), 1, 2 );
+		add_filter( 'woocommerce_account_menu_items',        array( $this, 'add_account_members_area_menu_item' ), 999 );
+		add_filter( 'woocommerce_account_menu_item_classes', array( $this, 'adjust_account_members_area_menu_item_classes' ), 999, 2 );
+
+		// filter the endpoint URL when customer has only a single membership
+		add_filter( 'woocommerce_get_endpoint_url', array( $this, 'get_members_area_memberships_endpoint_url' ), 10, 4 );
 
 		// renders the members area content
+		add_filter( 'wc_get_template',                                array( $this, 'get_members_area_navigation_template' ), 1, 2 );
 		add_action( "woocommerce_account_{$this->endpoint}_endpoint", array( $this, 'output_members_area' ) );
 
 		// handles WordPress page title and content in Members Area sections
-		add_filter( 'the_title',                                      array( $this, 'adjust_account_page_title' ), 40 );
-		add_filter( 'the_content',                                    array( $this, 'adjust_account_page_content' ), 40 );
+		add_filter( 'the_title',   array( $this, 'adjust_account_page_title' ), 40 );
+		add_filter( 'the_content', array( $this, 'adjust_account_page_content' ), 40 );
+
 		// filter the breadcrumbs in My Account area when viewing individual memberships
-		add_filter( 'woocommerce_get_breadcrumb',                     array( $this, 'adjust_account_page_breadcrumbs' ), 100 );
+		add_filter( 'woocommerce_get_breadcrumb', array( $this, 'adjust_account_page_breadcrumbs' ), 100 );
 	}
-
-
-	/**
-	 * Adds the members area query var to WooCommerce query vars.
-	 *
-	 * @see \WC_Query::get_query_vars()
-	 * @internal
-	 *
-	 * @since 1.10.1
-	 *
-	 * @param string[] $query_vars array of query vars
-	 * @return string[]
-	 */
-	public function add_query_var( $query_vars ) {
-
-		if ( ! isset( $query_vars[ $this->query_var ] ) ) {
-			$query_vars[ $this->query_var ] = $this->endpoint;
-		}
-
-		return $query_vars;
-    }
 
 
 	/**
@@ -266,7 +247,11 @@ class WC_Memberships_Members_Area {
 	 */
 	private function get_members_area_memberships_endpoint_title( $plan = null ) {
 
-		$endpoint_title = __( 'Memberships', 'woocommerce-memberships' );
+		if ( $this->redirect_to_single_membership() ) {
+			$endpoint_title = __( 'My Membership', 'woocommerce-memberships' );
+		} else {
+			$endpoint_title = __( 'Memberships', 'woocommerce-memberships' );
+		}
 
 		// perhaps display the current plan name
 		if ( $plan instanceof \WC_Memberships_Membership_Plan ) {
@@ -290,44 +275,40 @@ class WC_Memberships_Members_Area {
 
 
 	/**
-	 * Returns the Members Area endpoint URL.
+	 * Changes the Members Area endpoint URL when redirecting to a single membership.
 	 *
-	 * Normally this would consist of the simple endpoint itself. However, if the user has a single membership only, we redirect to that automatically.
+	 * @since 1.13.0
 	 *
-	 * @since 1.9.0
+	 * @internal
 	 *
-	 * @return string
+	 * @param string $url a My Account URL
+	 * @param string $endpoint a My Account endpoint
+	 * @return string endpoint URL
 	 */
-	private function get_members_area_memberships_endpoint() {
+	public function get_members_area_memberships_endpoint_url( $url, $endpoint ) {
 
-		$user_memberships = wc_memberships_get_user_memberships();
+		if ( $endpoint === wc_memberships_get_members_area_endpoint() ) {
 
-		if ( 1 === count( $user_memberships ) && ( $user_membership = $user_memberships[0] ) && $user_membership->is_active() ) {
+			$user_memberships = wc_memberships_get_user_memberships();
 
-			$members_area_sections = $user_membership->get_plan()->get_members_area_sections();
+			if ( $this->redirect_to_single_membership( $user_memberships ) ) {
 
-			// don't change the member area link if there are no sections to display
-			if ( empty( $members_area_sections ) ) {
-				$url = $this->endpoint;
-			} else {
-				$url = str_replace( wc_get_page_permalink( 'myaccount' ), '', wc_memberships_get_members_area_url( $user_membership->get_plan() ) );
-				$url = ! $this->using_permalinks && Framework\SV_WC_Helper::str_starts_with( $url, '&' ) ? ltrim( $url, '&' ) : untrailingslashit( $url );
+				$user_membership = isset( $user_memberships[0] ) ? $user_memberships[0] : null;
+
+				if ( $user_membership && $user_membership->is_active() ) {
+
+					$members_area_sections = $user_membership->get_plan()->get_members_area_sections();
+
+					// don't change the members area link if there are no sections to display
+					if ( ! empty( $members_area_sections ) ) {
+						$url = wc_memberships_get_members_area_url( $user_membership->get_plan() );
+						$url = ! $this->using_permalinks && Framework\SV_WC_Helper::str_starts_with( $url, '&' ) ? ltrim( $url, '&' ) : untrailingslashit( $url );
+					}
+				}
 			}
-
-		} else {
-			$url = $this->endpoint;
 		}
 
-		/**
-		 * Filters the members area endpoint for the account.
-		 *
-		 * @since 1.11.1
-		 *
-		 * @param string $url the members area URL
-		 * @param \WC_Memberships_User_Membership[] $user_memberships the user memberships
-		 * @param string $endpoint the endpoint used by the Members Area
-		 */
-		return apply_filters( 'wc_memberships_members_area_endpoint', $url, $user_memberships, $this->endpoint );
+		return $url;
 	}
 
 
@@ -358,8 +339,8 @@ class WC_Memberships_Members_Area {
 			// add new endpoint if there is at least 1 membership plan defined and the endpoint isn't blank
 			if ( ! empty( $members_area_endpoint ) && wc_memberships()->get_plans_instance()->get_membership_plans_count() > 0 ) {
 
+				$endpoint       = wc_memberships_get_members_area_endpoint();
 				$endpoint_title = esc_html( $this->get_members_area_memberships_endpoint_title() );
-				$endpoint       = $this->get_members_area_memberships_endpoint();
 
 				if ( array_key_exists( 'orders', $items ) ) {
 					$items = Framework\SV_WC_Helper::array_insert_after( $items, 'orders', array( $endpoint => $endpoint_title ) );
@@ -390,7 +371,7 @@ class WC_Memberships_Members_Area {
 
 		if ( ! $this->is_members_area_section() ) {
 
-			$members_area_endpoint = $this->get_members_area_memberships_endpoint();
+			$members_area_endpoint = wc_memberships_get_members_area_endpoint();
 
 			if ( $endpoint === $members_area_endpoint ) {
 
@@ -439,7 +420,7 @@ class WC_Memberships_Members_Area {
 		$available_sections = wc_memberships_get_members_area_sections( $membership_plan );
 		$plan_sections      = $membership_plan->get_members_area_sections();
 		$menu_items         = array( 'back-to-memberships' => array(
-			'url'   => 1 === $memberships_count ? wc_get_account_endpoint_url( 'dashboard' ) : wc_get_account_endpoint_url( $this->endpoint ),
+			'url'   => 1 === $memberships_count && $this->redirect_to_single_membership( $user_memberships ) ? wc_get_account_endpoint_url( 'dashboard' ) : wc_get_account_endpoint_url( $this->endpoint ),
 			/* translators: Placeholder: %s - "Back to Memberships" or "Back to Dashboard" label to return back to the memberships list or the My Account dashboard */
 			'label' => sprintf( __( 'Back to %s', 'woocommerce-memberships' ), 1 === $memberships_count ? __( 'Dashboard', 'woocommerce-memberships' ) : $this->get_members_area_memberships_endpoint_title() ),
 			'class' => '',
@@ -660,6 +641,33 @@ class WC_Memberships_Members_Area {
 
 
 	/**
+	 * Determines whether the Members Area should redirect directly to a membership plan's sections if it's the sole plan.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param null|int[]|\WC_Memberships_User_Membership[] array of memberships, otherwise it will try to get memberships count for the current user
+	 * @return bool
+	 */
+	private function redirect_to_single_membership( $user_memberships = null ) {
+
+		/**
+		 * Filters whether to redirect directly to a membership plan's sections if the user only has one membership.
+		 *
+		 * @since 1.13.0
+		 *
+		 * @param bool $redirect default true
+		 */
+		$redirect = (bool) apply_filters( 'wc_memberships_my_account_redirect_to_single_membership', true );
+
+		if ( $redirect && null === $user_memberships ) {
+			$user_memberships = wc_memberships_get_user_memberships( get_current_user_id() );
+		}
+
+		return $redirect && is_array( $user_memberships ) && 1 === count( $user_memberships );
+	}
+
+
+	/**
 	 * Renders the members area content.
 	 *
 	 * @internal
@@ -670,23 +678,21 @@ class WC_Memberships_Members_Area {
 
 		$the_content = '';
 
-		if ( $this->is_members_area() ) {
+		if ( $this->is_members_area() ) :
 
 			$user_id         = get_current_user_id();
 			$user_membership = $this->get_members_area_user_membership();
 
 			// check if membership exists and the current logged in user is an active or at least a delayed member.
 			if (    ( $user_membership && ( $user_id === $user_membership->get_user_id() ) )
-			     && ( wc_memberships_is_user_active_member( $user_id, $user_membership->get_plan() ) || wc_memberships_is_user_delayed_member( $user_id, $user_membership->get_plan() ) ) ) {
+			     && ( wc_memberships_is_user_active_member( $user_id, $user_membership->get_plan() ) || wc_memberships_is_user_delayed_member( $user_id, $user_membership->get_plan() ) ) ) :
 
 				// sections for this membership defined in admin
 				$sections     = (array) $user_membership->get_plan()->get_members_area_sections();
 				$members_area = array_intersect_key( wc_memberships_get_members_area_sections(), array_flip( $sections ) );
 
 				// Members Area should have at least one section enabled
-				if ( ! empty( $members_area ) ) {
-
-					ob_start();
+				if ( ! empty( $members_area ) ) :
 
 					// Get the section to display, or use the first designated section as fallback:
 					$section = $this->get_members_area_section();
@@ -694,32 +700,87 @@ class WC_Memberships_Members_Area {
 					// Get a paged request for the given section:
 					$paged   = $this->get_members_area_section_page();
 
+					ob_start();
+
 					?>
 					<div
 						class="my-membership-section <?php echo sanitize_html_class( $section ); ?>"
 						id="wc-memberships-members-area-section"
 						data-section="<?php echo esc_attr( $section ); ?>"
 						data-page="<?php echo esc_attr( $paged ); ?>">
-						<?php $this->get_template( $section, array(
+						<?php
+
+						/**
+						 * Fires before Members Area template output.
+						 *
+						 * @since 1.4.0
+						 *
+						 * @param string $section members area section
+						 * @param \WC_Memberships_User_Membership $user_membership the customer membership
+						 */
+						do_action( 'wc_memberships_before_members_area', $section, $user_membership );
+
+						$this->get_template( $section, array(
 							'user_membership' => $user_membership,
 							'user_id'         => $user_id,
 							'paged'           => $paged,
-						) ); ?>
+						) );
+
+						/**
+						 * Fires after Members Area template output.
+						 *
+						 * @since 1.4.0
+						 *
+						 * @param string $section members area section
+						 * @param \WC_Memberships_User_Membership $user_membership the customer membership
+						 */
+						do_action( 'wc_memberships_after_members_area', $section, $user_membership );
+
+						?>
 					</div>
 					<?php
 
 					// grab everything that was output above while processing any shortcode in between
 					$the_content = do_shortcode( ob_get_clean() );
-				}
 
-			} else {
+				endif;
 
-				wc_get_template( 'myaccount/my-memberships.php', array(
-					'customer_memberships' => wc_memberships_get_user_memberships(),
-					'user_id'              => get_current_user_id(),
-				) );
-			}
-		}
+			else :
+
+				ob_start();
+
+				?>
+				<div class="woocommerce-account-my-memberships">
+					<?php
+
+					/**
+					 * Fires before the Memberships table in My Account page.
+					 *
+					 * @since 1.4.0
+					 */
+					do_action( 'wc_memberships_before_my_memberships' );
+
+					wc_get_template( 'myaccount/my-memberships.php', array(
+						'customer_memberships' => wc_memberships_get_user_memberships(),
+						'user_id'              => get_current_user_id(),
+					) );
+
+					/**
+					 * Fires after the Memberships table in My Account page.
+					 *
+					 * @since 1.4.0
+					 */
+					do_action( 'wc_memberships_after_my_memberships' );
+
+					?>
+				</div>
+				<?php
+
+				$the_content = ob_get_clean();
+
+			endif;
+
+		endif;
 
 		echo $the_content;
 	}
@@ -844,39 +905,23 @@ class WC_Memberships_Members_Area {
 
 
 	/**
-	 * Backwards compatibility handler for deprecated methods.
+	 * Adds the members area query var to WooCommerce query vars.
 	 *
-	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-06-23}
+	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes earlier {FN 2019-01-28}
 	 *
-	 * @since 1.9.0
+	 * @internal
 	 *
-	 * @param string $method method name
-	 * @param array $args optional arguments passed to method call
-	 * @return null|mixed|void
+	 * @since 1.10.1
+	 * @deprecated since 1.13.0
+	 *
+	 * @param string[] $query_vars array of query vars
+	 * @return string[]
 	 */
-	public function __call( $method, $args ) {
+	public function add_query_var( $query_vars ) {
 
-		$class      = __CLASS__;
-		$deprecated = "{$class}::{$method}()";
+		_deprecated_function( '\WC_Memberships_Members_Area::add_query_var()', '1.13.0' );
 
-		switch ( $method ) {
-
-			/* @deprecated since 1.9.0 - remove by version 1.13.0 or higher {FN 2017-08-18} */
-			case 'filter_breadcrumbs' :
-				_deprecated_function( $deprecated, '1.9.0', "{$class}::filter_account_page_breadcrumbs()" );
-				return $this->adjust_account_page_breadcrumbs( $args );
-
-			/* @deprecated since 1.9.0 - remove by version 1.13.0 or higher {FN 2017-08-18} */
-			case 'my_account_memberships' :
-				_deprecated_function( $deprecated, '1.9.0', "{$class}::output_members_area()" );
-				$this->output_members_area();
-				return null;
-
-			// you're probably doing it wrong...
-			default :
-				trigger_error( "Call to undefined method {$deprecated}", E_USER_ERROR );
-				return null;
-		}
+		return $query_vars;
 	}
 
 

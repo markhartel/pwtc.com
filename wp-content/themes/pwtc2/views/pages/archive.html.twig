@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+    {% block content %}
+        <section class="news">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <div class="cell title"><h1>{% if title is defined %}{{ title }}{% endif %}</h1></div>
+                </div>
+                <div class="grid-x grid-padding-x small-up-1 medium-up-2 large-up-4">
+                    {% for post in posts %}
+                        <div class="cell">
+                            {% include 'teasers/post.html.twig' %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% include 'partials/pagination.html.twig' %}
+        </section>
+{% endblock %}

@@ -1,0 +1,13 @@
+<div class="comment-form">
+    <form class="comment-form" method="post" action="{{ site.site_url~'/wp-comments-post.php' }}">
+            <input type="hidden" name="email" value="{{ user.email }}">
+            <input type="hidden" name="author" value="{{ user.name }}">
+            <input type="hidden" name="url" value="{{ user.link }}">
+        <label>
+            <textarea placeholder="Leave a comment..." name="comment" cols="60" rows="3"></textarea>
+        </label>
+        <input name="comment_post_ID" value="{{ post.id }}" type="hidden">
+        <input name="comment_parent"  value="{{ comment.ID|default('0') }}" type="hidden">
+        <button type="submit" name="Submit" class="primary button">Add Comment</button>
+    </form>
+</div>

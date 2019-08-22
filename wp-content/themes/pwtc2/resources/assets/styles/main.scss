@@ -251,3 +251,22 @@ a.scroll-to-top {
         }
     }
 }
+
+// comments
+.blog-comment {
+  border: 1px solid $medium-gray;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  background-color: #F6F6F6;
+}
+.comment-box {
+  padding-left: 1rem;
+}
+.comment-author {
+  font-weight: bold;
+}
+.comment-content {
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+}

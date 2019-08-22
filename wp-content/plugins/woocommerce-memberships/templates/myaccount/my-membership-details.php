@@ -29,16 +29,13 @@ defined( 'ABSPATH' ) or exit;
  * @type \WC_Memberships_User_Membership $customer_membership the current user membership being displayed
  * @type array $membership_details associative array of settings data
  *
- * @version 1.12.0
+ * @version 1.13.0
  * @since 1.9.0
  */
 
-do_action( 'wc_memberships_before_members_area', 'my-membership-details', $customer_membership );
+if ( ! empty( $membership_details ) && is_array( $membership_details ) ) :
 
-?>
-
-<?php if ( ! empty( $membership_details ) && is_array( $membership_details ) ) : ?>
-
+	?>
 	<table class="shop_table shop_table_responsive my_account_orders my_account_memberships my_membership_settings">
 		<thead>
 			<tr>
@@ -54,11 +51,7 @@ do_action( 'wc_memberships_before_members_area', 'my-membership-details', $custo
 			<?php endforeach; ?>
 		</tbody>
 	</table>
+	<?php
 
-<?php endif; ?>
-
-<?php
-
-do_action( 'wc_memberships_after_members_area', 'my-membership-details', $customer_membership );
-
+endif;
 

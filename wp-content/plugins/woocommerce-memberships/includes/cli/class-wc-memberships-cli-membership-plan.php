@@ -21,12 +21,13 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 /**
  * Manage Membership Plans from WP CLI.
  *
  * @since 1.7.0
+ * @deprecated since 1.13.0
  */
 class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 
@@ -54,6 +55,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * * length
 	 * * start_date
 	 * * end_date
+	 * * members_area_sections
 	 * * rules
 	 *
 	 * ## EXAMPLES
@@ -68,6 +70,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -271,6 +274,12 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 				}
 			}
 
+			if ( empty( $data['members_area_sections'] ) ) {
+				$membership_plan->set_members_area_sections();
+			} else {
+				$membership_plan->set_members_area_sections( array_map( 'trim', explode( ',', $data['members_area_sections'] ) ) );
+			}
+
 			if ( ! empty( $data['rules'] ) ) {
 
 				$rules = json_decode( $data['rules'], true );
@@ -318,6 +327,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -556,6 +566,15 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 				}
 			}
 
+			if ( isset( $data['members_area_sections'] ) ) {
+
+				if ( '' === trim( $data['members_area_sections'] ) ) {
+					$membership_plan->set_members_area_sections( array() );
+				} else {
+					$membership_plan->set_members_area_sections( array_map( 'trim', explode( ',', $data['members_area_sections'] ) ) );
+				}
+			}
+
 			if ( ! empty( $data['rules'] ) ) {
 
 				$rules = json_decode( $data['rules'], true );
@@ -586,6 +605,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * Sets rules for a given Membership Plan.
 	 *
 	 * @since 1.12.3
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WC_Memberships_Membership_Plan $membership_plan plan to set rules for
 	 * @param array $rules associative array of rules data
@@ -703,11 +723,14 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param int[] $args only the first id will be used
 	 * @param array $assoc_args formatting arguments
 	 */
 	public function get( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc membership_plan get' ) );
 
 		try {
 
@@ -733,6 +756,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * Get default format fields that will be used in `list` and `get` subcommands.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @return string
 	 */
@@ -766,6 +790,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * Get Membership Plan data.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WC_Memberships_Membership_Plan $membership_plan
 	 * @return array
@@ -853,11 +878,14 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * @subcommand list
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
 	public function list_( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc membership_plan list' ) );
 
 		$query_args = $this->get_list_query_args( $assoc_args );
 		$formatter  = $this->get_formatter( $assoc_args );
@@ -884,6 +912,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * @see WC_Memberships_CLI_Membership_Plan::list__()
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param array $args arguments from command line
 	 * @return array
@@ -904,6 +933,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 * Format posts from WP_Query result to items.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param \WP_Post[] $posts array of post objects
 	 * @return array items
@@ -945,6 +975,7 @@ class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
 	 *
 	 * @param int|int[] $args
 	 * @param array $assoc_args

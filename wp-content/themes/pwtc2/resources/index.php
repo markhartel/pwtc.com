@@ -77,6 +77,7 @@ if(is_singular())
         else
         {
             $template = 'two-column.html.twig';
+            $context['comments'] = comments_open();
         }
     }
 }
@@ -86,6 +87,7 @@ elseif(get_post_type() == 'newsletter')
     $context['title'] = 'Newsletter Articles';
     if($context['title'] == "Archives") { $context['title'] = "Newsletters"; }
     $context['posts'] = new PostQuery();
+    $context['comments'] = comments_open();
 }
 else
 {

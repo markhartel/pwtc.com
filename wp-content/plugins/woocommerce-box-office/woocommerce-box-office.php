@@ -1,17 +1,17 @@
 <?php
 /**
  * Plugin Name: WooCommerce Box Office
- * Version: 1.1.11
+ * Version: 1.1.12
  * Plugin URI: https://www.woocommerce.com/products/woocommerce-box-office/
  * Description: The ultimate event ticket management system, built right on top of WooCommerce.
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/
  * License: GPL-2.0+
  * Requires at least: 4.4
- * Tested up to: 4.8
+ * Tested up to: 5.0
  * Text Domain: woocommerce-box-office
  * Domain Path: /languages
- * WC tested up to: 3.5
+ * WC tested up to: 3.6
  * WC requires at least: 2.6
  *
  * Woo: 1628717:e704c9160de318216a8fa657404b9131
@@ -51,7 +51,7 @@ if ( is_woocommerce_active() ) {
 	 * @return object WC_Box_Office.
 	 */
 	function WCBO() {
-		$instance = WC_Box_Office::instance( __FILE__, '1.1.11' );
+		$instance = WC_Box_Office::instance( __FILE__, '1.1.12' );
 
 		return $instance;
 	}

@@ -49,7 +49,7 @@ function wc_memberships_get_memberships_from_subscription( $subscription ) {
  * @since 1.8.0
  * @deprecated since 1.10.6
  *
- * TODO remove this deprecated function by version 1.13.0 {FN 2018-07-26}
+ * TODO remove this deprecated function by version 1.14.0 {FN 2018-07-26}
  *
  * @param int|\WC_Memberships_User_Membership|\WC_Memberships_Integration_Subscriptions_User_Membership $user_membership the user membership
  * @return bool

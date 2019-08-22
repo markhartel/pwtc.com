@@ -188,7 +188,7 @@ class WC_Box_Office_Ticket_Barcode {
 		if ( $args['post_ajax'] && $args['ticket_id'] ) {
 			$js .= sprintf(
 				'var ajax_args = %1$s; ajax_args.ticket_barcode_image = $( "%2$s" ).attr( "%3$s" );',
-				json_encode( array(
+				wp_json_encode( array(
 					'action'              => 'save_ticket_barcode',
 					'ticket_id'           => $args['ticket_id'],
 					'ticket_barcode_text' => $args['text'],
@@ -262,7 +262,7 @@ class WC_Box_Office_Ticket_Barcode {
 				break;
 		}
 
-		return json_encode( $args );
+		return wp_json_encode( $args );
 	}
 
 	/**
@@ -295,7 +295,7 @@ class WC_Box_Office_Ticket_Barcode {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		return json_encode( $args );
+		return wp_json_encode( $args );
 	}
 
 	/**
@@ -351,7 +351,7 @@ class WC_Box_Office_Ticket_Barcode {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		return json_encode( $args );
+		return wp_json_encode( $args );
 	}
 
 	/**

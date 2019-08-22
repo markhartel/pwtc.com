@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_3_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_4_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1140,7 +1140,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	/**
 	 * Backwards compatibility handler for deprecated methods.
 	 *
-	 * TODO remove deprecated methods when they are at least 3 minor versions older (as in x.Y.z semantic versioning) {FN 2017-23-06}
+	 * TODO remove deprecated methods when they are at least 18 months old or by the next major release (e.g. 2.0.0), whichever comes earlier {FN 2019-01-28}
 	 *
 	 * @since 1.10.0
 	 *
@@ -1154,37 +1154,37 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 
 		switch ( $method ) {
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'get_fields' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return array();
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'render_section' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'render_content' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'render_file_upload_field' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'render_date_range_field' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'set_admin_page_title' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return isset( $args[0] ) ? $args[0] : '';
 
-			/* @deprecated  since 1.10.0 - remove this method by 1.13.0 */
+			/* @deprecated since 1.10.0 - remove this method by October 2019 or by version 2.0.0 */
 			case 'process_import' :
 				_deprecated_function( $deprecated, '1.10.0' );
 				return null;
