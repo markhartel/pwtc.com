@@ -940,7 +940,7 @@ if( function_exists('acf_add_local_field_group') ):
                     'class' => '',
                     'id' => '',
                 ),
-                'default_value' => '2',
+                'default_value' => '',
                 'placeholder' => '',
                 'prepend' => '',
                 'append' => '',
