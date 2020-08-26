@@ -51,7 +51,11 @@
                 <div>
                     {% include 'partials/ride-calendarlink.html.twig' with {date: post.get_field('date')} only %}
                     <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
-                    <a href="/ride-online-signup/?post={{ post.id }}" class="dark button"><i class="fa fa-user-plus"></i> Online Signup</a>
+                    {% if logged_in %}
+                        <a href="/ride-online-signup/?post={{ post.id }}" class="dark button"><i class="fa fa-user-plus"></i> Online Signup</a>
+                    {% else %}
+                        <a href="/ride-online-nonmember-signup/?post={{ post.id }}" class="dark button"><i class="fa fa-user-plus"></i> Online Signup</a>
+                    {% endif %}
                     {% if user_can_cancel %}
                         <a href="/ride-view-signups/?post={{ post.id }}" class="dark button"><i class="fa fa-users"></i> View Signups</a>
                         {% if post.get_field('is_canceled') %}
