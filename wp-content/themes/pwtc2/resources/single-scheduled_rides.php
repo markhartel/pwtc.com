@@ -91,6 +91,7 @@ while ($tok !== false) {
 $data['description'] = $desc2;
 $data['user_can_cancel'] = can_cancel_ride(get_the_ID());
 $data['current_url'] = get_permalink();
+$data['logged_in'] = wp_get_current_user()->ID != 0;
 
 // render
 $timber->render('pages/single-ride.html.twig', $data);
