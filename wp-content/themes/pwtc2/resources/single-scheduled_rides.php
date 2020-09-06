@@ -91,7 +91,24 @@ while ($tok !== false) {
 $data['description'] = $desc2;
 $data['user_can_cancel'] = can_cancel_ride(get_the_ID());
 $data['current_url'] = get_permalink();
-$data['logged_in'] = wp_get_current_user()->ID != 0;
+
+if (function_exists('pwtc_mapdb_get_signup_mode')) {
+    $signup = pwtc_mapdb_get_signup_mode();
+    if ($signup['mode'] == 'no') {
+        $data['allow_signup'] = false;
+    }
+    else {
+        $data['allow_signup'] = true;
+    }
+    $data['view_signup'] = true;
+    $data['signup_msg'] = $signup['message'];
+    $data['signup_url'] = $signup['signup_url'];
+    $data['signup_view_url'] = $signup['view_url'];
+}
+else {
+    $data['allow_signup'] = false;
+    $data['view_signup'] = false;
+}
 
 // render
 $timber->render('pages/single-ride.html.twig', $data);
