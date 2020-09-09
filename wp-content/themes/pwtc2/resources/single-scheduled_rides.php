@@ -92,22 +92,19 @@ $data['description'] = $desc2;
 $data['user_can_cancel'] = can_cancel_ride(get_the_ID());
 $data['current_url'] = get_permalink();
 
-if (function_exists('pwtc_mapdb_get_signup_mode')) {
-    $signup = pwtc_mapdb_get_signup_mode();
-    if ($signup['mode'] == 'no') {
-        $data['allow_signup'] = false;
-    }
-    else {
-        $data['allow_signup'] = true;
-    }
-    $data['view_signup'] = true;
-    $data['signup_msg'] = $signup['message'];
-    $data['signup_url'] = $signup['signup_url'];
-    $data['signup_view_url'] = $signup['view_url'];
+if (function_exists('pwtc_mapdb_get_signup')) {
+    $signup = pwtc_mapdb_get_signup();
+    $data['view_signup_url'] = $signup['view_signup_url'];
+    $data['edit_ride_url'] = $signup['edit_ride_url'];
+    $data['ride_signup_msg'] = $signup['ride_signup_msg'];
+    $data['ride_signup_url'] = $signup['ride_signup_url'];
+
 }
 else {
-    $data['allow_signup'] = false;
-    $data['view_signup'] = false;
+    $data['view_signup_url'] = false;
+    $data['edit_ride_url'] = false;
+    $data['ride_signup_msg'] = false;
+    $data['ride_signup_url'] = false;
 }
 
 // render
