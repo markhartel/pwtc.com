@@ -66,6 +66,15 @@ $desc2 = "";
 $tok = strtok($desc, " \n\t\r");
 while ($tok !== false) {
     if (0 === strpos($tok, 'http://') or 0 === strpos($tok, 'https://')) {
+        $idx = strpos($tok, '<');
+        if ($idx !== false) {
+	        $link = substr($tok, 0, $idx);
+	        $rem = substr($tok, $idx);
+	        $tok = $link;
+        }
+        else {
+	        $rem = "";
+        }
         $strings = explode("|", $tok, 3);
         $ref = $strings[0];
         $label = $ref;
@@ -80,7 +89,7 @@ while ($tok !== false) {
                 }
             }
         }
-        $desc2 .= '<a href="' . $ref . '" target="_blank">' . $label . '</a>' . $end;
+        $desc2 .= '<a href="' . $ref . '" target="_blank">' . $label . '</a>' . $end . $rem;
     }
     else {
         $desc2 .= $tok;
