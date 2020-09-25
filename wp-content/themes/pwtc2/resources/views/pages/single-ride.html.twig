@@ -10,7 +10,7 @@
                 {% elseif ride_signup_msg %}
                     <div class="callout warning">{{ ride_signup_msg }} 
                     {% if ride_signup_url %}
-                        <br><a href="{{ ride_signup_url }}" class="dark button"><i class="fa fa-user-plus"></i> Signup</a>
+                        <br><a href="{{ ride_signup_url }}" class="dark button"><i class="fa fa-user-plus"></i> Sign-up</a>
                     {% endif %}
                     </div>
                 {% endif %}
@@ -59,7 +59,7 @@
                     <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
                     {% if user_can_cancel %}
                         {% if view_signup_url %}
-                            <a href="{{ view_signup_url }}" class="dark button"><i class="fa fa-users"></i> View Signups</a>
+                            <a href="{{ view_signup_url }}" class="dark button"><i class="fa fa-users"></i> View Sign-ups</a>
                         {% endif %}
                         {% if edit_ride_url %}
                             <a href="{{ edit_ride_url }}" class="dark button"><i class="fa fa-pencil-square-o"></i> Edit Ride</a>
