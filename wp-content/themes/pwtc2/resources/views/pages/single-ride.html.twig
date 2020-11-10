@@ -64,6 +64,9 @@
                         {% if edit_ride_url %}
                             <a href="{{ edit_ride_url }}" class="dark button"><i class="fa fa-pencil-square-o"></i> Edit Ride</a>
                         {% endif %}
+                        {% if copy_ride_url %}
+                            <a href="{{ copy_ride_url }}" class="dark button"><i class="fa fa-clone"></i> Copy Ride</a>
+                        {% endif %}
                         {% if post.get_field('is_canceled') %}
                             <a href="{{ current_url }}?canceled=0" class="success button"><i class="far fa-calendar-check"></i> Allow Ride</a>
                         {% else %}
