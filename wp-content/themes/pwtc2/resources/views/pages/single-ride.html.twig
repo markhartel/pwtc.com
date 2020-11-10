@@ -46,7 +46,7 @@
                 <div class="row column location">
                     <h4>Start Location </h4>
                     <div>
-                        <p>{{ post.get_field('start_location').address }}</p>
+                        <p>{{ post.get_field('start_location').address }}<br><em>{{ post.get_field('start_location_comment') }}</em></p>
                     </div>
                     <div class="google-maps">
                         <div class="acf-map">
