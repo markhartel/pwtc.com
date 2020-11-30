@@ -66,6 +66,15 @@ $desc2 = "";
 $tok = strtok($desc, " \n\t\r");
 while ($tok !== false) {
     if (0 === strpos($tok, 'http://') or 0 === strpos($tok, 'https://')) {
+        $idx = strpos($tok, '<');
+        if ($idx !== false) {
+	        $link = substr($tok, 0, $idx);
+	        $rem = substr($tok, $idx);
+	        $tok = $link;
+        }
+        else {
+	        $rem = "";
+        }
         $strings = explode("|", $tok, 3);
         $ref = $strings[0];
         $label = $ref;
@@ -80,7 +89,7 @@ while ($tok !== false) {
                 }
             }
         }
-        $desc2 .= '<a href="' . $ref . '" target="_blank">' . $label . '</a>' . $end;
+        $desc2 .= '<a href="' . $ref . '" target="_blank">' . $label . '</a>' . $end . $rem;
     }
     else {
         $desc2 .= $tok;
@@ -96,6 +105,7 @@ if (function_exists('pwtc_mapdb_get_signup')) {
     $signup = pwtc_mapdb_get_signup();
     $data['view_signup_url'] = $signup['view_signup_url'];
     $data['edit_ride_url'] = $signup['edit_ride_url'];
+    $data['copy_ride_url'] = $signup['copy_ride_url'];
     $data['ride_signup_msg'] = $signup['ride_signup_msg'];
     $data['ride_signup_url'] = $signup['ride_signup_url'];
 
@@ -103,6 +113,7 @@ if (function_exists('pwtc_mapdb_get_signup')) {
 else {
     $data['view_signup_url'] = false;
     $data['edit_ride_url'] = false;
+    $data['copy_ride_url'] = false;
     $data['ride_signup_msg'] = false;
     $data['ride_signup_url'] = false;
 }
