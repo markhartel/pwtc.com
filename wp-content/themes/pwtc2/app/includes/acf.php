@@ -10,7 +10,7 @@ if(function_exists('acf_add_options_page')) {
 }
 
 add_action('acf/init', function () {
-    acf_update_setting('google_api_key', 'AIzaSyCavyNjzJr3if7RNsq30NJYNtByBpSUjcA');
+    acf_update_setting('google_api_key', 'AIzaSyA63eXgkaChEypOBm2bGq9TazRaHzTcRhc');
 });
 
 if( function_exists('acf_add_local_field_group') ):
