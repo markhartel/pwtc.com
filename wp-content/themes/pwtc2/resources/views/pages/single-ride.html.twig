@@ -7,7 +7,7 @@
                 <h1 class="{% if post.get_field('is_canceled') %}canceled{% endif %}">{{ post.title() }}</h1>
                 {% if post.get_field('is_canceled') %}
                     <h3>This ride has been canceled!</h3>
-                {% elseif ride_signup_msg %}
+                {% elseif ride_signup_msg and is_published %}
                     <div class="callout warning">{{ ride_signup_msg }} 
                     {% if ride_signup_url %}
                         <br><a href="{{ ride_signup_url }}" class="dark button"><i class="fa fa-user-plus"></i> Sign-up</a>
@@ -55,15 +55,11 @@
                     </div>
                 </div>
                 <div>
-                    {% include 'partials/ride-calendarlink.html.twig' with {date: post.get_field('date')} only %}
-                    <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
-                    {% if copy_ride_url %}
-                        <a href="{{ copy_ride_url }}" class="dark button"><i class="fa fa-clone"></i> Copy Ride</a>
+                    {% if is_published %}
+                        {% include 'partials/ride-calendarlink.html.twig' with {date: post.get_field('date')} only %}
+                        <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
                     {% endif %}
-                    {% if user_can_cancel %}
-                        {% if edit_ride_url %}
-                            <a href="{{ edit_ride_url }}" class="dark button"><i class="fa fa-pencil-square-o"></i> Edit Ride</a>
-                        {% endif %}
+                    {% if user_can_cancel and is_published %}
                         {% if view_signup_url %}
                             <a href="{{ view_signup_url }}" class="dark button"><i class="fa fa-users"></i> View Sign-ups</a>
                         {% endif %}
@@ -72,6 +68,12 @@
                         {% else %}
                             <a href="{{ current_url }}?canceled=1" class="alert button"><i class="far fa-calendar-times"></i> Cancel Ride</a>
                         {% endif %}
+                    {% endif %}
+                    {% if edit_ride_url %}
+                        <a href="{{ edit_ride_url }}" class="dark button"><i class="fa fa-pencil-square-o"></i> Edit Ride</a>
+                    {% endif %}
+                    {% if copy_ride_url %}
+                        <a href="{{ copy_ride_url }}" class="dark button"><i class="fa fa-clone"></i> Copy Ride</a>
                     {% endif %}
                 </div>
             </article>
