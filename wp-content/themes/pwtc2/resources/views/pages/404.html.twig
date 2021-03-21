@@ -1,12 +1,11 @@
 {% extends 'base.html.twig' %}
 {% set title = '404 Page Not Found' %}
 {% block content %}
-    <div class="grid-container">
-        <div class="grid-x grid-padding-x">
-            <article class="cell">
-                <h2>Search</h2>
-                {{ function('get_search_form') }}
-            </article>
-        </div>
+<section class="two-col-section">
+    <div style="min-height: 100px"></div>
+    <div class="row column">
+        <h3>404 - Page Not Found</h3>
     </div>
+    <div style="min-height: 100px"></div>
+</section>
 {% endblock %}
