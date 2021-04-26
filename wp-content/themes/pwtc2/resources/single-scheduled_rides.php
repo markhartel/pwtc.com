@@ -14,6 +14,7 @@ if(isset($_GET['canceled']) && can_cancel_ride(get_the_ID())) {
 }
 
 $data['is_published'] = get_post_status() == 'publish';
+$data['is_pending'] = get_post_status() == 'pending';
 
 if(get_field('attach_map')) {
     $length = null;
