@@ -11,6 +11,7 @@ $data['post'] = $timber::get_post();
 $data['terrain'] = get_field('terrain');
 $data['length'] = get_field('length');
 $data['max_length'] = get_field('max_length');
+$data['maps'] = get_field('maps');
 $data['current_url'] = get_permalink();
 
 // render
