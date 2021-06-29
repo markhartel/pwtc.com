@@ -18,7 +18,8 @@ if ($raw_map[0]['type'] == 'link') {
 else {
 	$raw_map[0]['title'] = $raw_map[0]['file']['filename'];
 }
-$data['maps'] = $raw_map;$data['current_url'] = get_permalink();
+$data['maps'] = $raw_map;
+$data['current_url'] = get_permalink();
 
 // render
 $timber->render('pages/single-ride_map.html.twig', $data);
