@@ -16,6 +16,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="maps">
+                    {% include 'partials/ride-maps.html.twig' with {maps: maps, type: 'nongroup'} only %}
+                </div>
             </article>
         </div>
     </section>
