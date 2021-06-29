@@ -5,6 +5,13 @@
         <div class="row" data-equalizer data-equalize-on="medium">
             <article class="small-12 medium-8 large-9 columns content ride" data-equalizer-watch>
                 <h1>{{ post.title() }}</h1>
+                {% if not is_published %}
+                    <div class="callout alert">WARNING: This route map is NOT published so it will NOT appear in the map library!
+                    {% if is_pending %}
+                    It is awaiting review by a road captain.
+                    {% endif %}
+                    </div>
+                {% endif %}
                 <div class="row column details">
                     <h4>Details</h4>
                     <div class="row small-up-1 medium-up-2 large-up-3 details">
