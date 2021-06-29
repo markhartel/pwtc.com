@@ -8,6 +8,8 @@ $timber = $container->get('timber');
 $data = $timber::get_context();
 $data['post'] = $timber::get_post();
 
+$data['is_published'] = get_post_status() == 'publish';
+$data['is_pending'] = get_post_status() == 'pending';
 $data['terrain'] = get_field('terrain');
 $data['length'] = get_field('length');
 $data['max_length'] = get_field('max_length');
