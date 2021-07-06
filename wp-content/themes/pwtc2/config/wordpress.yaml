@@ -41,7 +41,7 @@ parameters:
 #    - { id: "font", source: "https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i", deps: ~ }
 #    - { id: "app", source: "%template_uri%/web/stylesheets/app.css", deps: ['font'] }
   wordpress.scripts:
-      - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
+#     - { id: "sharethis", source: "http://w.sharethis.com/button/buttons.js", deps: [], header: false, version: "1.0" }
       - { id: "gmaps", source: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAOx1I4Zr3acY0Mp5kB4kEujdtCO_EBNQw", deps: [], header: false, version: "1.0" }
   wordpress.post_types: []
 #    reviews:
