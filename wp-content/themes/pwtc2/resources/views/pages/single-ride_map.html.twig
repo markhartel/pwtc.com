@@ -26,6 +26,11 @@
                 <div class="maps">
                     {% include 'partials/ride-maps.html.twig' with {maps: maps, type: 'nongroup'} only %}
                 </div>
+                <div>
+                    {% if edit_map_url %}
+                        <a href="{{ edit_map_url }}" class="dark button"><i class="fa fa-pencil-square-o"></i> Edit Map</a>
+                    {% endif %}
+                </div>
             </article>
         </div>
     </section>
