@@ -23,5 +23,13 @@ else {
 $data['maps'] = $raw_map;
 $data['current_url'] = get_permalink();
 
+if (function_exists('pwtc_mapdb_get_map_metadata')) {
+    $metadata = pwtc_mapdb_get_map_metadata();
+    $data['edit_map_url'] = $metadata['edit_map_url'];
+}
+else {
+    $data['edit_map_url'] = false;
+}
+
 // render
 $timber->render('pages/single-ride_map.html.twig', $data);
