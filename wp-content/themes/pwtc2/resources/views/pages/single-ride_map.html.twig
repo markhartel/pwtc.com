@@ -24,7 +24,16 @@
                     </div>
                 </div>
                 <div class="maps">
-                    {% include 'partials/ride-maps.html.twig' with {maps: maps, type: 'nongroup'} only %}
+                    <span class="term">Maps:</span>
+                    <span class="value">
+                        {% for map in maps %}
+                            {% if map.type != "link" %}
+                                <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.file.filename }}</a>
+                            {% elseif map.type != "file"%}
+                                <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.link }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
                 </div>
                 <div>
                     {% if edit_map_url %}
