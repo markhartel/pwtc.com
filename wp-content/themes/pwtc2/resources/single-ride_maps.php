@@ -14,16 +14,6 @@ $data['terrain'] = get_field('terrain');
 $data['length'] = get_field('length');
 $data['max_length'] = get_field('max_length');
 $raw_map = get_field('maps');
-if ($raw_map[0]['type'] == 'both') {
-    $raw_map[0]['title'] = $raw_map[0]['file']['filename'];
-    $raw_map[0]['title2'] = $raw_map[0]['link'];
-}
-else if ($raw_map[0]['type'] == 'link') {
-	$raw_map[0]['title'] = $raw_map[0]['link'];
-}
-else {
-	$raw_map[0]['title'] = $raw_map[0]['file']['filename'];
-}
 $data['maps'] = $raw_map;
 $data['current_url'] = get_permalink();
 
