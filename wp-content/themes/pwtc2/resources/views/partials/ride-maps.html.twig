@@ -1,7 +1,9 @@
 <span class="term">Maps:</span>
 <span class="value">
     {% for map in maps %}
-        {% if map.type == "link" %}
+        {% if map.type == "both" %}
+            {{ map.title }} <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> PDF</a> <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> GPS</a>
+        {% elseif map.type == "link" %}
             <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.title }}</a>
         {% elseif map.type == "file"%}
             <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.title }}</a>
