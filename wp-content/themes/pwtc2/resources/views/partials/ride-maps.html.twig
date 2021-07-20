@@ -4,9 +4,9 @@
         {% if map.type == "both" %}
             {{ map.title }} <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> PDF</a> <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> GPS</a>
         {% elseif map.type == "link" %}
-            <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.title }}</a>
+            <a href="{{ map.link }}" target="_blank">{{ map.title }} <i class="fa fa-link"></i></a>
         {% elseif map.type == "file"%}
-            <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.title }}</a>
+            <a href="{{ map.file.url }}" target="_blank" download>{{ map.title }} <i class="fa fa-download"></i></a>
         {% endif %}
         {% if not loop.last %}, {% else %}
             {% if type == "nongroup" %}
