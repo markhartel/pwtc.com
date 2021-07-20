@@ -28,9 +28,13 @@
                     <span class="value">
                         {% for map in maps %}
                             {% if map.type != "link" %}
-                                <a href="{{ map.file.url }}" target="_blank" download><i class="fa fa-download"></i> {{ map.file.filename }}</a>
-                            {% elseif map.type != "file"%}
-                                <a href="{{ map.link }}" target="_blank"><i class="fa fa-link"></i> {{ map.link }}</a>
+                                <a href="{{ map.file.url }}" target="_blank" download>{{ map.file.filename }} <i class="fa fa-download"></i></a>
+                            {% endif %}
+                            {% if map.type == "both" %}
+                                ,
+                            {% endif %}
+                            {% if map.type != "file"%}
+                                <a href="{{ map.link }}" target="_blank">{{ map.link }} <i class="fa fa-link"></i></a>
                             {% endif %}
                         {% endfor %}
                     </span>
