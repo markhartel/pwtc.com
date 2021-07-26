@@ -1271,6 +1271,7 @@ if( function_exists('acf_add_local_field_group') ):
                         'choices' => array (
                             'link' => 'Link',
                             'file' => 'File',
+                            'both' => 'Both',
                         ),
                         'default_value' => array (
                             0 => 'file',
@@ -1293,8 +1294,8 @@ if( function_exists('acf_add_local_field_group') ):
                             array (
                                 array (
                                     'field' => 'field_57bb665f6797c',
-                                    'operator' => '==',
-                                    'value' => 'link',
+                                    'operator' => '!=',
+                                    'value' => 'file',
                                 ),
                             ),
                         ),
@@ -1317,8 +1318,8 @@ if( function_exists('acf_add_local_field_group') ):
                             array (
                                 array (
                                     'field' => 'field_57bb665f6797c',
-                                    'operator' => '==',
-                                    'value' => 'file',
+                                    'operator' => '!=',
+                                    'value' => 'link',
                                 ),
                             ),
                         ),
