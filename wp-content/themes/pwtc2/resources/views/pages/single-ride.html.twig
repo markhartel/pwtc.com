@@ -53,7 +53,9 @@
                 <div class="row column location">
                     <h4>Start Location </h4>
                     <div>
-                        <p>{{ post.get_field('start_location').address|escape }}<br><em>{{ post.get_field('start_location_comment')|escape }}</em></p>
+                        <p>{{ post.get_field('start_location').address|escape }}
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ post.get_field('start_location').lat }},{{ post.get_field('start_location').lng }}" target="_blank">open in Google Maps</a>
+                        <br><em>{{ post.get_field('start_location_comment')|escape }}</em></p>
                     </div>
                     <div class="google-maps">
                         <div class="acf-map">
