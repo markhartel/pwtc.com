@@ -1509,7 +1509,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'terrain',
                 'type' => 'checkbox',
                 'instructions' => '<b>Flat (a)</b> Basically flat, no steep hills<br />
-<b>Mostly Flat (b)</b> Gently rolling terrain with one or two short hills<br />
+<b>Mostly flat (b)</b> Gently rolling terrain with one or two short hills<br />
 <b>Small hills (c)</b> Moderate terrain with rolling short steep hills or moderate, sustained climbs<br />
 <b>Large hills (d)</b> Difficult terrain with longer, steeper hills <br />
 <b>Mountainous (e)</b> Extreme terrain with frequent steep hills and long sustained climbs',
@@ -1530,7 +1530,7 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'a' => '(A) Flat',
-                    'b' => '(B) Mostly Flat',
+                    'b' => '(B) Mostly flat',
                     'c' => '(C) Small hills',
                     'd' => '(D) Large hills',
                     'e' => '(E) Mountainous',
@@ -1995,7 +1995,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'terrain',
                 'type' => 'checkbox',
                 'instructions' => '<b>Flat (a)</b> Basically flat, no steep hills<br />
-<b>Mostly Flat (b)</b> Gently rolling terrain with one or two short hills<br />
+<b>Mostly flat (b)</b> Gently rolling terrain with one or two short hills<br />
 <b>Small hills (c)</b> Moderate terrain with rolling short steep hills or moderate, sustained climbs<br />
 <b>Large hills (d)</b> Difficult terrain with longer, steeper hills <br />
 <b>Mountainous (e)</b> Extreme terrain with frequent steep hills and long sustained climbs',
@@ -2016,7 +2016,7 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'a' => '(A) Flat',
-                    'b' => '(B) Mostly Flat',
+                    'b' => '(B) Mostly flat',
                     'c' => '(C) Small hills',
                     'd' => '(D) Large hills',
                     'e' => '(E) Mountainous',
