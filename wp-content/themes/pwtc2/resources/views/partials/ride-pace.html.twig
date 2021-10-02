@@ -1,36 +1,12 @@
 <span class="term">Pace:</span>
 {% if pace == "slow" %}
-    <span
-            class="value has-tip"
-            data-tooltip aria-haspopup="true"
-            data-disable-hover="false"
-            tabindex="1"
-            title="Speeds approximately 10-13 mph (or in a group ride, the pace of the slowest rider)"
-    >Slow</span>
+    <span>Slow (8-13 mph)</span>
 {% elseif pace == "leisurely" %}
-    <span
-            class="value has-tip"
-            data-tooltip aria-haspopup="true"
-            data-disable-hover="false"
-            tabindex="1"
-            title="Speeds approximately 13-15 mph"
-    >Leisurely</span>
+    <span>Intermediate (13-15 mph)</span>
 {% elseif pace == "moderate" %}
-    <span
-            class="value has-tip"
-            data-tooltip aria-haspopup="true"
-            data-disable-hover="false"
-            tabindex="1"
-            title="Speeds approximately 15-17 mph"
-    >Moderate</span>
+    <span>Brisk (15-17 mph)</span>
 {% elseif pace == "fast" %}
-    <span
-            class="value has-tip"
-            data-tooltip aria-haspopup="true"
-            data-disable-hover="false"
-            tabindex="1"
-            title="Normally a paceline ride; speeds in excess of 18 mph"
-    >Fast</span>
+    <span>Fast (18+ mph)</span>
 {% else %}
     <span
             class="value has-tip"
@@ -39,4 +15,13 @@
             tabindex="1"
             title="Ride leader has not submitted a pace"
     >N/A</span>
+{% endif %}
+{% if pace != "no" %}
+    <span
+        class="value has-tip"
+        data-tooltip aria-haspopup="true"
+        data-disable-hover="false"
+        tabindex="1"
+        title="Speed indicated is while on a flat or gentle hill terrain—not an average speed, but a cruising speed."
+    ><i class="fa fa-info-circle" aria-hidden="true"></i></span>
 {% endif %}

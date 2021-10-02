@@ -24,20 +24,28 @@
                     </div>
                 </div>
                 <div class="maps">
-                    <span class="term">Maps:</span>
-                    <span class="value">
                         {% for map in maps %}
                             {% if map.type != "link" %}
-                                <a href="{{ map.file.url }}" target="_blank" download>{{ map.file.filename }} <i class="fa fa-download"></i></a>
+                                <span class="term">Map File:</span> <span class="value"><a href="{{ map.file.url }}" target="_blank" download>{{ map.file.filename }} <i class="fa fa-download"></i></a></span><br>
+                                <object
+                                    type="application/pdf"
+                                    width="100%"
+                                    height="400"
+                                    data="{{ map.file.url }}">
+                                </object>
                             {% endif %}
                             {% if map.type == "both" %}
-                                ,
+                                <hr>
                             {% endif %}
                             {% if map.type != "file"%}
-                                <a href="{{ map.link }}" target="_blank">{{ map.link }} <i class="fa fa-link"></i></a>
+                                <span class="term">Map Link:</span> <span class="value"><a href="{{ map.link }}" target="_blank">{{ map.link }} <i class="fa fa-link"></i></a></span><br>
+                                <iframe 
+                                    width="100%"
+                                    height="400"
+                                    src="{{ map.link }}">
+                                </iframe>
                             {% endif %}
                         {% endfor %}
-                    </span>
                 </div>
                 <div>
                     {% if edit_map_url %}

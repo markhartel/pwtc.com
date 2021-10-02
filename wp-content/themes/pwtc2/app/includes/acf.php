@@ -1478,9 +1478,9 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'pace',
                 'type' => 'radio',
                 'instructions' => '<b>N/A</b> Ride leader has not submitted a pace <br />
-<b>Slow</b> Speeds approximately 10-13 mph (or in a group ride, the pace of the slowest rider) <br />
-<b>Leisurely</b> Speeds approximately 13-15 mph <br />
-<b>Moderate</b> Speeds approximately 15-17 mph <br />
+<b>Slow</b> Speeds approximately 8-13 mph (or in a group ride, the pace of the slowest rider) <br />
+<b>Intermediate</b> Speeds approximately 13-15 mph <br />
+<b>Brisk</b> Speeds approximately 15-17 mph <br />
 <b>Fast</b> Normally a paceline ride; speeds in excess of 18 mph',
                 'required' => 1,
                 'conditional_logic' => 0,
@@ -1491,10 +1491,10 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'no' => 'N/A',
-                    'slow' => 'Slow',
-                    'leisurely' => 'Leisurely',
-                    'moderate' => 'Moderate',
-                    'fast' => 'Fast',
+                    'slow' => 'Slow (8-13 mph)',
+                    'leisurely' => 'Intermediate (13-15 mph)',
+                    'moderate' => 'Brisk (15-17 mph)',
+                    'fast' => 'Fast (18+ mph)',
                 ),
                 'allow_null' => 0,
                 'other_choice' => 0,
@@ -1509,7 +1509,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'terrain',
                 'type' => 'checkbox',
                 'instructions' => '<b>Flat (a)</b> Basically flat, no steep hills<br />
-<b>Mostly Flat (b)</b> Gently rolling terrain with one or two short hills<br />
+<b>Mostly flat (b)</b> Gently rolling terrain with one or two short hills<br />
 <b>Small hills (c)</b> Moderate terrain with rolling short steep hills or moderate, sustained climbs<br />
 <b>Large hills (d)</b> Difficult terrain with longer, steeper hills <br />
 <b>Mountainous (e)</b> Extreme terrain with frequent steep hills and long sustained climbs',
@@ -1530,7 +1530,7 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'a' => '(A) Flat',
-                    'b' => '(B) Mostly Flat',
+                    'b' => '(B) Mostly flat',
                     'c' => '(C) Small hills',
                     'd' => '(D) Large hills',
                     'e' => '(E) Mountainous',
@@ -1964,9 +1964,9 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'pace',
                 'type' => 'radio',
                 'instructions' => '<b>N/A</b> Ride leader has not submitted a pace <br />
-<b>Slow</b> Speeds approximately 10-13 mph (or in a group ride, the pace of the slowest rider) <br />
-<b>Leisurely</b> Speeds approximately 13-15 mph <br />
-<b>Moderate</b> Speeds approximately 15-17 mph <br />
+<b>Slow</b> Speeds approximately 8-13 mph (or in a group ride, the pace of the slowest rider) <br />
+<b>Intermediate</b> Speeds approximately 13-15 mph <br />
+<b>Brisk</b> Speeds approximately 15-17 mph <br />
 <b>Fast</b> Normally a paceline ride; speeds in excess of 18 mph',
                 'required' => 1,
                 'conditional_logic' => 0,
@@ -1977,10 +1977,10 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'no' => 'N/A',
-                    'slow' => 'Slow',
-                    'leisurely' => 'Leisurely',
-                    'moderate' => 'Moderate',
-                    'fast' => 'Fast',
+                    'slow' => 'Slow (8-13 mph)',
+                    'leisurely' => 'Intermediate (13-15 mph)',
+                    'moderate' => 'Brisk (15-17 mph)',
+                    'fast' => 'Fast (18+ mph)',
                 ),
                 'allow_null' => 0,
                 'other_choice' => 0,
@@ -1995,7 +1995,7 @@ if( function_exists('acf_add_local_field_group') ):
                 'name' => 'terrain',
                 'type' => 'checkbox',
                 'instructions' => '<b>Flat (a)</b> Basically flat, no steep hills<br />
-<b>Mostly Flat (b)</b> Gently rolling terrain with one or two short hills<br />
+<b>Mostly flat (b)</b> Gently rolling terrain with one or two short hills<br />
 <b>Small hills (c)</b> Moderate terrain with rolling short steep hills or moderate, sustained climbs<br />
 <b>Large hills (d)</b> Difficult terrain with longer, steeper hills <br />
 <b>Mountainous (e)</b> Extreme terrain with frequent steep hills and long sustained climbs',
@@ -2016,7 +2016,7 @@ if( function_exists('acf_add_local_field_group') ):
                 ),
                 'choices' => array (
                     'a' => '(A) Flat',
-                    'b' => '(B) Mostly Flat',
+                    'b' => '(B) Mostly flat',
                     'c' => '(C) Small hills',
                     'd' => '(D) Large hills',
                     'e' => '(E) Mountainous',
