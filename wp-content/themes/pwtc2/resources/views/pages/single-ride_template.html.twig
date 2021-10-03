@@ -5,6 +5,13 @@
         <div class="row" data-equalizer data-equalize-on="medium">
             <article class="small-12 medium-8 large-9 columns content ride" data-equalizer-watch>
                 <h1>{{ post.title() }}</h1>
+                {% if not is_published %}
+                    <div class="callout alert">WARNING: This ride template is NOT published!
+                    {% if is_pending %}
+                    It is awaiting review by a road captain.
+                    {% endif %}
+                    </div>
+                {% endif %}
                 <div class="row column description">
                     {% include 'partials/ride-description.html.twig' with {description: description} only %}
                 </div>
