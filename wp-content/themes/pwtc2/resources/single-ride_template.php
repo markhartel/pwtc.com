@@ -8,6 +8,9 @@ $timber = $container->get('timber');
 $data = $timber::get_context();
 $data['post'] = $timber::get_post();
 
+$data['is_published'] = get_post_status() == 'publish';
+$data['is_pending'] = get_post_status() == 'pending';
+
 if(get_field('attach_map')) {
     $length = null;
     $maxLength = null;
