@@ -27,6 +27,7 @@ add_action('acf/save_post', function ($post_id) {
         update_field('pace', get_field('pace'), $id);
         update_field('description', get_field('description', false, false), $id);
         update_field('start_location', get_field('start_location', false, false), $id);
+        update_field('start_location_comment', get_field('start_location_comment'), $id);
         update_field('ride_leaders', $leaders, $id);
         update_field('attach_map', get_field('attach_map'), $id);
         update_field('maps', get_field('maps', false, false), $id);
