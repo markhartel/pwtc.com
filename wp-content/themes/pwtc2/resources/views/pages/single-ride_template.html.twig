@@ -38,7 +38,9 @@
                 <div class="row column location">
                     <h4>Start Location </h4>
                     <div>
-                        <p>{{ post.get_field('start_location').address|escape }}</p>
+                        <p>{{ post.get_field('start_location').address|escape }}
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ post.get_field('start_location').lat }},{{ post.get_field('start_location').lng }}" target="_blank">Google Maps <i class="fa fa-map-marker"></i></a>
+                        <br><em>{{ post.get_field('start_location_comment')|escape }}</em></p>
                     </div>
                     <div class="google-maps">
                         <div class="acf-map">
