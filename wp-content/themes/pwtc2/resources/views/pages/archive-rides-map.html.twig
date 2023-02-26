@@ -3,15 +3,14 @@
     <section class="main-section">
         <div class="row column">
 
-            <h1 class="text-center">Rides - {{ day_pretty }}</h1>
+            <h1 class="text-center">Rides -&nbsp;{{ day_pretty }}</h1>
 
             <div class="clearfix">
                 <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day_previous_val }}" class="button float-left">
-                    <i class="fa fa-chevron-left"></i> {{ day_previous }}
+                    <i class="fa fa-chevron-left"></i>&nbsp;{{ day_previous }}
                 </a>
                 <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day_next_val }}" class="button float-right">
-                    {{ day_next }}
-                    <i class="fa fa-chevron-right"></i>
+                    {{ day_next }}&nbsp;<i class="fa fa-chevron-right"></i>
                 </a>
             </div>
 
@@ -32,7 +31,7 @@
             {% endif %}
 
             <div class="clearfix">
-                <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_val }}" class="button float-left"><i class="fa fa-chevron-left"></i> Back to {{ month_name }}</a>           
+                <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_val }}" class="button float-left"><i class="fa fa-chevron-left"></i> Back to&nbsp;{{ month_name }}</a>           
             </div>
 
         </div>
