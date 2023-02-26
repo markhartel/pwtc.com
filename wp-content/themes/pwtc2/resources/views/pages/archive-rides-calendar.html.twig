@@ -5,16 +5,15 @@
 
             {{ SP.ACF.get_field('ride_calandar_content', 'option') }}
 
-            <h1 class="text-center">Rides - {{ month_current }} {{ year_current }}</h1>
+            <h1 class="text-center">Rides -&nbsp;{{ month_current }}&nbsp;{{ year_current }}</h1>
 
             {% block months %}
                 <div class="clearfix">
                     <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_previous_val }}" class="button float-left">
-                        <i class="fa fa-chevron-left"></i> {{ month_previous }}
+                        <i class="fa fa-chevron-left"></i>&nbsp;{{ month_previous }}
                     </a>
                     <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_next_val }}" class="button float-right">
-                        {{ month_next }}
-                        <i class="fa fa-chevron-right"></i>
+                        {{ month_next }}&nbsp;<i class="fa fa-chevron-right"></i>
                     </a>
                 </div>
             {% endblock %}
