@@ -1,20 +1,20 @@
 {% for leader in leaders %}
     <div class="leader">
         {{ fn('get_avatar', leader.ID, 256) }}
-        <h5 class="name">{{ leader.user_firstname }} {{ leader.user_lastname }}</h5>
+        <h5 class="name">{{ leader.user_firstname }}&nbsp;{{ leader.user_lastname }}</h5>
         <ul class="contact vertical menu">
             {% if fn('get_field', 'use_contact_email', 'user_'~leader.ID) %}
                 {% if fn('get_field', 'contact_email', 'user_'~leader.ID) %}
-                    <li><a href="mailto:{{ fn('get_field', 'contact_email', 'user_'~leader.ID) }}"><i class="fa fa-envelope"></i> {{ fn('get_field', 'contact_email', 'user_'~leader.ID) }}</a></li>
+                    <li><a href="mailto:{{ fn('get_field', 'contact_email', 'user_'~leader.ID) }}"><i class="fa fa-envelope"></i>&nbsp;{{ fn('get_field', 'contact_email', 'user_'~leader.ID) }}</a></li>
                 {% endif %}
             {% else %}
-                <li><a href="mailto:{{ leader.user_email }}"><i class="fa fa-envelope"></i>{{ leader.user_email }}</a></li>            
+                <li><a href="mailto:{{ leader.user_email }}"><i class="fa fa-envelope"></i>&nbsp;{{ leader.user_email }}</a></li>            
             {% endif %}
             {% if fn('get_field', 'home_phone', 'user_'~leader.ID) %}
-                <li><a href="sms:{{ fn('get_field', 'home_phone', 'user_'~leader.ID) }}"><i class="fa fa-mobile"></i> {{ fn('get_field', 'home_phone', 'user_'~leader.ID) }}</a></li>
+                <li><a href="sms:{{ fn('get_field', 'home_phone', 'user_'~leader.ID) }}"><i class="fa fa-mobile"></i>&nbsp;{{ fn('get_field', 'home_phone', 'user_'~leader.ID) }}</a></li>
             {% endif %}
             {% if fn('get_field', 'cell_phone', 'user_'~leader.ID) %}
-                <li><a href="tel:{{ fn('get_field', 'cell_phone', 'user_'~leader.ID) }}"><i class="fa fa-phone"></i> {{ fn('get_field', 'cell_phone', 'user_'~leader.ID) }}</a></li>
+                <li><a href="tel:{{ fn('get_field', 'cell_phone', 'user_'~leader.ID) }}"><i class="fa fa-phone"></i>&nbsp;{{ fn('get_field', 'cell_phone', 'user_'~leader.ID) }}</a></li>
             {% endif %}
         </ul>
     </div>
