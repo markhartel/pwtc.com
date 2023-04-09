@@ -10,7 +10,7 @@
                 {% elseif ride_signup_msg and is_published %}
                     <div class="callout warning">{{ ride_signup_msg }} 
                     {% if ride_signup_url %}
-                        <br><a href="{{ ride_signup_url }}" class="dark button"><i class="fa fa-user-plus"></i> Sign-up</a>
+                        <br><a href="{{ ride_signup_url }}" class="dark button">{{ ride_signup_btn }}</a>
                     {% endif %}
                     </div>
                 {% endif %}
