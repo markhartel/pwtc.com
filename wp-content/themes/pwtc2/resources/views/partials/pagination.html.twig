@@ -1,35 +1,15 @@
 <nav aria-label="Pagination">
     {% spaceless %}
         <ul class="pagination text-center">
-            {#{% if posts.pagination.prev %}#}
-                {#<li class="pagination-previous">#}
-                    {#<a href="{{posts.pagination.prev.link}}" title="Previous Page">#}
-                        {#<i class="fas fa-long-arrow-alt-left"></i> Previous<span class="show-for-sr">page</span>#}
-                    {#</a>#}
-                {#</li>#}
-            {#{% else %}#}
-                {#<li class="pagination-previous disabled">#}
-                    {#<i class="fas fa-long-arrow-alt-left"></i> Previous <span class="show-for-sr">page</span>#}
-                {#</li>#}
-            {#{% endif %}#}
-            {% for key, page in posts.pagination.pages %}
-                {% if key+1 == posts.pagination.current %}
+            {% for page in posts.pagination.pages %}
+                {% if page.link %}
+                    <li><a href="{{page.link}}" aria-label="Page {{ page.title }}">{{page.title}}</a></li>
+                {% elseif page.title matches '/^\\d+$/' %}
                     <li class="current"><span class="show-for-sr">You're on page</span> {{ page.title }}</li>
                 {% else %}
-                    <li><a href="{{page.link}}" aria-label="Page {{ page.title }}">{{page.title}}</a></li>
+                    <li>{{ page.title }}</li>
                 {% endif %}
             {% endfor %}
-            {#{% if posts.pagination.next %}#}
-                {#<li class="pagination-next">#}
-                    {#<a href="{{posts.pagination.prev.link}}" title="Next Page">#}
-                        {#Next <span class="show-for-sr">page</span> <i class="fas fa-long-arrow-alt-right"></i>#}
-                    {#</a>#}
-                {#</li>#}
-            {#{% else %}#}
-                {#<li class="pagination-next disabled">#}
-                    {#Next <span class="show-for-sr">page</span> <i class="fas fa-long-arrow-alt-right"></i>#}
-                {#</li>#}
-            {#{% endif %}#}
         </ul>
     {% endspaceless %}
 </nav>
