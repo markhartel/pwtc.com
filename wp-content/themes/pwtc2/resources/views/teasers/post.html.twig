@@ -13,6 +13,12 @@
         <i class="fa fa-clipboard"></i>
     {% elseif post.get_field('format') == "gallery" %}
         <i class="fa fa-picture-o"></i>
+    {% elseif post.post_type == 'ride_template' %}
+        <i class="fa fa-bicycle"></i>
+    {% elseif post.post_type == 'scheduled_rides' %}
+        <i class="fa fa-bicycle"></i>
+    {% elseif post.post_type == 'ride_maps' %}
+        <i class="fa fa-map"></i>
     {% else %}
         <i class="fa fa-file-text"></i>
     {% endif %}
