@@ -176,8 +176,8 @@ if ($daily_view) {
         'orderby' => ['date' => 'ASC'],
     ];
     // search term
-    if (isset($_GET['s'])) {
-        $context['args']['s'] = $query_args['s'] = $_GET['s'];
+    if (isset($_GET['title'])) {
+        $context['args']['s'] = $query_args['s'] = $_GET['title'];
     }
     // search terrain
     if (isset($_GET['terrain'])) {
