@@ -19,11 +19,22 @@
                             </ul>
                         </li>
                     </ul>
+                    <div class="float-right" style="padding-top:6px">
                 {% else %}
                     <ul class="login-menu menu float-right">
                         <li><a href="{{ function('wp_login_url') }}" class="tiny primary hollow button">Login</a></li>
                     </ul>
+                    <div class="float-right" style="padding-top:20px">
                 {% endif %}
+                    <form method="get" action="{{ site.url }}">
+                        <div class="input-group">
+		                    <input class="input-group-field" type="search" name="s" value="" placeholder="Enter search text..." required />
+                            <div class="input-group-button">
+                                    <button type="submit" class="clear button" style="border:0"><i class="fa fa-search" aria-hidden="true"></i></button>
+                            </div>
+	                    </div> 
+	                </form>
+	            </div>
             </div>
             <!-- bottom row -->
             <div class="bottom clearfix">
