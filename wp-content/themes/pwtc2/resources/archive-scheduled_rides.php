@@ -190,7 +190,7 @@ if ($daily_view) {
                 $context['args']['terrain'] = $_GET['terrain'];
                 $query_args['meta_query'][] = [
                     'key' => 'terrain',
-                    'value' => $_GET['terrain'],
+                    'value' => '"' . $_GET['terrain'] . '"',
                     'compare' => 'LIKE',
                 ];
                 break;
