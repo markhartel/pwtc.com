@@ -155,7 +155,7 @@ if ($daily_view) {
 
     // get all the scheduled events in the time range
     $context['args'] = [
-        'month' => $current_datetime->format('F'),
+        'month' => $current_datetime->format('Y-m'),
         // populated later
         's' => '',
         'terrain' => '',
