@@ -225,7 +225,8 @@ if ($daily_view) {
                 $context['args']['length'] = $_GET['length'];
                 $query_args['meta_query'][] = [
                     'key' => 'length',
-                    'value' => [0, 2],
+                    'value' => [0, 25],
+                    'type' => 'NUMERIC',
                     'compare' => 'BETWEEN',
                 ];
                 break;
@@ -233,7 +234,8 @@ if ($daily_view) {
                 $context['args']['length'] = $_GET['length'];
                 $query_args['meta_query'][] = [
                     'key' => 'length',
-                    'value' => [2, 5],
+                    'value' => [25, 50],
+                    'type' => 'NUMERIC',
                     'compare' => 'BETWEEN',
                 ];
                 break;
@@ -241,7 +243,8 @@ if ($daily_view) {
                 $context['args']['length'] = $_GET['length'];
                 $query_args['meta_query'][] = [
                     'key' => 'length',
-                    'value' => [5, 10],
+                    'value' => [50, 75],
+                    'type' => 'NUMERIC',
                     'compare' => 'BETWEEN',
                 ];
                 break;
@@ -249,7 +252,17 @@ if ($daily_view) {
                 $context['args']['length'] = $_GET['length'];
                 $query_args['meta_query'][] = [
                     'key' => 'length',
-                    'value' => 10,
+                    'value' => [75, 100],
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                ];
+                break;
+            case 5:
+                $context['args']['length'] = $_GET['length'];
+                $query_args['meta_query'][] = [
+                    'key' => 'length',
+                    'value' => 100,
+                    'type' => 'NUMERIC',
                     'compare' => '>',
                 ];
                 break;
