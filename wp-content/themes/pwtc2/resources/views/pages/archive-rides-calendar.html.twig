@@ -60,10 +60,11 @@
                                         <label>Length
                                             <select name="length">
                                                 <option value="0" {% if not args.length %}selected{% endif %}>Any</option>
-                                                <option value="1" {% if args.length == '1' %}selected{% endif %}>&lt; 2 miles</option>
-                                                <option value="2" {% if args.length == '2' %}selected{% endif %}>2-5 miles</option>
-                                                <option value="3" {% if args.length == '3' %}selected{% endif %}>5-10 miles</option>
-                                                <option value="4" {% if args.length == '4' %}selected{% endif %}>&gt; 10 miles</option>
+                                                <option value="1" {% if args.length == '1' %}selected{% endif %}>0-25 miles</option>
+                                                <option value="2" {% if args.length == '2' %}selected{% endif %}>25-50 miles</option>
+                                                <option value="3" {% if args.length == '3' %}selected{% endif %}>50-75 miles</option>
+                                                <option value="4" {% if args.length == '4' %}selected{% endif %}>75-100 miles</option>
+                                                <option value="5" {% if args.length == '5' %}selected{% endif %}>&gt; 100 miles</option>
                                             </select>
                                         </label>
                                     </div>
