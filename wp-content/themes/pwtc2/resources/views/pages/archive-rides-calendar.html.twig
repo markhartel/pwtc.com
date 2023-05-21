@@ -8,11 +8,12 @@
             <h1 class="text-center">Rides -&nbsp;{{ month_current }}&nbsp;{{ year_current }}</h1>
 
             {% block months %}
-                <div class="clearfix">
-                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_previous_val }}" class="button float-left">
+                <div class="align-justify grid-x grid-padding-x">
+                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_previous_val }}" class="dark button">
                         <i class="fa fa-chevron-left"></i>&nbsp;{{ month_previous }}
                     </a>
-                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_next_val }}" class="button float-right">
+                    <a class="dark button" href="/scheduled_rides_list"><i class="fa fa-list" aria-hidden="true"></i> List View</a>
+                    <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?month={{ month_next_val }}" class="dark button">
                         {{ month_next }}&nbsp;<i class="fa fa-chevron-right"></i>
                     </a>
                 </div>
