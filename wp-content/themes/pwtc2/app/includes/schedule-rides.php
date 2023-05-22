@@ -58,3 +58,54 @@ function can_cancel_ride($post_id) {
 
     return false;
 }
+
+function get_actual_ride_terrain($post_id) {
+    if (get_field('attach_map', $post_id)) {
+        $terrain = [];
+        foreach (get_field('maps', $post_id) as $map) {
+            $map_id = $map;
+            $terrain = array_merge($terrain, get_field('terrain', $map_id));
+        }
+        return array_unique($terrain);
+    }
+    else {
+        return get_field('terrain', $post_id);
+    }
+}
+
+function get_actual_ride_length($post_id) {
+    if (get_field('attach_map', $post_id)) {
+         $length = null;
+         foreach (get_field('maps', $post_id) as $map) {
+            $map_id = $map;
+            if ($length) {
+                $length = min(get_field('length', $map_id), $length);
+            } else {
+                $length = get_field('length', $map_id);
+            }
+        }
+        return $length;
+    }
+    else {
+        return get_field('length', $post_id);
+    }
+}
+
+function get_actual_ride_maxlength($post_id) {
+    if (get_field('attach_map', $post_id)) {
+         $maxlength = null;
+         foreach (get_field('maps', $post_id) as $map) {
+            $map_id = $map;
+            if ($maxlength) {
+                $maxlength = max(get_field('max_length', $map_id), $maxlength, get_field('length', $map_id));
+            } 
+            else {
+                $maxlength = get_field('max_length', $map_id) ?: get_field('length', $map_id);
+            }
+        }
+        return $maxlength;
+    }
+    else {
+        return get_field('max_length', $post_id);
+    }
+}
