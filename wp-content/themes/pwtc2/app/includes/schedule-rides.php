@@ -59,7 +59,7 @@ function can_cancel_ride($post_id) {
     return false;
 }
 
-function get_actual_ride_terrain($post_id) {
+function get_actual_ride_terrain($post_id=false) {
     if (get_field('attach_map', $post_id)) {
         $terrain = [];
         foreach (get_field('maps', $post_id) as $map) {
@@ -73,7 +73,7 @@ function get_actual_ride_terrain($post_id) {
     }
 }
 
-function get_actual_ride_length($post_id) {
+function get_actual_ride_length($post_id=false) {
     if (get_field('attach_map', $post_id)) {
          $length = null;
          foreach (get_field('maps', $post_id) as $map) {
@@ -91,7 +91,7 @@ function get_actual_ride_length($post_id) {
     }
 }
 
-function get_actual_ride_maxlength($post_id) {
+function get_actual_ride_maxlength($post_id=false) {
     if (get_field('attach_map', $post_id)) {
          $maxlength = null;
          foreach (get_field('maps', $post_id) as $map) {
