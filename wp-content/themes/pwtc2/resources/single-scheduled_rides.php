@@ -16,6 +16,7 @@ if(isset($_GET['canceled']) && can_cancel_ride(get_the_ID())) {
 $data['is_published'] = get_post_status() == 'publish';
 $data['is_pending'] = get_post_status() == 'pending';
 
+/*
 if(get_field('attach_map')) {
     $length = null;
     $maxLength = null;
@@ -56,13 +57,16 @@ else {
     $data['max_length'] = get_field('max_length');
     $data['maps'] = false;
 }
+*/
+$data['terrain'] = get_actual_ride_terrain();
+$data['length'] = get_actual_ride_length();
+$data['max_length'] = get_actual_ride_maxlength();
+if ($data['length'] == $data['max_length']) {
+    $data['max_length'] = null;
+}
+$data['maps'] = get_actual_ride_maps();
 
-// Fetch the ride's description, break it into tokens delemited by whitespace
-// and look for strings that start with "http://" or "https://". Convert those
-// strings to HTML links using the following translation rules:
-// 1) http://foo.bar.com becomes <a href="http://foo.bar.com">http://foo.bar.com</a>
-// 2) http://foo.bar.com|foobar becomes <a href="http://foo.bar.com">foobar</a>
-// 3) http://foo.bar.com|foobar|. becomes <a href="http://foo.bar.com">foobar</a>.
+/*
 $message = get_field('description');
 $desc = wp_kses($message, array('br' => array(), 'em' => array(), 'strong' => array()));
 $desc2 = "";
@@ -101,6 +105,9 @@ while ($tok !== false) {
     $tok = strtok(" \n\t\r");
 }
 $data['description'] = $desc2;
+*/
+$data['description'] = convert_ride_desc_addr_to_link();
+
 $data['user_can_cancel'] = can_cancel_ride(get_the_ID());
 $data['current_url'] = get_permalink();
 
