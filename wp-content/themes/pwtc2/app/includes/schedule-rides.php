@@ -109,3 +109,51 @@ function get_actual_ride_maxlength($post_id=false) {
         return get_field('max_length', $post_id);
     }
 }
+
+// Fetch the ride's description, break it into tokens delemited by whitespace
+// and look for strings that start with "http://" or "https://". Convert those
+// strings to HTML links using the following translation rules:
+// 1) http://foo.bar.com becomes <a href="http://foo.bar.com">http://foo.bar.com</a>
+// 2) http://foo.bar.com|foobar becomes <a href="http://foo.bar.com">foobar</a>
+// 3) http://foo.bar.com|foobar|. becomes <a href="http://foo.bar.com">foobar</a>.
+function convert_ride_desc_addr_to_link($post_id=false) {
+    $message = get_field('description', $post_id);
+    $desc = wp_kses($message, array('br' => array(), 'em' => array(), 'strong' => array()));
+    $desc2 = "";
+    $tok = strtok($desc, " \n\t\r");
+    while ($tok !== false) {
+        if (0 === strpos($tok, 'http://') or 0 === strpos($tok, 'https://')) {
+            $idx = strpos($tok, '<');
+            if ($idx !== false) {
+	            $link = substr($tok, 0, $idx);
+	            $rem = substr($tok, $idx);
+	            $tok = $link;
+            }
+            else {
+	            $rem = "";
+            }
+            $strings = explode("|", $tok, 3);
+            $ref = $strings[0];
+            $label = $ref;
+            $end = "";
+            if (count($strings) > 1) {
+                if (strlen($strings[1]) > 0) {
+                    $label = str_replace("_", " ", $strings[1]);
+                }
+                if (count($strings) > 2) {
+                    if (strlen($strings[2]) > 0) {
+                        $end = $strings[2];
+                    }
+                }
+            }
+            $desc2 .= '<a href="' . $ref . '" target="_blank">' . $label . '</a>' . $end . $rem;
+        }
+        else {
+            $desc2 .= $tok;
+        }
+        $desc2 .= " ";
+        $tok = strtok(" \n\t\r");
+    }
+    return $desc2;
+}
+
