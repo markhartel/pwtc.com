@@ -110,6 +110,22 @@ function get_actual_ride_maxlength($post_id=false) {
     }
 }
 
+function get_actual_ride_maps($post_id=false) {
+    if (get_field('attach_map', $post_id)) {
+        $maps = [];
+        foreach (get_field('maps', $post_id) as $map) {
+            $map_id = $map;
+            $raw_map = get_field('maps', $map_id);
+            $raw_map[0]['title'] = $map->post_title;
+            $maps = array_merge($maps, $raw_map);
+        }
+        return $maps;
+    }
+    else {
+        return false;
+    }
+}
+
 // Fetch the ride's description, break it into tokens delemited by whitespace
 // and look for strings that start with "http://" or "https://". Convert those
 // strings to HTML links using the following translation rules:
