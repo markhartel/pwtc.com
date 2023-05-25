@@ -19,6 +19,7 @@ add_action('init', function() {
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-location-alt',
+        'exclude_from_search' => true,
     ]);
     register_post_type('ride_template', [
         'public' => true,
@@ -39,6 +40,7 @@ add_action('init', function() {
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-schedule',
+        'exclude_from_search' => true,
     ]);
     register_post_type('scheduled_rides', [
         'public' => true,
@@ -59,6 +61,7 @@ add_action('init', function() {
         'has_archive' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-calendar-alt',
+        'exclude_from_search' => true,
     ]);
     add_filter('wp_insert_post_data', function($data) {
         $types = array('ride_maps', 'ride_template', 'scheduled_rides');
