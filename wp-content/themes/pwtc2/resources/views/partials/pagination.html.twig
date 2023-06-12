@@ -1,6 +1,9 @@
 <nav aria-label="Pagination">
     {% spaceless %}
         <ul class="pagination text-center">
+            {% if posts.pagination.prev %}
+                <li class="pagination-previous"><a href="{{posts.pagination.prev.link}}">Previous</a></li>
+            {% endif %}
             {% for page in posts.pagination.pages %}
                 {% if page.link %}
                     <li><a href="{{page.link}}" aria-label="Page {{ page.title }}">{{page.title}}</a></li>
@@ -10,6 +13,9 @@
                     <li>{{ page.title }}</li>
                 {% endif %}
             {% endfor %}
+            {% if posts.pagination.next %}
+                <li class="pagination-next"><a href="{{posts.pagination.next.link}}">Next</a></li>
+            {% endif %}
         </ul>
     {% endspaceless %}
 </nav>
