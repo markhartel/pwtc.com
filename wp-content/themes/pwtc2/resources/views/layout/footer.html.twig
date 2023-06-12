@@ -17,7 +17,14 @@
                     </li>
                 {% endfor %}
             </ul>
-            <hr />
+		    <form method="get" action="{{ site.url }}">
+                <div class="input-group">
+		            <input class="input-group-field" type="search" name="s" value="" placeholder="Enter search text..." required />
+                    <div class="input-group-button">
+                        <button type="submit" class="clear button" style="border:0"><i class="fa fa-search" aria-hidden="true"></i></button>
+                    </div>
+		        </div> 
+	        </form>
             <ul class="no-bullet">
                 <li>
                     <i class="fa fa-building"></i>
