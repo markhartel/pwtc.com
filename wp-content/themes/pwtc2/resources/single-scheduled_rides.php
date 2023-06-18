@@ -119,6 +119,7 @@ if (function_exists('pwtc_mapdb_get_signup')) {
     $data['ride_signup_msg'] = $signup['ride_signup_msg'];
     $data['ride_signup_url'] = $signup['ride_signup_url'];
     $data['ride_signup_btn'] = $signup['ride_signup_btn'];
+    $data['allow_cancel'] = $signup['allow_cancel'];
 }
 else {
     $data['view_signup_url'] = false;
@@ -127,6 +128,7 @@ else {
     $data['ride_signup_msg'] = false;
     $data['ride_signup_url'] = false;
     $data['ride_signup_btn'] = false;
+    $data['allow_cancel'] = true;
 }
 
 // render
