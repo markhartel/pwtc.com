@@ -66,7 +66,9 @@
                 <div>
                     {% if is_published %}
                         {% include 'partials/ride-calendarlink.html.twig' with {date: post.get_field('date')} only %}
-                        <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
+                        {% if allow_cancel %}
+                            <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
+                        {% endif %}
                     {% endif %}
                     {% if user_can_cancel and is_published %}
                         {% if view_signup_url %}
