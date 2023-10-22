@@ -59,6 +59,24 @@ function can_cancel_ride($post_id) {
     return false;
 }
 
+function can_view_signups($post_id) {
+    $user = wp_get_current_user();
+    $user_info = get_userdata($user->ID);
+    if(user_can($user,'edit_published_rides')) {
+        return true;
+    } elseif (in_array('statistician', $user_info->roles)) {
+        return true;
+    } elseif (in_array('ride_leader', (array) $user->roles)) {
+        $leaders = get_field('ride_leaders', $post_id);
+        foreach($leaders as $leader) {
+            if($leader['ID'] == $user->ID) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 function get_actual_ride_terrain($post_id=false) {
     if (get_field('attach_map', $post_id)) {
         $terrain = [];
