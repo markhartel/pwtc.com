@@ -61,10 +61,9 @@ function can_cancel_ride($post_id) {
 
 function can_view_signups($post_id) {
     $user = wp_get_current_user();
-    $user_info = get_userdata($user->ID);
-    if(user_can($user,'edit_published_rides')) {
+    if (user_can($user,'edit_published_rides')) {
         return true;
-    } elseif (in_array('statistician', $user_info->roles)) {
+    } elseif (in_array('statistician', (array) $user->roles)) {
         return true;
     } elseif (in_array('ride_leader', (array) $user->roles)) {
         $leaders = get_field('ride_leaders', $post_id);
