@@ -70,10 +70,12 @@
                             <a href="{{ current_url }}?feed=ical-ride" class="dark button"><i class="fa fa-download"></i> Add to Calendar</a>
                         {% endif %}
                     {% endif %}
-                    {% if user_can_cancel and is_published %}
+                    {% if user_can_view_signups and is_published %}
                         {% if view_signup_url %}
                             <a href="{{ view_signup_url }}" class="dark button"><i class="fa fa-users"></i> View Sign-ups</a>
                         {% endif %}
+                    {% endif %}
+                    {% if user_can_cancel and is_published %}
                         {% if allow_cancel %}
                             {% if post.get_field('is_canceled') %}
                                 <a href="{{ current_url }}?canceled=0" class="success button"><i class="far fa-calendar-check"></i> Allow Ride</a>
