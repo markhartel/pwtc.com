@@ -11,6 +11,11 @@ add_action('init', function() {
 
 /* After login, redirect all users that are not administrators to the home page. */
 add_filter('login_redirect', function ($redirect_to, $request, $user) {
+    $home_page = trim(get_field('home_page', 'user_'.$user->ID));
+    if (!empty($home_page)) {
+	    //error_log( 'login_redirect: user home page set, redirect to ' . $home_page);
+        return $home_page;
+    }
     if ( isset( $user->roles ) && is_array( $user->roles ) ) {
         if ( in_array( 'administrator', $user->roles ) ) {
             //error_log( 'login_redirect: administrator, redirect to ' . $redirect_to);
