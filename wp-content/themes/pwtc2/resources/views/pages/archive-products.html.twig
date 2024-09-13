@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 {% block content %}
     <div class="grid-container">
-        <div class="grid-x grid-padding-x">
+        <div class="grid-x grid-padding-x grid-padding-y">
             <div class="cell">
                 <h1 class="font-prequel">{% if title %}{{ title }}{% else %}Shop{% endif %}</h1>
+                <a class="button" href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Show cart</a>
                 {% do action('woocommerce_before_main_content') %}
                 {% do action('woocommerce_after_main_content') %}
                 {% do action('woocommerce_before_shop_loop') %}
