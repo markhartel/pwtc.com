@@ -1,6 +1,7 @@
 <section class="rides">
     <div class="row column">
         <h2>Rides</h2>
+        <p class="help-text">(as of {{ today }})</p>
     </div>
     {% for ride in rides %}
         {% if loop.first or ride.get_field('date') | date("l, M j") != prev_date %}
