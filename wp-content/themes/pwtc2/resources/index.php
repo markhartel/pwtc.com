@@ -59,6 +59,7 @@ if(is_singular())
                     ];
                 }
                 $context['rides'] = $context['news'] = Timber::get_posts($rides_query);
+                $context['today'] = $today->format('Y-m-d H:i:s');
                 wp_reset_query();
             }
         }
