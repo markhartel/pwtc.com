@@ -29,6 +29,7 @@ class UpcomingRides extends \WP_Widget {
         }
 
         $today = new \DateTime(null, new \DateTimeZone(pwtc_get_timezone_string()));
+        echo "<div>As of " . $today->format('Y-m-d H:i:s') . "</div>";
         $rides_query = new \WP_Query([
             'posts_per_page'	=> 6,
             'post_type' => 'scheduled_rides',
