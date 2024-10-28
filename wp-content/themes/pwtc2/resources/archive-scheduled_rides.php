@@ -15,6 +15,9 @@ $context = $timber::get_context();
 // get timezone
 $timezone = new \DateTimeZone(pwtc_get_timezone_string());
 
+$today = new DateTime(null, $timezone);
+$context['today'] = $today->format('n/d/Y g:i A');
+
 $daily_view = false;
 if (isset($_GET['view']) && $_GET['view']) {
     if ($_GET['view'] == 'daily') {
