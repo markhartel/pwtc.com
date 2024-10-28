@@ -4,6 +4,7 @@
         <div class="row column">
 
             <h1 class="text-center">Rides -&nbsp;{{ day_pretty }}</h1>
+            <p class="help-text">(as of&nbsp; {{ today }})</p>
 
             <div class="clearfix">
                 <a href="{{ SP.WordPress.site_url(false, 'scheduled_rides') }}?view=daily&date={{ day_previous_val }}" class="button float-left">
