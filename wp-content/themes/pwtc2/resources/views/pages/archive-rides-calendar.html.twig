@@ -6,6 +6,7 @@
             {{ SP.ACF.get_field('ride_calandar_content', 'option') }}
 
             <h1 class="text-center">Rides -&nbsp;{{ month_current }}&nbsp;{{ year_current }}</h1>
+            <p class="help-text">(as of&nbsp; {{ today }})</p>
 
             {% block months %}
                 <div class="align-justify grid-x grid-padding-x">
