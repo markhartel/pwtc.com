@@ -11,6 +11,7 @@ $data['post'] = $timber::get_post();
 // cancel/reschedule ride?
 if(isset($_GET['canceled']) && can_cancel_ride(get_the_ID())) {
     update_field('is_canceled', (bool) $_GET['canceled']);
+    WordKeeper\System\Purge::purge_all();
 }
 
 $data['is_published'] = get_post_status() == 'publish';
