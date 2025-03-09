@@ -28,20 +28,22 @@ if(is_singular())
             }
             elseif(get_row_layout() == "rides")
             {
-                $today = new DateTime(null, new DateTimeZone(pwtc_get_timezone_string()));
-                $rides_query = new WP_Query([
-                    'posts_per_page' => 6,
-                    'post_type' => 'scheduled_rides',
-                    'meta_query' => [
-                        [
-                            'key' => 'date',
-                            'value' =>  $today->format('Y-m-d 00:00:00'),
-                            'compare' => '>=',
-                            'type'	=> 'DATETIME'
-                        ],
-                    ],
-                    'orderby' => ['date' => 'ASC'],
-                ]);
+    		    $today = new DateTime(null, new DateTimeZone(pwtc_get_timezone_string()));
+    		    $later = clone $today;
+   		        $later->add(new DateInterval('P2D'));
+    		    $rides_query = new WP_Query([
+        		    'posts_per_page' => -1,
+        		    'post_type' => 'scheduled_rides',
+        		    'meta_query' => [
+            			[
+                			'key' => 'date',
+                			'value' => [$today->format('Y-m-d 00:00:00'), $later->format('Y-m-d 23:59:59')],
+                			'compare' => 'BETWEEN',
+                			'type' => 'DATETIME'
+            			],
+        		    ],
+        		    'orderby' => ['date' => 'ASC'],
+    		    ]);
                 $rides_data = [];
                 while($rides_query->have_posts()){
                     $rides_query->the_post();
