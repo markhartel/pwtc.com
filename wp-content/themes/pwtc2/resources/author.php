@@ -9,6 +9,7 @@ $data = $timber::get_context();
 
 $curauth = (isset($_GET['author_name'])) ? get_user_by('slug', $author_name) : get_userdata(intval($author));
 
+$data['id'] = $curauth-ID;
 $data['nickname'] = $curauth->nickname;
 $data['first_name'] = $curauth->first_name;
 $data['last_name'] = $curauth->last_name;
