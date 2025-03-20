@@ -4,7 +4,8 @@
         <div class="background"></div>
         <div class="row" data-equalizer data-equalize-on="medium">
             <article class="small-12 medium-8 large-9 columns content ride" data-equalizer-watch>
-                <h1>{{ first_name }}&nbsp;{{ last_name }}</h1>
+                {{ fn('get_avatar', id, 256) }}          
+                <h5 class="name">{{ first_name }}&nbsp;{{ last_name }}</h5>
             </article>
         </div>
     </section>
