@@ -79,7 +79,7 @@ if(is_singular())
         }
         else
         {
-            $template = 'two-column.html.twig';
+            $template = 'one-column.html.twig';
             $context['comments'] = comments_open();
         }
     }
