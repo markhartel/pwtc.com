@@ -14,7 +14,9 @@
                             {% if post.comments %}
                                 <h3>Comments </h3>
                                 {% for cmt in post.comments %}
-                                    {% include "partials/comment.twig" with {comment:cmt} %}
+				                    {% if cmt.comment_approved %}
+                                    	{% include "partials/comment.twig" with {comment:cmt} %}
+				                    {% endif %}
                                 {% endfor %}
                             {% endif %}
                         </div>
