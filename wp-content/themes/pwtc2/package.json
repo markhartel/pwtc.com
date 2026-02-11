@@ -77,7 +77,7 @@
   },
   "dependencies": {
     "@fancyapps/fancybox": "^3.5.6",
-    "bootstrap": "v4.2.1",
+    "bootstrap": "v4.3.1",
     "foundation-sites": "^6.5.1",
     "jquery": "^3.5.0",
     "popper.js": "^1.14.6",
